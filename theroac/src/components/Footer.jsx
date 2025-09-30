@@ -1,0 +1,132 @@
+import React from 'react';
+
+const Footer = () => {
+  return (
+    <div className="footer10-sertion-area">
+			<div className="container">
+				<div className="row">
+					<div className="col-lg-3 col-md-6">
+						<div className="footer-logo-area">
+							<img src="assets/img/logo/logo5.png" alt="" />
+							<div className="space16"></div>
+							<p>We are committed to creating a platform where business leaders, innovators, and professionals can come together to exchange ideas</p>
+							<div className="space24"></div>
+							<ul>
+								<li>
+									<a href="#"><i className="fa-brands fa-facebook-f"></i></a>
+								</li>
+								<li>
+									<a href="#"><i className="fa-brands fa-instagram"></i></a>
+								</li>
+								<li>
+									<a href="#"><i className="fa-brands fa-linkedin-in"></i></a>
+								</li>
+								<li>
+									<a href="#" className="m-0"><i className="fa-brands fa-pinterest-p"></i></a>
+								</li>
+							</ul>
+						</div>
+					</div>
+					<div className="col-lg-2 col-md-6">
+						<div className="link-content">
+							<h3>Quick Links</h3>
+							<ul>
+								<li><a href="about.html">About Us</a></li>
+								<li><a href="blog.html">Our Blogs</a></li>
+								<li><a href="event.html">Event Listing</a></li>
+								<li><a href="pricing-plan.html">Pricing Plan</a></li>
+								<li><a href="contact.html">Contact Us</a></li>
+							</ul>
+						</div>
+					</div>
+
+					<div className="col-lg-3 col-md-6">
+						<div className="link-content2">
+							<h3>Contact Us</h3>
+							<ul>
+								<li>
+									<a href="tel:+11234567890"><img src="assets/img/icons/phn1.svg" alt="" />+1 123 456 7890</a>
+								</li>
+								<li>
+									<a href="#"><img src="assets/img/icons/location1.svg" alt="" />Secret Location In The UK</a>
+								</li>
+								<li>
+									<a href="mailto:eventifyevent@gmail.com"><img src="assets/img/icons/mail1.svg" alt="" />eventifyevent@gmail.com</a>
+								</li>
+								<li>
+									<a href="#"> <img src="assets/img/icons/world1.svg" alt="" />eventifyevent.com</a>
+								</li>
+							</ul>
+						</div>
+					</div>
+					<div className="col-lg-4 col-md-6">
+						<div className="footer-social-box" style={{ visibility: 'hidden'}}>
+							<h3>Our Recent Event Gallery</h3>
+							<div className="space12"></div>
+							<div className="row">
+								<div className="col-lg-4 col-md-4 col-4">
+									<div className="img1">
+										<img src="assets/img/all-images/footer/footer-img1.png" alt="" />
+										<div className="icons">
+											<a href="#"><i className="fa-brands fa-instagram"></i></a>
+										</div>
+									</div>
+								</div>
+								<div className="col-lg-4 col-md-4 col-4">
+									<div className="img1">
+										<img src="assets/img/all-images/footer/footer-img2.png" alt="" />
+										<div className="icons">
+											<a href="#"><i className="fa-brands fa-instagram"></i></a>
+										</div>
+									</div>
+								</div>
+								<div className="col-lg-4 col-md-4 col-4">
+									<div className="img1">
+										<img src="assets/img/all-images/footer/footer-img3.png" alt="" />
+										<div className="icons">
+											<a href="#"><i className="fa-brands fa-instagram"></i></a>
+										</div>
+									</div>
+								</div>
+								<div className="col-lg-4 col-md-4 col-4">
+									<div className="img1">
+										<img src="assets/img/all-images/footer/footer-img4.png" alt="" />
+										<div className="icons">
+											<a href="#"><i className="fa-brands fa-instagram"></i></a>
+										</div>
+									</div>
+								</div>
+								<div className="col-lg-4 col-md-4 col-4">
+									<div className="img1">
+										<img src="assets/img/all-images/footer/footer-img5.png" alt="" />
+										<div className="icons">
+											<a href="#"><i className="fa-brands fa-instagram"></i></a>
+										</div>
+									</div>
+								</div>
+								<div className="col-lg-4 col-md-4 col-4">
+									<div className="img1">
+										<img src="assets/img/all-images/footer/footer-img6.png" alt="" />
+										<div className="icons">
+											<a href="#"><i className="fa-brands fa-instagram"></i></a>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div className="space60"></div>
+				<div className="row">
+					<div className="col-lg-12">
+						<div className="copyright">
+							<p>&copy; Copyright 2024 -Eventify. All Right Reserved</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+  );
+}
+
+export default Footer;

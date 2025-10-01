@@ -7,7 +7,7 @@ const Speakers = () => {
 				<div className="row">
 					<div className="col-lg-6 m-auto">
 						<div className="heading13 text-center space-margin60">
-							<h5><img src="assets/img/icons/sub-logo1.svg" alt="" />our speaker</h5>
+							<h5><img src="assets/img/icons/sub-logo1.svg" alt="" width={26} />our speaker</h5>
 							<div className="space20"></div>
 							<h2>Meet Our 2025 Speakers</h2>
 						</div>

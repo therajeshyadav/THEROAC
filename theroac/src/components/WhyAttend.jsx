@@ -7,9 +7,9 @@ const WhyAttend = () => {
 				<div className="row">
 					<div className="col-lg-8 m-auto">
 						<div className="heading13 text-center space-margin60">
-							<h5><img src="assets/img/icons/sub-logo1.svg" alt="" />WHY ATTEND</h5>
+							<h5><img src="assets/img/icons/sub-logo1.svg" alt="" width={26} />WHY ATTEND</h5>
 							<div className="space20"></div>
-							<h2 className="text-anime-style-3">Why You Shouldn’t Miss This Event</h2>
+							<h2 className="text-anime-style-3">Why You Shouldn't Miss This Event</h2>
 						</div>
 					</div>
 				</div>

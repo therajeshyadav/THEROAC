@@ -96,55 +96,58 @@ if ($('.odometer').length > 0) {
 //========== TESTIMONIAL AREA ============= //
 
 // testimonial //
-$('.team-slider-area').owlCarousel({
-  loop:true,
-  margin:30,
-  nav:true,
-  dots:false,
-  items:10,
-  navText:["<i class='fa-solid fa-angle-left'></i>" , "<i class='fa-solid fa-angle-right'></i>"],
-  autoplay:true,
-  smartSpeed:2000,
-  autoplayTimeout:3000,
-  responsiveClass:true,
-  responsive:{
-      0:{
-          items:1,
-      },
-      600:{
-          items:2,
-      },
-      1000:{
-          items:3,
-      }
-  }
+$(document).ready(function(){
+  $('.team-slider-area').owlCarousel({
+    loop:true,
+    margin:30,
+    nav:true,
+    dots:false,
+    items:10,
+    navText:["<i class='fa-solid fa-angle-left'></i>" , "<i class='fa-solid fa-angle-right'></i>"],
+    autoplay:true,
+    smartSpeed:2000,
+    autoplayTimeout:3000,
+    responsiveClass:true,
+    responsive:{
+        0:{
+            items:1,
+        },
+        600:{
+            items:2,
+        },
+        1000:{
+            items:3,
+        }
+    }
+  });
 });
 
 // testimonial //
-$('.team-slider-area7').owlCarousel({
-  loop:true,
-  margin:30,
-  nav:true,
-  dots:false,
-  items:10,
-  navText:["<i class='fa-solid fa-angle-left'></i>" , "<i class='fa-solid fa-angle-right'></i>"],
-  autoplay:true,
-  smartSpeed:2000,
-  autoplayTimeout:3000,
-  responsiveClass:true,
-  responsive:{
-      0:{
-          items:1,
-      },
-      600:{
-          items:2,
-      },
-      1000:{
-          items:4,
-      }
-  }
+$(document).ready(function(){
+  $('.team-slider-area7').owlCarousel({
+    loop:true,
+    margin:30,
+    nav:true,
+    dots:false,
+    items:10,
+    navText:["<i class='fa-solid fa-angle-left'></i>" , "<i class='fa-solid fa-angle-right'></i>"],
+    autoplay:true,
+    smartSpeed:2000,
+    autoplayTimeout:3000,
+    responsiveClass:true,
+    responsive:{
+        0:{
+            items:1,
+        },
+        600:{
+            items:2,
+        },
+        1000:{
+            items:4,
+        }
+    }
+  });
 });
-
 // testimonial //
 $('.team-slider-area8').owlCarousel({
   loop:true,
@@ -273,57 +276,59 @@ $('.memory-slider-area').owlCarousel({
 });
 
 // testimonial //
-$('.brand-slider-area').owlCarousel({
-  loop:true,
-  margin:30,
-  nav:false,
-  dots:false,
-  items:10,
-  autoplay:true,
-  smartSpeed:2000,
-  autoplayTimeout:3000,
-  responsiveClass:true,
-  responsive:{
-      0:{
-          items:1,
-          center:false,
-      },
-      600:{
-          items:2,
-          center:false,
-      },
-      1000:{
-          items:4,
-      }
-  }
+$(document).ready(function(){
+  $('.brand-slider-area').owlCarousel({
+    loop:true,
+    margin:30,
+    nav:false,
+    dots:false,
+    items:10,
+    autoplay:true,
+    smartSpeed:2000,
+    autoplayTimeout:3000,
+    responsiveClass:true,
+    responsive:{
+        0:{
+            items:1,
+            center:false,
+        },
+        600:{
+            items:2,
+            center:false,
+        },
+        1000:{
+            items:4,
+        }
+    }
+  });
 });
-
 // testimonial //
-$('.brand-slider-area9').owlCarousel({
-  loop:true,
-  margin:30,
-  nav:false,
-  dots:false,
-  items:10,
-  autoplay:true,
-  smartSpeed:2000,
-  autoplayTimeout:3000,
-  responsiveClass:true,
-  responsive:{
-      0:{
-          items:1,
-          center:false,
-      },
-      600:{
-          items:2,
-          center:false,
-      },
-      1000:{
-          items:4,
-      }
-  }
+$(document).ready(function(){
+  $('.brand-slider-area9').owlCarousel({
+    loop:true,
+    margin:30,
+    nav:false,
+    dots:false,
+    items:10,
+    autoplay:true,
+    smartSpeed:2000,
+    autoplayTimeout:3000,
+    responsiveClass:true,
+    responsive:{
+        0:{
+            items:1,
+            center:false,
+        },
+        600:{
+            items:2,
+            center:false,
+        },
+        1000:{
+            items:4,
+        }
+    }
+  });
 });
-
 
 $('.memory-widget-slider').owlCarousel({
   loop:true,

@@ -7,7 +7,7 @@ const Schedule = () => {
 				<div className="row">
 					<div className="col-lg-8 m-auto">
 						<div className="event-heading heading13 text-center space-margin60">
-							<h5><img src="assets/img/icons/sub-logo1.svg" alt="" />Event Schedule</h5>
+							<h5><img src="assets/img/icons/sub-logo1.svg" alt="" width={26} />Event Schedule</h5>
 							<div className="space20"></div>
 							<h2 className="text-anime-style-3">Event Location & How to Get There</h2>
 						</div>

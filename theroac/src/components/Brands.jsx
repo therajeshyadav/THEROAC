@@ -52,7 +52,7 @@ const Brands = () => {
                     <div className="text">
                       <h5>Our Email</h5>
                       <div className="space14"></div>
-                      <a href="mailto:eventify@gmail.com">eventify@gmail.com</a>
+                      <a href="mailto:partnership@theroac.com">partnership@theroac.com</a>
                     </div>
                   </div>
                   <div className="space18"></div>
@@ -85,7 +85,7 @@ const Brands = () => {
                     <div className="text">
                       <h5>Call/Message</h5>
                       <div className="space14"></div>
-                      <a href="tel:+11234567890">+1 123 456 7890</a>
+                      <a href="tel:+917973977956">+91 7973977956</a>
                     </div>
                   </div>
                   <div className="space18"></div>

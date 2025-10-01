@@ -4042,21 +4042,20 @@ Location:
   filter: brightness(0);
 }
 .hero10-section-area .hero6-header .arrow-btn .circle {
-  position: absolute;
-  margin-bottom: 0;
+  position: relative;
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
   font-size: var(--ztc-font-size-font-s14);
   text-transform: uppercase;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
   color: var(--tg-color-white-default);
 }
+
 .hero10-section-area .hero6-header .arrow-btn .circle span {
   position: absolute;
-  top: -55px;
-  display: inline-block;
-  transform-origin: 0 55px;
   color: var(--ztc-text-text-1);
+  text-transform: uppercase;
+  white-space: pre;
 }
 @media (max-width: 767px) {
   .hero10-section-area .hero6-header .arrow-btn {

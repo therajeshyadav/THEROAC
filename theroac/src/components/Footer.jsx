@@ -45,17 +45,17 @@ const Footer = () => {
 							<h3>Contact Us</h3>
 							<ul>
 								<li>
-									<a href="tel:+11234567890"><img src="assets/img/icons/phn1.svg" alt="" />+1 123 456 7890</a>
+									<a href="tel:+917973977956"><img src="assets/img/icons/phn1.svg" alt="" />+91 7973977956</a>
 								</li>
 								<li>
-									<a href="#"><img src="assets/img/icons/location1.svg" alt="" />Secret Location In The UK</a>
+									<a href="#"><img src="assets/img/icons/location1.svg" alt="" />Chandigarh</a>
 								</li>
 								<li>
-									<a href="mailto:eventifyevent@gmail.com"><img src="assets/img/icons/mail1.svg" alt="" />eventifyevent@gmail.com</a>
+									<a href="mailto:partnership@theroac.com"><img src="assets/img/icons/mail1.svg" alt="" />partnership@theroac.com</a>
 								</li>
-								<li>
+								{/* <li>
 									<a href="#"> <img src="assets/img/icons/world1.svg" alt="" />eventifyevent.com</a>
-								</li>
+								</li> */}
 							</ul>
 						</div>
 					</div>
@@ -120,7 +120,7 @@ const Footer = () => {
 				<div className="row">
 					<div className="col-lg-12">
 						<div className="copyright">
-							<p>&copy; Copyright 2024 -Eventify. All Right Reserved</p>
+							<p>&copy; Copyright 2025 -Dev Innovations Labs. All Right Reserved</p>
 						</div>
 					</div>
 				</div>

@@ -89,28 +89,30 @@ const Home = () => {
           <ul className="mobile-nav-list nav-list1">
             <li>
               <a href="#">Home</a>
-              <ul className="sub-menu">
+              {/* <ul className="sub-menu">
                 <li><a href="/">Home One</a></li>
                 <li><a href="/index2">Home Two</a></li>
                 <li><a href="/index3">Home Three</a></li>
-                {/* ...continue mapping others */}
+              </ul> */}
+            </li>
+            <li><a href="/about">About</a></li>
+            <li>
+              <a href="/speakers">Events</a>
+              <ul className="sub-menu">
+                <li><a href="/UpcomingEvents">Upcoming Events</a></li>
+                <li><a href="/PastEvents">Past Events</a></li>
+                <li><a href="/Workshops&Training">Workshops & Training</a></li>
+                <li><a href="/Hackathons&Competitions">Hackathons & Competitions</a></li>
+                <li><a href="/Conferences&Meetups">Conferences & Meetups</a></li>
               </ul>
             </li>
-            <li><a href="/about">About Event</a></li>
             <li>
-              <a href="/speakers">Speakers</a>
-              <ul className="sub-menu">
-                <li><a href="/speakers">Speakers</a></li>
-                <li><a href="/speakers-single">Speakers Details</a></li>
-              </ul>
-            </li>
-            <li>
-              <a href="/schedule">Schedule</a>
-              <ul className="sub-menu">
+              <a href="/Jobs">Jobs</a>
+              {/* <ul className="sub-menu">
                 <li><a href="/event">Our Event</a></li>
                 <li><a href="/event-schedule">Event Schedule</a></li>
                 <li><a href="/event-single">Event Details</a></li>
-              </ul>
+              </ul> */}
             </li>
             <li>
               <a href="/blog">Blogs</a>
@@ -119,7 +121,7 @@ const Home = () => {
                 <li><a href="/blog-single">Blog Details</a></li>
               </ul>
             </li>
-            <li>
+            {/* <li>
               <a href="#">Pages</a>
               <ul className="sub-menu">
                 <li><a href="/memories">Our Memories</a></li>
@@ -127,7 +129,7 @@ const Home = () => {
                 <li><a href="/faq">FAQ’s</a></li>
                 <li><a href="/contact">Contact Us</a></li>
               </ul>
-            </li>
+            </li> */}
             <li><a href="/contact">Contact Us</a></li>
           </ul>
 
@@ -146,7 +148,7 @@ const Home = () => {
                     <span><i className="fa-solid fa-phone-volume"></i></span>
                   </div>
                   <div className="contact-info-text">
-                    <a href="tel:+39244596512">+3(924)4596512</a>
+                    <a href="tel:+917973977956">+91 7973977956</a>
                   </div>
                 </div>
                 <div className="contact-info-single">
@@ -154,7 +156,7 @@ const Home = () => {
                     <span><i className="fa-solid fa-envelope"></i></span>
                   </div>
                   <div className="contact-info-text">
-                    <a href="mailto:info@example.com">info@example.com</a>
+                    <a href="mailto:partnership@theroac.com">partnership@theroac.com</a>
                   </div>
                 </div>
                 <div className="single-footer">
@@ -164,8 +166,7 @@ const Home = () => {
                       <span><i className="fa-solid fa-location-dot"></i></span>
                     </div>
                     <div className="contact-info-text">
-                      55 East Birchwood Ave. Brooklyn,<br />
-                      New York 11201, United States
+                      <a href="#">Chandigarh</a>Chandigarh
                     </div>
                   </div>
                 </div>

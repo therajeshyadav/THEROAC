@@ -1,4 +1,29 @@
-import React from 'react';
+import React from "react";
+
+// const CircleText = ({ text, radius = 50 }) => {
+//   const chars = text.split("");
+//   const angleStep = 360 / chars.length;
+
+//   return (
+//     <h6 className="circle rotateme">
+//       {chars.map((char, i) => (
+//         <span
+//           key={i}
+//           style={{
+//             position: "absolute",
+//             left: "50%",
+//             top: "50%",
+//             transformOrigin: `0 ${radius}px`,
+//             // rotate into position, push outward, then counter-rotate so letters stay upright
+//             transform: `rotate(${i * angleStep}deg) translateY(-${radius}px) rotate(${-i * angleStep}deg)`,
+//           }}
+//         >
+//           {char}
+//         </span>
+//       ))}
+//     </h6>
+//   );
+// };
 
 const Hero = () => {
   return (
@@ -8,7 +33,7 @@ const Hero = () => {
         backgroundImage: "url('assets/img/bg/header-bg23.png')",
         backgroundRepeat: "no-repeat",
         backgroundSize: "cover",
-        backgroundPosition: "center top"
+        backgroundPosition: "center top",
       }}
     >
       <div className="container">
@@ -17,7 +42,12 @@ const Hero = () => {
           <div className="col-lg-7">
             <div className="hero6-header">
               <h5>
-                <img src="assets/img/icons/sub-logo1.svg" alt="" /> 12th Technology Forum Conference
+                <img
+                  src="assets/img/icons/sub-logo1.svg"
+                  alt=""
+                  width={26}
+                />{" "}
+                12th Technology Forum Conference
               </h5>
               <div className="space24"></div>
               <h1 className="text-anime-style-3">Technology</h1>
@@ -34,24 +64,35 @@ const Hero = () => {
               <ul>
                 <li>
                   <a href="#">
-                    <img src="assets/img/icons/calender1.svg" alt="" /> 15th, 16th, & 17th January “2025”
+                    <img
+                      src="assets/img/icons/calender1.svg"
+                      alt=""
+                    />{" "}
+                    15th, 16th, & 17th January “2025”
                   </a>
                 </li>
               </ul>
               <div className="space32"></div>
               <div className="btn-area1">
                 <a href="/contact" className="vl-btn10">
-                  Register now <img src="assets/img/icons/arrow2.svg" alt="" />
+                  Register now{" "}
+                  <img
+                    src="assets/img/icons/arrow2.svg"
+                    alt=""
+                  />
                 </a>
               </div>
-              <div className="arrow-btn">
+              {/* <div className="arrow-btn">
                 <div className="content">
-                  <h6 className="circle rotateme">Build Success Brand .</h6>
+                  <CircleText text="Build Success Brand ." />
                 </div>
                 <div className="arrow">
-                  <img src="assets/img/icons/arrow2.svg" alt="" />
+                  <img
+                    src="assets/img/icons/arrow2.svg"
+                    alt=""
+                  />
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
 
@@ -59,18 +100,34 @@ const Hero = () => {
           <div className="col-lg-5">
             <div className="hero10-images">
               <div className="img1">
-                <img src="assets/img/all-images/hero/hero-img12.png" alt="" />
+                <img
+                  src="assets/img/all-images/hero/hero-img12.png"
+                  alt=""
+                />
               </div>
               <div className="img2">
-                <img src="assets/img/all-images/hero/hero-img13.png" alt="" />
+                <img
+                  src="assets/img/all-images/hero/hero-img13.png"
+                  alt=""
+                />
               </div>
               <div className="img3">
-                <img src="assets/img/all-images/hero/hero-img14.png" alt="" />
+                <img
+                  src="assets/img/all-images/hero/hero-img14.png"
+                  alt=""
+                />
               </div>
               <div className="img4">
-                <img src="assets/img/all-images/hero/hero-img15.png" alt="" />
+                <img
+                  src="assets/img/all-images/hero/hero-img15.png"
+                  alt=""
+                />
               </div>
-              <img src="assets/img/elements/elements38.png" alt="" className="elements38 keyframe5" />
+              <img
+                src="assets/img/elements/elements38.png"
+                alt=""
+                className="elements38 keyframe5"
+              />
             </div>
           </div>
         </div>

@@ -26,7 +26,7 @@ const About = () => {
           <div className="col-lg-6">
             <div className="about-header heading13">
               <h5 data-aos="fade-left" data-aos-duration="800">
-                <img src="assets/img/icons/sub-logo1.svg" alt="" /> About Summit
+                <img src="assets/img/icons/sub-logo1.svg" alt="" width={26}/> About Summit
               </h5>
               <div className="space18"></div>
               <h2 className="text-anime-style-3">

@@ -50,14 +50,14 @@ const Header = () => {
                     </li>
                     <li>
                       <a href="#">
-                        Pages <i className="fa-solid fa-angle-down"></i>
+                        Contact Us
                       </a>
-                      <ul className="dropdown-padding">
+                      {/* <ul className="dropdown-padding">
                         <li><a href="/memories">Our Memories</a></li>
                         <li><a href="/pricing-plan">Pricing Plan</a></li>
                         <li><a href="/faq">FAQ’s</a></li>
                         <li><a href="/contact">Contact Us</a></li>
-                      </ul>
+                      </ul> */}
                     </li>
                   </ul>
                 </div>
@@ -71,7 +71,7 @@ const Header = () => {
                     <li><a href="#"><i className="fa-brands fa-facebook-f"></i></a></li>
                     <li><a href="#"><i className="fa-brands fa-instagram"></i></a></li>
                     <li><a href="#"><i className="fa-brands fa-linkedin-in"></i></a></li>
-                    <li><a href="#" className="m-0"><i className="fa-brands fa-pinterest-p"></i></a></li>
+                    {/* <li><a href="#" className="m-0"><i className="fa-brands fa-pinterest-p"></i></a></li> */}
                   </ul>
                 </div>
 

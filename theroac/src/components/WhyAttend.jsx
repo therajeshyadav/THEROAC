@@ -7,9 +7,9 @@ const WhyAttend = () => {
 				<div className="row">
 					<div className="col-lg-8 m-auto">
 						<div className="heading13 text-center space-margin60">
-							<h5><img src="assets/img/icons/sub-logo1.svg" alt="" width={26} />WHY ATTEND</h5>
+							{/* <h5><img src="assets/img/icons/sub-logo1.svg" alt="" width={26} />WHY ATTEND</h5> */}
 							<div className="space20"></div>
-							<h2 className="text-anime-style-3">Why You Shouldn't Miss This Event</h2>
+							<h2 className="text-anime-style-3">Why You Shouldn't Miss This Opportunity</h2>
 						</div>
 					</div>
 				</div>
@@ -25,7 +25,7 @@ const WhyAttend = () => {
 										<p>Hear from top industry experts and get exclusive insights into emerging technologies. Participate in workshops that offer real-world applications of today’s technology. Connect with peers, investors, and tech pioneers to expand your professional network.</p>
 										<div className="space32"></div>
 										<div className="btn-area1">
-											<a href="event.html" className="vl-btn10">See Eventify <img src="assets/img/icons/arrow2.svg" alt="" /></a>
+											<a href="event.html" className="vl-btn10">See Opportunity <img src="assets/img/icons/arrow2.svg" alt="" /></a>
 										</div>
 									</div>
 								</div>
@@ -39,7 +39,7 @@ const WhyAttend = () => {
 						</div>
 					</div>
 				</div>
-				<div className="space30"></div>
+				{/* <div className="space30"></div>
 				<div className="row">
 					<div className="col-lg-4 col-md-6">
 						<div className="schedule-boxarea">
@@ -76,7 +76,7 @@ const WhyAttend = () => {
 							</div>
 						</div>
 					</div>
-				</div>
+				</div> */}
 			</div>
 		</div>
   );

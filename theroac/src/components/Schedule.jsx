@@ -1,5 +1,7 @@
-import React from 'react';
-
+import React, { useEffect } from 'react';
+import EventSlider from './EventSlider';
+import Header from './Header';
+import { eventsData } from '../Data/Event.js';
 const Schedule = () => {
   return (
     <div className="event10-section-area sp3">
@@ -7,15 +9,17 @@ const Schedule = () => {
 				<div className="row">
 					<div className="col-lg-8 m-auto">
 						<div className="event-heading heading13 text-center space-margin60">
-							<h5><img src="assets/img/icons/sub-logo1.svg" alt="" width={26} />Event Schedule</h5>
+							{/* <h5><img src="assets/img/icons/sub-logo1.svg" alt="" width={26} />Events</h5> */}
 							<div className="space20"></div>
-							<h2 className="text-anime-style-3">Event Location & How to Get There</h2>
+							<h2 className="text-anime-style-3"><img src="assets/img/icons/sub-logo1.svg" alt="" width={30} /> Opportunities</h2>
 						</div>
 					</div>
 				</div>
 				<div className="row">
 					<div className="col-lg-12">
-						<div className="event6-widget-boxarea" data-aos="fade-left" data-aos-duration="1000">
+						<EventSlider eventsData={eventsData}/>
+						<div className="space30"></div>
+						{/* <div className="event6-widget-boxarea" data-aos="fade-left" data-aos-duration="1000">
 							<div className="row align-items-center">
 								<div className="col-lg-7">
 									<div className="img1 image-anime reveal">
@@ -101,7 +105,7 @@ const Schedule = () => {
 								</div>
 							</div>
 						</div>
-						<div className="space30"></div>
+						<div className="space30"></div> */}
 					</div>
 				</div>
 			</div>

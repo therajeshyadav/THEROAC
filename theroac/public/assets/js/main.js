@@ -28,9 +28,8 @@ $(".tx-search-close").on("click", function (e) {
   $("body").removeClass("active");
   $('.body-overlay').removeClass('active');
 });
-//========== SIDEBAR/SEARCH AREA ============= //
 
-//========== PAGE PROGRESS STARTS ============= // 
+
   var progressPath = document.querySelector(".progress-wrap path");
   var pathLength = progressPath.getTotalLength();
   progressPath.style.transition = progressPath.style.WebkitTransition =
@@ -630,40 +629,40 @@ $(window).on("load", function (event) {
 //========== TIMER ============= //
  // TIMER //
  
-function startCountdown(targetDate, daysId, hoursId, minutesId, secondsId) {
-  var countdownFunction = setInterval(function () {
-      var now = new Date().getTime();
-      var distance = targetDate - now;
+// function startCountdown(targetDate, daysId, hoursId, minutesId, secondsId) {
+//   var countdownFunction = setInterval(function () {
+//       var now = new Date().getTime();
+//       var distance = targetDate - now;
 
-      var days = Math.floor(distance / (1000 * 60 * 60 * 24));
-      var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-      var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+//       var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+//       var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+//       var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+//       var seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-      document.getElementById(daysId).innerHTML = days + " <span>DAYS</span>";
-      document.getElementById(hoursId).innerHTML = hours + " <span>Hours</span>";
-      document.getElementById(minutesId).innerHTML = minutes + " <span>Minutes</span>";
-      document.getElementById(secondsId).innerHTML = seconds + " <span>Seconds</span>";
+//       document.getElementById(daysId).innerHTML = days + " <span>DAYS</span>";
+//       document.getElementById(hoursId).innerHTML = hours + " <span>Hours</span>";
+//       document.getElementById(minutesId).innerHTML = minutes + " <span>Minutes</span>";
+//       document.getElementById(secondsId).innerHTML = seconds + " <span>Seconds</span>";
 
-      if (distance < 0) {
-          clearInterval(countdownFunction);
-          document.getElementById(daysId).innerHTML = "00";
-          document.getElementById(hoursId).innerHTML = "00";
-          document.getElementById(minutesId).innerHTML = "00";
-          document.getElementById(secondsId).innerHTML = "00";
-          alert("Countdown Ended");
-      }
-  }, 1000);
-}
+//       if (distance < 0) {
+//           clearInterval(countdownFunction);
+//           document.getElementById(daysId).innerHTML = "00";
+//           document.getElementById(hoursId).innerHTML = "00";
+//           document.getElementById(minutesId).innerHTML = "00";
+//           document.getElementById(secondsId).innerHTML = "00";
+//           alert("Countdown Ended");
+//       }
+//   }, 1000);
+// }
 
-var targetDate = new Date();
-targetDate.setDate(targetDate.getDate() + 119);
-targetDate.setHours(targetDate.getHours() + 22);
-targetDate.setMinutes(targetDate.getMinutes() + 18);
-targetDate.setSeconds(targetDate.getSeconds() + 44);
+// var targetDate = new Date();
+// targetDate.setDate(targetDate.getDate() + 119);
+// targetDate.setHours(targetDate.getHours() + 22);
+// targetDate.setMinutes(targetDate.getMinutes() + 18);
+// targetDate.setSeconds(targetDate.getSeconds() + 44);
 
-startCountdown(targetDate, "days", "hours", "minutes", "seconds");
-startCountdown(targetDate, "days1", "hours1", "minutes1", "seconds1");
+// startCountdown(targetDate, "days", "hours", "minutes", "seconds");
+// startCountdown(targetDate, "days1", "hours1", "minutes1", "seconds1");
 
 
 //========== GSAP AREA ============= //

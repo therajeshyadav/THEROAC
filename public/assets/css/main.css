@@ -1,13 +1,3 @@
-/*
-============================
-Name: Eventify- Event And Conference Templete
-Version: 2.0.0
-Description: Eventify- Event And Conference Templete
-Author: alithemes
-Author URI: https://themeforest.net/user/alithemes/portfolio
-Location:
-============================
-*/
 @import url("https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&family=Space+Grotesk:wght@300..700&display=swap");
 a, a:hover {
   text-decoration: none;
@@ -608,35 +598,6 @@ img {
   --ztc-family-font2: 'Figtree', sans-serif;
 }
 
-/*
-============================
-Name: Eventify- Event And Conference Templete
-Version: 2.0.0
-Description: Eventify- Event And Conference Templete
-Author: alithemes
-Author URI: https://themeforest.net/user/alithemes/portfolio
-Location:
-============================
-*/
-/*============= HEDAER CSS AREA ===============*/
-/*============= HERO CSS AREA ===============*/
-/*============= MOBILE-MENU CSS AREA ===============*/
-/*============= ABOUT CSS AREA ===============*/
-/*============= SERVICE CSS AREA ===============*/
-/*============= ATTENT CSS AREA ===============*/
-/*============= TESTIMONIAL CSS AREA ===============*/
-/*============= BLOG CSS AREA ===============*/
-/*============= MEMORY CSS AREA ===============*/
-/*============= CONTACT CSS AREA ===============*/
-/*============= EVENT CSS AREA ===============*/
-/*============= TEAM CSS AREA ===============*/
-/*============= FAQ CSS AREA ===============*/
-/*============= CASE CSS AREA ===============*/
-/*============= PRICING CSS AREA ===============*/
-/*============= CTA CSS AREA ===============*/
-/*============= OTHERS CSS AREA ===============*/
-/*============= FOOTER CSS AREA ===============*/
-/*============= COMMON CSS AREA ===============*/
 .heading1 h5 {
   color: var(--ztc-text-text-1);
   font-family: var(--ztc-family-font1);
@@ -17408,6 +17369,9 @@ Location:
   line-height: 18px;
   text-transform: uppercase;
 }
+.contact10-bg-section .contact-boxarea .text .emailAddress {
+  font-size: 15px;
+}
 .contact10-bg-section .contact-boxarea .text a {
   color: var(--ztc-text-text-1);
   text-align: center;
@@ -17418,6 +17382,7 @@ Location:
   line-height: 18px;
   display: inline-block;
 }
+
 
 /*============= CONTACT CSS AREA ENDS===============*/
 /*============= CTA CSS AREA ===============*/
@@ -17433,6 +17398,9 @@ Location:
   padding: 44px;
 }
 @media (max-width: 767px) {
+  .contact10-bg-section .contact-boxarea .text .emailAddress {
+    font-size: 17px;
+  }
   .cta1-section-area .cta1-main-boxarea {
     padding: 20px;
     text-align: center;

@@ -1,0 +1,199 @@
+.prime-carousel-container {
+  position: relative;
+  width: 100%;
+  padding: 30px 0px;
+}
+
+.prime-carousel {
+  display: flex;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  gap: 20px;
+}
+.prime-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.prime-card {
+  flex: 0 0 320px;
+  background: #141414;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+}
+.prime-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(255, 255, 255, 0.1);
+  z-index: 10;
+}
+
+.prime-img-wrapper {
+  height: 180px;
+  overflow: hidden;
+}
+.prime-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.prime-card-content {
+  padding: 16px;
+  color: #fff;
+}
+.prime-card-content h3 {
+  font-size: 1rem;
+  line-height: 1.4;
+  margin-bottom: 10px;
+}
+.prime-card-content p {
+  font-size: 0.9rem;
+  margin: 6px 0;
+  color: #aaa;
+}
+.prime-card-content .icon {
+  width: 16px;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+.buy-btn {
+  color: #00a8e1;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 0.9rem;
+  margin-top: 8px;
+  display: inline-block;
+  transition: color 0.3s;
+}
+.buy-btn:hover {
+  color: #00cfff;
+}
+
+/* Navigation Buttons */
+.Event-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.6);
+  border: none;
+  border-radius: 30px;
+  font-size: 2rem;
+  cursor: pointer;
+  width: 50px;
+  height: 50px;
+  transition: background 0.3s;
+}
+.Event-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+.Event-btn.left {
+  left: -60px;
+}
+.Event-btn.right {
+  right: -60px;
+}
+
+/* ===================================================== */
+/* 🧠 RESPONSIVE DESIGN */
+/* ===================================================== */
+
+/* Tablets (landscape & portrait) */
+@media (max-width: 1024px) {
+  .prime-carousel-container {
+    padding: 30px;
+  }
+  .prime-card {
+    flex: 0 0 280px;
+  }
+
+  .prime-img-wrapper {
+    height: 160px;
+  }
+
+  .prime-card-content h3 {
+    font-size: 0.95rem;
+  }
+
+  .Event-btn.left {
+    left: -32px;
+  }
+  .Event-btn.right {
+    right: -32px;
+  }
+}
+
+/* Mobile Large (portrait mode phones) */
+@media (max-width: 768px) {
+  .prime-carousel-container {
+    padding: 10px 30px;
+  }
+
+  .prime-card {
+    flex: 0 0 240px;
+  }
+
+  .prime-img-wrapper {
+    height: 140px;
+  }
+
+  .prime-card-content {
+    padding: 12px;
+  }
+
+  .prime-card-content h3 {
+    font-size: 0.9rem;
+  }
+
+  .prime-card-content p {
+    font-size: 0.8rem;
+  }
+
+  .Event-btn {
+    width: 30px;
+    height: 30px;
+    font-size: 1.5rem;
+  }
+  .Event-btn.left {
+    left: -20px;
+  }
+  .Event-btn.right {
+    right: -20px;
+  }
+}
+
+/* Mobile Small (under 480px) */
+@media (max-width: 480px) {
+  .prime-carousel-container {
+    padding: 10px 20px;
+  }
+  .prime-carousel {
+    gap: 12px;
+  }
+
+  .prime-card {
+    flex: 0 0 76%;
+    margin: 0px 10px;
+  }
+
+  .prime-img-wrapper {
+    height: 130px;
+  }
+
+  .prime-card-content {
+    padding: 10px;
+  }
+
+  .prime-card-content h3 {
+    font-size: 0.85rem;
+  }
+
+  .prime-card-content p {
+    font-size: 0.75rem;
+  }
+  .Event-btn {
+    display: none;
+  }
+}

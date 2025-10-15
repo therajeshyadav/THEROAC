@@ -1,8 +1,8 @@
 import React from 'react';
 import Header from '../components/Header';
 import Brands from '../components/Brands';
-import Hero from '../components/Hero';
-import About from '../components/About';
+import HeroSlider from '../components/HeroSlider';
+import AboutSlider from '../components/About';
 import WhyAttend from '../components/WhyAttend';
 import Schedule from '../components/Schedule';
 import Countdown from '../components/Countdown';
@@ -11,7 +11,6 @@ import ContactSection from '../components/ContactSection';
 const Home = () => {
   return (
     <>
-      {/* ===== Popup Section ===== */}
       <div id="popup" className="popup-overlay d-none">
         <div className="popup-content">
           <span className="close-btn" id="close-popup">&times;</span>
@@ -46,8 +45,6 @@ const Home = () => {
           </div>
         </div>
       </div>
-
-      {/* ===== Page Progress ===== */}
       <div className="paginacontainer">
         <div className="progress-wrap warp2">
           <svg className="progress-circle svg-content" width="100%" height="100%" viewBox="-1 -1 102 102">
@@ -55,11 +52,7 @@ const Home = () => {
           </svg>
         </div>
       </div>
-
-      {/* ===== Header ===== */}
       <Header />
-
-      {/* ===== Mobile Header ===== */}
       <div className="mobile-header mobile-haeder10 d-block d-lg-none">
         <div className="container-fluid">
           <div className="col-12">
@@ -135,12 +128,12 @@ const Home = () => {
 
           {/* ===== Contact Info in Sidebar ===== */}
           <div className="allmobilesection">
-            <a className="vl-btn10" href="/contact">
+            <a className="vl-btn10" href="/login">
               <span className="demo">
-                Contact Us <img src="assets/img/icons/arrow2.svg" alt="" />
+                Login <img src="assets/img/icons/arrow2.svg" alt="" />
               </span>
             </a>
-            <div className="single-footer">
+            {/* <div className="single-footer">
               <h3>Contact Info</h3>
               <div className="footer1-contact-info">
                 <div className="contact-info-single">
@@ -182,16 +175,23 @@ const Home = () => {
                   </div>
                 </div>
               </div>
-            </div>
+            </div> */}
+          </div>
+          <div className="allmobilesection">
+            <a className="vl-btn10" href="/login">
+              <span className="demo">
+                Signup as Recruiter <img src="assets/img/icons/arrow2.svg" alt="" />
+              </span>
+            </a>
           </div>
         </div>
       </div>
-      <Hero />
-      <About />
+      <HeroSlider />
+      <AboutSlider />
       <WhyAttend />
       <Schedule />
-      <Countdown />
-      <ContactSection />
+      {/* <Countdown /> */}
+      {/* <ContactSection /> */}
       <Brands />
     </>
   );

@@ -1,26 +1,25 @@
-import React from 'react';
+import React from "react";
 
 const Header = () => {
   return (
     <header>
       <div className="header-area homepage10 header header-sticky d-none d-lg-block" id="header">
         <div className="container">
-          <div className="row">
+          <div className="row align-items-center">
             <div className="col-lg-12">
-              <div className="header-elements">
+              <div className="header-elements d-flex justify-content-between align-items-center">
+                
                 {/* Logo */}
                 <div className="site-logo">
-                  <a href="/"><img src="assets/img/logo/logo5.png" alt="Logo" /></a>
+                  <a href="/">
+                    <img src="assets/img/logo/logo5.png" alt="Logo" />
+                  </a>
                 </div>
 
                 {/* Main Menu */}
                 <div className="main-menu">
-                  <ul>
-                    <li>
-                      <a href="/">
-                        Home
-                      </a>
-                    </li>
+                  <ul className="d-flex align-items-center m-0 p-0" style={{ listStyle: "none" }}>
+                    <li><a href="/">Home</a></li>
                     <li><a href="/about">About</a></li>
                     <li>
                       <a href="#">
@@ -34,11 +33,7 @@ const Header = () => {
                         <li><a href="/Conferences&Meetups">Conferences & Meetups</a></li>
                       </ul>
                     </li>
-                    <li>
-                      <a href="#">
-                        Jobs
-                      </a>
-                    </li>
+                    <li><a href="#">Jobs</a></li>
                     <li>
                       <a href="#">
                         Blogs <i className="fa-solid fa-angle-down"></i>
@@ -48,55 +43,65 @@ const Header = () => {
                         <li><a href="/blog-single">Blog Details</a></li>
                       </ul>
                     </li>
-                    <li>
-                      <a href="#">
-                        Contact Us
-                      </a>
-                      {/* <ul className="dropdown-padding">
-                        <li><a href="/memories">Our Memories</a></li>
-                        <li><a href="/pricing-plan">Pricing Plan</a></li>
-                        <li><a href="/faq">FAQ’s</a></li>
-                        <li><a href="/contact">Contact Us</a></li>
-                      </ul> */}
-                    </li>
+                    <li><a href="#">Contact Us</a></li>
                   </ul>
                 </div>
 
-                {/* Right Icons */}
-                <div className="btn-area">
-                  <div className="search-icon header__search header-search-btn">
-                    <a href="#"><img src="assets/img/icons/search1.svg" alt="Search" /></a>
+                {/* Right Login Buttons */}
+                <div className="d-flex justify-content-end align-items-center">
+                  <div className="btn-area1">
+                    <a
+                      href="/login"
+                      style={{
+                        color: "var(--ztc-text-text-2)",
+                        fontFamily: "var(--ztc-family-font1)",
+                        fontSize: "var(--ztc-font-size-font-s16)",
+                        fontStyle: "normal",
+                        fontWeight: "var(--ztc-weight-bold)",
+                        lineHeight: "20px",
+                        textTransform: "uppercase",
+                        transition: "all 0.4s",
+                        position: "relative",
+                        zIndex: 1,
+                        display: "inline-block",
+                        borderRadius: "60px",
+                        padding: "10px 15px",
+                        background: "var(--ztc-bg-bg-14)",
+                        overflow: "hidden",
+                      }}
+                    >
+                      Login
+                    </a>
                   </div>
-                  <ul>
-                    <li><a href="#"><i className="fa-brands fa-facebook-f"></i></a></li>
-                    <li><a href="#"><i className="fa-brands fa-instagram"></i></a></li>
-                    <li><a href="#"><i className="fa-brands fa-linkedin-in"></i></a></li>
-                    {/* <li><a href="#" className="m-0"><i className="fa-brands fa-pinterest-p"></i></a></li> */}
-                  </ul>
-                </div>
 
-                {/* Search Form */}
-                <div className="header-search-form-wrapper">
-                  <div className="tx-search-close tx-close">
-                    <i className="fa-solid fa-xmark"></i>
-                  </div>
-                  <div className="header-search-container">
-                    <form role="search" className="search-form">
-                      <input
-                        type="search"
-                        className="search-field"
-                        placeholder="Search …"
-                        defaultValue=""
-                        name="s"
-                      />
-                      <button type="submit" className="search-submit">
-                        <img src="assets/img/icons/search1.svg" alt="search" />
-                      </button>
-                    </form>
+                  <div className="ms-3 d-none d-xl-block">
+                    <a
+                      href="/register"
+                      style={{
+                        color: "var(--ztc-text-text-2)",
+                        fontFamily: "var(--ztc-family-font1)",
+                        fontSize: "var(--ztc-font-size-font-s16)",
+                        fontStyle: "normal",
+                        fontWeight: "var(--ztc-weight-bold)",
+                        lineHeight: "20px",
+                        textTransform: "uppercase",
+                        transition: "all 0.4s",
+                        position: "relative",
+                        zIndex: 1,
+                        display: "inline-block",
+                        borderRadius: "60px",
+                        padding: "10px 15px",
+                        background: "var(--ztc-bg-bg-14)",
+                        overflow: "hidden",
+                      }}
+                    >
+                      Join as Recruiter
+                    </a>
                   </div>
                 </div>
-                <div className="body-overlay"></div>
               </div>
+
+              <div className="body-overlay"></div>
             </div>
           </div>
         </div>

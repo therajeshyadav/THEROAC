@@ -1,5 +1,4 @@
 import React from 'react';
-import Header from '../components/Header';
 import Brands from '../components/Brands';
 import HeroSlider from '../components/HeroSlider';
 import AboutSlider from '../components/About';
@@ -52,7 +51,6 @@ const Home = () => {
           </svg>
         </div>
       </div>
-      <Header />
       <div className="mobile-header mobile-haeder10 d-block d-lg-none">
         <div className="container-fluid">
           <div className="col-12">

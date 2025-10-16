@@ -1,0 +1,90 @@
+import React from 'react';
+
+const Jobs = () => {
+  return (
+    <div className="jobs-page">
+      <div className="container">
+        <div className="row">
+          <div className="col-12">
+            <div className="page-header text-center py-5">
+              <h1>Job Opportunities</h1>
+              <p>Find your dream career with top companies</p>
+            </div>
+          </div>
+        </div>
+        
+        <div className="row">
+          <div className="col-12">
+            <div className="jobs-content">
+              <div className="job-filters mb-4">
+                <h3>Filter Jobs</h3>
+                <div className="row">
+                  <div className="col-md-3">
+                    <select className="form-control">
+                      <option>All Categories</option>
+                      <option>Software Development</option>
+                      <option>Data Science</option>
+                      <option>Design</option>
+                      <option>Marketing</option>
+                    </select>
+                  </div>
+                  <div className="col-md-3">
+                    <select className="form-control">
+                      <option>All Locations</option>
+                      <option>Remote</option>
+                      <option>Delhi</option>
+                      <option>Mumbai</option>
+                      <option>Bangalore</option>
+                    </select>
+                  </div>
+                  <div className="col-md-3">
+                    <select className="form-control">
+                      <option>Experience Level</option>
+                      <option>Entry Level</option>
+                      <option>Mid Level</option>
+                      <option>Senior Level</option>
+                    </select>
+                  </div>
+                  <div className="col-md-3">
+                    <button className="btn btn-primary w-100">Search Jobs</button>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="jobs-list">
+                <div className="job-card mb-3 p-4 border rounded">
+                  <h4>Frontend Developer</h4>
+                  <p><strong>Company:</strong> Tech Solutions Inc.</p>
+                  <p><strong>Location:</strong> Remote</p>
+                  <p><strong>Experience:</strong> 2-4 years</p>
+                  <p>We are looking for a skilled Frontend Developer to join our team...</p>
+                  <button className="btn btn-primary">Apply Now</button>
+                </div>
+                
+                <div className="job-card mb-3 p-4 border rounded">
+                  <h4>Data Scientist</h4>
+                  <p><strong>Company:</strong> Analytics Pro</p>
+                  <p><strong>Location:</strong> Bangalore</p>
+                  <p><strong>Experience:</strong> 3-5 years</p>
+                  <p>Join our data science team to work on cutting-edge ML projects...</p>
+                  <button className="btn btn-primary">Apply Now</button>
+                </div>
+                
+                <div className="job-card mb-3 p-4 border rounded">
+                  <h4>UI/UX Designer</h4>
+                  <p><strong>Company:</strong> Creative Studios</p>
+                  <p><strong>Location:</strong> Mumbai</p>
+                  <p><strong>Experience:</strong> 1-3 years</p>
+                  <p>Design beautiful and intuitive user experiences for our products...</p>
+                  <button className="btn btn-primary">Apply Now</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Jobs;

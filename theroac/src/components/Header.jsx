@@ -1,4 +1,3 @@
-import React from "react";
 
 const Header = () => {
   return (
@@ -8,7 +7,7 @@ const Header = () => {
           <div className="row align-items-center">
             <div className="col-lg-12">
               <div className="header-elements d-flex justify-content-between align-items-center">
-                
+
                 {/* Logo */}
                 <div className="site-logo">
                   <a href="/">
@@ -20,8 +19,8 @@ const Header = () => {
                 <div className="main-menu">
                   <ul className="d-flex align-items-center m-0 p-0" style={{ listStyle: "none" }}>
                     <li><a href="/">Home</a></li>
-                    <li><a href="/about">About</a></li>
                     <li>
+                      {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
                       <a href="#">
                         Events <i className="fa-solid fa-angle-down"></i>
                       </a>
@@ -33,8 +32,10 @@ const Header = () => {
                         <li><a href="/Conferences&Meetups">Conferences & Meetups</a></li>
                       </ul>
                     </li>
+                    {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
                     <li><a href="#">Jobs</a></li>
                     <li>
+                      {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
                       <a href="#">
                         Blogs <i className="fa-solid fa-angle-down"></i>
                       </a>
@@ -43,6 +44,7 @@ const Header = () => {
                         <li><a href="/blog-single">Blog Details</a></li>
                       </ul>
                     </li>
+                    {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
                     <li><a href="#">Contact Us</a></li>
                   </ul>
                 </div>
@@ -76,7 +78,7 @@ const Header = () => {
 
                   <div className="ms-3 d-none d-xl-block">
                     <a
-                      href="/register"
+                      href="/signup?type=recruiter"
                       style={{
                         color: "var(--ztc-text-text-2)",
                         fontFamily: "var(--ztc-family-font1)",

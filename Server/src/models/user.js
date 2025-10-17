@@ -1,6 +1,6 @@
 const { DataTypes, Model } = require('sequelize');
 const sequelize = require('../config/database');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 class User extends Model {
   async checkPassword(password) {
@@ -25,7 +25,7 @@ User.init({
   city: { type: DataTypes.STRING, allowNull: true },
   state: { type: DataTypes.STRING, allowNull: true },
   country: { type: DataTypes.STRING, allowNull: true },
-  role: { type: DataTypes.ENUM('user','organizer','moderator','admin','superadmin'), defaultValue: 'user' },
+  role: { type: DataTypes.ENUM('user','candidate','recruiter','organizer','moderator','admin','superadmin'), defaultValue: 'candidate' },
   status: { type: DataTypes.ENUM('active','inactive','banned','suspended'), defaultValue: 'active' },
   isVerified: { type: DataTypes.BOOLEAN, defaultValue: false },
   emailVerificationToken: { type: DataTypes.STRING, allowNull: true },

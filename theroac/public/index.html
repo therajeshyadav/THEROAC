@@ -119,9 +119,9 @@
         //   });
         // }
 
-        // Nice select init
+        // Nice select init (exclude form selects)
         if ($.fn.niceSelect) {
-          $('select').niceSelect();
+          $('select:not(.no-nice-select)').niceSelect();
         }
 
         // Magnific popup example for links with .popup-link
@@ -140,6 +140,6 @@
       });
     })(jQuery);
   </script>
-  <script src="assets/js/main.js"></script>
+  <!-- <script src="assets/js/main.js"></script> -->
 </body>
 </html>

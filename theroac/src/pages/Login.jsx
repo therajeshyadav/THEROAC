@@ -1,13 +1,18 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import './Auth.css';
 
 const Login = () => {
+  const navigate = useNavigate();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     rememberMe: false
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -17,10 +22,32 @@ const Login = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Login data:', formData);
-    // Add login logic here
+    setLoading(true);
+    setError('');
+    
+    try {
+      const result = await login({
+        email: formData.email,
+        password: formData.password
+      });
+      
+      if (result.success) {
+        // Redirect based on user role
+        if (result.user.role === 'recruiter') {
+          navigate('/recruiter-dashboard');
+        } else {
+          navigate('/candidate-dashboard');
+        }
+      } else {
+        setError(result.error || 'Login failed');
+      }
+    } catch (err) {
+      setError('Login failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -35,6 +62,13 @@ const Login = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="auth-form">
+            {error && (
+              <div className="error-message">
+                <i className="fas fa-exclamation-circle"></i>
+                {error}
+              </div>
+            )}
+            
             <div className="form-group">
               <input
                 type="email"
@@ -43,6 +77,7 @@ const Login = () => {
                 value={formData.email}
                 onChange={handleChange}
                 required
+                disabled={loading}
               />
               <i className="fa-solid fa-envelope input-icon"></i>
             </div>
@@ -54,7 +89,9 @@ const Login = () => {
                 placeholder="Password"
                 value={formData.password}
                 onChange={handleChange}
+                autoComplete="current-password"
                 required
+                disabled={loading}
               />
               <i className="fa-solid fa-lock input-icon"></i>
             </div>
@@ -75,8 +112,15 @@ const Login = () => {
               </Link>
             </div>
 
-            <button type="submit" className="auth-btn">
-              Login
+            <button type="submit" className="auth-btn" disabled={loading}>
+              {loading ? (
+                <>
+                  <i className="fas fa-spinner fa-spin"></i>
+                  Logging in...
+                </>
+              ) : (
+                'Login'
+              )}
             </button>
           </form>
 

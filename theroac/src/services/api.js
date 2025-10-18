@@ -1,109 +1,157 @@
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000/api';
 
-class ApiService {
-  constructor() {
-    this.baseURL = API_BASE_URL;
-  }
-
-  async request(endpoint, options = {}) {
-    const url = `${this.baseURL}${endpoint}`;
+// Base request function
+const request = async (endpoint, options = {}) => {
+    const url = `${API_BASE_URL}${endpoint}`;
     const token = localStorage.getItem('token');
-    
+
     const config = {
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token && { Authorization: `Bearer ${token}` }),
-        ...options.headers,
-      },
-      ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...(token && { Authorization: `Bearer ${token}` }),
+            ...options.headers,
+        },
+        ...options,
     };
 
     try {
-      const response = await fetch(url, config);
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.message || 'API request failed');
-      }
-      
-      return data;
+        const response = await fetch(url, config);
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || 'API request failed');
+        }
+
+        return data;
     } catch (error) {
-      console.error('API Error:', error);
-      throw error;
+        console.error('API Error:', error);
+        throw error;
     }
-  }
+};
 
-  // Auth endpoints
-  async login(credentials) {
-    return this.request('/auth/login', {
-      method: 'POST',
-      body: JSON.stringify(credentials),
+// Auth endpoints
+const login = async (credentials) => {
+    return request('/auth/login', {
+        method: 'POST',
+        body: JSON.stringify(credentials),
     });
-  }
+};
 
-  async register(userData) {
-    return this.request('/auth/register', {
-      method: 'POST',
-      body: JSON.stringify(userData),
+const register = async (userData) => {
+    return request('/auth/register', {
+        method: 'POST',
+        body: JSON.stringify(userData),
     });
-  }
+};
 
-  async getCurrentUser() {
-    return this.request('/auth/me');
-  }
+const getCurrentUser = async () => {
+    return request('/auth/me');
+};
 
-  // Jobs endpoints
-  async getJobs(filters = {}) {
+// Jobs endpoints
+const getJobs = async (filters = {}) => {
     const queryParams = new URLSearchParams(filters).toString();
-    return this.request(`/jobs${queryParams ? `?${queryParams}` : ''}`);
-  }
+    return request(`/jobs${queryParams ? `?${queryParams}` : ''}`);
+};
 
-  async getJobById(id) {
-    return this.request(`/jobs/${id}`);
-  }
+const getJobById = async (id) => {
+    return request(`/jobs/${id}`);
+};
 
-  async applyToJob(jobId, applicationData) {
-    return this.request(`/jobs/${jobId}/apply`, {
-      method: 'POST',
-      body: JSON.stringify(applicationData),
+const applyToJob = async (jobId, applicationData) => {
+    return request(`/jobs/${jobId}/apply`, {
+        method: 'POST',
+        body: JSON.stringify(applicationData),
     });
-  }
+};
 
-  async getUserApplications() {
-    return this.request('/jobs/applications');
-  }
+const getUserApplications = async () => {
+    return request('/jobs/applications');
+};
 
-  // Events endpoints
-  async getEvents() {
-    return this.request('/events');
-  }
+// Events endpoints
+const getEvents = async () => {
+    return request('/events');
+};
 
-  async registerForEvent(eventId) {
-    return this.request(`/events/${eventId}/register`, {
-      method: 'POST',
+const registerForEvent = async (eventId) => {
+    return request(`/events/${eventId}/register`, {
+        method: 'POST',
     });
-  }
+};
 
-  // Hackathons endpoints
-  async getHackathons() {
-    return this.request('/hackathons');
-  }
+// Hackathons endpoints
+const getHackathons = async () => {
+    return request('/hackathons');
+};
 
-  async registerForHackathon(hackathonId, teamData) {
-    return this.request(`/hackathons/${hackathonId}/register`, {
-      method: 'POST',
-      body: JSON.stringify(teamData),
+const registerForHackathon = async (hackathonId, teamData) => {
+    return request(`/hackathons/${hackathonId}/register`, {
+        method: 'POST',
+        body: JSON.stringify(teamData),
     });
-  }
+};
 
-  // User profile endpoints
-  async updateProfile(profileData) {
-    return this.request('/users/profile', {
-      method: 'PUT',
-      body: JSON.stringify(profileData),
+// User profile endpoints
+const updateProfile = async (profileData) => {
+    return request('/users/profile', {
+        method: 'PUT',
+        body: JSON.stringify(profileData),
     });
-  }
-}
+};
 
-const apiService = new ApiService();
+// Admin endpoints
+const getAdminStats = async () => {
+    return request('/admin/dashboard/stats');
+};
+
+const getAdminUsers = async (params = {}) => {
+    const queryParams = new URLSearchParams(params).toString();
+    return request(`/admin/users${queryParams ? `?${queryParams}` : ''}`);
+};
+
+const updateUserStatus = async (userId, status) => {
+    return request(`/admin/users/${userId}/status`, {
+        method: 'PUT',
+        body: JSON.stringify({ status }),
+    });
+};
+
+const getAdminJobs = async (params = {}) => {
+    const queryParams = new URLSearchParams(params).toString();
+    return request(`/admin/jobs${queryParams ? `?${queryParams}` : ''}`);
+};
+
+const getAdminEvents = async (params = {}) => {
+    const queryParams = new URLSearchParams(params).toString();
+    return request(`/admin/events${queryParams ? `?${queryParams}` : ''}`);
+};
+
+const getAdminAnalytics = async () => {
+    return request('/admin/analytics');
+};
+
+// Export all functions as apiService object
+const apiService = {
+    request,
+    login,
+    register,
+    getCurrentUser,
+    getJobs,
+    getJobById,
+    applyToJob,
+    getUserApplications,
+    getEvents,
+    registerForEvent,
+    getHackathons,
+    registerForHackathon,
+    updateProfile,
+    getAdminStats,
+    getAdminUsers,
+    updateUserStatus,
+    getAdminJobs,
+    getAdminEvents,
+    getAdminAnalytics
+};
+
 export default apiService;

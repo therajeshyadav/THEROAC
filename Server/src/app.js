@@ -8,6 +8,7 @@ const eventRoutes = require('./routes/events');
 const hackathonRoutes = require('./routes/hackathons');
 const jobRoutes = require('./routes/jobs');
 const userRoutes = require('./routes/users');
+const adminRoutes = require('./routes/admin');
 const errorHandler = require('./middlewares/errorHandler');
 
 const app = express();
@@ -22,6 +23,7 @@ app.use('/api/events', eventRoutes);
 app.use('/api/hackathons', hackathonRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/admin', adminRoutes);
 
 // health check
 app.get('/health', (req, res) => res.json({ ok: true }));

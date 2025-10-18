@@ -19,14 +19,27 @@ module.exports = {
       updatedAt: new Date()
     }], { returning: ['id'] });
 
-    // Insert Normal User
-    const [normalUser] = await queryInterface.bulkInsert('users', [{
+    // Insert Candidate User
+    const [candidateUser] = await queryInterface.bulkInsert('users', [{
       id: Sequelize.literal('gen_random_uuid()'),
-      fullName: 'Test User',
-      username: 'testuser',
-      email: 'user@roac.com',
+      fullName: 'Test Candidate',
+      username: 'candidate',
+      email: 'candidate@roac.com',
       passwordHash: await bcrypt.hash('User@123', 10),
-      role: 'user',
+      role: 'candidate',
+      status: 'active',
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }], { returning: ['id'] });
+
+    // Insert Recruiter User
+    const [recruiterUser] = await queryInterface.bulkInsert('users', [{
+      id: Sequelize.literal('gen_random_uuid()'),
+      fullName: 'Test Recruiter',
+      username: 'recruiter',
+      email: 'recruiter@roac.com',
+      passwordHash: await bcrypt.hash('User@123', 10),
+      role: 'recruiter',
       status: 'active',
       createdAt: new Date(),
       updatedAt: new Date()
@@ -69,7 +82,7 @@ module.exports = {
       id: Sequelize.literal('gen_random_uuid()'),
       hackathonId: hackathon ? hackathon.id : null,
       name: 'Team Alpha',
-      leaderId: normalUser ? normalUser.id : null,
+      leaderId: candidateUser ? candidateUser.id : null,
       status: 'registered',
       createdAt: new Date(),
       updatedAt: new Date()
@@ -79,7 +92,7 @@ module.exports = {
     await queryInterface.bulkInsert('team_members', [{
       id: Sequelize.literal('gen_random_uuid()'),
       teamId: team ? team.id : null,
-      userId: normalUser ? normalUser.id : null,
+      userId: candidateUser ? candidateUser.id : null,
       role: 'Developer',
       createdAt: new Date(),
       updatedAt: new Date()
@@ -109,7 +122,7 @@ module.exports = {
       experienceLevel: 'junior',
       locationType: 'remote',
       status: 'open',
-      createdBy: adminUser ? adminUser.id : null,
+      createdBy: recruiterUser ? recruiterUser.id : null,
       createdAt: new Date(),
       updatedAt: new Date()
     }]);

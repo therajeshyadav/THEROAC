@@ -34,15 +34,18 @@
 
 /* Dashboard Navigation - Matching Landing Page */
 .dashboard-nav {
-  background: rgba(15, 15, 35, 0.95);  /* Landing page dark background */
+  background: rgba(15, 15, 35, 0.95);
+  /* Landing page dark background */
   backdrop-filter: blur(15px);
-  border-bottom: 1px solid rgba(255, 214, 0, 0.3);  /* ROAC yellow border */
+  border-bottom: 1px solid rgba(255, 214, 0, 0.3);
+  /* ROAC yellow border */
   padding: 0;
   position: sticky;
   top: 65px;
   z-index: 100;
   margin-top: 20px;
-  box-shadow: 0 4px 20px rgba(255, 214, 0, 0.1);  /* Golden shadow */
+  box-shadow: 0 4px 20px rgba(255, 214, 0, 0.1);
+  /* Golden shadow */
 }
 
 .nav-tabs {
@@ -75,7 +78,8 @@
 .nav-tab.active {
   color: #0f0f23;
   border-bottom-color: #FFD600;
-  background: rgba(255, 214, 0, 0.9);  /* Golden yellow background */
+  background: rgba(255, 214, 0, 0.9);
+  /* Golden yellow background */
   position: relative;
   font-weight: 600;
 }
@@ -87,7 +91,8 @@
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(135deg, #FF5000 0%, #FF00B8 100%);  /* ROAC gradient border */
+  background: linear-gradient(135deg, #FFD600 0%, #FFA500 100%);
+  /* Landing page yellow gradient */
   border-radius: 2px 2px 0 0;
 }
 
@@ -119,15 +124,18 @@
 
 /* Dashboard Cards - ROAC Style */
 .dashboard-card {
-  background: rgba(26, 23, 25, 0.8);  /* ROAC dark background */
+  background: rgba(26, 23, 25, 0.8);
+  /* ROAC dark background */
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 214, 0, 0.2);  /* ROAC yellow border */
+  border: 1px solid rgba(255, 214, 0, 0.2);
+  /* ROAC yellow border */
   border-radius: 20px;
   padding: 30px;
   margin-bottom: 30px;
-  box-shadow: 
+  box-shadow:
     0 20px 40px rgba(0, 0, 0, 0.3),
-    0 0 0 1px rgba(255, 80, 0, 0.1);  /* ROAC orange glow */
+    0 0 0 1px rgba(255, 80, 0, 0.1);
+  /* ROAC orange glow */
 }
 
 .card-header {
@@ -1361,7 +1369,8 @@ ional Mobile Adjustments */
   left: 10%;
   width: 120px;
   height: 120px;
-  background: radial-gradient(circle, rgba(255, 80, 0, 0.12) 0%, transparent 70%);  /* ROAC Orange */
+  background: radial-gradient(circle, rgba(255, 80, 0, 0.12) 0%, transparent 70%);
+  /* ROAC Orange */
   border-radius: 50%;
   animation: pulse 4s ease-in-out infinite, drift 8s ease-in-out infinite;
 }
@@ -1373,10 +1382,13 @@ ional Mobile Adjustments */
   right: 15%;
   width: 180px;
   height: 180px;
-  background: radial-gradient(circle, rgba(255, 0, 184, 0.08) 0%, transparent 70%);  /* ROAC Pink */
+  background: radial-gradient(circle, rgba(255, 0, 184, 0.08) 0%, transparent 70%);
+  /* ROAC Pink */
   border-radius: 50%;
   animation: pulse 6s ease-in-out infinite reverse, drift 10s ease-in-out infinite reverse;
-}/* Loa
+}
+
+/* Loa
 ding Dots Animation */
 .loading-dots {
   display: flex;
@@ -1391,20 +1403,34 @@ ding Dots Animation */
   animation: loadingDots 1.4s ease-in-out infinite both;
 }
 
-.loading-dots span:nth-child(1) { animation-delay: -0.32s; }
-.loading-dots span:nth-child(2) { animation-delay: -0.16s; }
-.loading-dots span:nth-child(3) { animation-delay: 0s; }
+.loading-dots span:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.loading-dots span:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+.loading-dots span:nth-child(3) {
+  animation-delay: 0s;
+}
 
 @keyframes loadingDots {
-  0%, 80%, 100% {
+
+  0%,
+  80%,
+  100% {
     transform: scale(0);
     opacity: 0.5;
   }
+
   40% {
     transform: scale(1);
     opacity: 1;
   }
-}/* Enhan
+}
+
+/* Enhan
 ced Dashboard Card Hover Effects */
 .dashboard-card:hover {
   transform: translateY(-2px);
@@ -1466,7 +1492,7 @@ ced Dashboard Card Hover Effects */
   padding-right: 45px;
 }
 
-.search-input-wrapper .form-control:focus + .search-icon {
+.search-input-wrapper .form-control:focus+.search-icon {
   color: #FFD600;
 }
 
@@ -1485,7 +1511,9 @@ ced Dashboard Card Hover Effects */
   background: #FFD600;
   color: #1A1719;
   transform: translateY(-1px);
-}/* Quick 
+}
+
+/* Quick 
 Actions */
 .quick-actions {
   background: rgba(255, 255, 255, 0.05);
@@ -1582,15 +1610,17 @@ Actions */
   .actions-grid {
     grid-template-columns: repeat(2, 1fr);
   }
-  
+
   .action-btn {
     padding: 15px;
   }
-  
+
   .action-btn i {
     font-size: 20px;
   }
-}/* R
+}
+
+/* R
 OAC 5 Pillars - Discover Opportunities */
 .pillars-section {
   background: rgba(255, 255, 255, 0.05);
@@ -1756,17 +1786,32 @@ OAC 5 Pillars - Discover Opportunities */
 }
 
 /* Pillar Card Animations */
-.pillar-card:nth-child(1) { animation-delay: 0.1s; }
-.pillar-card:nth-child(2) { animation-delay: 0.2s; }
-.pillar-card:nth-child(3) { animation-delay: 0.3s; }
-.pillar-card:nth-child(4) { animation-delay: 0.4s; }
-.pillar-card:nth-child(5) { animation-delay: 0.5s; }
+.pillar-card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.pillar-card:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.pillar-card:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.pillar-card:nth-child(4) {
+  animation-delay: 0.4s;
+}
+
+.pillar-card:nth-child(5) {
+  animation-delay: 0.5s;
+}
 
 @keyframes pillarFadeIn {
   from {
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -1783,19 +1828,19 @@ OAC 5 Pillars - Discover Opportunities */
     grid-template-columns: 1fr;
     gap: 20px;
   }
-  
+
   .pillars-section {
     padding: 20px;
   }
-  
+
   .pillars-header h4 {
     font-size: 24px;
   }
-  
+
   .pillar-image {
     height: 150px;
   }
-  
+
   .pillar-content {
     padding: 20px;
   }
@@ -1805,15 +1850,17 @@ OAC 5 Pillars - Discover Opportunities */
   .pillars-header h4 {
     font-size: 20px;
   }
-  
+
   .pillar-content h5 {
     font-size: 18px;
   }
-  
+
   .pillar-content p {
     font-size: 13px;
   }
-}/* No
+}
+
+/* No
 tification Banner */
 .notification-banner {
   background: linear-gradient(135deg, #FFD600 0%, #FFED4E 100%);
@@ -1853,11 +1900,14 @@ tification Banner */
     transform: translateY(-100%);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;
   }
-}/* ROAC N
+}
+
+/* ROAC N
 avigation Bar - Unstop Style */
 .roac-navbar {
   background: rgba(26, 23, 25, 0.95);
@@ -1909,11 +1959,10 @@ avigation Bar - Unstop Style */
 /* Hero Section - Unstop Style */
 .hero-section {
   padding: 60px 0;
-  background: linear-gradient(135deg, 
-    rgba(26, 23, 25, 0.9) 0%, 
-    rgba(255, 80, 0, 0.1) 50%, 
-    rgba(255, 0, 184, 0.08) 100%
-  );
+  background: linear-gradient(135deg,
+      rgba(26, 23, 25, 0.9) 0%,
+      rgba(255, 80, 0, 0.1) 50%,
+      rgba(255, 0, 184, 0.08) 100%);
 }
 
 .hero-content h1 {
@@ -2096,20 +2145,20 @@ avigation Bar - Unstop Style */
   .hero-content h1 {
     font-size: 36px;
   }
-  
+
   .hero-content p {
     font-size: 16px;
   }
-  
+
   .hero-buttons {
     justify-content: center;
   }
-  
+
   .categories-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 15px;
   }
-  
+
   .roac-nav-item {
     padding: 10px 20px;
     font-size: 14px;
@@ -2120,15 +2169,17 @@ avigation Bar - Unstop Style */
   .hero-content h1 {
     font-size: 28px;
   }
-  
+
   .categories-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .profile-card {
     padding: 20px;
   }
-}/* Comi
+}
+
+/* Comi
 ng Soon Section */
 .coming-soon-section {
   text-align: center;
@@ -2138,7 +2189,7 @@ ng Soon Section */
 .coming-soon-icon {
   width: 100px;
   height: 100px;
-  background: linear-gradient(135deg, #FF5000 0%, #FF00B8 100%);
+  background: linear-gradient(135deg, #FFA500 0%, #FFED4E 100%);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -2168,6 +2219,7 @@ ng Soon Section */
   margin-left: auto;
   margin-right: auto;
 }
+
 /* Dashboa
 rd Header - New Layout */
 .dashboard-top-header {
@@ -2256,7 +2308,7 @@ rd Header - New Layout */
   position: absolute;
   top: 0;
   right: 0;
-  background: #FF5000;
+  background: #FFA500;
   color: #fff;
   font-size: 0.7rem;
   padding: 0.2rem 0.4rem;
@@ -2313,7 +2365,7 @@ rd Header - New Layout */
 
 .logout-btn:hover {
   background: rgba(255, 80, 0, 0.1);
-  color: #FF5000;
+  color: #FFA500;
   transform: translateY(-2px);
 }
 
@@ -2322,27 +2374,27 @@ rd Header - New Layout */
   .header-content {
     padding: 0 1rem;
   }
-  
+
   .dashboard-main-nav {
     overflow-x: auto;
     scrollbar-width: none;
     -ms-overflow-style: none;
     margin: 0 1rem;
   }
-  
+
   .dashboard-main-nav::-webkit-scrollbar {
     display: none;
   }
-  
+
   .nav-category {
     padding: 0.5rem 1rem;
     font-size: 0.8rem;
   }
-  
+
   .user-details {
     display: none;
   }
-  
+
   .dashboard-logo img {
     height: 30px;
   }
@@ -2465,21 +2517,24 @@ rd Header - New Layout */
 
 /* Mobile Responsive for Search */
 @media (max-width: 768px) {
+
   .search-filters .col-md-4,
   .search-filters .col-md-3,
   .search-filters .col-md-2 {
     margin-bottom: 0.75rem;
   }
-  
+
   .quick-filters {
     justify-content: flex-start;
   }
-  
+
   .filter-tag {
     font-size: 0.75rem;
     padding: 0.3rem 0.8rem;
   }
-}/* Recru
+}
+
+/* Recru
 iter Dashboard Styles */
 .recruiter-dashboard {
   background: #0f0f23;
@@ -2842,7 +2897,7 @@ iter Dashboard Styles */
 .employee-avatar {
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, #FF5000 0%, #FF00B8 100%);
+  background: linear-gradient(135deg, #FFA500 0%, #FFED4E 100%);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -2916,38 +2971,39 @@ iter Dashboard Styles */
     gap: 1rem;
     text-align: center;
   }
-  
+
   .welcome-actions {
     justify-content: center;
   }
-  
+
   .table-actions {
     flex-direction: column;
     gap: 0.75rem;
     align-items: stretch;
   }
-  
+
   .search-box input {
     width: 100%;
   }
-  
+
   .employees-table {
     font-size: 0.8rem;
   }
-  
+
   .chart-legend {
     flex-direction: column;
     gap: 0.5rem;
   }
-  
+
   .calendar-grid {
     gap: 0.25rem;
   }
-  
+
   .calendar-day {
     font-size: 0.7rem;
   }
 }
+
 /* Recruiter Dashboard Styles - Matching Landing Page Background */
 .recruiter-dashboard {
   min-height: 100vh;
@@ -3422,47 +3478,723 @@ iter Dashboard Styles */
   .recruiter-content {
     padding: 90px 15px 15px;
   }
-  
+
   .recruiter-navigation {
     padding: 10px 0;
     gap: 10px;
   }
-  
+
   .recruiter-nav-item {
     padding: 10px 16px;
     font-size: 13px;
   }
-  
+
   .recruiter-stats-grid {
     grid-template-columns: 1fr;
     gap: 15px;
   }
-  
+
   .recruiter-main-content {
     grid-template-columns: 1fr;
     gap: 20px;
   }
-  
+
   .management-controls {
     flex-direction: column;
     gap: 10px;
     align-items: stretch;
   }
-  
+
   .search-input {
     width: 100%;
   }
-  
+
   .employee-table {
     font-size: 12px;
   }
-  
+
   .employee-table th,
   .employee-table td {
     padding: 10px 8px;
   }
-  
+
   .chart-container {
     height: 200px;
   }
+}
+
+/* ===== ADMIN DASHBOARD STYLES ===== */
+/* Admin uses same styling as other dashboards, just with admin badge */
+
+.admin-badge {
+  background: #FF6B6B;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-left: 10px;
+  text-transform: uppercase;
+}
+
+/* Admin Stats Cards */
+.admin-stat-card {
+  background: white;
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.admin-stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.admin-stat-card .stat-icon {
+  font-size: 2.5rem;
+  color: #FFA500;
+  margin-right: 20px;
+}
+
+.admin-stat-card .stat-content h3 {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #2c3e50;
+  margin: 0;
+}
+
+.admin-stat-card .stat-content p {
+  color: #7f8c8d;
+  margin: 5px 0 0 0;
+  font-size: 0.9rem;
+}
+
+/* Admin Tables - Matching ROAC Colors */
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.admin-table th {
+  background: linear-gradient(135deg, #FFD600, #FFA500);
+  color: #0f0f23;
+  padding: 15px;
+  text-align: left;
+  font-weight: 600;
+}
+
+.admin-table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #ecf0f1;
+}
+
+.admin-table tr:hover {
+  background-color: #f8f9fa;
+}
+
+/* Admin Badge - Matching ROAC Colors */
+.admin-badge {
+  background: linear-gradient(135deg, #FFD600, #FFA500);
+  color: #0f0f23;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: bold;
+  margin-left: 10px;
+  text-transform: uppercase;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 214, 0, 0.7);
+  }
+
+  70% {
+    box-shadow: 0 0 0 10px rgba(255, 214, 0, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 214, 0, 0);
+  }
+}
+
+.admin-stat-card {
+  align-items: center;
+  gap: 20px;
+  transition: transform 0.3s ease;
+}
+
+.admin-stat-card:hover {
+  transform: translateY(-5px);
+}
+
+.admin-stat-card .stat-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 24px;
+}
+
+.admin-stat-card .stat-info h3 {
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0;
+  color: #2c3e50;
+}
+
+.admin-stat-card .stat-info p {
+  margin: 5px 0;
+  color: #7f8c8d;
+  font-weight: 500;
+}
+
+.admin-stat-card .growth {
+  font-size: 12px;
+  color: #27ae60;
+  font-weight: 600;
+}
+
+/* Admin Dashboard Grid Layout */
+.admin-stat-card .stat-info {
+  flex: 1;
+}
+
+.admin-stat-card .stat-info h3 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0 0 5px 0;
+}
+
+.admin-stat-card .stat-info p {
+  color: #7f8c8d;
+  margin: 0 0 8px 0;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.admin-stat-card .growth {
+  color: #27ae60;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* Overview Grid */
+.overview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+.overview-item {
+  text-align: center;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.overview-item:hover {
+  background: #e9ecef;
+  transform: translateY(-2px);
+}
+
+.overview-number {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #FFA500;
+  margin-bottom: 8px;
+}
+
+.overview-label {
+  color: #6c757d;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Quick Actions - Matching ROAC Colors */
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  padding: 20px;
+}
+
+.action-btn {
+  background: linear-gradient(135deg, #FFD600, #FFA500);
+  color: #0f0f23;
+  border: none;
+  padding: 15px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.action-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(255, 214, 0, 0.3);
+}
+
+/* Responsive Design for Admin Dashboard */
+@media (max-width: 768px) {
+  .admin-stat-card {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .admin-stat-card .stat-icon {
+    margin-right: 0;
+    margin-bottom: 15px;
+  }
+
+  .overview-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .quick-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* D
+ashboard Header Logo Fix */
+.dashboard-logo {
+  display: flex;
+  align-items: center;
+}
+
+.dashboard-logo img {
+  height: 40px;
+  width: auto;
+  max-width: 120px;
+  object-fit: contain;
+}
+
+/* Dashboard Top Header */
+.dashboard-top-header {
+  background: rgba(15, 15, 35, 0.95);
+  backdrop-filter: blur(15px);
+  border-bottom: 1px solid rgba(255, 214, 0, 0.3);
+  padding: 15px 0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 4px 20px rgba(255, 214, 0, 0.1);
+}
+
+.dashboard-top-header .header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+}
+
+/* Dashboard Main Navigation */
+.dashboard-main-nav {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.dashboard-main-nav .nav-category {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 8px;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dashboard-main-nav .nav-category:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.dashboard-main-nav .nav-category.active {
+  color: #0f0f23;
+  background: linear-gradient(135deg, #FFD600, #FFA500);
+  font-weight: 600;
+}
+
+/* Dashboard User Section */
+.dashboard-user-section {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.notification-btn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 18px;
+  cursor: pointer;
+  position: relative;
+  padding: 8px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.notification-btn:hover {
+  color: #FFD600;
+  background: rgba(255, 214, 0, 0.1);
+}
+
+.notification-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: #FFA500;
+  color: white;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  min-width: 16px;
+  text-align: center;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-avatar {
+  width: 35px;
+  height: 35px;
+  background: linear-gradient(135deg, #FFD600, #FFA500);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #0f0f23;
+  font-size: 16px;
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-name {
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.user-email {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
+}
+
+.logout-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 214, 0, 0.3);
+  color: rgba(255, 255, 255, 0.7);
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+}
+
+.logout-btn:hover {
+  background: rgba(255, 214, 0, 0.1);
+  border-color: #FFD600;
+  color: #FFD600;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .dashboard-top-header .header-content {
+    flex-direction: column;
+    gap: 15px;
+    padding: 10px;
+  }
+
+  .dashboard-main-nav {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .dashboard-main-nav .nav-category {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
+  .user-details {
+    display: none;
+  }
+}
+
+/* Prel
+
+/* ===== ADMIN DASHBOARD - CANDIDATE THEME MATCHING ===== */
+
+/* Admin Dashboard - Same Dark Background as Candidate */
+.dashboard-container:has(.admin-badge) {
+  background: #0f0f23 !important;
+}
+
+.dashboard-container:has(.admin-badge) .dashboard-background {
+  background: #0f0f23 !important;
+}
+
+/* Admin Header - Same as Candidate */
+.dashboard-container:has(.admin-badge) .dashboard-top-header {
+  background: rgba(15, 15, 35, 0.95) !important;
+  backdrop-filter: blur(15px);
+  border-bottom: 1px solid rgba(255, 214, 0, 0.3) !important;
+  box-shadow: 0 4px 20px rgba(255, 214, 0, 0.1) !important;
+}
+
+/* Admin Navigation - Same Yellow Theme as Candidate */
+.dashboard-container:has(.admin-badge) .dashboard-main-nav .nav-category {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.dashboard-container:has(.admin-badge) .dashboard-main-nav .nav-category:hover {
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.dashboard-container:has(.admin-badge) .dashboard-main-nav .nav-category.active {
+  color: #0f0f23 !important;
+  background: linear-gradient(135deg, #FFD600, #FFA500) !important;
+  font-weight: 600;
+}
+
+/* Admin Badge - Same Style as Candidate Theme */
+.dashboard-container:has(.admin-badge) .admin-badge {
+  background: linear-gradient(135deg, #FFD600, #FFA500) !important;
+  color: #0f0f23 !important;
+  animation: pulse 2s infinite;
+}
+
+/* Admin User Section - Same as Candidate */
+.dashboard-container:has(.admin-badge) .user-name {
+  color: #ffffff !important;
+}
+
+.dashboard-container:has(.admin-badge) .user-email {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.dashboard-container:has(.admin-badge) .user-avatar {
+  background: linear-gradient(135deg, #FFD600, #FFA500) !important;
+  color: #0f0f23 !important;
+}
+
+.dashboard-container:has(.admin-badge) .notification-btn {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.dashboard-container:has(.admin-badge) .notification-btn:hover {
+  color: #FFD600 !important;
+  background: rgba(255, 214, 0, 0.1) !important;
+}
+
+.dashboard-container:has(.admin-badge) .logout-btn {
+  border-color: rgba(255, 214, 0, 0.3) !important;
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.dashboard-container:has(.admin-badge) .logout-btn:hover {
+  background: rgba(255, 214, 0, 0.1) !important;
+  border-color: #FFD600 !important;
+  color: #FFD600 !important;
+}
+
+/* Admin Cards - Same Dark Theme as Candidate */
+.dashboard-container:has(.admin-badge) .dashboard-card {
+  background: rgba(26, 23, 25, 0.8) !important;
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 214, 0, 0.2) !important;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3) !important;
+}
+
+.dashboard-container:has(.admin-badge) .dashboard-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.4) !important;
+  border-color: rgba(255, 214, 0, 0.4) !important;
+}
+
+.dashboard-container:has(.admin-badge) .dashboard-card .card-header {
+  background: rgba(255, 214, 0, 0.1) !important;
+  border-bottom: 1px solid rgba(255, 214, 0, 0.2) !important;
+  margin: -20px -20px 20px -20px !important;
+  padding: 15px 20px !important;
+  border-radius: 20px 20px 0 0 !important;
+}
+
+.dashboard-container:has(.admin-badge) .dashboard-card .card-header h4 {
+  color: #FFD600 !important;
+  margin: 0 !important;
+  font-weight: 600;
+}
+
+/* Admin Stats Cards - Same as Candidate */
+.dashboard-container:has(.admin-badge) .admin-stat-card {
+  background: rgba(26, 23, 25, 0.8) !important;
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 214, 0, 0.2) !important;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3) !important;
+}
+
+.dashboard-container:has(.admin-badge) .admin-stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.4) !important;
+  border-color: rgba(255, 214, 0, 0.4) !important;
+}
+
+.dashboard-container:has(.admin-badge) .admin-stat-card .stat-icon {
+  color: #FFD600 !important;
+}
+
+.dashboard-container:has(.admin-badge) .admin-stat-card .stat-info h3 {
+  color: #ffffff !important;
+}
+
+.dashboard-container:has(.admin-badge) .admin-stat-card .stat-info p {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.dashboard-container:has(.admin-badge) .admin-stat-card .growth {
+  color: #27ae60 !important;
+}
+
+/* Admin Tables - Same Dark Theme as Candidate */
+.dashboard-container:has(.admin-badge) .admin-table {
+  background: rgba(26, 23, 25, 0.8) !important;
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 214, 0, 0.2) !important;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.dashboard-container:has(.admin-badge) .admin-table th {
+  background: linear-gradient(135deg, #FFD600, #FFA500) !important;
+  color: #0f0f23 !important;
+  font-weight: 600 !important;
+  padding: 15px !important;
+}
+
+.dashboard-container:has(.admin-badge) .admin-table td {
+  color: rgba(255, 255, 255, 0.9) !important;
+  border-bottom: 1px solid rgba(255, 214, 0, 0.1) !important;
+  background: transparent !important;
+}
+
+.dashboard-container:has(.admin-badge) .admin-table tr:hover {
+  background: rgba(255, 214, 0, 0.1) !important;
+}
+
+/* Admin Buttons - Same Yellow Theme as Candidate */
+.dashboard-container:has(.admin-badge) .action-btn {
+  background: linear-gradient(135deg, #FFD600, #FFA500) !important;
+  color: #0f0f23 !important;
+  border: none !important;
+  font-weight: 600 !important;
+}
+
+.dashboard-container:has(.admin-badge) .action-btn:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: 0 10px 25px rgba(255, 214, 0, 0.3) !important;
+}
+
+/* Admin Text Colors - Same as Candidate */
+.dashboard-container:has(.admin-badge) h1,
+.dashboard-container:has(.admin-badge) h2,
+.dashboard-container:has(.admin-badge) h3,
+.dashboard-container:has(.admin-badge) h4,
+.dashboard-container:has(.admin-badge) h5,
+.dashboard-container:has(.admin-badge) h6 {
+  color: #ffffff !important;
+}
+
+.dashboard-container:has(.admin-badge) p {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Admin Overview Items - Same as Candidate */
+.dashboard-container:has(.admin-badge) .overview-item {
+  background: rgba(26, 23, 25, 0.6) !important;
+  border: 1px solid rgba(255, 214, 0, 0.2) !important;
+  border-radius: 10px;
+}
+
+.dashboard-container:has(.admin-badge) .overview-item:hover {
+  background: rgba(26, 23, 25, 0.8) !important;
+  border-color: rgba(255, 214, 0, 0.4) !important;
+  transform: translateY(-2px);
+}
+
+.dashboard-container:has(.admin-badge) .overview-number {
+  color: #FFD600 !important;
+}
+
+.dashboard-container:has(.admin-badge) .overview-label {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* Admin Filter Buttons - Same as Candidate */
+.dashboard-container:has(.admin-badge) .btn-filter {
+  background: rgba(26, 23, 25, 0.6) !important;
+  color: rgba(255, 255, 255, 0.8) !important;
+  border: 1px solid rgba(255, 214, 0, 0.3) !important;
+  border-radius: 8px;
+}
+
+.dashboard-container:has(.admin-badge) .btn-filter:hover {
+  background: rgba(255, 214, 0, 0.1) !important;
+  border-color: #FFD600 !important;
+  color: #FFD600 !important;
+}
+
+/* Admin Status Badges - Same as Candidate */
+.dashboard-container:has(.admin-badge) .status-active {
+  background: rgba(39, 174, 96, 0.2) !important;
+  color: #27ae60 !important;
+  border: 1px solid rgba(39, 174, 96, 0.3) !important;
+}
+
+.dashboard-container:has(.admin-badge) .status-inactive {
+  background: rgba(231, 76, 60, 0.2) !important;
+  color: #e74c3c !important;
+  border: 1px solid rgba(231, 76, 60, 0.3) !important;
+}
+
+.dashboard-container:has(.admin-badge) .status-pending {
+  background: rgba(255, 214, 0, 0.2) !important;
+  color: #FFD600 !important;
+  border: 1px solid rgba(255, 214, 0, 0.3) !important;
 }

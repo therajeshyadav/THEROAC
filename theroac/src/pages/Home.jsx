@@ -44,6 +44,7 @@ const Home = () => {
           </div>
         </div>
       </div>
+
       <div className="paginacontainer">
         <div className="progress-wrap warp2">
           <svg className="progress-circle svg-content" width="100%" height="100%" viewBox="-1 -1 102 102">
@@ -51,6 +52,7 @@ const Home = () => {
           </svg>
         </div>
       </div>
+
       <div className="mobile-header mobile-haeder10 d-block d-lg-none">
         <div className="container-fluid">
           <div className="col-12">
@@ -80,11 +82,6 @@ const Home = () => {
           <ul className="mobile-nav-list nav-list1">
             <li>
               <a href="#">Home</a>
-              {/* <ul className="sub-menu">
-                <li><a href="/">Home One</a></li>
-                <li><a href="/index2">Home Two</a></li>
-                <li><a href="/index3">Home Three</a></li>
-              </ul> */}
             </li>
             <li><a href="/about">About</a></li>
             <li>
@@ -98,83 +95,14 @@ const Home = () => {
               </ul>
             </li>
             <li>
-              <a href="/Jobs">Jobs</a>
-              {/* <ul className="sub-menu">
-                <li><a href="/event">Our Event</a></li>
-                <li><a href="/event-schedule">Event Schedule</a></li>
-                <li><a href="/event-single">Event Details</a></li>
-              </ul> */}
-            </li>
-            <li>
               <a href="/blog">Blogs</a>
               <ul className="sub-menu">
                 <li><a href="/blog">Our Blog</a></li>
                 <li><a href="/blog-single">Blog Details</a></li>
               </ul>
             </li>
-            {/* <li>
-              <a href="#">Pages</a>
-              <ul className="sub-menu">
-                <li><a href="/memories">Our Memories</a></li>
-                <li><a href="/pricing-plan">Pricing Plan</a></li>
-                <li><a href="/faq">FAQ’s</a></li>
-                <li><a href="/contact">Contact Us</a></li>
-              </ul>
-            </li> */}
             <li><a href="/contact">Contact Us</a></li>
           </ul>
-
-          {/* ===== Contact Info in Sidebar ===== */}
-          <div className="allmobilesection">
-            <a className="vl-btn10" href="/login">
-              <span className="demo">
-                Login <img src="assets/img/icons/arrow2.svg" alt="" />
-              </span>
-            </a>
-            {/* <div className="single-footer">
-              <h3>Contact Info</h3>
-              <div className="footer1-contact-info">
-                <div className="contact-info-single">
-                  <div className="contact-info-icon">
-                    <span><i className="fa-solid fa-phone-volume"></i></span>
-                  </div>
-                  <div className="contact-info-text">
-                    <a href="tel:+917973977956">+91 7973977956</a>
-                  </div>
-                </div>
-                <div className="contact-info-single">
-                  <div className="contact-info-icon">
-                    <span><i className="fa-solid fa-envelope"></i></span>
-                  </div>
-                  <div className="contact-info-text">
-                    <a href="mailto:partnership@theroac.com">partnership@theroac.com</a>
-                  </div>
-                </div>
-                <div className="single-footer">
-                  <h3>Our Location</h3>
-                  <div className="contact-info-single">
-                    <div className="contact-info-icon">
-                      <span><i className="fa-solid fa-location-dot"></i></span>
-                    </div>
-                    <div className="contact-info-text">
-                      <a href="#">Chandigarh</a>Chandigarh
-                    </div>
-                  </div>
-                </div>
-                <div className="single-footer">
-                  <h3>Social Links</h3>
-                  <div className="social-links-mobile-menu">
-                    <ul>
-                      <li><a href="#"><i className="fa-brands fa-facebook-f"></i></a></li>
-                      <li><a href="#"><i className="fa-brands fa-instagram"></i></a></li>
-                      <li><a href="#"><i className="fa-brands fa-linkedin-in"></i></a></li>
-                      <li><a href="#"><i className="fa-brands fa-youtube"></i></a></li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div> */}
-          </div>
           <div className="allmobilesection">
             <a className="vl-btn10" href="/login">
               <span className="demo">
@@ -184,12 +112,11 @@ const Home = () => {
           </div>
         </div>
       </div>
+
       <HeroSlider />
       <AboutSlider />
       <WhyAttend />
       <Schedule />
-      {/* <Countdown /> */}
-      {/* <ContactSection /> */}
       <Brands />
     </>
   );

@@ -15,6 +15,7 @@ import Register from "./pages/Register";
 import Signup from "./pages/Signup";
 import CandidateDashboard from "./pages/CandidateDashboard";
 import RecruiterDashboard from "./pages/RecruiterDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
 
 
 function App() {
@@ -22,7 +23,7 @@ function App() {
 
   // Auth pages and dashboard that don't need Header/Footer
   const authPages = ["/login", "/register", "/signup"];
-  const dashboardPages = ["/dashboard", "/candidate-dashboard", "/recruiter-dashboard"];
+  const dashboardPages = ["/dashboard", "/candidate-dashboard", "/recruiter-dashboard", "/admin-dashboard"];
   const isAuthPage = authPages.includes(location.pathname);
   const isDashboardPage = dashboardPages.includes(location.pathname);
 
@@ -53,6 +54,11 @@ function App() {
           <Route path="/recruiter-dashboard" element={
             <ProtectedRoute requiredRole="recruiter">
               <RecruiterDashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin-dashboard" element={
+            <ProtectedRoute requiredRole="admin">
+              <AdminDashboard />
             </ProtectedRoute>
           } />
         </Routes>

@@ -5,41 +5,58 @@ import './Auth.css';
 const Register = () => {
   return (
     <div className="auth-container">
-      <div className="auth-background"></div>
-      
-      <div className="auth-content">
-        <div className="auth-card register-selection">
+      <div className="container row justify-content-between auth-card">
+        <div className="col-5 align-content-center">
+          <img
+            src="assets/img/login/Login-pana.svg"
+            alt="Register Illustration"
+          />
+        </div>
+        <div className="col-6">
           <div className="auth-header">
             <h2>Choose Your Registration Type</h2>
-            <Link to="/" className="close-btn">×</Link>
           </div>
 
           <div className="registration-options">
             <Link to="/signup?type=candidate" className="registration-option">
-              <div className="option-icon">
-                <i className="fa-solid fa-user"></i>
+              <div className="option-left">
+                <div className="option-icon">
+                  <i className="fa-solid fa-user"></i>
+                </div>
+                <div className="option-text">
+                  <h3>
+                    Register as <span>Candidate</span>
+                  </h3>
+                </div>
               </div>
-              <h3>Register as Candidate</h3>
-              <p>Looking for jobs, internships, and career opportunities</p>
-              <div className="option-arrow">
-                <i className="fa-solid fa-arrow-right"></i>
+
+              <div className="option-right">
+                <i className="fa-solid fa-arrow-right option-arrow"></i>
               </div>
             </Link>
 
             <Link to="/signup?type=recruiter" className="registration-option">
-              <div className="option-icon">
-                <i className="fa-solid fa-building"></i>
+              <div className="option-left">
+                <div className="option-icon">
+                  <i className="fa-solid fa-building"></i>
+                </div>
+                <div className="option-text">
+                  <h3>
+                    Register as <span>Recruiter</span>
+                  </h3>
+                </div>
               </div>
-              <h3>Register as Recruiter</h3>
-              <p>Post jobs, find talent, and manage recruitment</p>
-              <div className="option-arrow">
-                <i className="fa-solid fa-arrow-right"></i>
+
+              <div className="option-right">
+                <i className="fa-solid fa-arrow-right option-arrow"></i>
               </div>
             </Link>
           </div>
 
           <div className="auth-footer">
-            <p>Already have an account? <Link to="/login">Login</Link></p>
+            <p>
+              Already have an account? <Link to="/login">Login</Link>
+            </p>
           </div>
         </div>
       </div>

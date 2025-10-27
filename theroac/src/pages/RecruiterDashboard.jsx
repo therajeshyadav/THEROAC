@@ -5,7 +5,7 @@ import {
   Users, Briefcase, Calendar, UserCheck, Bell,
   Settings, Download, Plus, Search, TrendingUp,
   MessageSquare, Eye, MoreVertical,
-  HelpCircle, Grid, ClipboardCheck, Star, Trophy, Phone
+  HelpCircle, Grid, ClipboardCheck, Star, Trophy, Phone, LogOut
 } from 'lucide-react';
 import './RecruiterDashboard.css';
 
@@ -16,6 +16,21 @@ const RecruiterDashboard = () => {
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
   const [notifications] = useState(3);
   const [searchQuery, setSearchQuery] = useState('');
+
+  const handleLogout = () => {
+    // Clear all authentication data from localStorage
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('authToken');
+
+    // Redirect to home page
+    navigate('/');
+  };
+
+  const getUserInitials = (name) => {
+    if (!name) return 'U';
+    return name.split(' ').map(n => n[0]).join('').toUpperCase();
+  };
 
   useEffect(() => {
     if (authLoading) return;
@@ -31,12 +46,6 @@ const RecruiterDashboard = () => {
       return;
     }
   }, [isAuthenticated, authLoading, authUser, navigate]);
-
-  // Helper function to get user initials
-  const getUserInitials = (name) => {
-    if (!name) return 'U';
-    return name.split(' ').map(n => n[0]).join('').toUpperCase();
-  };
 
   // Show loading state
   if (authLoading) {
@@ -179,6 +188,9 @@ const RecruiterDashboard = () => {
                 <span>{getUserInitials(authUser?.name || authUser?.fullName)}</span>
               </div>
             </div>
+            <button className="logout-btn" onClick={handleLogout} title="Logout">
+              <LogOut className="w-5 h-5" />
+            </button>
           </div>
         </div>
       </div>

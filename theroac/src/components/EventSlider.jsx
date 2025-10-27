@@ -61,7 +61,7 @@ const EventSlider = ({ eventsData }) => {
                     {event.location}
                   </p>
                   <a href="#" className="buy-btn">
-                    Buy Tickets Now →
+                   Apply Now →
                   </a>
                 </div>
               </div>

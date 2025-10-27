@@ -87,38 +87,6 @@
         if (typeof AOS !== 'undefined') {
           AOS.init({ duration: 800, once: true, offset: 50 });
         }
-
-        // Owl Carousel init (safe guard: only if element exists)
-        // if ($.fn.owlCarousel) {
-        //   $('.owl-carousel').each(function(){
-        //     var $this = $(this);
-        //     $this.owlCarousel({
-        //       loop:true,
-        //       margin:30,
-        //       nav:false,
-        //       dots:false,
-        //       items:10,
-        //       autoplay:true,
-        //       smartSpeed:2000,
-        //       autoplayTimeout:3000,
-        //       responsiveClass:true,
-        //       responsive:{
-        //           0:{
-        //               items:1,
-        //               center:false,
-        //           },
-        //           600:{
-        //               items:2,
-        //               center:false,
-        //           },
-        //           1000:{
-        //               items:4,
-        //           }
-        //       }
-        //     });
-        //   });
-        // }
-
         // Nice select init (exclude form selects)
         if ($.fn.niceSelect) {
           $('select:not(.no-nice-select)').niceSelect();

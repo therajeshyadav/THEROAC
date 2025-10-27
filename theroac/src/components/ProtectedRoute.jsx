@@ -26,10 +26,10 @@ const ProtectedRoute = ({ children, requiredRole = null }) => {
   if (requiredRole && user?.role !== requiredRole) {
     // Redirect to appropriate dashboard based on user role
     let redirectPath = '/candidate-dashboard';
-    if (user?.role === 'recruiter') {
-      redirectPath = '/recruiter-dashboard';
-    } else if (user?.role === 'admin') {
+    if (user?.role === 'admin') {
       redirectPath = '/admin-dashboard';
+    } else if (user?.role === 'recruiter') {
+      redirectPath = '/recruiter-dashboard';
     }
     return <Navigate to={redirectPath} replace />;
   }

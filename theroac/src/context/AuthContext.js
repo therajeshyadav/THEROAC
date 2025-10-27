@@ -24,14 +24,22 @@ export const AuthProvider = ({ children }) => {
     try {
       const token = localStorage.getItem('token');
       if (token) {
+        // Validate token with server
         const userData = await apiService.getCurrentUser();
         setUser(userData);
         setIsAuthenticated(true);
+      } else {
+        // No token found, ensure user is logged out
+        setUser(null);
+        setIsAuthenticated(false);
       }
     } catch (error) {
       console.error('Auth check failed:', error);
+      // Token is invalid or expired, clear everything
       localStorage.removeItem('token');
       localStorage.removeItem('user');
+      setUser(null);
+      setIsAuthenticated(false);
     } finally {
       setLoading(false);
     }

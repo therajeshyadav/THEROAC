@@ -1,18 +1,46 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './Auth.css';
 
 const Login = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, isAuthenticated, user, loading } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     rememberMe: false
   });
-  const [loading, setLoading] = useState(false);
+  const [submitLoading, setSubmitLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (!loading && isAuthenticated && user) {
+      // Redirect based on user role
+      if (user.role === 'admin') {
+        navigate('/admin-dashboard', { replace: true });
+      } else if (user.role === 'recruiter') {
+        navigate('/recruiter-dashboard', { replace: true });
+      } else {
+        navigate('/candidate-dashboard', { replace: true });
+      }
+    }
+  }, [isAuthenticated, user, loading, navigate]);
+
+  // Show loading while checking authentication
+  if (loading) {
+    return (
+      <div className="auth-container">
+        <div className="loading-container">
+          <div className="loading-spinner">
+            <i className="fas fa-spinner fa-spin"></i>
+          </div>
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -24,7 +52,7 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    setSubmitLoading(true);
     setError('');
     
     try {
@@ -35,10 +63,12 @@ const Login = () => {
       
       if (result.success) {
         // Redirect based on user role
-        if (result.user.role === 'recruiter') {
-          navigate('/recruiter-dashboard');
+        if (result.user.role === 'admin') {
+          navigate('/admin-dashboard', { replace: true });
+        } else if (result.user.role === 'recruiter') {
+          navigate('/recruiter-dashboard', { replace: true });
         } else {
-          navigate('/candidate-dashboard');
+          navigate('/candidate-dashboard', { replace: true });
         }
       } else {
         setError(result.error || 'Login failed');
@@ -46,7 +76,7 @@ const Login = () => {
     } catch (err) {
       setError('Login failed. Please try again.');
     } finally {
-      setLoading(false);
+      setSubmitLoading(false);
     }
   };
 
@@ -92,7 +122,7 @@ const Login = () => {
                 value={formData.email}
                 onChange={handleChange}
                 required
-                disabled={loading}
+                disabled={submitLoading}
               />
               <i className="fa-solid fa-envelope input-icon"></i>
             </div>
@@ -106,7 +136,7 @@ const Login = () => {
                 onChange={handleChange}
                 autoComplete="current-password"
                 required
-                disabled={loading}
+                disabled={submitLoading}
               />
               <i className="fa-solid fa-lock input-icon"></i>
             </div>
@@ -127,8 +157,8 @@ const Login = () => {
               </Link>
             </div>
 
-            <button type="submit" className="auth-btn" disabled={loading}>
-              {loading ? (
+            <button type="submit" className="auth-btn" disabled={submitLoading}>
+              {submitLoading ? (
                 <>
                   <i className="fas fa-spinner fa-spin"></i>
                   Logging in...

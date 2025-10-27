@@ -229,14 +229,14 @@
 .nav-item:hover {
     background: rgba(255, 214, 0, 0.1);
     color: #FFD600;
-    border-left-color: #FFD600;
+    /* border-left-color: #FFD600; */
 }
 
 .nav-item.active {
     background: rgba(255, 214, 0, 0.15);
     color: #FFD600;
     font-weight: 600;
-    border-left-color: #FFD600;
+    /* border-left-color: #FFD600; */
 }
 
 .nav-item svg {
@@ -551,7 +551,7 @@
     gap: 1rem;
 }
 
-.stat-card.blue {
+/* .stat-card.blue {
     border-left: 4px solid #3B82F6;
 }
 
@@ -565,25 +565,42 @@
 
 .stat-card.orange {
     border-left: 4px solid #F59E0B;
+} */
+
+.stat-icon-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
 }
 
 .stat-icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    flex-shrink: 0;
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  flex-shrink: 0;
 }
 
+.stat-number {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #fff; /* or adjust based on your theme */
+}
+.stat-label {
+     text-align: right;
+}
+
+
 .stat-card.blue .stat-icon {
-    background: #3B82F6;
+ background: #FFD600;
 }
 
 .stat-card.pink .stat-icon {
-    background: #EC4899;
+    background: #FFD600;
 }
 
 .stat-card.yellow .stat-icon {
@@ -591,7 +608,7 @@
 }
 
 .stat-card.orange .stat-icon {
-    background: #F59E0B;
+    background: #FFD600;
 }
 
 .stat-info {

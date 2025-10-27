@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import apiService from '../services/api';
-import DashboardHeader from '../components/DashboardHeader';
-import './Dashboard.css';
+// import DashboardHeader from '../components/DashboardHeader';
+// import './Dashboard.css';
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
@@ -96,7 +96,7 @@ const AdminDashboard = () => {
             <div className="dashboard-background"></div>
 
             {/* Dashboard Header with Navigation */}
-            <DashboardHeader
+            {/* <DashboardHeader
                 user={authUser}
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
@@ -107,7 +107,7 @@ const AdminDashboard = () => {
                     if (tab === 'jobs') loadJobs();
                     if (tab === 'events') loadEvents();
                 }}
-            />
+            /> */}
 
             {/* Dashboard Content */}
             <div className="dashboard-content">

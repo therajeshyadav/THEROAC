@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import apiService from '../services/api';
-import DashboardHeader from '../components/DashboardHeader';
-import './Dashboard.css';
+// import DashboardHeader from '../components/DashboardHeader';
+// import './Dashboard.css';
 
 const CandidateDashboard = () => {
     const navigate = useNavigate();
@@ -109,7 +109,7 @@ const CandidateDashboard = () => {
             <div className="dashboard-background"></div>
 
             {/* Dashboard Header with Navigation */}
-            <DashboardHeader user={authUser} activeTab={activeTab} setActiveTab={setActiveTab} />
+            {/* <DashboardHeader user={authUser} activeTab={activeTab} setActiveTab={setActiveTab} /> */}
 
             {/* Notification */}
             {notification && (

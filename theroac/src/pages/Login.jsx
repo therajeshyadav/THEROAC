@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { usePreloader } from '../hooks/usePreloader';
 import './Auth.css';
 
 const Login = () => {
@@ -13,6 +14,7 @@ const Login = () => {
   });
   const [submitLoading, setSubmitLoading] = useState(false);
   const [error, setError] = useState('');
+  const preloaderVisible = usePreloader(300);
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -82,14 +84,16 @@ const Login = () => {
 
   return (
     <div className="auth-container">
-      <div className="preloader">
-        <div className="loading-container">
-          <div className="loading"></div>
-          <div id="loading-icon">
-            <img src="assets/img/logo/preloader.png" alt="" />
+      {preloaderVisible && (
+        <div className="preloader">
+          <div className="loading-container">
+            <div className="loading"></div>
+            <div id="loading-icon">
+              <img src="assets/img/logo/preloader.png" alt="" />
+            </div>
           </div>
         </div>
-      </div>
+      )}
       <div className="paginacontainer">
         <div className="progress-wrap warp2">
           <svg className="progress-circle svg-content" width="100%" height="100%" viewBox="-1 -1 102 102">

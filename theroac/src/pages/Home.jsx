@@ -6,8 +6,10 @@ import WhyAttend from '../components/WhyAttend';
 import Schedule from '../components/Schedule';
 import Countdown from '../components/Countdown';
 import ContactSection from '../components/ContactSection';
+import { usePreloader } from '../hooks/usePreloader';
 
 const Home = () => {
+  const isLoading = usePreloader(500); // Hide preloader after 500ms
   return (
     <>
       <div id="popup" className="popup-overlay d-none">
@@ -36,14 +38,16 @@ const Home = () => {
       </div>
 
       {/* ===== Preloader ===== */}
-      <div className="preloader">
-        <div className="loading-container">
-          <div className="loading"></div>
-          <div id="loading-icon">
-            <img src="assets/img/logo/preloader.png" alt="" />
+      {isLoading && (
+        <div className="preloader">
+          <div className="loading-container">
+            <div className="loading"></div>
+            <div id="loading-icon">
+              <img src="assets/img/logo/preloader.png" alt="" />
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       <div className="paginacontainer">
         <div className="progress-wrap warp2">

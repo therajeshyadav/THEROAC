@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { usePreloader } from "../hooks/usePreloader";
 import {
   Users,
   Briefcase,
@@ -27,20 +28,18 @@ import "./RecruiterDashboard.css";
 
 const RecruiterDashboard = () => {
   const navigate = useNavigate();
-  const { user: authUser, isAuthenticated, loading: authLoading } = useAuth();
+  const { user: authUser, isAuthenticated, loading: authLoading, logout } = useAuth();
   const [activeTab, setActiveTab] = useState("dashboard");
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
   const [notifications] = useState(3);
   const [searchQuery, setSearchQuery] = useState("");
+  const preloaderVisible = usePreloader(300);
 
   const handleLogout = () => {
-    // Clear all authentication data from localStorage
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    localStorage.removeItem("authToken");
-
-    // Redirect to home page
-    navigate("/");
+    // Use the AuthContext logout function to properly clear state
+    logout();
+    // Redirect to home page and replace history
+    navigate("/", { replace: true });
   };
 
   const getUserInitials = (name) => {
@@ -173,14 +172,16 @@ const RecruiterDashboard = () => {
 
   return (
     <div className="auth-container">
-      <div className="preloader">
-        <div className="loading-container">
-          <div className="loading"></div>
-          <div id="loading-icon">
-            <img src="assets/img/logo/preloader.png" alt="" />
+      {preloaderVisible && (
+        <div className="preloader">
+          <div className="loading-container">
+            <div className="loading"></div>
+            <div id="loading-icon">
+              <img src="assets/img/logo/preloader.png" alt="" />
+            </div>
           </div>
         </div>
-      </div>
+      )}
       <div className="paginacontainer">
         <div className="progress-wrap warp2">
           <svg

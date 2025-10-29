@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import apiService from '../services/api';
+import { usePreloader } from '../hooks/usePreloader';
 // import DashboardHeader from '../components/DashboardHeader';
 // import './Dashboard.css';
 
@@ -14,33 +15,61 @@ const CandidateDashboard = () => {
     const [events, setEvents] = useState([]);
     const [applications, setApplications] = useState([]);
     const [loading, setLoading] = useState(true);
+    const preloaderVisible = usePreloader(300); // Hide preloader after 300ms
 
     useEffect(() => {
-        if (authLoading) return;
+        console.log('🎯 CandidateDashboard useEffect triggered', { authLoading, isAuthenticated, user: authUser });
+        
+        if (authLoading) {
+            console.log('⏳ Auth still loading, waiting...');
+            return;
+        }
 
         if (!isAuthenticated) {
+            console.log('🚫 Not authenticated, redirecting to login');
             navigate('/login');
             return;
         }
 
+        console.log('✅ Authenticated, loading dashboard data');
         loadDashboardData();
+
+        // Fallback: Force loading to false after 10 seconds
+        const loadingTimeout = setTimeout(() => {
+            console.warn('⚠️ Dashboard loading timeout - forcing completion');
+            setLoading(false);
+            setNotification('Dashboard loaded with limited functionality. Please refresh if needed.');
+        }, 10000);
+
+        return () => clearTimeout(loadingTimeout);
     }, [isAuthenticated, authLoading, navigate]);
 
     const loadDashboardData = async () => {
         try {
             setLoading(true);
-            const [jobsData, eventsData, applicationsData] = await Promise.all([
-                apiService.getJobs(),
-                apiService.getEvents(),
+            const [jobsData, eventsData, applicationsData] = await Promise.allSettled([
+                apiService.getJobs().catch(() => ({ jobs: [] })),
+                apiService.getEvents().catch(() => ({ events: [] })),
                 apiService.getUserApplications().catch(() => ({ applications: [] }))
             ]);
 
-            setJobs(jobsData.jobs || []);
-            setEvents(eventsData.events || []);
-            setApplications(applicationsData.applications || []);
+            // Handle results from Promise.allSettled
+            setJobs(jobsData.status === 'fulfilled' ? (jobsData.value.jobs || []) : []);
+            setEvents(eventsData.status === 'fulfilled' ? (eventsData.value.events || []) : []);
+            setApplications(applicationsData.status === 'fulfilled' ? (applicationsData.value.applications || []) : []);
+
+            // Show notification if any requests failed
+            const failedRequests = [jobsData, eventsData, applicationsData].filter(result => result.status === 'rejected');
+            if (failedRequests.length > 0) {
+                setNotification('Some data could not be loaded. Working in offline mode.');
+            }
         } catch (error) {
             console.error('Failed to load dashboard data:', error);
-            setNotification('Failed to load some data. Please refresh the page.');
+            setNotification('Failed to load dashboard data. Working in offline mode.');
+            // Set empty arrays as fallback
+            setJobs([]);
+            setEvents([]);
+            setApplications([]);
         } finally {
             setLoading(false);
         }
@@ -106,14 +135,16 @@ const CandidateDashboard = () => {
 
     return (
         <div className="dashboard-container">
-            <div className="preloader">
-                <div className="loading-container">
-                <div className="loading"></div>
-                <div id="loading-icon">
-                    <img src="assets/img/logo/preloader.png" alt="" />
+            {preloaderVisible && (
+                <div className="preloader">
+                    <div className="loading-container">
+                    <div className="loading"></div>
+                    <div id="loading-icon">
+                        <img src="assets/img/logo/preloader.png" alt="" />
+                    </div>
+                    </div>
                 </div>
-                </div>
-            </div>
+            )}
             <div className="paginacontainer">
                 <div className="progress-wrap warp2">
                 <svg className="progress-circle svg-content" width="100%" height="100%" viewBox="-1 -1 102 102">

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import apiService from '../services/api';
+import { usePreloader } from '../hooks/usePreloader';
 // import DashboardHeader from '../components/DashboardHeader';
 // import './Dashboard.css';
 
@@ -14,6 +15,7 @@ const AdminDashboard = () => {
     const [users, setUsers] = useState([]);
     const [jobs, setJobs] = useState([]);
     const [events, setEvents] = useState([]);
+    const preloaderVisible = usePreloader(300);
 
     useEffect(() => {
         if (authLoading) return;
@@ -93,14 +95,16 @@ const AdminDashboard = () => {
 
     return (
         <div className="dashboard-container">
-            <div className="preloader">
-                <div className="loading-container">
-                <div className="loading"></div>
-                <div id="loading-icon">
-                    <img src="assets/img/logo/preloader.png" alt="" />
+            {preloaderVisible && (
+                <div className="preloader">
+                    <div className="loading-container">
+                    <div className="loading"></div>
+                    <div id="loading-icon">
+                        <img src="assets/img/logo/preloader.png" alt="" />
+                    </div>
+                    </div>
                 </div>
-                </div>
-            </div>
+            )}
             <div className="paginacontainer">
                 <div className="progress-wrap warp2">
                 <svg className="progress-circle svg-content" width="100%" height="100%" viewBox="-1 -1 102 102">

@@ -193,11 +193,20 @@
     z-index: 900;
     transition: width 0.3s ease;
     overflow: hidden;
-    overflow-y: auto;
 }
 
 .organizer-sidebar:hover {
     width: 250px;
+}
+
+/* Hide scrollbars in sidebar */
+.organizer-sidebar::-webkit-scrollbar {
+    display: none;
+}
+
+.organizer-sidebar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
 }
 
 .sidebar-nav {

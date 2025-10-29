@@ -1,6 +1,7 @@
 export const eventsData = [
   {
     title: "Jobs",
+    titleId:"Jobs",
     events: [
       {
         img: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=800&q=80",
@@ -36,6 +37,7 @@ export const eventsData = [
   },
   {
     title: "Events",
+    titleId:"Events",
     events: [
       {
         img: "https://images.unsplash.com/photo-1531058020387-3be344556be6?auto=format&fit=crop&w=800&q=80",
@@ -71,6 +73,7 @@ export const eventsData = [
   },
   {
     title: "ROAC Prime Talent Hub",
+    titleId:"ROAC",
     events: [
       {
         img: "https://rallyrecruitmentmarketing.com/wp-content/uploads/2022/08/Top-10-Talent-Network-Resources-810x423.jpg",

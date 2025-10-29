@@ -33,7 +33,7 @@ const Header = () => {
                       </ul>
                     </li>
                     {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-                    <li><a href="#">Jobs</a></li>
+                    <li><a href="#Jobs">Jobs</a></li>
                     <li>
                       {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
                       <a href="#">

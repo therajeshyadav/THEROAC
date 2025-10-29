@@ -1,8 +1,10 @@
 import React, { useEffect, useRef } from "react";
 import "./AboutSlider.css";
 import arrowLeft from "../img/arrow-left.svg";
+import { useNavigate } from 'react-router-dom';
 
 const AboutSlider = () => {
+  const navigate = useNavigate();
   const trackRef = useRef(null);
   const prevRef = useRef(null);
   const nextRef = useRef(null);
@@ -144,16 +146,17 @@ const AboutSlider = () => {
           <article className="project-card">
             <img
               className="project-card__bg"
-              src="https://img.freepik.com/free-photo/young-people-office-competitions-concept_23-2149367244.jpg?w=1380"
+              src="assets/img/discover/Competitions.png"
               alt="Competitions"
             />
+            <div className="overlay"></div>
             <div className="project-card__content">
               <div>
                 <h3 className="project-card__title">Competitions</h3>
                 <p className="project-card__desc">
                   Participate. Compete. Showcase your talent on the grand stage.
                 </p>
-                <button className="project-card__btn">Explore</button>
+                <button className="project-card__btn" onClick={() => navigate('/')}>Explore</button>
               </div>
             </div>
           </article>
@@ -162,16 +165,17 @@ const AboutSlider = () => {
           <article className="project-card">
             <img
               className="project-card__bg"
-              src="https://img.freepik.com/free-photo/modern-office-with-people-working_23-2149270910.jpg?w=1380"
+              src='assets/img/discover/Jobs.png'
               alt="Jobs"
             />
+            <div className="overlay"></div>
             <div className="project-card__content">
               <div>
                 <h3 className="project-card__title">Jobs</h3>
                 <p className="project-card__desc">
                   Find career opportunities that match your skills and passion.
                 </p>
-                <button className="project-card__btn">View Jobs</button>
+                <button className="project-card__btn" onClick={() => navigate('/#Jobs')}>View Jobs</button>
               </div>
             </div>
           </article>
@@ -180,9 +184,10 @@ const AboutSlider = () => {
           <article className="project-card">
             <img
               className="project-card__bg"
-              src="https://img.freepik.com/free-photo/group-people-working-together_53876-13811.jpg?w=1380"
+              src="assets/img/discover/Workshop.png"
               alt="Workshops"
             />
+            <div className="overlay"></div>
             <div className="project-card__content">
               <div>
                 <h3 className="project-card__title">Workshops</h3>
@@ -198,9 +203,10 @@ const AboutSlider = () => {
           <article className="project-card">
             <img
               className="project-card__bg"
-              src="https://img.freepik.com/free-photo/education-graduation-concept_53876-123111.jpg?w=1380"
+              src="assets/img/discover/Scholarships.jpg"
               alt="Scholarships"
             />
+            <div className="overlay"></div>
             <div className="project-card__content">
               <div>
                 <h3 className="project-card__title">Scholarships</h3>
@@ -216,9 +222,10 @@ const AboutSlider = () => {
           <article className="project-card">
             <img
               className="project-card__bg"
-              src="https://img.freepik.com/free-photo/team-analyzing-data_53876-13819.jpg?w=1380"
+              src="assets/img/discover/ROACPrimeTalentHub.png"
               alt="ROAC Talent Prime Hub"
             />
+            <div className="overlay"></div>
             <div className="project-card__content">
               <div>
                 <h3 className="project-card__title">ROAC Talent Prime Hub</h3>

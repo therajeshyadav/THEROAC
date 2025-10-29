@@ -112,7 +112,6 @@ const Home = () => {
           </div>
         </div>
       </div>
-
       <HeroSlider />
       <AboutSlider />
       <WhyAttend />

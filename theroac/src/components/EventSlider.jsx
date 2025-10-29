@@ -19,7 +19,7 @@ const EventSlider = ({ eventsData }) => {
   return (
     <div className="event-sections-wrapper">
       {eventsData.map((section, sectionIndex) => (
-        <div className="prime-carousel-container" key={sectionIndex}>
+        <div className="prime-carousel-container" key={sectionIndex} id={section.titleId}>
           {/* Section Heading */}
           <div className="heading13 h2 pb-3 text-white">{section.title}</div>
 

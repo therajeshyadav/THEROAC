@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -17,19 +17,50 @@ import CandidateDashboard from "./pages/CandidateDashboard";
 import RecruiterDashboard from "./pages/RecruiterDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 
+// ✅ Helper component to handle smooth scrolling to hash IDs
+function ScrollToHashElement() {
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.hash) {
+      const id = location.hash.replace("#", "");
+      // Wait a moment for DOM to render
+      setTimeout(() => {
+        const element = document.getElementById(id);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 100); // adjust delay if needed
+    } else {
+      // Optional: scroll to top when there's no hash
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [location]);
+
+  return null;
+}
 
 function App() {
   const location = useLocation();
 
   // Auth pages and dashboard that don't need Header/Footer
   const authPages = ["/login", "/register", "/signup"];
-  const dashboardPages = ["/dashboard", "/candidate-dashboard", "/recruiter-dashboard", "/admin-dashboard"];
+  const dashboardPages = [
+    "/dashboard",
+    "/candidate-dashboard",
+    "/recruiter-dashboard",
+    "/admin-dashboard",
+  ];
+
   const isAuthPage = authPages.includes(location.pathname);
   const isDashboardPage = dashboardPages.includes(location.pathname);
 
   return (
     <AuthProvider>
+      <ScrollToHashElement /> {/* ✅ enables smooth hash scrolling */}
+
       {!isAuthPage && !isDashboardPage && <Header />}
+
       <main>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -41,28 +72,41 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/signup" element={<Signup />} />
 
-          <Route path="/dashboard" element={
-            <ProtectedRoute>
-              <CandidateDashboard />
-            </ProtectedRoute>
-          } />
-          <Route path="/candidate-dashboard" element={
-            <ProtectedRoute requiredRole="candidate">
-              <CandidateDashboard />
-            </ProtectedRoute>
-          } />
-          <Route path="/recruiter-dashboard" element={
-            <ProtectedRoute requiredRole="recruiter">
-              <RecruiterDashboard />
-            </ProtectedRoute>
-          } />
-          <Route path="/admin-dashboard" element={
-            <ProtectedRoute requiredRole="admin">
-              <AdminDashboard />
-            </ProtectedRoute>
-          } />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <CandidateDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/candidate-dashboard"
+            element={
+              <ProtectedRoute requiredRole="candidate">
+                <CandidateDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/recruiter-dashboard"
+            element={
+              <ProtectedRoute requiredRole="recruiter">
+                <RecruiterDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin-dashboard"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </main>
+
       {!isAuthPage && !isDashboardPage && <Footer />}
     </AuthProvider>
   );

@@ -232,7 +232,7 @@
     white-space: nowrap;
     text-align: left;
     width: 100%;
-    border-left: 3px solid transparent;
+    /* border-left: 3px solid transparent; */
 }
 
 .nav-item:hover {

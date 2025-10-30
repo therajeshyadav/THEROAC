@@ -13,6 +13,11 @@ import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Signup from "./pages/Signup";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+import VerifyEmail from "./pages/VerifyEmail";
+import ResendVerification from "./pages/ResendVerification";
+import VerificationPending from "./pages/VerificationPending";
 import CandidateDashboard from "./pages/CandidateDashboard";
 import RecruiterDashboard from "./pages/RecruiterDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -44,7 +49,7 @@ function App() {
   const location = useLocation();
 
   // Auth pages and dashboard that don't need Header/Footer
-  const authPages = ["/login", "/register", "/signup"];
+  const authPages = ["/login", "/register", "/signup", "/forgot-password", "/reset-password", "/verify-email", "/resend-verification", "/verification-pending"];
   const dashboardPages = [
     "/dashboard",
     "/candidate-dashboard",
@@ -71,6 +76,11 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
+          <Route path="/resend-verification" element={<ResendVerification />} />
+          <Route path="/verification-pending" element={<VerificationPending />} />
 
           <Route
             path="/dashboard"

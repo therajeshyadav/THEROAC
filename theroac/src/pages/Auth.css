@@ -8,9 +8,12 @@
 }
 
 @keyframes float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0px) rotate(0deg);
   }
+
   50% {
     transform: translateY(-20px) rotate(180deg);
   }
@@ -48,6 +51,146 @@
   font-weight: 700;
   margin: 0;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.auth-subtitle {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 16px;
+  margin-top: 10px;
+  line-height: 1.5;
+}
+
+.back-btn {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #FFD600;
+  text-decoration: none;
+  font-size: 18px;
+  transition: color 0.3s ease;
+}
+
+.back-btn:hover {
+  color: #FFED4E;
+}
+
+.success-message {
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  border-radius: 12px;
+  padding: 30px;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.success-message i {
+  color: #22c55e;
+  font-size: 48px;
+  margin-bottom: 20px;
+}
+
+.success-message p {
+  color: #ffffff;
+  font-size: 16px;
+  margin: 10px 0;
+}
+
+.success-message .text-muted {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 14px;
+}
+
+.loading-container {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.loading-spinner {
+  margin-bottom: 20px;
+}
+
+.loading-spinner i {
+  font-size: 48px;
+  color: #FFD600;
+}
+
+.verification-info {
+  margin-bottom: 30px;
+}
+
+.info-message {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 12px;
+  padding: 25px;
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.info-message i {
+  color: #3b82f6;
+  font-size: 48px;
+  margin-bottom: 15px;
+}
+
+.info-message p {
+  color: #ffffff;
+  font-size: 16px;
+  margin: 10px 0;
+}
+
+.email-display {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  margin-top: 15px;
+}
+
+.verification-steps {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 25px;
+  margin-bottom: 25px;
+}
+
+.verification-steps h3 {
+  color: #FFD600;
+  font-size: 18px;
+  margin-bottom: 15px;
+}
+
+.verification-steps ol {
+  color: rgba(255, 255, 255, 0.9);
+  padding-left: 20px;
+  margin-bottom: 15px;
+}
+
+.verification-steps li {
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.help-text {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+  margin-top: 15px;
+  font-style: italic;
+}
+
+.verification-actions {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.secondary-btn {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.secondary-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
 }
 
 .close-btn {
@@ -109,6 +252,17 @@
   box-sizing: border-box;
 }
 
+/* Input fields with icons on the left */
+.form-group.has-icon input {
+  padding-left: 50px;
+}
+
+/* Password fields with both left icon and right toggle */
+.form-group.password-group input {
+  padding-left: 50px;
+  padding-right: 50px;
+}
+
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
@@ -125,11 +279,43 @@
 
 .input-icon {
   position: absolute;
-  right: 15px;
+  left: 15px;
   top: 50%;
   transform: translateY(-50%);
   color: rgba(255, 255, 255, 0.5);
   font-size: 16px;
+}
+
+.password-group {
+  position: relative;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  padding: 5px;
+  font-size: 16px;
+  transition: color 0.3s ease;
+  z-index: 1;
+}
+
+.password-toggle:hover {
+  color: #FFD600;
+}
+
+.password-toggle:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.password-toggle:disabled:hover {
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .form-options {

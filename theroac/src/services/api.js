@@ -61,6 +61,31 @@ const getCurrentUser = async () => {
     return request('/auth/me');
 };
 
+const forgotPassword = async (email) => {
+    return request('/auth/forgot-password', {
+        method: 'POST',
+        body: JSON.stringify(email),
+    });
+};
+
+const resetPassword = async (resetData) => {
+    return request('/auth/reset-password', {
+        method: 'POST',
+        body: JSON.stringify(resetData),
+    });
+};
+
+const verifyEmail = async (token) => {
+    return request(`/auth/verify-email?token=${token}`);
+};
+
+const resendVerification = async (email) => {
+    return request('/auth/resend-verification', {
+        method: 'POST',
+        body: JSON.stringify(email),
+    });
+};
+
 // Jobs endpoints
 const getJobs = async (filters = {}) => {
     const queryParams = new URLSearchParams(filters).toString();
@@ -150,6 +175,10 @@ const apiService = {
     login,
     register,
     getCurrentUser,
+    forgotPassword,
+    resetPassword,
+    verifyEmail,
+    resendVerification,
     getJobs,
     getJobById,
     applyToJob,

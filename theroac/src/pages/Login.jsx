@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { usePreloader } from '../hooks/usePreloader';
 import './Auth.css';
 
 const Login = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { login, isAuthenticated, user, loading } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
@@ -14,7 +15,21 @@ const Login = () => {
   });
   const [submitLoading, setSubmitLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
   const preloaderVisible = usePreloader(300);
+
+  // Check for success messages
+  useEffect(() => {
+    const resetSuccess = searchParams.get('reset');
+    const verifiedSuccess = searchParams.get('verified');
+    
+    if (resetSuccess === 'success') {
+      setSuccessMessage('Password reset successful! You can now login with your new password.');
+    } else if (verifiedSuccess === 'success') {
+      setSuccessMessage('Email verified successfully! You can now login to your account.');
+    }
+  }, [searchParams]);
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -52,6 +67,10 @@ const Login = () => {
     }));
   };
 
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitLoading(true);
@@ -73,7 +92,18 @@ const Login = () => {
           navigate('/candidate-dashboard', { replace: true });
         }
       } else {
-        setError(result.error || 'Login failed');
+        if (result.needsVerification) {
+          setError(
+            <span>
+              {result.error}{' '}
+              <Link to="/resend-verification" style={{ color: '#FFD600', textDecoration: 'underline' }}>
+                Resend verification email
+              </Link>
+            </span>
+          );
+        } else {
+          setError(result.error || 'Login failed');
+        }
       }
     } catch (err) {
       setError('Login failed. Please try again.');
@@ -118,7 +148,14 @@ const Login = () => {
               </div>
             )}
             
-            <div className="form-group">
+            {successMessage && (
+              <div className="success-message">
+                <i className="fas fa-check-circle"></i>
+                {successMessage}
+              </div>
+            )}
+            
+            <div className="form-group has-icon">
               <input
                 type="email"
                 name="email"
@@ -131,9 +168,9 @@ const Login = () => {
               <i className="fa-solid fa-envelope input-icon"></i>
             </div>
 
-            <div className="form-group">
+            <div className="form-group password-group">
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 name="password"
                 placeholder="Password"
                 value={formData.password}
@@ -143,6 +180,14 @@ const Login = () => {
                 disabled={submitLoading}
               />
               <i className="fa-solid fa-lock input-icon"></i>
+              <button
+                type="button"
+                className="password-toggle"
+                onClick={togglePasswordVisibility}
+                disabled={submitLoading}
+              >
+                <i className={`fa-solid ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+              </button>
             </div>
 
             <div className="form-options">

@@ -19,6 +19,8 @@ const Signup = () => {
     confirmPassword: '',
     phone: '',
   });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -26,6 +28,14 @@ const Signup = () => {
       ...prev,
       [name]: value,
     }));
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword);
   };
 
   const handleSubmit = async (e) => {
@@ -63,10 +73,21 @@ const Signup = () => {
       const result = await register(userData);
 
       if (result.success) {
-        if (userType === 'recruiter') {
-          navigate('/recruiter-dashboard');
+        if (result.needsVerification) {
+          // Redirect to a verification pending page or show message
+          navigate('/verification-pending', { 
+            state: { 
+              email: formData.email, 
+              message: result.message 
+            } 
+          });
         } else {
-          navigate('/candidate-dashboard');
+          // For users who don't need verification (shouldn't happen now)
+          if (userType === 'recruiter') {
+            navigate('/recruiter-dashboard');
+          } else {
+            navigate('/candidate-dashboard');
+          }
         }
       } else {
         setError(result.error || 'Registration failed');
@@ -135,7 +156,7 @@ const Signup = () => {
               </div>
             </div>
 
-            <div className="form-group">
+            <div className="form-group has-icon">
               <input
                 type="email"
                 name="email"
@@ -151,7 +172,7 @@ const Signup = () => {
               <i className="fa-solid fa-envelope input-icon"></i>
             </div>
 
-            <div className="form-group">
+            <div className="form-group has-icon">
               <input
                 type="tel"
                 name="phone"
@@ -164,9 +185,9 @@ const Signup = () => {
             </div>
 
             <div className="form-row">
-              <div className="form-group">
+              <div className="form-group password-group">
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   name="password"
                   placeholder="Password"
                   value={formData.password}
@@ -174,10 +195,18 @@ const Signup = () => {
                   required
                 />
                 <i className="fa-solid fa-lock input-icon"></i>
+                <button
+                  type="button"
+                  className="password-toggle"
+                  onClick={togglePasswordVisibility}
+                  disabled={loading}
+                >
+                  <i className={`fa-solid ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+                </button>
               </div>
-              <div className="form-group">
+              <div className="form-group password-group">
                 <input
-                  type="password"
+                  type={showConfirmPassword ? "text" : "password"}
                   name="confirmPassword"
                   placeholder="Confirm Password"
                   value={formData.confirmPassword}
@@ -185,6 +214,14 @@ const Signup = () => {
                   required
                 />
                 <i className="fa-solid fa-lock input-icon"></i>
+                <button
+                  type="button"
+                  className="password-toggle"
+                  onClick={toggleConfirmPasswordVisibility}
+                  disabled={loading}
+                >
+                  <i className={`fa-solid ${showConfirmPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+                </button>
               </div>
             </div>
 

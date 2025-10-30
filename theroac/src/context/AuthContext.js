@@ -108,6 +108,16 @@ export const AuthProvider = ({ children }) => {
   const login = async (credentials) => {
     try {
       const response = await apiService.login(credentials);
+      
+      // Check if user needs verification
+      if (response.needsVerification) {
+        return { 
+          success: false, 
+          error: response.message,
+          needsVerification: true 
+        };
+      }
+      
       const { token, user: userData } = response;
       
       localStorage.setItem('token', token);
@@ -125,6 +135,19 @@ export const AuthProvider = ({ children }) => {
   const register = async (userData) => {
     try {
       const response = await apiService.register(userData);
+      
+      // Check if user needs verification
+      if (response.needsVerification) {
+        // Don't set authentication state for unverified users
+        return { 
+          success: true, 
+          user: response.user, 
+          needsVerification: true,
+          message: response.message 
+        };
+      }
+      
+      // For verified users (shouldn't happen with current flow)
       const { token, user: newUser } = response;
       
       localStorage.setItem('token', token);

@@ -37,6 +37,18 @@ Submission.belongsTo(HackathonTeam, { foreignKey: 'teamId' });
 Job.belongsToMany(User, { through: JobApplication, foreignKey: 'jobId', otherKey: 'userId' });
 User.belongsToMany(Job, { through: JobApplication, foreignKey: 'userId', otherKey: 'jobId' });
 
+// Direct associations for JobApplication
+JobApplication.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+JobApplication.belongsTo(Job, { foreignKey: 'jobId', as: 'job' });
+User.hasMany(JobApplication, { foreignKey: 'userId', as: 'jobApplications' });
+Job.hasMany(JobApplication, { foreignKey: 'jobId', as: 'jobApplications' });
+
+// Direct associations for EventRegistration
+EventRegistration.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+EventRegistration.belongsTo(Event, { foreignKey: 'eventId', as: 'event' });
+User.hasMany(EventRegistration, { foreignKey: 'userId', as: 'eventRegistrations' });
+Event.hasMany(EventRegistration, { foreignKey: 'eventId', as: 'eventRegistrations' });
+
 module.exports = {
   sequelize,
   User,

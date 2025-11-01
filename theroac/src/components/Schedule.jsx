@@ -1,10 +1,159 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import EventSlider from './EventSlider';
-import Header from './Header';
 import { eventsData } from '../Data/Event.js';
+import apiService from '../services/api';
+
 const Schedule = () => {
-  return (
-    <div className="event10-section-area sp3">
+	// Initialize with static data or empty array as fallback
+	const [dynamicEventsData, setDynamicEventsData] = useState(() => {
+		return Array.isArray(eventsData) ? eventsData : [];
+	});
+	const [loading, setLoading] = useState(true);
+
+	useEffect(() => {
+		fetchDynamicContent();
+	}, []);
+
+	const fetchDynamicContent = async () => {
+		try {
+			setLoading(true);
+			const [jobsData, apiEventsData, hubContentData] = await Promise.all([
+				apiService.getJobs({ limit: 10 }).catch(() => ({ jobs: [] })),
+				apiService.getEvents().catch(() => ({ events: [] })),
+				apiService.getHubContent({ limit: 10 }).catch(() => ({ events: [] }))
+			]);
+
+			console.log('Fetched jobs data:', jobsData);
+
+			// Transform API data to match the existing event structure
+			const jobs = (jobsData.jobs || jobsData || []).map(job => ({
+				img: job.companyLogo || "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?auto=format&fit=crop&w=800&q=80",
+				title: `${job.title} - ${job.companyName}`,
+				time: `${job.jobType || 'Full-time'} • ${job.experienceLevel || 'All levels'}`,
+				location: job.location || 'Remote',
+				type: 'job',
+				data: job
+			}));
+
+			const events = (apiEventsData.events || apiEventsData || [])
+				.filter(event => event.eventType !== 'hub-content')
+				.map(event => ({
+					img: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80",
+					title: event.title,
+					time: event.date && event.time ? `${new Date(event.date).toLocaleDateString()} • ${event.time}` : 'TBD',
+					location: event.venue || 'Online Event',
+					type: 'event',
+					data: event
+				}));
+
+			const hubContent = (hubContentData.events || hubContentData || [])
+				.filter(content => content.eventType === 'hub-content')
+				.map(content => ({
+					img: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80",
+					title: content.title,
+					time: `${content.category?.replace('-', ' ') || 'Career Tips'} • ${new Date(content.createdAt || Date.now()).toLocaleDateString()}`,
+					location: "ROAC Talent Hub",
+					type: 'hub-content',
+					data: content
+				}));
+
+			// Create enhanced events data with dynamic content using the imported static data
+			const baseEventsData = Array.isArray(eventsData) ? eventsData : [];
+			const enhancedEventsData = [...baseEventsData];
+
+			console.log('Transformed jobs:', jobs);
+			console.log('Enhanced events data before modification:', enhancedEventsData);
+
+			// Add dynamic jobs to the Jobs section
+			const jobsIndex = enhancedEventsData.findIndex(section => section.titleId === "Jobs");
+			if (jobsIndex !== -1 && enhancedEventsData[jobsIndex]) {
+				const existingJobs = Array.isArray(enhancedEventsData[jobsIndex].events)
+					? enhancedEventsData[jobsIndex].events
+					: [];
+
+				// Add dynamic jobs to existing static jobs
+				const combinedJobs = [
+					...existingJobs,
+					...jobs.slice(0, 5) // Add up to 5 recent jobs from backend
+				];
+
+				enhancedEventsData[jobsIndex] = {
+					...enhancedEventsData[jobsIndex],
+					events: combinedJobs
+				};
+			}
+
+			// Add dynamic events to the Events section
+			const eventsIndex = enhancedEventsData.findIndex(section => section.titleId === "Events");
+			if (eventsIndex !== -1 && enhancedEventsData[eventsIndex]) {
+				const existingEvents = Array.isArray(enhancedEventsData[eventsIndex].events)
+					? enhancedEventsData[eventsIndex].events
+					: [];
+
+				// Add dynamic events to existing static events
+				const combinedEvents = [
+					...existingEvents,
+					...events.slice(0, 3) // Add up to 3 recent events from backend
+				];
+
+				enhancedEventsData[eventsIndex] = {
+					...enhancedEventsData[eventsIndex],
+					events: combinedEvents
+				};
+			}
+
+			// Add dynamic content to ROAC Prime Talent Hub section
+			const roacHubIndex = enhancedEventsData.findIndex(section => section.titleId === "ROAC");
+			if (roacHubIndex !== -1 && enhancedEventsData[roacHubIndex]) {
+				const existingRoacEvents = Array.isArray(enhancedEventsData[roacHubIndex].events)
+					? enhancedEventsData[roacHubIndex].events
+					: [];
+
+				// Add hub content to ROAC section
+				const combinedRoacEvents = [
+					...existingRoacEvents,
+					...hubContent.slice(0, 3) // Add up to 3 hub content items
+				];
+
+				enhancedEventsData[roacHubIndex] = {
+					...enhancedEventsData[roacHubIndex],
+					events: combinedRoacEvents
+				};
+			}
+
+			setDynamicEventsData(enhancedEventsData);
+		} catch (error) {
+			console.error('Error fetching dynamic content:', error);
+			// Fallback to static data with safety check
+			const fallbackData = Array.isArray(eventsData) ? eventsData : [];
+			setDynamicEventsData(fallbackData);
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	if (loading) {
+		return (
+			<div className="event10-section-area sp3">
+				<div className="container">
+					<div className="row">
+						<div className="col-lg-8 m-auto">
+							<div className="event-heading heading13 text-center space-margin60">
+								<div className="space20"></div>
+								<h2 className="text-anime-style-3">
+									<img src="assets/img/icons/sub-logo1.svg" alt="" width={30} />
+									Loading Opportunities...
+								</h2>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		);
+	}
+
+	return (
+		<div className="event10-section-area sp3">
 			<div className="container">
 				<div className="row">
 					<div className="col-lg-8 m-auto">
@@ -17,7 +166,7 @@ const Schedule = () => {
 				</div>
 				<div className="row">
 					<div className="col-lg-12">
-						<EventSlider eventsData={eventsData}/>
+						<EventSlider eventsData={dynamicEventsData} />
 						<div className="space30"></div>
 						{/* <div className="event6-widget-boxarea" data-aos="fade-left" data-aos-duration="1000">
 							<div className="row align-items-center">
@@ -110,7 +259,7 @@ const Schedule = () => {
 				</div>
 			</div>
 		</div>
-  );
+	);
 }
 
 export default Schedule;

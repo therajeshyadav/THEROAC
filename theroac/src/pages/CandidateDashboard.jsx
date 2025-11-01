@@ -3,23 +3,42 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import apiService from '../services/api';
 import { usePreloader } from '../hooks/usePreloader';
+import './CandidateDashboard.css';
 // import DashboardHeader from '../components/DashboardHeader';
-// import './Dashboard.css';
 
 const CandidateDashboard = () => {
     const navigate = useNavigate();
-    const { user: authUser, isAuthenticated, loading: authLoading } = useAuth();
+    const { user: authUser, isAuthenticated, loading: authLoading, logout } = useAuth();
     const [activeTab, setActiveTab] = useState('internships');
     const [notification, setNotification] = useState('');
     const [jobs, setJobs] = useState([]);
     const [events, setEvents] = useState([]);
     const [applications, setApplications] = useState([]);
+    const [dashboardStats, setDashboardStats] = useState({
+        totalApplications: 0,
+        availableJobs: 0,
+        upcomingEvents: 0,
+        profileViews: 0,
+        statusCounts: {},
+        candidateEventRegistrations: 0,
+        recentApplications: []
+    });
     const [loading, setLoading] = useState(true);
+    const [isEditingProfile, setIsEditingProfile] = useState(false);
+    const [profileData, setProfileData] = useState({
+        fullName: '',
+        email: '',
+        phone: '',
+        city: '',
+        state: '',
+        country: '',
+        bio: ''
+    });
     const preloaderVisible = usePreloader(300); // Hide preloader after 300ms
 
     useEffect(() => {
         console.log('🎯 CandidateDashboard useEffect triggered', { authLoading, isAuthenticated, user: authUser });
-        
+
         if (authLoading) {
             console.log('⏳ Auth still loading, waiting...');
             return;
@@ -32,14 +51,18 @@ const CandidateDashboard = () => {
         }
 
         console.log('✅ Authenticated, loading dashboard data');
-        loadDashboardData();
 
-        // Fallback: Force loading to false after 10 seconds
+        // Set up timeout before loading data
         const loadingTimeout = setTimeout(() => {
             console.warn('⚠️ Dashboard loading timeout - forcing completion');
             setLoading(false);
             setNotification('Dashboard loaded with limited functionality. Please refresh if needed.');
-        }, 10000);
+        }, 5000);
+
+        // Load data and clear timeout on success
+        loadDashboardData().finally(() => {
+            clearTimeout(loadingTimeout);
+        });
 
         return () => clearTimeout(loadingTimeout);
     }, [isAuthenticated, authLoading, navigate]);
@@ -47,19 +70,51 @@ const CandidateDashboard = () => {
     const loadDashboardData = async () => {
         try {
             setLoading(true);
-            const [jobsData, eventsData, applicationsData] = await Promise.allSettled([
-                apiService.getJobs().catch(() => ({ jobs: [] })),
-                apiService.getEvents().catch(() => ({ events: [] })),
-                apiService.getUserApplications().catch(() => ({ applications: [] }))
+            console.log('🔄 Loading dashboard data...');
+            
+            const [jobsData, eventsData, applicationsData, statsData] = await Promise.allSettled([
+                apiService.getJobs().catch((error) => {
+                    console.warn('Jobs API failed:', error);
+                    return { jobs: [] };
+                }),
+                apiService.getEvents().catch((error) => {
+                    console.warn('Events API failed:', error);
+                    return { events: [] };
+                }),
+                apiService.getUserApplications().catch((error) => {
+                    console.warn('Applications API failed:', error);
+                    return { applications: [] };
+                }),
+                apiService.getCandidateStats().catch((error) => {
+                    console.warn('Stats API failed:', error);
+                    return {
+                        totalApplications: 0,
+                        availableJobs: 0,
+                        upcomingEvents: 0,
+                        profileViews: 0,
+                        statusCounts: {},
+                        candidateEventRegistrations: 0,
+                        recentApplications: []
+                    };
+                })
             ]);
 
             // Handle results from Promise.allSettled
             setJobs(jobsData.status === 'fulfilled' ? (jobsData.value.jobs || []) : []);
             setEvents(eventsData.status === 'fulfilled' ? (eventsData.value.events || []) : []);
             setApplications(applicationsData.status === 'fulfilled' ? (applicationsData.value.applications || []) : []);
+            setDashboardStats(statsData.status === 'fulfilled' ? statsData.value : {
+                totalApplications: 0,
+                availableJobs: 0,
+                upcomingEvents: 0,
+                profileViews: 0,
+                statusCounts: {},
+                candidateEventRegistrations: 0,
+                recentApplications: []
+            });
 
-            // Show notification if any requests failed
-            const failedRequests = [jobsData, eventsData, applicationsData].filter(result => result.status === 'rejected');
+            // Only show notification if any requests failed
+            const failedRequests = [jobsData, eventsData, applicationsData, statsData].filter(result => result.status === 'rejected');
             if (failedRequests.length > 0) {
                 setNotification('Some data could not be loaded. Working in offline mode.');
             }
@@ -70,16 +125,62 @@ const CandidateDashboard = () => {
             setJobs([]);
             setEvents([]);
             setApplications([]);
+            setDashboardStats({
+                totalApplications: 0,
+                availableJobs: 0,
+                upcomingEvents: 0,
+                profileViews: 0,
+                statusCounts: {},
+                candidateEventRegistrations: 0,
+                recentApplications: []
+            });
         } finally {
+            console.log('✅ Dashboard data loading completed');
             setLoading(false);
         }
     };
 
     const quickStats = [
-        { title: 'Applied Jobs', count: applications.length || 0, icon: 'fa-briefcase', color: '#FFD600' },
-        { title: 'Available Jobs', count: jobs.length || 0, icon: 'fa-search', color: '#4CAF50' },
-        { title: 'Upcoming Events', count: events.length || 0, icon: 'fa-calendar-check', color: '#2196F3' },
-        { title: 'Profile Views', count: 45, icon: 'fa-eye', color: '#FF9800' }
+        {
+            title: 'Applied Jobs',
+            value: (dashboardStats.totalApplications || 0).toString(),
+            icon: 'fa-briefcase',
+            color: 'yellow',
+            details: [
+                { label: 'Total Applications', value: (dashboardStats.totalApplications || 0).toString() },
+                { label: 'This Month', value: Math.floor((dashboardStats.totalApplications || 0) * 0.3).toString() }
+            ]
+        },
+        {
+            title: 'Available Jobs',
+            value: (dashboardStats.availableJobs || 0).toString(),
+            icon: 'fa-search',
+            color: 'blue',
+            details: [
+                { label: 'Open Positions', value: (dashboardStats.availableJobs || 0).toString() },
+                { label: 'New This Week', value: Math.floor((dashboardStats.availableJobs || 0) * 0.1).toString() }
+            ]
+        },
+        {
+            title: 'Upcoming Events',
+            value: (dashboardStats.upcomingEvents || 0).toString(),
+            icon: 'fa-calendar-check',
+            color: 'pink',
+            details: [
+                { label: 'Total Events', value: (dashboardStats.upcomingEvents || 0).toString() },
+                { label: 'Registered', value: (dashboardStats.candidateEventRegistrations || 0).toString() }
+            ]
+        },
+        {
+            title: 'Profile Views',
+            value: (dashboardStats.profileViews || 0).toString(),
+            icon: 'fa-eye',
+            color: 'orange',
+            details: [
+                { label: 'Total Views', value: (dashboardStats.profileViews || 0).toString() },
+                { label: 'This Week', value: Math.floor((dashboardStats.profileViews || 0) * 0.2).toString() }
+            ]
+        }
     ];
 
     const getStatusColor = (status) => {
@@ -111,6 +212,51 @@ const CandidateDashboard = () => {
         }
     };
 
+    const handleEditProfile = () => {
+        setProfileData({
+            fullName: authUser?.fullName || authUser?.name || '',
+            email: authUser?.email || '',
+            phone: authUser?.phone || '',
+            city: authUser?.city || '',
+            state: authUser?.state || '',
+            country: authUser?.country || '',
+            bio: authUser?.bio || ''
+        });
+        setIsEditingProfile(true);
+    };
+
+    const handleSaveProfile = async () => {
+        try {
+            const updatedUser = await apiService.updateProfile(profileData);
+            setNotification('Profile updated successfully!');
+            setIsEditingProfile(false);
+            // Update the auth context with new user data
+            // You might need to add an updateUser method to AuthContext
+        } catch (error) {
+            setNotification('Failed to update profile. Please try again.');
+        }
+    };
+
+    const handleCancelEdit = () => {
+        setIsEditingProfile(false);
+        setProfileData({
+            fullName: '',
+            email: '',
+            phone: '',
+            city: '',
+            state: '',
+            country: '',
+            bio: ''
+        });
+    };
+
+    const handleProfileInputChange = (field, value) => {
+        setProfileData(prev => ({
+            ...prev,
+            [field]: value
+        }));
+    };
+
     if (authLoading || loading) {
         return (
             <div className="dashboard-container">
@@ -119,7 +265,6 @@ const CandidateDashboard = () => {
                     <div className="loading-spinner">
                         <i className="fas fa-spinner fa-spin"></i>
                     </div>
-                    <p>Loading your dashboard...</p>
                     <div className="loading-dots">
                         <span></span>
                         <span></span>
@@ -132,30 +277,112 @@ const CandidateDashboard = () => {
 
     // Debug log to check if component is rendering
     console.log('CandidateDashboard rendering with user:', authUser);
+    console.log('User name fields:', {
+        fullName: authUser?.fullName,
+        name: authUser?.name,
+        firstChar: (authUser?.fullName || authUser?.name)?.charAt(0)?.toUpperCase()
+    });
 
     return (
         <div className="dashboard-container">
             {preloaderVisible && (
                 <div className="preloader">
                     <div className="loading-container">
-                    <div className="loading"></div>
-                    <div id="loading-icon">
-                        <img src="assets/img/logo/preloader.png" alt="" />
-                    </div>
+                        <div className="loading"></div>
+                        <div id="loading-icon">
+                            <img src="assets/img/logo/preloader.png" alt="" />
+                        </div>
                     </div>
                 </div>
             )}
             <div className="paginacontainer">
                 <div className="progress-wrap warp2">
-                <svg className="progress-circle svg-content" width="100%" height="100%" viewBox="-1 -1 102 102">
-                    <path d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98" />
-                </svg>
+                    <svg className="progress-circle svg-content" width="100%" height="100%" viewBox="-1 -1 102 102">
+                        <path d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98" />
+                    </svg>
                 </div>
-            </div> 
+            </div>
             <div className="dashboard-background"></div>
 
-            {/* Dashboard Header with Navigation */}
-            {/* <DashboardHeader user={authUser} activeTab={activeTab} setActiveTab={setActiveTab} /> */}
+            {/* Dashboard Header */}
+            <header className="candidate-header">
+                <div className="header-content">
+                    <div className="header-left">
+                        <div className="logo-section">
+                            <img
+                                src="assets/img/logo/logo5.png"
+                                alt="ROAC Logo"
+                                className="dashboard-logo"
+                                onError={(e) => {
+                                    e.target.style.display = 'none';
+                                }}
+                            />
+                        </div>
+                    </div>
+
+                    <nav className="header-nav">
+                        <button
+                            className={`nav-btn ${activeTab === 'internships' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('internships')}
+                        >
+                            <i className="fas fa-briefcase"></i>
+                            <span>Dashboard</span>
+                        </button>
+                        <button
+                            className={`nav-btn ${activeTab === 'jobs' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('jobs')}
+                        >
+                            <i className="fas fa-search"></i>
+                            <span>Find Jobs</span>
+                        </button>
+                        <button
+                            className={`nav-btn ${activeTab === 'applications' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('applications')}
+                        >
+                            <i className="fas fa-file-alt"></i>
+                            <span>Applications</span>
+                        </button>
+                        <button
+                            className={`nav-btn ${activeTab === 'events' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('events')}
+                        >
+                            <i className="fas fa-calendar"></i>
+                            <span>Events</span>
+                        </button>
+                        <button
+                            className={`nav-btn ${activeTab === 'profile' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('profile')}
+                        >
+                            <i className="fas fa-user"></i>
+                            <span>Profile</span>
+                        </button>
+                    </nav>
+
+                    <div className="header-right">
+                        <div className="header-actions">
+                            <button className="notification-btn">
+                                <i className="fas fa-bell"></i>
+                                <span className="notification-badge">3</span>
+                            </button>
+                            <div className="user-menu">
+                                <div className="user-avatar">
+                                    {(authUser?.fullName || authUser?.name)?.charAt(0)?.toUpperCase() || 'U'}
+                                </div>
+                                <span className="user-name">{authUser?.fullName || authUser?.name || 'User'}</span>
+                            </div>
+                            <button
+                                className="logout-btn"
+                                onClick={() => {
+                                    logout();
+                                    navigate('/login');
+                                }}
+                            >
+                                <i className="fas fa-sign-out-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </header>
 
             {/* Notification */}
             {notification && (
@@ -182,20 +409,23 @@ const CandidateDashboard = () => {
                     {(activeTab === 'internships') && (
                         <div className="tab-content">
                             {/* Quick Stats */}
-                            <div className="row mb-4">
+                            <div className="stats-grid mb-4">
                                 {quickStats.map((stat, index) => (
-                                    <div key={index} className="col-lg-3 col-md-6 mb-3">
-                                        <div className="stat-card clickable" onClick={() => console.log('Stat clicked:', index)}>
-                                            <div className="stat-icon" style={{ backgroundColor: stat.color }}>
+                                    <div key={index} className={`stat-card ${stat.color} enhanced-card`}>
+                                        <div className="stat-icon-row">
+                                            <div className="stat-icon">
                                                 <i className={`fas ${stat.icon}`}></i>
                                             </div>
-                                            <div className="stat-info">
-                                                <h3>{stat.count}</h3>
-                                                <p>{stat.title}</p>
-                                            </div>
-                                            <div className="stat-arrow">
-                                                <i className="fas fa-arrow-right"></i>
-                                            </div>
+                                            <div className="stat-number">{stat.value}</div>
+                                        </div>
+                                        <div className="stat-info">
+                                            <div className="stat-label">{stat.title}</div>
+                                            {stat.details.map((detail, idx) => (
+                                                <div key={idx} className="stat-details">
+                                                    <div>{detail.label}</div>
+                                                    <div>{detail.value}</div>
+                                                </div>
+                                            ))}
                                         </div>
                                     </div>
                                 ))}
@@ -208,7 +438,7 @@ const CandidateDashboard = () => {
                                         <div className="card-header">
                                             <h4>Find Internships</h4>
                                             <div className="search-stats">
-                                                <span>2,500+ internships available</span>
+                                                <span>{dashboardStats.availableJobs || 0}+ internships available</span>
                                             </div>
                                         </div>
                                         <div className="internship-search-section">
@@ -378,7 +608,7 @@ const CandidateDashboard = () => {
                                 <div className="card-header">
                                     <h4>Find Jobs</h4>
                                     <div className="search-stats">
-                                        <span>1,234 jobs available</span>
+                                        <span>{dashboardStats.availableJobs || 0} jobs available</span>
                                     </div>
                                 </div>
                                 <div className="job-search-section">
@@ -422,7 +652,7 @@ const CandidateDashboard = () => {
                             <div className="dashboard-card">
                                 <div className="card-header">
                                     <h4>Available Jobs</h4>
-                                    <span className="job-count">1,234 jobs found</span>
+                                    <span className="job-count">{jobs.length || 0} jobs found</span>
                                 </div>
                                 <div className="jobs-grid">
                                     {jobs.map(job => (
@@ -638,7 +868,7 @@ const CandidateDashboard = () => {
                                                     <i className="fas fa-camera"></i>
                                                 </button>
                                             </div>
-                                            <h4>{authUser?.name || 'User'}</h4>
+                                            <h4>{authUser?.fullName || authUser?.name || 'User'}</h4>
                                             <p>{authUser?.email || 'user@example.com'}</p>
                                             <div className="profile-completion-mini">
                                                 <span>Profile: 75% Complete</span>
@@ -656,29 +886,91 @@ const CandidateDashboard = () => {
                                     <div className="dashboard-card">
                                         <div className="card-header">
                                             <h4>Profile Information</h4>
-                                            <button className="btn-edit">Edit Profile</button>
+                                            {!isEditingProfile ? (
+                                                <button className="btn-edit" onClick={handleEditProfile}>Edit Profile</button>
+                                            ) : (
+                                                <div className="edit-actions">
+                                                    <button className="btn-save" onClick={handleSaveProfile}>Save</button>
+                                                    <button className="btn-cancel" onClick={handleCancelEdit}>Cancel</button>
+                                                </div>
+                                            )}
                                         </div>
                                         <div className="profile-form">
                                             <div className="row">
                                                 <div className="col-md-6 mb-3">
                                                     <label>Full Name</label>
-                                                    <input type="text" className="form-control" value={authUser?.name || ''} readOnly />
+                                                    <input
+                                                        type="text"
+                                                        className="form-control"
+                                                        value={isEditingProfile ? profileData.fullName : (authUser?.fullName || authUser?.name || '')}
+                                                        readOnly={!isEditingProfile}
+                                                        onChange={(e) => handleProfileInputChange('fullName', e.target.value)}
+                                                    />
                                                 </div>
                                                 <div className="col-md-6 mb-3">
                                                     <label>Email</label>
-                                                    <input type="email" className="form-control" value={authUser?.email || ''} readOnly />
+                                                    <input
+                                                        type="email"
+                                                        className="form-control"
+                                                        value={isEditingProfile ? profileData.email : (authUser?.email || '')}
+                                                        readOnly={!isEditingProfile}
+                                                        onChange={(e) => handleProfileInputChange('email', e.target.value)}
+                                                    />
                                                 </div>
                                                 <div className="col-md-6 mb-3">
                                                     <label>Phone</label>
-                                                    <input type="tel" className="form-control" placeholder="Add phone number" />
+                                                    <input
+                                                        type="tel"
+                                                        className="form-control"
+                                                        value={isEditingProfile ? profileData.phone : (authUser?.phone || '')}
+                                                        placeholder="Add phone number"
+                                                        readOnly={!isEditingProfile}
+                                                        onChange={(e) => handleProfileInputChange('phone', e.target.value)}
+                                                    />
                                                 </div>
                                                 <div className="col-md-6 mb-3">
-                                                    <label>Location</label>
-                                                    <input type="text" className="form-control" placeholder="Add location" />
+                                                    <label>City</label>
+                                                    <input
+                                                        type="text"
+                                                        className="form-control"
+                                                        value={isEditingProfile ? profileData.city : (authUser?.city || '')}
+                                                        placeholder="Add city"
+                                                        readOnly={!isEditingProfile}
+                                                        onChange={(e) => handleProfileInputChange('city', e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="col-md-6 mb-3">
+                                                    <label>State</label>
+                                                    <input
+                                                        type="text"
+                                                        className="form-control"
+                                                        value={isEditingProfile ? profileData.state : (authUser?.state || '')}
+                                                        placeholder="Add state"
+                                                        readOnly={!isEditingProfile}
+                                                        onChange={(e) => handleProfileInputChange('state', e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="col-md-6 mb-3">
+                                                    <label>Country</label>
+                                                    <input
+                                                        type="text"
+                                                        className="form-control"
+                                                        value={isEditingProfile ? profileData.country : (authUser?.country || '')}
+                                                        placeholder="Add country"
+                                                        readOnly={!isEditingProfile}
+                                                        onChange={(e) => handleProfileInputChange('country', e.target.value)}
+                                                    />
                                                 </div>
                                                 <div className="col-12 mb-3">
                                                     <label>Professional Summary</label>
-                                                    <textarea className="form-control" rows="4" placeholder="Tell us about yourself..."></textarea>
+                                                    <textarea
+                                                        className="form-control"
+                                                        rows="4"
+                                                        value={isEditingProfile ? profileData.bio : (authUser?.bio || '')}
+                                                        placeholder="Tell us about yourself..."
+                                                        readOnly={!isEditingProfile}
+                                                        onChange={(e) => handleProfileInputChange('bio', e.target.value)}
+                                                    />
                                                 </div>
                                                 <div className="col-md-6 mb-3">
                                                     <label>Experience Level</label>

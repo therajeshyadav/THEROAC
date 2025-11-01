@@ -16,6 +16,17 @@ const EventSlider = ({ eventsData }) => {
     });
   };
 
+  // Add safety check for eventsData
+  if (!eventsData || !Array.isArray(eventsData)) {
+    return (
+      <div className="event-sections-wrapper">
+        <div className="text-center text-white">
+          <p>Loading events...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="event-sections-wrapper">
       {eventsData.map((section, sectionIndex) => (
@@ -37,7 +48,7 @@ const EventSlider = ({ eventsData }) => {
             className="prime-carousel"
             ref={(el) => (scrollRefs.current[sectionIndex] = el)}
           >
-            {section.events.map((event, index) => (
+            {(section.events || []).map((event, index) => (
               <div className="prime-card" key={index}>
                 <div className="image-anime prime-img-wrapper">
                   <img src={event.img} alt={event.title} className="prime-img" />
@@ -61,7 +72,10 @@ const EventSlider = ({ eventsData }) => {
                     {event.location}
                   </p>
                   <a href="#" className="buy-btn">
-                   Apply Now →
+                   {event.type === 'job' ? 'Apply Now' : 
+                    event.type === 'event' ? 'Register' : 
+                    event.type === 'hub-content' ? 'Read More' : 
+                    'Apply Now'} →
                   </a>
                 </div>
               </div>

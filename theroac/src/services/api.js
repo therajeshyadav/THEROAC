@@ -96,6 +96,13 @@ const getJobById = async (id) => {
     return request(`/jobs/${id}`);
 };
 
+const createJob = async (jobData) => {
+    return request('/jobs', {
+        method: 'POST',
+        body: JSON.stringify(jobData),
+    });
+};
+
 const applyToJob = async (jobId, applicationData) => {
     return request(`/jobs/${jobId}/apply`, {
         method: 'POST',
@@ -110,6 +117,13 @@ const getUserApplications = async () => {
 // Events endpoints
 const getEvents = async () => {
     return request('/events');
+};
+
+const createEvent = async (eventData) => {
+    return request('/events', {
+        method: 'POST',
+        body: JSON.stringify(eventData),
+    });
 };
 
 const registerForEvent = async (eventId) => {
@@ -131,11 +145,20 @@ const registerForHackathon = async (hackathonId, teamData) => {
 };
 
 // User profile endpoints
+const getProfile = async () => {
+    return request('/users/me');
+};
+
 const updateProfile = async (profileData) => {
-    return request('/users/profile', {
+    return request('/users/me', {
         method: 'PUT',
         body: JSON.stringify(profileData),
     });
+};
+
+// Dashboard endpoints
+const getCandidateStats = async () => {
+    return request('/dashboard/candidate/stats');
 };
 
 // Admin endpoints
@@ -169,6 +192,25 @@ const getAdminAnalytics = async () => {
     return request('/admin/analytics');
 };
 
+// Hub Content endpoints
+const createHubContent = async (contentData) => {
+    return request('/events', {
+        method: 'POST',
+        body: JSON.stringify({
+            ...contentData,
+            eventType: 'hub-content'
+        }),
+    });
+};
+
+const getHubContent = async (filters = {}) => {
+    const queryParams = new URLSearchParams({
+        ...filters,
+        eventType: 'hub-content'
+    }).toString();
+    return request(`/events${queryParams ? `?${queryParams}` : ''}`);
+};
+
 // Export all functions as apiService object
 const apiService = {
     request,
@@ -181,19 +223,25 @@ const apiService = {
     resendVerification,
     getJobs,
     getJobById,
+    createJob,
     applyToJob,
     getUserApplications,
     getEvents,
+    createEvent,
     registerForEvent,
     getHackathons,
     registerForHackathon,
+    getProfile,
     updateProfile,
+    getCandidateStats,
     getAdminStats,
     getAdminUsers,
     updateUserStatus,
     getAdminJobs,
     getAdminEvents,
-    getAdminAnalytics
+    getAdminAnalytics,
+    createHubContent,
+    getHubContent
 };
 
 export default apiService;

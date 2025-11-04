@@ -18,15 +18,29 @@ const Schedule = () => {
 		try {
 			setLoading(true);
 			const [jobsData, apiEventsData, hubContentData] = await Promise.all([
-				apiService.getJobs({ limit: 10 }).catch(() => ({ jobs: [] })),
-				apiService.getEvents().catch(() => ({ events: [] })),
-				apiService.getHubContent({ limit: 10 }).catch(() => ({ events: [] }))
+				apiService.getJobs({ limit: 10 }).catch((error) => {
+					console.log('⚠️ Jobs API failed:', error.message);
+					return { jobs: [] };
+				}),
+				apiService.getEvents().catch((error) => {
+					console.log('⚠️ Events API failed:', error.message);
+					return { events: [] };
+				}),
+				apiService.getHubContent({ limit: 10 }).catch((error) => {
+					console.log('⚠️ Hub Content API failed:', error.message);
+					return [];
+				})
 			]);
 
-			console.log('Fetched jobs data:', jobsData);
+			console.log('🔍 API Response - Jobs:', jobsData);
+			console.log('🔍 API Response - Events:', apiEventsData);
+			console.log('🔍 API Response - Hub Content:', hubContentData);
+			console.log('📊 Jobs Array Length:', (Array.isArray(jobsData) ? jobsData : (jobsData.jobs || [])).length);
+			console.log('📊 Events Array Length:', (Array.isArray(apiEventsData) ? apiEventsData : (apiEventsData.events || [])).length);
+			console.log('📊 Hub Content Array Length:', (Array.isArray(hubContentData) ? hubContentData : []).length);
 
 			// Transform API data to match the existing event structure
-			const jobs = (jobsData.jobs || jobsData || []).map(job => ({
+			const jobs = (Array.isArray(jobsData) ? jobsData : (jobsData.jobs || [])).map(job => ({
 				img: job.companyLogo || "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?auto=format&fit=crop&w=800&q=80",
 				title: `${job.title} - ${job.companyName}`,
 				time: `${job.jobType || 'Full-time'} • ${job.experienceLevel || 'All levels'}`,
@@ -35,19 +49,40 @@ const Schedule = () => {
 				data: job
 			}));
 
-			const events = (apiEventsData.events || apiEventsData || [])
-				.filter(event => event.eventType !== 'hub-content')
-				.map(event => ({
-					img: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80",
-					title: event.title,
-					time: event.date && event.time ? `${new Date(event.date).toLocaleDateString()} • ${event.time}` : 'TBD',
-					location: event.venue || 'Online Event',
-					type: 'event',
-					data: event
-				}));
+			const events = (Array.isArray(apiEventsData) ? apiEventsData : (apiEventsData.events || []))
+				.map(event => {
+					// Extract date and time from startDate
+					let formattedDateTime = 'Date & Time TBD';
+					if (event.startDate) {
+						try {
+							const startDate = new Date(event.startDate);
+							const dateStr = startDate.toLocaleDateString('en-US', { 
+								month: 'short', 
+								day: 'numeric' 
+							});
+							const timeStr = startDate.toLocaleTimeString('en-US', { 
+								hour: 'numeric', 
+								minute: '2-digit',
+								hour12: true 
+							});
+							formattedDateTime = `${dateStr} • ${timeStr}`;
+						} catch (error) {
+							console.error('Error formatting date:', error);
+						}
+					}
 
-			const hubContent = (hubContentData.events || hubContentData || [])
-				.filter(content => content.eventType === 'hub-content')
+					return {
+						img: event.bannerImage || event.image || "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80",
+						title: event.title || 'Untitled Event',
+						time: formattedDateTime,
+						location: event.location || event.venue || 'Online Event',
+						type: 'event',
+						data: event,
+						category: event.tags?.[0] || 'workshop'
+					};
+				});
+
+			const hubContent = (Array.isArray(hubContentData) ? hubContentData : [])
 				.map(content => ({
 					img: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80",
 					title: content.title,
@@ -57,15 +92,21 @@ const Schedule = () => {
 					data: content
 				}));
 
+			console.log('Processed hub content:', hubContent);
+
 			// Create enhanced events data with dynamic content using the imported static data
 			const baseEventsData = Array.isArray(eventsData) ? eventsData : [];
 			const enhancedEventsData = [...baseEventsData];
 
-			console.log('Transformed jobs:', jobs);
-			console.log('Enhanced events data before modification:', enhancedEventsData);
+			console.log('🔄 Transformed Jobs for Display:', jobs);
+			console.log('🔄 Transformed Events for Display:', events);
+			console.log('🔄 Transformed Hub Content for Display:', hubContent);
+			console.log('📋 Static Events Data (Base):', baseEventsData);
+			console.log('📋 Enhanced Events Data (Before Modification):', enhancedEventsData);
 
 			// Add dynamic jobs to the Jobs section
 			const jobsIndex = enhancedEventsData.findIndex(section => section.titleId === "Jobs");
+			console.log('🔍 Jobs Section Index:', jobsIndex);
 			if (jobsIndex !== -1 && enhancedEventsData[jobsIndex]) {
 				const existingJobs = Array.isArray(enhancedEventsData[jobsIndex].events)
 					? enhancedEventsData[jobsIndex].events
@@ -74,8 +115,9 @@ const Schedule = () => {
 				// Add dynamic jobs to existing static jobs
 				const combinedJobs = [
 					...existingJobs,
-					...jobs.slice(0, 5) // Add up to 5 recent jobs from backend
+					...(jobs.length > 0 ? jobs.slice(0, 5) : []) // Add up to 5 recent jobs from backend if available
 				];
+				console.log('✅ Combined Jobs:', combinedJobs.length, 'items (', existingJobs.length, 'static +', jobs.length > 0 ? jobs.slice(0, 5).length : 0, 'dynamic)');
 
 				enhancedEventsData[jobsIndex] = {
 					...enhancedEventsData[jobsIndex],
@@ -85,6 +127,7 @@ const Schedule = () => {
 
 			// Add dynamic events to the Events section
 			const eventsIndex = enhancedEventsData.findIndex(section => section.titleId === "Events");
+			console.log('🔍 Events Section Index:', eventsIndex);
 			if (eventsIndex !== -1 && enhancedEventsData[eventsIndex]) {
 				const existingEvents = Array.isArray(enhancedEventsData[eventsIndex].events)
 					? enhancedEventsData[eventsIndex].events
@@ -93,17 +136,21 @@ const Schedule = () => {
 				// Add dynamic events to existing static events
 				const combinedEvents = [
 					...existingEvents,
-					...events.slice(0, 3) // Add up to 3 recent events from backend
+					...(events.length > 0 ? events.slice(0, 3) : []) // Add up to 3 recent events from backend if available
 				];
+				console.log('✅ Combined Events:', combinedEvents.length, 'items (', existingEvents.length, 'static +', events.length > 0 ? events.slice(0, 3).length : 0, 'dynamic)');
 
 				enhancedEventsData[eventsIndex] = {
 					...enhancedEventsData[eventsIndex],
 					events: combinedEvents
 				};
+				
+				console.log('Updated Events section with combined events:', combinedEvents);
 			}
 
 			// Add dynamic content to ROAC Prime Talent Hub section
 			const roacHubIndex = enhancedEventsData.findIndex(section => section.titleId === "ROAC");
+			console.log('🔍 ROAC Hub Section Index:', roacHubIndex);
 			if (roacHubIndex !== -1 && enhancedEventsData[roacHubIndex]) {
 				const existingRoacEvents = Array.isArray(enhancedEventsData[roacHubIndex].events)
 					? enhancedEventsData[roacHubIndex].events
@@ -112,8 +159,9 @@ const Schedule = () => {
 				// Add hub content to ROAC section
 				const combinedRoacEvents = [
 					...existingRoacEvents,
-					...hubContent.slice(0, 3) // Add up to 3 hub content items
+					...(hubContent.length > 0 ? hubContent.slice(0, 3) : []) // Add up to 3 hub content items if available
 				];
+				console.log('✅ Combined ROAC Hub Content:', combinedRoacEvents.length, 'items (', existingRoacEvents.length, 'static +', hubContent.length > 0 ? hubContent.slice(0, 3).length : 0, 'dynamic)');
 
 				enhancedEventsData[roacHubIndex] = {
 					...enhancedEventsData[roacHubIndex],
@@ -121,9 +169,11 @@ const Schedule = () => {
 				};
 			}
 
+			console.log('🎯 Final Enhanced Events Data:', enhancedEventsData);
 			setDynamicEventsData(enhancedEventsData);
 		} catch (error) {
-			console.error('Error fetching dynamic content:', error);
+			console.error('❌ Error fetching dynamic content:', error);
+			console.log('🔄 Falling back to static data only');
 			// Fallback to static data with safety check
 			const fallbackData = Array.isArray(eventsData) ? eventsData : [];
 			setDynamicEventsData(fallbackData);

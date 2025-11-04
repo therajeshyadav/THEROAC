@@ -4,11 +4,14 @@ import apiService from '../services/api';
 import './Auth.css';
 
 const ForgotPassword = () => {
+
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
+
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -30,6 +33,8 @@ const ForgotPassword = () => {
   const handleChange = (e) => {
     setEmail(e.target.value);
   };
+
+
 
   if (isSubmitted) {
     return (
@@ -70,7 +75,7 @@ const ForgotPassword = () => {
         </div>
         <div className="col-6">
           <div className="auth-header">
-           
+
             <h2>Forgot Password</h2>
 
           </div>

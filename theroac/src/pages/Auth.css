@@ -24,30 +24,47 @@
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 20px;
-  padding: 40px;
+  padding: 32px;
   width: 100%;
-  max-width: 1024px;
+  max-width: 900px !important;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
   position: relative;
+  margin: 0 auto;
+}
+
+/* Override Bootstrap container behavior for auth cards */
+.auth-card.container {
+  max-width: 900px !important;
+  padding-left: 32px !important;
+  padding-right: 32px !important;
+}
+
+/* Ensure the columns don't get too wide */
+.auth-card .col-5 {
+  max-width: 400px;
+}
+
+.auth-card .col-6 {
+  max-width: 450px;
 }
 
 .signup-card {
-  max-width: 600px;
+  max-width: 500px;
 }
 
 .register-selection {
-  max-width: 500px;
+  max-width: 450px;
 }
 
 .auth-header {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 25px;
   position: relative;
 }
 
 .auth-header h2 {
   color: #ffffff;
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 700;
   margin: 0;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
@@ -221,7 +238,7 @@
 .auth-form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 18px;
 }
 
 .signup-form {
@@ -242,25 +259,25 @@
 .form-group select,
 .form-group textarea {
   width: 100%;
-  padding: 15px 20px;
+  padding: 12px 16px;
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 12px;
+  border-radius: 10px;
   color: #ffffff;
-  font-size: 16px;
+  font-size: 15px;
   transition: all 0.3s ease;
   box-sizing: border-box;
 }
 
 /* Input fields with icons on the left */
 .form-group.has-icon input {
-  padding-left: 50px;
+  padding-left: 44px;
 }
 
 /* Password fields with both left icon and right toggle */
 .form-group.password-group input {
-  padding-left: 50px;
-  padding-right: 50px;
+  padding-left: 44px;
+  padding-right: 44px;
 }
 
 .form-group input:focus,
@@ -279,11 +296,11 @@
 
 .input-icon {
   position: absolute;
-  left: 15px;
+  left: 14px;
   top: 50%;
   transform: translateY(-50%);
   color: rgba(255, 255, 255, 0.5);
-  font-size: 16px;
+  font-size: 15px;
 }
 
 .password-group {
@@ -292,15 +309,15 @@
 
 .password-toggle {
   position: absolute;
-  right: 15px;
+  right: 14px;
   top: 50%;
   transform: translateY(-50%);
   background: none;
   border: none;
   color: rgba(255, 255, 255, 0.6);
   cursor: pointer;
-  padding: 5px;
-  font-size: 16px;
+  padding: 4px;
+  font-size: 15px;
   transition: color 0.3s ease;
   z-index: 1;
 }
@@ -353,15 +370,15 @@
   background: #FFD600;
   color: #1A1719;
   border: none;
-  padding: 15px 30px;
-  border-radius: 60px;
-  font-size: 16px;
+  padding: 12px 24px;
+  border-radius: 50px;
+  font-size: 15px;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.4s ease;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-top: 10px;
+  letter-spacing: 0.5px;
+  margin-top: 8px;
   position: relative;
   overflow: hidden;
 }
@@ -505,10 +522,18 @@
   background-color: #FFD600;
 }
 
+/* Image styling for auth forms */
+.auth-card .col-5 img {
+  width: 100%;
+  max-width: 350px;
+  height: auto;
+}
+
 @media (max-width: 768px) {
   .auth-card {
-    flex-direction: row-reverse;
+    flex-direction: column;
     align-items: center;
+    max-width: 500px !important;
   }
 
   .auth-card .col-5,
@@ -541,12 +566,40 @@
   }
 }
 
+@media (min-width: 1200px) {
+  .auth-card {
+    max-width: 1000px !important;
+  }
+}
+
 @media (max-width: 480px) {
   .auth-header h2 {
-    font-size: 24px;
+    font-size: 22px;
   }
 
   .auth-card {
-    padding: 25px 15px;
+    padding: 24px 20px;
+    max-width: 95% !important;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding: 10px 14px;
+    font-size: 14px;
+  }
+
+  .form-group.has-icon input {
+    padding-left: 40px;
+  }
+
+  .form-group.password-group input {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+
+  .auth-btn {
+    padding: 10px 20px;
+    font-size: 14px;
   }
 }

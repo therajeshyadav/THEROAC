@@ -33,6 +33,8 @@ const request = async (endpoint, options = {}) => {
     } catch (error) {
         clearTimeout(timeoutId); // Clear timeout on error
         console.error('API Error:', error);
+        console.error('Request URL:', url);
+        console.error('Request Config:', config);
         
         // Handle timeout and network errors gracefully
         if (error.name === 'AbortError') {
@@ -194,21 +196,15 @@ const getAdminAnalytics = async () => {
 
 // Hub Content endpoints
 const createHubContent = async (contentData) => {
-    return request('/events', {
+    return request('/hub-content', {
         method: 'POST',
-        body: JSON.stringify({
-            ...contentData,
-            eventType: 'hub-content'
-        }),
+        body: JSON.stringify(contentData),
     });
 };
 
 const getHubContent = async (filters = {}) => {
-    const queryParams = new URLSearchParams({
-        ...filters,
-        eventType: 'hub-content'
-    }).toString();
-    return request(`/events${queryParams ? `?${queryParams}` : ''}`);
+    const queryParams = new URLSearchParams(filters).toString();
+    return request(`/hub-content${queryParams ? `?${queryParams}` : ''}`);
 };
 
 // Export all functions as apiService object

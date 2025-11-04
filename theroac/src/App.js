@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AuthPageProtection from "./components/AuthPageProtection";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 
@@ -73,14 +74,14 @@ function App() {
           <Route path="/schedule" element={<Schedule />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="/verify-email" element={<VerifyEmail />} />
-          <Route path="/resend-verification" element={<ResendVerification />} />
-          <Route path="/verification-pending" element={<VerificationPending />} />
+          <Route path="/login" element={<AuthPageProtection><Login /></AuthPageProtection>} />
+          <Route path="/register" element={<AuthPageProtection><Register /></AuthPageProtection>} />
+          <Route path="/signup" element={<AuthPageProtection><Signup /></AuthPageProtection>} />
+          <Route path="/forgot-password" element={<AuthPageProtection><ForgotPassword /></AuthPageProtection>} />
+          <Route path="/reset-password" element={<AuthPageProtection><ResetPassword /></AuthPageProtection>} />
+          <Route path="/verify-email" element={<AuthPageProtection><VerifyEmail /></AuthPageProtection>} />
+          <Route path="/resend-verification" element={<AuthPageProtection><ResendVerification /></AuthPageProtection>} />
+          <Route path="/verification-pending" element={<AuthPageProtection><VerificationPending /></AuthPageProtection>} />
 
           <Route
             path="/dashboard"
@@ -109,7 +110,7 @@ function App() {
           <Route
             path="/admin-dashboard"
             element={
-              <ProtectedRoute requiredRole="admin">
+              <ProtectedRoute requiredRole={["admin", "superadmin"]}>
                 <AdminDashboard />
               </ProtectedRoute>
             }

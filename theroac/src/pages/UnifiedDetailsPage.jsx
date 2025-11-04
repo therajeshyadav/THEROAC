@@ -362,7 +362,16 @@ const UnifiedDetailsPage = () => {
     };
 
     if (!data || !typeConfig[type]) {
-        return <div className="loading">Loading...</div>;
+        return (
+            <div className="preloader">
+                <div className="loading-container">
+                    <div className="loading"></div>
+                    <div id="loading-icon">
+                        <img src="assets/img/logo/preloader.png" alt="" />
+                    </div>
+                </div>
+            </div>
+        );
     }
 
     const config = typeConfig[type];

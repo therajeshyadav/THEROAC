@@ -10,6 +10,7 @@ const jobRoutes = require('./routes/jobs');
 const userRoutes = require('./routes/users');
 const adminRoutes = require('./routes/admin');
 const dashboardRoutes = require('./routes/dashboard');
+const hubContentRoutes = require('./routes/hubContent');
 const errorHandler = require('./middlewares/errorHandler');
 
 const app = express();
@@ -26,6 +27,7 @@ app.use('/api/jobs', jobRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/hub-content', hubContentRoutes);
 
 // health check
 app.get('/health', (req, res) => res.json({ ok: true }));

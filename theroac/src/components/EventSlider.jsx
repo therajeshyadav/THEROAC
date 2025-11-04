@@ -72,10 +72,7 @@ const EventSlider = ({ eventsData }) => {
                     {event.location}
                   </p>
                   <a href="#" className="buy-btn">
-                   {event.type === 'job' ? 'Apply Now' : 
-                    event.type === 'event' ? 'Register' : 
-                    event.type === 'hub-content' ? 'Read More' : 
-                    'Apply Now'} →
+                    Apply Now →
                   </a>
                 </div>
               </div>

@@ -31,33 +31,7 @@ const Login = () => {
     }
   }, [searchParams]);
 
-  // Redirect if already authenticated
-  useEffect(() => {
-    if (!loading && isAuthenticated && user) {
-      // Redirect based on user role
-      if (user.role === 'admin') {
-        navigate('/admin-dashboard', { replace: true });
-      } else if (user.role === 'recruiter') {
-        navigate('/recruiter-dashboard', { replace: true });
-      } else {
-        navigate('/candidate-dashboard', { replace: true });
-      }
-    }
-  }, [isAuthenticated, user, loading, navigate]);
 
-  // Show loading while checking authentication
-  if (loading) {
-    return (
-      <div className="auth-container">
-        <div className="loading-container">
-          <div className="loading-spinner">
-            <i className="fas fa-spinner fa-spin"></i>
-          </div>
-          <p>Loading...</p>
-        </div>
-      </div>
-    );
-  }
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;

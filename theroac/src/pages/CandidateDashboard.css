@@ -364,7 +364,7 @@
     /* Account for fixed header */
 }
 
-.container {
+.dashboard-container .container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 1rem;
@@ -968,7 +968,7 @@ input:-moz-autofill {
 }
 
 /* Job Cards Detailed */
-.jobs-grid {
+.dashboard-container .jobs-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
     gap: 1.5rem;
@@ -1303,7 +1303,7 @@ input:-moz-autofill {
 }
 
 /* Bootstrap-like Grid System */
-.row {
+.dashboard-container .row {
     display: flex;
     flex-wrap: wrap;
     margin: 0 -0.75rem;

@@ -260,15 +260,12 @@ const CandidateDashboard = () => {
     if (authLoading || loading) {
         return (
             <div className="dashboard-container">
-                <div className="dashboard-background"></div>
-                <div className="loading-container">
-                    <div className="loading-spinner">
-                        <i className="fas fa-spinner fa-spin"></i>
-                    </div>
-                    <div className="loading-dots">
-                        <span></span>
-                        <span></span>
-                        <span></span>
+                <div className="preloader">
+                    <div className="loading-container">
+                        <div className="loading"></div>
+                        <div id="loading-icon">
+                            <img src="assets/img/logo/preloader.png" alt="" />
+                        </div>
                     </div>
                 </div>
             </div>

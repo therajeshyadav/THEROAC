@@ -1,60 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import apiService from '../services/api';
+import React from 'react';
 
 const Jobs = () => {
-  const [jobs, setJobs] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState({
-    search: '',
-    jobType: '',
-    experienceLevel: '',
-    locationType: ''
-  });
-
-  useEffect(() => {
-    fetchJobs();
-  }, []);
-
-  const fetchJobs = async () => {
-    try {
-      setLoading(true);
-      const response = await apiService.getJobs(filters);
-      setJobs(response.jobs || []);
-    } catch (error) {
-      console.error('Error fetching jobs:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleFilterChange = (e) => {
-    const { name, value } = e.target;
-    setFilters(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleSearch = () => {
-    fetchJobs();
-  };
-
-  const handleApply = async (jobId) => {
-    try {
-      // Check if user is logged in
-      const token = localStorage.getItem('token');
-      if (!token) {
-        alert('Please login to apply for jobs');
-        return;
-      }
-      
-      // For now, just show alert. You can implement proper application flow
-      alert('Application feature will be implemented soon!');
-    } catch (error) {
-      console.error('Error applying to job:', error);
-    }
-  };
-
   return (
     <>
     <div className="preloader">

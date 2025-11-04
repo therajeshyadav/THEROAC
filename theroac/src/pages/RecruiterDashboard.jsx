@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { usePreloader } from "../hooks/usePreloader";
@@ -47,6 +47,8 @@ const RecruiterDashboard = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [modalType, setModalType] = useState('job');
   const [showHostDropdown, setShowHostDropdown] = useState(false);
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
+  const hostButtonRef = useRef(null);
   const preloaderVisible = usePreloader(300);
 
   const handleLogout = () => {
@@ -110,7 +112,14 @@ const RecruiterDashboard = () => {
 
     // Check if user is a recruiter
     if (authUser?.role !== "recruiter") {
-      navigate("/login");
+      // Redirect to appropriate dashboard based on user role
+      let redirectPath = '/candidate-dashboard';
+      if (authUser?.role === 'admin' || authUser?.role === 'superadmin') {
+        redirectPath = '/admin-dashboard';
+      } else if (authUser?.role === 'candidate') {
+        redirectPath = '/candidate-dashboard';
+      }
+      navigate(redirectPath, { replace: true });
       return;
     }
 
@@ -132,7 +141,9 @@ const RecruiterDashboard = () => {
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (showHostDropdown && !event.target.closest('.host-dropdown-container')) {
+      if (showHostDropdown &&
+        !event.target.closest('.host-dropdown-container') &&
+        !event.target.closest('.host-dropdown')) {
         setShowHostDropdown(false);
       }
     };
@@ -147,10 +158,12 @@ const RecruiterDashboard = () => {
   if (authLoading) {
     return (
       <div className="organizer-panel">
-        <div className="dashboard-background"></div>
-        <div className="loading-container">
-          <div className="loading-spinner">
-            <div className="spinner"></div>
+        <div className="preloader">
+          <div className="loading-container">
+            <div className="loading"></div>
+            <div id="loading-icon">
+              <img src="assets/img/logo/preloader.png" alt="" />
+            </div>
           </div>
         </div>
       </div>
@@ -266,14 +279,38 @@ const RecruiterDashboard = () => {
   };
 
   const handleOpenModal = (type) => {
+    console.log('Opening modal for type:', type);
     setModalType(type);
     setShowAddModal(true);
     setShowHostDropdown(false);
   };
 
   const handleModalSuccess = () => {
+    console.log('Modal success - refreshing dashboard data');
     // Refresh dashboard data after successful creation
     fetchDashboardData();
+  };
+
+  const calculateDropdownPosition = () => {
+    console.log('Calculating dropdown position, ref:', hostButtonRef.current);
+    if (hostButtonRef.current) {
+      const rect = hostButtonRef.current.getBoundingClientRect();
+      const position = {
+        top: rect.bottom + 8,
+        left: rect.right - 220 // 220px is the min-width of dropdown
+      };
+      console.log('Calculated position:', position);
+      setDropdownPosition(position);
+    }
+  };
+
+  const handleHostDropdownToggle = () => {
+    console.log('Dropdown toggle clicked, current state:', showHostDropdown);
+    if (!showHostDropdown) {
+      calculateDropdownPosition();
+    }
+    setShowHostDropdown(!showHostDropdown);
+    console.log('Dropdown state after toggle:', !showHostDropdown);
   };
 
   const navItems = [
@@ -286,7 +323,8 @@ const RecruiterDashboard = () => {
     { id: "talent", icon: Users, label: "Talent Pipeline" },
   ];
 
-
+  // Debug: Log current dropdown state
+  console.log('Render - showHostDropdown:', showHostDropdown, 'dropdownPosition:', dropdownPosition);
 
   return (
     <div className="auth-container">
@@ -413,14 +451,21 @@ const RecruiterDashboard = () => {
                 <div className="welcome-actions">
                   <div className="host-dropdown-container">
                     <button
+                      ref={hostButtonRef}
                       className="btn-host"
-                      onClick={() => setShowHostDropdown(!showHostDropdown)}
+                      onClick={handleHostDropdownToggle}
                     >
                       <Plus className="w-4 h-4" /> Host
                       <ChevronDown className="w-4 h-4" />
                     </button>
                     {showHostDropdown && (
-                      <div className="host-dropdown">
+                      <div
+                        className="host-dropdown"
+                        style={{
+                          top: `${dropdownPosition.top}px`,
+                          left: `${dropdownPosition.left}px`
+                        }}
+                      >
                         <button
                           className="dropdown-item"
                           onClick={() => handleOpenModal('job')}
@@ -428,13 +473,15 @@ const RecruiterDashboard = () => {
                           <Briefcase className="w-4 h-4" />
                           Add Job Posting
                         </button>
-                        <button
-                          className="dropdown-item"
-                          onClick={() => handleOpenModal('event')}
-                        >
-                          <Calendar className="w-4 h-4" />
-                          Create Event
-                        </button>
+                        {(authUser?.role === 'recruiter' || authUser?.role === 'organizer' || authUser?.role === 'admin' || authUser?.role === 'superadmin') && (
+                          <button
+                            className="dropdown-item"
+                            onClick={() => handleOpenModal('event')}
+                          >
+                            <Calendar className="w-4 h-4" />
+                            Create Event
+                          </button>
+                        )}
                         <button
                           className="dropdown-item"
                           onClick={() => handleOpenModal('hub-content')}
@@ -847,9 +894,12 @@ const RecruiterDashboard = () => {
 
                 <div className="candidates-table modern">
                   {candidatesLoading ? (
-                    <div className="loading-container" style={{ padding: '2rem', textAlign: 'center' }}>
-                      <div className="loading-spinner">
-                        <div className="spinner"></div>
+                    <div className="preloader" style={{ position: 'relative', height: '200px' }}>
+                      <div className="loading-container">
+                        <div className="loading"></div>
+                        <div id="loading-icon">
+                          <img src="assets/img/logo/preloader.png" alt="" />
+                        </div>
                       </div>
                     </div>
                   ) : (

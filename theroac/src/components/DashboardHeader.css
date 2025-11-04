@@ -1,0 +1,248 @@
+/* Dashboard Header Styles */
+.dashboard-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 70px;
+    background: rgba(42, 42, 42, 0.95);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2rem;
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+
+.dashboard-header.scrolled {
+    background: rgba(42, 42, 42, 1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.logo-section img {
+    height: 40px;
+    width: auto;
+}
+
+.panel-title {
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.header-right .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.notification-btn {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.notification-btn:hover {
+    background: rgba(255, 214, 0, 0.1);
+    color: #FFD600;
+}
+
+.notification-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: #FF4444;
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 600;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    background: #FFD600;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1A1719;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.user-name {
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.logout-btn {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+}
+
+.logout-btn:hover {
+    background: rgba(255, 68, 68, 0.1);
+    color: #FF4444;
+    transform: translateY(-1px);
+}
+
+.logout-btn:active {
+    transform: translateY(0);
+}
+
+/* Navigation Tabs */
+.dashboard-nav {
+    position: fixed;
+    top: 70px;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: rgba(26, 26, 26, 0.95);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    padding: 0 2rem;
+    z-index: 999;
+}
+
+.nav-tabs {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.nav-tab {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    border-radius: 25px;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.nav-tab:hover {
+    background: rgba(255, 214, 0, 0.1);
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.nav-tab.active {
+    background: #FFD600;
+    color: #1A1719;
+    font-weight: 600;
+}
+
+.nav-tab i {
+    font-size: 0.9rem;
+}
+
+/* Adjust main content for fixed headers */
+.dashboard-content {
+    margin-top: 130px; /* 70px header + 60px nav */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .dashboard-header {
+        padding: 0 1rem;
+    }
+    
+    .header-left {
+        gap: 1rem;
+    }
+    
+    .panel-title {
+        font-size: 1.2rem;
+    }
+    
+    .user-name {
+        display: none;
+    }
+    
+    .dashboard-nav {
+        padding: 0 1rem;
+        overflow-x: auto;
+    }
+    
+    .nav-tabs {
+        gap: 0.25rem;
+        min-width: max-content;
+    }
+    
+    .nav-tab {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+    }
+    
+    .nav-tab span {
+        display: none;
+    }
+    
+    .nav-tab i {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-actions {
+        gap: 0.5rem;
+    }
+    
+    .notification-btn,
+    .logout-btn {
+        padding: 0.4rem;
+    }
+    
+    .user-avatar {
+        width: 35px;
+        height: 35px;
+        font-size: 0.9rem;
+    }
+}

@@ -8,7 +8,7 @@ router.get('/', eventController.listEvents);
 router.get('/:id', eventController.getEvent);
 
 // Protected
-router.post('/', authenticate, requireRole(['organizer','admin','superadmin']), eventController.createEvent);
+router.post('/', authenticate, requireRole(['recruiter', 'organizer', 'admin', 'superadmin']), eventController.createEvent);
 router.post('/:id/register', authenticate, eventController.registerForEvent);
 
 module.exports = router;

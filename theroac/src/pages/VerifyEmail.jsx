@@ -51,11 +51,13 @@ const VerifyEmail = () => {
                         <div className="auth-header">
                             <h2>Verifying Email...</h2>
                         </div>
-                        <div className="loading-container">
-                            <div className="loading-spinner">
-                                <i className="fas fa-spinner fa-spin"></i>
+                        <div className="preloader">
+                            <div className="loading-container">
+                                <div className="loading"></div>
+                                <div id="loading-icon">
+                                    <img src="assets/img/logo/preloader.png" alt="" />
+                                </div>
                             </div>
-                            <p>Please wait while we verify your email address.</p>
                         </div>
                     </div>
                 </div>

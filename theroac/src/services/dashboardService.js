@@ -38,6 +38,10 @@ class DashboardService {
   async getAnalytics(period = 'year') {
     return this.fetchWithAuth(`/dashboard/analytics?period=${period}`);
   }
+
+  async getEvents() {
+    return this.fetchWithAuth('/dashboard/events');
+  }
 }
 
 export default new DashboardService();

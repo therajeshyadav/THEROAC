@@ -3,6 +3,7 @@ const User = require('./user');
 const Event = require('./event');
 const Hackathon = require('./hackathon');
 const Job = require('./job');
+const HubContent = require('./hubContent');
 const EventRegistration = require('./eventRegistration');
 const HackathonTeam = require('./hackathonTeam');
 const TeamMember = require('./teamMember');
@@ -18,6 +19,9 @@ Hackathon.belongsTo(User, { foreignKey: 'createdBy', as: 'organizer' });
 
 User.hasMany(Job, { foreignKey: 'createdBy', as: 'createdJobs' });
 Job.belongsTo(User, { foreignKey: 'createdBy', as: 'recruiter' });
+
+User.hasMany(HubContent, { foreignKey: 'createdBy', as: 'createdHubContent' });
+HubContent.belongsTo(User, { foreignKey: 'createdBy', as: 'author' });
 
 User.belongsToMany(Event, { through: EventRegistration, foreignKey: 'userId', otherKey: 'eventId' });
 Event.belongsToMany(User, { through: EventRegistration, foreignKey: 'eventId', otherKey: 'userId' });
@@ -55,6 +59,7 @@ module.exports = {
   Event,
   Hackathon,
   Job,
+  HubContent,
   EventRegistration,
   HackathonTeam,
   TeamMember,

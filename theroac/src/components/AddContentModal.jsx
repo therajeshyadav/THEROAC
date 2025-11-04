@@ -21,7 +21,6 @@ const AddContentModal = ({ isOpen, onClose, type, onSuccess }) => {
         venue: '',
         capacity: '',
         registrationDeadline: '',
-        eventType: 'workshop',
         // ROAC Talent Prime Hub specific fields
         category: 'career-tips',
         content: '',
@@ -122,7 +121,7 @@ const AddContentModal = ({ isOpen, onClose, type, onSuccess }) => {
                     venue: formData.venue,
                     capacity: parseInt(formData.capacity) || null,
                     registrationDeadline: formData.registrationDeadline,
-                    eventType: formData.eventType
+
                 });
             } else if (type === 'hub-content') {
                 response = await apiService.createHubContent({
@@ -151,7 +150,6 @@ const AddContentModal = ({ isOpen, onClose, type, onSuccess }) => {
                 venue: '',
                 capacity: '',
                 registrationDeadline: '',
-                eventType: 'workshop',
                 category: 'career-tips',
                 content: '',
                 tags: ''
@@ -411,21 +409,7 @@ const AddContentModal = ({ isOpen, onClose, type, onSuccess }) => {
                                     </div>
                                 </div>
 
-                                <div className="form-group">
-                                    <label htmlFor="eventType">Event Type</label>
-                                    <select
-                                        id="eventType"
-                                        name="eventType"
-                                        value={formData.eventType}
-                                        onChange={handleInputChange}
-                                    >
-                                        <option value="workshop">Workshop</option>
-                                        <option value="seminar">Seminar</option>
-                                        <option value="conference">Conference</option>
-                                        <option value="networking">Networking</option>
-                                        <option value="hackathon">Hackathon</option>
-                                    </select>
-                                </div>
+
                             </div>
 
                             <div className="form-group">

@@ -6,6 +6,7 @@ import './Auth.css';
 const ResetPassword = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     password: '',
     confirmPassword: ''
@@ -24,6 +25,8 @@ const ResetPassword = () => {
       setError('Invalid or missing reset token.');
     }
   }, [token]);
+
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -63,7 +66,7 @@ const ResetPassword = () => {
         token,
         password: formData.password
       });
-      
+
       // Redirect to login with success message
       navigate('/login?reset=success');
     } catch (err) {
@@ -72,6 +75,8 @@ const ResetPassword = () => {
       setLoading(false);
     }
   };
+
+
 
   if (!isValidToken) {
     return (

@@ -6,6 +6,7 @@ import './UnifiedDetailsPage.css';
 
 const UnifiedDetailsPage = () => {
     const { type, id } = useParams(); // type: 'jobs' | 'events' | 'internships'
+    console.log(type, id);
     const navigate = useNavigate();
     const { isAuthenticated, user } = useAuth();
     const [activeTab, setActiveTab] = useState('');
@@ -398,7 +399,6 @@ const UnifiedDetailsPage = () => {
 
     return (
         <div className="unified-details-page">
-            {/* Top Navigation */}
             <div className={`top-nav ${isHeaderSticky ? 'sticky' : ''}`}>
                 <div className="nav-container">
                     <div className="nav-left">

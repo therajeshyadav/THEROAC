@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
-import AuthPageProtection from "./components/AuthPageProtection";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 
@@ -22,7 +21,7 @@ import VerificationPending from "./pages/VerificationPending";
 import CandidateDashboard from "./pages/CandidateDashboard";
 import RecruiterDashboard from "./pages/RecruiterDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
-
+import UnifiedDetailsPage from './pages/UnifiedDetailsPage';
 // ✅ Helper component to handle smooth scrolling to hash IDs
 function ScrollToHashElement() {
   const location = useLocation();
@@ -56,6 +55,7 @@ function App() {
     "/candidate-dashboard",
     "/recruiter-dashboard",
     "/admin-dashboard",
+    "/event-detail/:type/:id"
   ];
 
   const isAuthPage = authPages.includes(location.pathname);
@@ -63,7 +63,7 @@ function App() {
 
   return (
     <AuthProvider>
-      <ScrollToHashElement /> {/* ✅ enables smooth hash scrolling */}
+      <ScrollToHashElement />
 
       {!isAuthPage && !isDashboardPage && <Header />}
 
@@ -74,15 +74,15 @@ function App() {
           <Route path="/schedule" element={<Schedule />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path="/login" element={<AuthPageProtection><Login /></AuthPageProtection>} />
-          <Route path="/register" element={<AuthPageProtection><Register /></AuthPageProtection>} />
-          <Route path="/signup" element={<AuthPageProtection><Signup /></AuthPageProtection>} />
-          <Route path="/forgot-password" element={<AuthPageProtection><ForgotPassword /></AuthPageProtection>} />
-          <Route path="/reset-password" element={<AuthPageProtection><ResetPassword /></AuthPageProtection>} />
-          <Route path="/verify-email" element={<AuthPageProtection><VerifyEmail /></AuthPageProtection>} />
-          <Route path="/resend-verification" element={<AuthPageProtection><ResendVerification /></AuthPageProtection>} />
-          <Route path="/verification-pending" element={<AuthPageProtection><VerificationPending /></AuthPageProtection>} />
-
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
+          <Route path="/resend-verification" element={<ResendVerification />} />
+          <Route path="/verification-pending" element={<VerificationPending />} />
+          <Route path="/event-detail/:type/:id" element={<UnifiedDetailsPage />} />
           <Route
             path="/dashboard"
             element={
@@ -110,7 +110,7 @@ function App() {
           <Route
             path="/admin-dashboard"
             element={
-              <ProtectedRoute requiredRole={["admin", "superadmin"]}>
+              <ProtectedRoute requiredRole="admin">
                 <AdminDashboard />
               </ProtectedRoute>
             }

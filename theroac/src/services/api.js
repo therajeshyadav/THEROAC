@@ -98,6 +98,10 @@ const getJobById = async (id) => {
     return request(`/jobs/${id}`);
 };
 
+const getJobBySlug = async (slug) => {
+    return request(`/jobs/slug/${slug}`);
+};
+
 const createJob = async (jobData) => {
     return request('/jobs', {
         method: 'POST',
@@ -119,6 +123,14 @@ const getUserApplications = async () => {
 // Events endpoints
 const getEvents = async () => {
     return request('/events');
+};
+
+const getEventById = async (id) => {
+    return request(`/events/${id}`);
+};
+
+const getEventBySlug = async (slug) => {
+    return request(`/events/slug/${slug}`);
 };
 
 const createEvent = async (eventData) => {
@@ -207,6 +219,14 @@ const getHubContent = async (filters = {}) => {
     return request(`/hub-content${queryParams ? `?${queryParams}` : ''}`);
 };
 
+const getHubContentById = async (id) => {
+    return request(`/hub-content/${id}`);
+};
+
+const getHubContentBySlug = async (slug) => {
+    return request(`/hub-content/slug/${slug}`);
+};
+
 // Export all functions as apiService object
 const apiService = {
     request,
@@ -219,10 +239,13 @@ const apiService = {
     resendVerification,
     getJobs,
     getJobById,
+    getJobBySlug,
     createJob,
     applyToJob,
     getUserApplications,
     getEvents,
+    getEventById,
+    getEventBySlug,
     createEvent,
     registerForEvent,
     getHackathons,
@@ -237,7 +260,9 @@ const apiService = {
     getAdminEvents,
     getAdminAnalytics,
     createHubContent,
-    getHubContent
+    getHubContent,
+    getHubContentById,
+    getHubContentBySlug
 };
 
 export default apiService;

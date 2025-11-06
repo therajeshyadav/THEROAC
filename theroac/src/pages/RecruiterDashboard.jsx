@@ -77,7 +77,7 @@ const RecruiterDashboard = () => {
       setStats(statsData);
       setAnalytics(analyticsData);
     } catch (error) {
-      console.error('Error fetching dashboard data:', error);
+      // Error fetching dashboard data
     } finally {
       setLoading(false);
     }
@@ -96,7 +96,7 @@ const RecruiterDashboard = () => {
       setTotalPages(candidatesData.totalPages);
       setCurrentPage(candidatesData.currentPage);
     } catch (error) {
-      console.error('Error fetching candidates:', error);
+      // Error fetching candidates
     } finally {
       setCandidatesLoading(false);
     }
@@ -279,38 +279,32 @@ const RecruiterDashboard = () => {
   };
 
   const handleOpenModal = (type) => {
-    console.log('Opening modal for type:', type);
     setModalType(type);
     setShowAddModal(true);
     setShowHostDropdown(false);
   };
 
   const handleModalSuccess = () => {
-    console.log('Modal success - refreshing dashboard data');
     // Refresh dashboard data after successful creation
     fetchDashboardData();
   };
 
   const calculateDropdownPosition = () => {
-    console.log('Calculating dropdown position, ref:', hostButtonRef.current);
     if (hostButtonRef.current) {
       const rect = hostButtonRef.current.getBoundingClientRect();
       const position = {
         top: rect.bottom + 8,
         left: rect.right - 220 // 220px is the min-width of dropdown
       };
-      console.log('Calculated position:', position);
       setDropdownPosition(position);
     }
   };
 
   const handleHostDropdownToggle = () => {
-    console.log('Dropdown toggle clicked, current state:', showHostDropdown);
     if (!showHostDropdown) {
       calculateDropdownPosition();
     }
     setShowHostDropdown(!showHostDropdown);
-    console.log('Dropdown state after toggle:', !showHostDropdown);
   };
 
   const navItems = [
@@ -323,8 +317,6 @@ const RecruiterDashboard = () => {
     { id: "talent", icon: Users, label: "Talent Pipeline" },
   ];
 
-  // Debug: Log current dropdown state
-  console.log('Render - showHostDropdown:', showHostDropdown, 'dropdownPosition:', dropdownPosition);
 
   return (
     <div className="auth-container">
@@ -384,9 +376,17 @@ const RecruiterDashboard = () => {
               </button>
               <div className="user-profile">
                 <div className="user-avatar">
-                  <span>
-                    {getUserInitials(authUser?.name || authUser?.fullName)}
-                  </span>
+                  {authUser?.profilePicture || authUser?.avatar ? (
+                    <img 
+                      src={authUser.profilePicture || authUser.avatar} 
+                      alt={authUser.name || authUser.fullName || 'User'} 
+                      className="profile-image"
+                    />
+                  ) : (
+                    <span className="profile-initials">
+                      {getUserInitials(authUser?.name || authUser?.fullName)}
+                    </span>
+                  )}
                 </div>
               </div>
               <button

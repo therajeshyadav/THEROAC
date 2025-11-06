@@ -1,9 +1,12 @@
 import React, { useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import { createJobURL, createEventURL, createHubContentURL } from "../utils/urlUtils";
 import "./EventSlider.css";
 import arrowLeft from "../img/arrow-left.svg";
 
 const EventSlider = ({ eventsData }) => {
   const scrollRefs = useRef([]);
+  const navigate = useNavigate();
 
   const scroll = (index, direction) => {
     const container = scrollRefs.current[index];
@@ -14,6 +17,49 @@ const EventSlider = ({ eventsData }) => {
       left: direction === "left" ? -scrollAmount : scrollAmount,
       behavior: "smooth",
     });
+  };
+
+  const handleApplyNow = (event, sectionTitle) => {
+    // Determine the type based on section title and event data
+    let type = 'jobs'; // default
+    let url = '';
+
+    if (sectionTitle.toLowerCase().includes('event')) {
+      type = 'events';
+    } else if (sectionTitle.toLowerCase().includes('roac') || sectionTitle.toLowerCase().includes('talent')) {
+      type = 'internships';
+    } else if (sectionTitle.toLowerCase().includes('job')) {
+      type = 'jobs';
+    }
+
+    // If event has a type property, use that
+    if (event.type) {
+      if (event.type === 'job') type = 'jobs';
+      else if (event.type === 'event') type = 'events';
+      else if (event.type === 'hub-content') type = 'internships';
+    }
+
+    // Generate SEO-friendly URL based on type
+    try {
+      if (type === 'jobs' && event.data) {
+        url = createJobURL(event.data);
+      } else if (type === 'events' && event.data) {
+        url = createEventURL(event.data);
+      } else if (type === 'internships' && event.data) {
+        url = createHubContentURL(event.data);
+      } else {
+        // Fallback for cases where we don't have proper data structure
+        const id = event.data?.id || '1';
+        url = `/event-detail/${type}/${id}`;
+      }
+      
+      navigate(url);
+    } catch (error) {
+      // Fallback to ID-based URL
+      const id = event.data?.id || '1';
+      url = `/event-detail/${type}/${id}`;
+      navigate(url);
+    }
   };
 
   // Add safety check for eventsData
@@ -71,9 +117,12 @@ const EventSlider = ({ eventsData }) => {
                     />
                     {event.location}
                   </p>
-                  <a href="#" className="buy-btn">
+                  <button 
+                    className="buy-btn"
+                    onClick={() => handleApplyNow(event, section.title)}
+                  >
                     Apply Now →
-                  </a>
+                  </button>
                 </div>
               </div>
             ))}

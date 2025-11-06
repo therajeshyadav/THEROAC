@@ -34,7 +34,6 @@ const ProtectedRoute = ({ children, requiredRole = null }) => {
       } else if (user?.role === 'candidate') {
         redirectPath = '/candidate-dashboard';
       }
-      console.log(`User role ${user?.role} doesn't match required roles ${allowedRoles.join(', ')}, redirecting to:`, redirectPath);
       return <Navigate to={redirectPath} replace />;
     }
   }

@@ -21,7 +21,6 @@ const AuthPageProtection = ({ children }) => {
 
     // If user is authenticated, redirect to their dashboard
     if (isAuthenticated && user) {
-        console.log('User is already logged in, redirecting from auth page');
         // Redirect based on user role
         if (user.role === 'admin') {
             return <Navigate to="/admin-dashboard" replace />;

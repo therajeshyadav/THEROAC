@@ -115,12 +115,10 @@ const AdminDashboard = () => {
     };
 
     useEffect(() => {
-        console.log('AdminDashboard useEffect:', { authLoading, isAuthenticated, userRole: authUser?.role });
         
         if (authLoading) return;
 
         if (!isAuthenticated || authUser?.role !== "admin") {
-            console.log('Redirecting to login - not authenticated or not admin');
             navigate("/login");
             return;
         }
@@ -134,7 +132,7 @@ const AdminDashboard = () => {
             const statsData = await apiService.getAdminStats();
             setDashboardStats(statsData);
         } catch (error) {
-            console.error("Failed to load dashboard data:", error);
+            // Failed to load dashboard data
         } finally {
             setLoading(false);
         }
@@ -145,7 +143,7 @@ const AdminDashboard = () => {
             const usersData = await apiService.getAdminUsers();
             setUsers(usersData.users || []);
         } catch (error) {
-            console.error("Failed to load users:", error);
+            // Failed to load users
         }
     };
 
@@ -154,7 +152,7 @@ const AdminDashboard = () => {
             const jobsData = await apiService.request("/admin/jobs");
             setJobs(jobsData.jobs || []);
         } catch (error) {
-            console.error("Failed to load jobs:", error);
+            // Failed to load jobs
         }
     };
 
@@ -163,7 +161,7 @@ const AdminDashboard = () => {
             const eventsData = await apiService.request("/admin/events");
             setEvents(eventsData.events || []);
         } catch (error) {
-            console.error("Failed to load events:", error);
+            // Failed to load events
         }
     };
 
@@ -175,7 +173,7 @@ const AdminDashboard = () => {
             });
             loadUsers(); // Refresh users list
         } catch (error) {
-            console.error("Failed to update user status:", error);
+            // Failed to update user status
         }
     };
 
@@ -239,9 +237,17 @@ const AdminDashboard = () => {
                             </button>
                             <div className="admin-user-profile">
                                 <div className="admin-user-avatar">
-                                    <span>
-                                        {getUserInitials(authUser?.name || authUser?.fullName)}
-                                    </span>
+                                    {authUser?.profilePicture || authUser?.avatar ? (
+                                        <img 
+                                            src={authUser.profilePicture || authUser.avatar} 
+                                            alt={authUser.name || authUser.fullName || 'Admin'} 
+                                            className="profile-image"
+                                        />
+                                    ) : (
+                                        <span className="profile-initials">
+                                            {getUserInitials(authUser?.name || authUser?.fullName)}
+                                        </span>
+                                    )}
                                 </div>
                             </div>
                             <button
@@ -441,7 +447,17 @@ const AdminDashboard = () => {
                                                             <div className="user-card-header">
                                                                 <div className="user-avatar-section">
                                                                     <div className="user-avatar-large">
-                                                                        <span>{getUserInitials(user.fullName)}</span>
+                                                                        {user.profilePicture || user.avatar ? (
+                                                                            <img 
+                                                                                src={user.profilePicture || user.avatar} 
+                                                                                alt={user.fullName || 'User'} 
+                                                                                className="profile-image"
+                                                                            />
+                                                                        ) : (
+                                                                            <span className="profile-initials">
+                                                                                {getUserInitials(user.fullName)}
+                                                                            </span>
+                                                                        )}
                                                                     </div>
                                                                     <div className="user-basic-info">
                                                                         <h4 className="user-name">{user.fullName}</h4>

@@ -66,6 +66,11 @@
   margin-top: 8px;
   display: inline-block;
   transition: color 0.3s;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
 }
 .buy-btn:hover {
   color: #00cfff;

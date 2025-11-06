@@ -1,0 +1,246 @@
+.not-found-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #1A1719 0%, #2A2729 100%);
+    color: #ffffff;
+    padding: 2rem;
+}
+
+.not-found-content {
+    max-width: 800px;
+    width: 100%;
+    text-align: center;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+}
+
+.not-found-animation {
+    margin-bottom: 2rem;
+}
+
+.error-code {
+    font-size: 120px;
+    font-weight: bold;
+    background: linear-gradient(45deg, #FFD600, #FF6B00);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1;
+    margin-bottom: 1rem;
+    animation: pulse 2s infinite;
+}
+
+.error-message {
+    font-size: 24px;
+    color: #FFD600;
+    margin-bottom: 1rem;
+}
+
+.not-found-details {
+    margin-bottom: 2rem;
+}
+
+.not-found-details h2 {
+    font-size: 28px;
+    margin-bottom: 1rem;
+    color: #FFD600;
+}
+
+.user-role-text {
+    font-size: 14px;
+    color: #FFD600;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    opacity: 0.8;
+}
+
+.not-found-details p {
+    font-size: 16px;
+    color: #ffffff;
+    margin-bottom: 0.5rem;
+}
+
+.not-found-details code {
+    background: rgba(255, 214, 0, 0.2);
+    color: #FFD600;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+}
+
+.countdown-text {
+    font-size: 14px;
+    color: #cccccc;
+    margin-top: 1rem;
+}
+
+.countdown {
+    color: #FFD600;
+    font-weight: bold;
+}
+
+.stop-redirect-btn {
+    background: none;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    margin-left: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.stop-redirect-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.not-found-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.not-found-actions button {
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.btn-primary {
+    background: #FFD600;
+    color: #1A1719;
+}
+
+.btn-primary:hover {
+    background: #FFE44D;
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+.not-found-suggestions {
+    margin-bottom: 2rem;
+}
+
+.not-found-suggestions h3 {
+    font-size: 20px;
+    margin-bottom: 1rem;
+    color: #FFD600;
+}
+
+.suggestion-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.suggestion-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    color: #ffffff;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.suggestion-link:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+.not-found-footer {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logo-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.logo {
+    height: 40px;
+    width: auto;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.05);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .not-found-container {
+        padding: 1rem;
+    }
+
+    .not-found-content {
+        padding: 1.5rem;
+    }
+
+    .error-code {
+        font-size: 80px;
+    }
+
+    .error-message {
+        font-size: 20px;
+    }
+
+    .not-found-details h2 {
+        font-size: 24px;
+    }
+
+    .not-found-actions {
+        flex-direction: column;
+    }
+
+    .suggestion-links {
+        flex-direction: column;
+    }
+
+    .suggestion-link {
+        width: 100%;
+        justify-content: center;
+    }
+}

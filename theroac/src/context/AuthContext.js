@@ -22,7 +22,6 @@ export const AuthProvider = ({ children }) => {
     // Fallback: Force loading to false after 5 seconds
     const fallbackTimeout = setTimeout(() => {
       if (loading) {
-        console.warn('⚠️ Auth loading timeout - forcing completion');
         setLoading(false);
         
         // Try to use stored data as last resort
@@ -34,9 +33,7 @@ export const AuthProvider = ({ children }) => {
             const userData = JSON.parse(storedUser);
             setUser(userData);
             setIsAuthenticated(true);
-            console.log('🔄 Using stored credentials after timeout');
           } catch (error) {
-            console.error('Failed to parse stored user after timeout:', error);
             setUser(null);
             setIsAuthenticated(false);
           }
@@ -48,13 +45,9 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const checkAuthStatus = async () => {
-    console.log('🔍 Starting auth check...');
     try {
       const token = localStorage.getItem('token');
       const storedUser = localStorage.getItem('user');
-      
-      console.log('🔑 Token found:', !!token);
-      console.log('👤 Stored user found:', !!storedUser);
       
       if (token && storedUser) {
         try {
@@ -62,24 +55,19 @@ export const AuthProvider = ({ children }) => {
           const userData = JSON.parse(storedUser);
           setUser(userData);
           setIsAuthenticated(true);
-          console.log('💾 Using stored user data:', userData);
           
           // Then try to validate with server in background (optional)
           try {
-            console.log('📡 Validating with server...');
             const serverUserData = await apiService.getCurrentUser();
-            console.log('✅ Server validation successful:', serverUserData);
             // Update with fresh server data if different
             if (JSON.stringify(userData) !== JSON.stringify(serverUserData)) {
               setUser(serverUserData);
               localStorage.setItem('user', JSON.stringify(serverUserData));
             }
           } catch (apiError) {
-            console.warn('⚠️ Server validation failed, continuing with stored data:', apiError.message);
             // Continue with stored data - don't fail the auth
           }
         } catch (parseError) {
-          console.error('❌ Failed to parse stored user data:', parseError);
           // Clear invalid stored data
           localStorage.removeItem('token');
           localStorage.removeItem('user');
@@ -88,19 +76,16 @@ export const AuthProvider = ({ children }) => {
         }
       } else {
         // No token or user found, ensure user is logged out
-        console.log('🚫 No credentials found, logging out');
         setUser(null);
         setIsAuthenticated(false);
       }
     } catch (error) {
-      console.error('❌ Auth check failed:', error);
       // Clear everything on error
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       setUser(null);
       setIsAuthenticated(false);
     } finally {
-      console.log('✅ Auth check complete, setting loading to false');
       setLoading(false);
     }
   };
@@ -163,13 +148,11 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    console.log('🚪 Logging out user...');
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     localStorage.removeItem('authToken'); // Also remove any other auth tokens
     setUser(null);
     setIsAuthenticated(false);
-    console.log('✅ Logout complete - user state cleared');
   };
 
   const updateUser = (updatedUser) => {

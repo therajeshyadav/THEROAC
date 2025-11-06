@@ -22,6 +22,7 @@ import CandidateDashboard from "./pages/CandidateDashboard";
 import RecruiterDashboard from "./pages/RecruiterDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import UnifiedDetailsPage from './pages/UnifiedDetailsPage';
+import NotFound from './pages/NotFound';
 // ✅ Helper component to handle smooth scrolling to hash IDs
 function ScrollToHashElement() {
   const location = useLocation();
@@ -48,24 +49,27 @@ function ScrollToHashElement() {
 function App() {
   const location = useLocation();
 
-  // Auth pages and dashboard that don't need Header/Footer
+  // Pages that don't need Header/Footer
   const authPages = ["/login", "/register", "/signup", "/forgot-password", "/reset-password", "/verify-email", "/resend-verification", "/verification-pending"];
   const dashboardPages = [
     "/dashboard",
     "/candidate-dashboard",
     "/recruiter-dashboard",
-    "/admin-dashboard",
-    "/event-detail/:type/:id"
+    "/admin-dashboard"
   ];
+  const validPages = ["/", "/speakers", "/schedule", "/blog", "/contact", ...authPages, ...dashboardPages];
 
   const isAuthPage = authPages.includes(location.pathname);
   const isDashboardPage = dashboardPages.includes(location.pathname);
+  const isDetailPage = location.pathname.startsWith('/event-detail/');
+  const isValidPage = validPages.includes(location.pathname) || isDetailPage;
+  const showHeaderFooter = !isAuthPage && !isDashboardPage && !isDetailPage && isValidPage;
 
   return (
     <AuthProvider>
       <ScrollToHashElement />
 
-      {!isAuthPage && !isDashboardPage && <Header />}
+      {showHeaderFooter && <Header />}
 
       <main>
         <Routes>
@@ -82,7 +86,7 @@ function App() {
           <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path="/resend-verification" element={<ResendVerification />} />
           <Route path="/verification-pending" element={<VerificationPending />} />
-          <Route path="/event-detail/:type/:id" element={<UnifiedDetailsPage />} />
+          <Route path="/event-detail/:type/:slug" element={<UnifiedDetailsPage />} />
           <Route
             path="/dashboard"
             element={
@@ -115,10 +119,12 @@ function App() {
               </ProtectedRoute>
             }
           />
+          {/* Catch-all route for 404 - must be last */}
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
 
-      {!isAuthPage && !isDashboardPage && <Footer />}
+      {showHeaderFooter && <Footer />}
     </AuthProvider>
   );
 }

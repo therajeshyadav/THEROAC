@@ -1,4 +1,5 @@
 import React from 'react';
+import JobCard from '../components/JobCard';
 
 const Jobs = () => {
   return (
@@ -68,32 +69,33 @@ const Jobs = () => {
               </div>
               
               <div className="jobs-list">
-                <div className="job-card mb-3 p-4 border rounded">
-                  <h4>Frontend Developer</h4>
-                  <p><strong>Company:</strong> Tech Solutions Inc.</p>
-                  <p><strong>Location:</strong> Remote</p>
-                  <p><strong>Experience:</strong> 2-4 years</p>
-                  <p>We are looking for a skilled Frontend Developer to join our team...</p>
-                  <button className="btn btn-primary">Apply Now</button>
-                </div>
+                {/* Example jobs data - replace with actual API data */}
+                <JobCard job={{
+                  id: 1,
+                  title: "Frontend Developer",
+                  company: "Tech Solutions Inc.",
+                  location: "Remote",
+                  experience: "2-4 years",
+                  description: "We are looking for a skilled Frontend Developer to join our team..."
+                }} />
                 
-                <div className="job-card mb-3 p-4 border rounded">
-                  <h4>Data Scientist</h4>
-                  <p><strong>Company:</strong> Analytics Pro</p>
-                  <p><strong>Location:</strong> Bangalore</p>
-                  <p><strong>Experience:</strong> 3-5 years</p>
-                  <p>Join our data science team to work on cutting-edge ML projects...</p>
-                  <button className="btn btn-primary">Apply Now</button>
-                </div>
+                <JobCard job={{
+                  id: 2,
+                  title: "Data Scientist",
+                  company: "Analytics Pro",
+                  location: "Bangalore",
+                  experience: "3-5 years",
+                  description: "Join our data science team to work on cutting-edge ML projects..."
+                }} />
                 
-                <div className="job-card mb-3 p-4 border rounded">
-                  <h4>UI/UX Designer</h4>
-                  <p><strong>Company:</strong> Creative Studios</p>
-                  <p><strong>Location:</strong> Mumbai</p>
-                  <p><strong>Experience:</strong> 1-3 years</p>
-                  <p>Design beautiful and intuitive user experiences for our products...</p>
-                  <button className="btn btn-primary">Apply Now</button>
-                </div>
+                <JobCard job={{
+                  id: 3,
+                  title: "UI/UX Designer",
+                  company: "Creative Studios",
+                  location: "Mumbai",
+                  experience: "1-3 years",
+                  description: "Design beautiful and intuitive user experiences for our products..."
+                }} />
               </div>
             </div>
           </div>

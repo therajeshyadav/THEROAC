@@ -330,6 +330,28 @@
     color: #1A1719;
     font-weight: 600;
     font-size: 1rem;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.user-avatar:hover {
+    border-color: #FFD600;
+    box-shadow: 0 0 10px rgba(255, 214, 0, 0.3);
+}
+
+.user-avatar .profile-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.user-avatar .profile-initials {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1A1719;
 }
 
 .user-name {
@@ -489,6 +511,8 @@
     margin-bottom: 2rem;
     padding-bottom: 1rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    flex-wrap: wrap;
+    gap: 1rem;
 }
 
 .card-header h4 {
@@ -1463,73 +1487,95 @@ input:-moz-autofill {
 .profile-summary {
     text-align: center;
     padding: 2rem 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
 }
 
 .profile-image-section {
     position: relative;
-    display: inline-block;
-    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
 }
 
 .profile-image-section img {
-    width: 100px;
-    height: 100px;
+    width: 120px;
+    height: 120px;
     border-radius: 50%;
     object-fit: cover;
-    border: 3px solid #FFD600;
+    border: 4px solid #FFD600;
+    box-shadow: 0 8px 25px rgba(255, 214, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+.profile-image-section img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 35px rgba(255, 214, 0, 0.4);
 }
 
 .change-photo-btn {
     position: absolute;
-    bottom: 0;
-    right: 0;
+    bottom: 5px;
+    right: 5px;
     background: #FFD600;
     color: #1A1719;
     border: none;
     border-radius: 50%;
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .change-photo-btn:hover {
     transform: scale(1.1);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
 }
 
 .profile-summary h4 {
     color: #fff;
     font-weight: 600;
-    margin-bottom: 0.5rem;
-    font-size: 1.2rem;
+    margin-bottom: 0.75rem;
+    font-size: 1.4rem;
+    text-align: center;
 }
 
 .profile-summary p {
     color: rgba(255, 255, 255, 0.7);
-    margin-bottom: 1rem;
-    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
     word-break: break-word;
+    text-align: center;
+    max-width: 250px;
 }
 
 .profile-completion-mini {
     text-align: center;
+    width: 100%;
+    max-width: 200px;
 }
 
 .profile-completion-mini span {
     color: rgba(255, 255, 255, 0.8);
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     display: block;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
+    font-weight: 500;
 }
 
 .mini-progress {
     width: 100%;
-    height: 6px;
+    height: 8px;
     background: rgba(255, 255, 255, 0.2);
-    border-radius: 3px;
+    border-radius: 4px;
     overflow: hidden;
 }
 
@@ -1544,51 +1590,73 @@ input:-moz-autofill {
     background: rgba(255, 214, 0, 0.1);
     color: #FFD600;
     border: 1px solid rgba(255, 214, 0, 0.3);
-    border-radius: 8px;
-    padding: 0.5rem 1rem;
+    border-radius: 12px;
+    padding: 0.75rem 1.5rem;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .btn-edit:hover {
     background: rgba(255, 214, 0, 0.2);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 214, 0, 0.2);
 }
 
 .edit-actions {
     display: flex;
-    gap: 0.5rem;
+    gap: 0.75rem;
+    align-items: center;
 }
 
 .btn-save {
-    background: linear-gradient(135deg, #4CAF50, #45a049);
-    color: #fff;
+    background: linear-gradient(135deg, #FFD600, #FFA500);
+    color: #1A1719;
     border: none;
-    border-radius: 8px;
-    padding: 0.5rem 1rem;
-    font-weight: 500;
+    border-radius: 12px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 12px rgba(255, 214, 0, 0.2);
 }
 
 .btn-save:hover {
-    background: linear-gradient(135deg, #45a049, #4CAF50);
-    transform: translateY(-1px);
+    background: linear-gradient(135deg, #FFA500, #FFD600);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 214, 0, 0.4);
+}
+
+.btn-save:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(255, 214, 0, 0.3);
 }
 
 .btn-cancel {
-    background: rgba(255, 68, 68, 0.1);
-    color: #FF4444;
-    border: 1px solid rgba(255, 68, 68, 0.3);
-    border-radius: 8px;
-    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 0.75rem 1.5rem;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
+    font-size: 0.9rem;
 }
 
 .btn-cancel:hover {
-    background: rgba(255, 68, 68, 0.2);
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
 }
 
 .profile-form {
@@ -1761,6 +1829,27 @@ input:-moz-autofill {
         flex-direction: column;
         align-items: flex-start;
         gap: 1rem;
+    }
+
+    .edit-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    .btn-save,
+    .btn-cancel {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.85rem;
+    }
+
+    .profile-summary {
+        padding: 1.5rem 0.5rem;
+        min-height: 250px;
+    }
+
+    .profile-image-section img {
+        width: 100px;
+        height: 100px;
     }
 
     .stat-card {

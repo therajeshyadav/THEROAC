@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import apiService from '../services/api';
 import { usePreloader } from '../hooks/usePreloader';
+import { createJobURL, createEventURL, createHubContentURL } from '../utils/urlUtils';
 import './CandidateDashboard.css';
 // import DashboardHeader from '../components/DashboardHeader';
 
@@ -13,6 +14,7 @@ const CandidateDashboard = () => {
     const [notification, setNotification] = useState('');
     const [jobs, setJobs] = useState([]);
     const [events, setEvents] = useState([]);
+    const [hubContent, setHubContent] = useState([]);
     const [applications, setApplications] = useState([]);
     const [dashboardStats, setDashboardStats] = useState({
         totalApplications: 0,
@@ -37,24 +39,17 @@ const CandidateDashboard = () => {
     const preloaderVisible = usePreloader(300); // Hide preloader after 300ms
 
     useEffect(() => {
-        console.log('🎯 CandidateDashboard useEffect triggered', { authLoading, isAuthenticated, user: authUser });
-
         if (authLoading) {
-            console.log('⏳ Auth still loading, waiting...');
             return;
         }
 
         if (!isAuthenticated) {
-            console.log('🚫 Not authenticated, redirecting to login');
             navigate('/login');
             return;
         }
 
-        console.log('✅ Authenticated, loading dashboard data');
-
         // Set up timeout before loading data
         const loadingTimeout = setTimeout(() => {
-            console.warn('⚠️ Dashboard loading timeout - forcing completion');
             setLoading(false);
             setNotification('Dashboard loaded with limited functionality. Please refresh if needed.');
         }, 5000);
@@ -70,23 +65,21 @@ const CandidateDashboard = () => {
     const loadDashboardData = async () => {
         try {
             setLoading(true);
-            console.log('🔄 Loading dashboard data...');
             
-            const [jobsData, eventsData, applicationsData, statsData] = await Promise.allSettled([
+            const [jobsData, eventsData, hubContentData, applicationsData, statsData] = await Promise.allSettled([
                 apiService.getJobs().catch((error) => {
-                    console.warn('Jobs API failed:', error);
                     return { jobs: [] };
                 }),
                 apiService.getEvents().catch((error) => {
-                    console.warn('Events API failed:', error);
                     return { events: [] };
                 }),
+                apiService.getHubContent().catch((error) => {
+                    return { hubContent: [] };
+                }),
                 apiService.getUserApplications().catch((error) => {
-                    console.warn('Applications API failed:', error);
                     return { applications: [] };
                 }),
                 apiService.getCandidateStats().catch((error) => {
-                    console.warn('Stats API failed:', error);
                     return {
                         totalApplications: 0,
                         availableJobs: 0,
@@ -102,6 +95,7 @@ const CandidateDashboard = () => {
             // Handle results from Promise.allSettled
             setJobs(jobsData.status === 'fulfilled' ? (jobsData.value.jobs || []) : []);
             setEvents(eventsData.status === 'fulfilled' ? (eventsData.value.events || []) : []);
+            setHubContent(hubContentData.status === 'fulfilled' ? (hubContentData.value.hubContent || []) : []);
             setApplications(applicationsData.status === 'fulfilled' ? (applicationsData.value.applications || []) : []);
             setDashboardStats(statsData.status === 'fulfilled' ? statsData.value : {
                 totalApplications: 0,
@@ -114,7 +108,7 @@ const CandidateDashboard = () => {
             });
 
             // Only show notification if any requests failed
-            const failedRequests = [jobsData, eventsData, applicationsData, statsData].filter(result => result.status === 'rejected');
+            const failedRequests = [jobsData, eventsData, hubContentData, applicationsData, statsData].filter(result => result.status === 'rejected');
             if (failedRequests.length > 0) {
                 setNotification('Some data could not be loaded. Working in offline mode.');
             }
@@ -124,6 +118,7 @@ const CandidateDashboard = () => {
             // Set empty arrays as fallback
             setJobs([]);
             setEvents([]);
+            setHubContent([]);
             setApplications([]);
             setDashboardStats({
                 totalApplications: 0,
@@ -135,7 +130,6 @@ const CandidateDashboard = () => {
                 recentApplications: []
             });
         } finally {
-            console.log('✅ Dashboard data loading completed');
             setLoading(false);
         }
     };
@@ -212,6 +206,23 @@ const CandidateDashboard = () => {
         }
     };
 
+    const handleViewJobDetails = (job) => {
+        const url = createJobURL(job);
+        navigate(url);
+    };
+
+    const handleViewEventDetails = (event) => {
+        const url = createEventURL(event);
+        navigate(url);
+    };
+
+    const handleViewHubContentDetails = (content) => {
+        const url = createHubContentURL(content);
+        navigate(url);
+    };
+
+
+
     const handleEditProfile = () => {
         setProfileData({
             fullName: authUser?.fullName || authUser?.name || '',
@@ -272,13 +283,7 @@ const CandidateDashboard = () => {
         );
     }
 
-    // Debug log to check if component is rendering
-    console.log('CandidateDashboard rendering with user:', authUser);
-    console.log('User name fields:', {
-        fullName: authUser?.fullName,
-        name: authUser?.name,
-        firstChar: (authUser?.fullName || authUser?.name)?.charAt(0)?.toUpperCase()
-    });
+   
 
     return (
         <div className="dashboard-container">
@@ -347,6 +352,13 @@ const CandidateDashboard = () => {
                             <span>Events</span>
                         </button>
                         <button
+                            className={`nav-btn ${activeTab === 'prime-hub' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('prime-hub')}
+                        >
+                            <i className="fas fa-star"></i>
+                            <span>ROAC Prime</span>
+                        </button>
+                        <button
                             className={`nav-btn ${activeTab === 'profile' ? 'active' : ''}`}
                             onClick={() => setActiveTab('profile')}
                         >
@@ -363,7 +375,17 @@ const CandidateDashboard = () => {
                             </button>
                             <div className="user-menu">
                                 <div className="user-avatar">
-                                    {(authUser?.fullName || authUser?.name)?.charAt(0)?.toUpperCase() || 'U'}
+                                    {authUser?.profilePicture || authUser?.avatar ? (
+                                        <img 
+                                            src={authUser.profilePicture || authUser.avatar} 
+                                            alt={authUser.fullName || authUser.name || 'User'} 
+                                            className="profile-image"
+                                        />
+                                    ) : (
+                                        <span className="profile-initials">
+                                            {(authUser?.fullName || authUser?.name)?.charAt(0)?.toUpperCase() || 'U'}
+                                        </span>
+                                    )}
                                 </div>
                                 <span className="user-name">{authUser?.fullName || authUser?.name || 'User'}</span>
                             </div>
@@ -531,7 +553,12 @@ const CandidateDashboard = () => {
                                         </div>
                                         <div className="events-list">
                                             {events.length > 0 ? events.slice(0, 3).map(event => (
-                                                <div key={event.id} className="event-item">
+                                                <div 
+                                                    key={event.id} 
+                                                    className="event-item clickable"
+                                                    onClick={() => handleViewEventDetails(event)}
+                                                    style={{ cursor: 'pointer' }}
+                                                >
                                                     <div className="event-date">
                                                         <span className="date">{new Date(event.date).getDate()}</span>
                                                         <span className="month">{new Date(event.date).toLocaleDateString('en', { month: 'short' })}</span>
@@ -574,6 +601,13 @@ const CandidateDashboard = () => {
                                                             <span><i className="fas fa-rupee-sign"></i> {job.salary || 'Competitive'}</span>
                                                         </div>
                                                         <div className="job-actions">
+                                                            <button
+                                                                className="btn-secondary btn-sm"
+                                                                onClick={() => handleViewJobDetails(job)}
+                                                                style={{ marginRight: '8px' }}
+                                                            >
+                                                                View Details
+                                                            </button>
                                                             <button
                                                                 className="btn-apply"
                                                                 onClick={() => handleApplyToJob(job.id)}
@@ -695,7 +729,12 @@ const CandidateDashboard = () => {
                                             <div className="job-card-footer">
                                                 <span className="posted-time">Posted {new Date(job.createdAt).toLocaleDateString()}</span>
                                                 <div className="job-actions">
-                                                    <button className="btn-secondary">View Details</button>
+                                                    <button 
+                                                        className="btn-secondary"
+                                                        onClick={() => handleViewJobDetails(job)}
+                                                    >
+                                                        View Details
+                                                    </button>
                                                     <button
                                                         className="btn-apply"
                                                         onClick={() => handleApplyToJob(job.id)}
@@ -711,8 +750,173 @@ const CandidateDashboard = () => {
                         </div>
                     )}
 
+                    {/* ROAC Prime Talent Hub Tab */}
+                    {activeTab === 'prime-hub' && (
+                        <div className="tab-content">
+                            <div className="dashboard-card">
+                                <div className="card-header">
+                                    <h4>ROAC Prime Talent Hub</h4>
+                                    <div className="search-stats">
+                                        <span>{hubContent.length || 0} opportunities available</span>
+                                    </div>
+                                </div>
+                                <div className="hub-content-grid">
+                                    {hubContent.length > 0 ? hubContent.map(content => (
+                                        <div key={content.id} className="hub-content-card">
+                                            <div className="hub-content-header">
+                                                <div className="company-logo">
+                                                    <i className="fas fa-star"></i>
+                                                </div>
+                                                <div className="hub-content-basic-info">
+                                                    <h5>{content.title}</h5>
+                                                    <p className="company-name">{content.company || content.organization || 'ROAC Prime'}</p>
+                                                </div>
+                                                <button className="save-content-btn">
+                                                    <i className="far fa-bookmark"></i>
+                                                </button>
+                                            </div>
+
+                                            <div className="hub-content-details-grid">
+                                                <div className="detail-item">
+                                                    <i className="fas fa-map-marker-alt"></i>
+                                                    <span>{content.location || 'Remote'}</span>
+                                                </div>
+                                                <div className="detail-item">
+                                                    <i className="fas fa-rupee-sign"></i>
+                                                    <span>{content.stipend || 'Competitive'}</span>
+                                                </div>
+                                                <div className="detail-item">
+                                                    <i className="fas fa-clock"></i>
+                                                    <span>{content.duration || 'Flexible'}</span>
+                                                </div>
+                                                <div className="detail-item">
+                                                    <i className="fas fa-calendar"></i>
+                                                    <span>{content.timing || content.type || 'Part-time'}</span>
+                                                </div>
+                                            </div>
+
+                                            <div className="hub-content-skills">
+                                                {content.skills && content.skills.slice(0, 3).map((skill, index) => (
+                                                    <span key={index} className="skill-tag">{skill}</span>
+                                                ))}
+                                            </div>
+
+                                            <div className="hub-content-card-footer">
+                                                <span className="posted-time">Posted {new Date(content.createdAt || Date.now()).toLocaleDateString()}</span>
+                                                <div className="hub-content-actions">
+                                                    <button 
+                                                        className="btn-secondary"
+                                                        onClick={() => handleViewHubContentDetails(content)}
+                                                    >
+                                                        View Details
+                                                    </button>
+                                                    <button
+                                                        className="btn-apply"
+                                                        onClick={() => handleApplyToJob(content.id)}
+                                                    >
+                                                        Apply Now
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )) : (
+                                        <div className="no-data">
+                                            <div className="no-data-icon">
+                                                <i className="fas fa-star"></i>
+                                            </div>
+                                            <h3>Welcome to ROAC Prime Talent Hub!</h3>
+                                            <p>Exclusive opportunities and premium content coming soon. Stay tuned for amazing career opportunities!</p>
+                                            <button className="btn-primary" onClick={() => setActiveTab('jobs')}>
+                                                Explore Jobs Meanwhile
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Events Tab */}
+                    {activeTab === 'events' && (
+                        <div className="tab-content">
+                            <div className="row">
+                                <div className="col-lg-8 mb-4">
+                                    <div className="dashboard-card">
+                                        <div className="card-header">
+                                            <h4>Upcoming Events</h4>
+                                        </div>
+                                        <div className="events-detailed">
+                                            {events.length > 0 ? events.map(event => (
+                                                <div key={event.id} className="event-detailed-item">
+                                                    <div className="event-image">
+                                                        <div className="event-placeholder">
+                                                            <i className="fas fa-calendar-alt"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div className="event-content">
+                                                        <h5>{event.title}</h5>
+                                                        <p>{event.description || 'Join us for an exciting event to enhance your skills'}</p>
+                                                        <div className="event-meta">
+                                                            <span><i className="fas fa-calendar"></i> {new Date(event.date || event.startDate || Date.now()).toLocaleDateString()}</span>
+                                                            <span><i className="fas fa-map-marker-alt"></i> {event.location || 'Online'}</span>
+                                                            <span className="event-type-badge">{event.type || 'Event'}</span>
+                                                        </div>
+                                                        <div className="event-actions mt-2">
+                                                            <button
+                                                                className="btn-secondary btn-sm"
+                                                                onClick={() => handleViewEventDetails(event)}
+                                                                style={{ marginRight: '8px' }}
+                                                            >
+                                                                View Details
+                                                            </button>
+                                                            <button
+                                                                className="btn-primary"
+                                                                onClick={() => handleRegisterForEvent(event.id)}
+                                                            >
+                                                                Register Now
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )) : (
+                                                <div className="no-data">
+                                                    <p>No events available at the moment</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="col-lg-4">
+                                    <div className="dashboard-card">
+                                        <div className="card-header">
+                                            <h4>Event Categories</h4>
+                                        </div>
+                                        <div className="event-categories">
+                                            <div className="category-item">
+                                                <i className="fas fa-laptop-code"></i>
+                                                <span>Workshops</span>
+                                            </div>
+                                            <div className="category-item">
+                                                <i className="fas fa-users"></i>
+                                                <span>Networking</span>
+                                            </div>
+                                            <div className="category-item">
+                                                <i className="fas fa-trophy"></i>
+                                                <span>Competitions</span>
+                                            </div>
+                                            <div className="category-item">
+                                                <i className="fas fa-microphone"></i>
+                                                <span>Conferences</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     {/* Coming Soon Tabs */}
-                    {(activeTab === 'competitions' || activeTab === 'scholarships' || activeTab === 'workshops' || activeTab === 'prime-hub') && (
+                    {(activeTab === 'competitions' || activeTab === 'scholarships' || activeTab === 'workshops') && (
                         <div className="tab-content">
                             <div className="dashboard-card">
                                 <div className="coming-soon-section">
@@ -780,76 +984,6 @@ const CandidateDashboard = () => {
                         </div>
                     )}
 
-                    {/* Events Tab */}
-                    {activeTab === 'events' && (
-                        <div className="tab-content">
-                            <div className="row">
-                                <div className="col-lg-8 mb-4">
-                                    <div className="dashboard-card">
-                                        <div className="card-header">
-                                            <h4>Upcoming Events</h4>
-                                        </div>
-                                        <div className="events-detailed">
-                                            {events.length > 0 ? events.map(event => (
-                                                <div key={event.id} className="event-detailed-item">
-                                                    <div className="event-image">
-                                                        <div className="event-placeholder">
-                                                            <i className="fas fa-calendar-alt"></i>
-                                                        </div>
-                                                    </div>
-                                                    <div className="event-content">
-                                                        <h5>{event.title}</h5>
-                                                        <p>{event.description || 'Join us for an exciting event to enhance your skills'}</p>
-                                                        <div className="event-meta">
-                                                            <span><i className="fas fa-calendar"></i> {new Date(event.date).toLocaleDateString()}</span>
-                                                            <span><i className="fas fa-map-marker-alt"></i> {event.location || 'Online'}</span>
-                                                            <span className="event-type-badge">{event.type || 'Event'}</span>
-                                                        </div>
-                                                        <button
-                                                            className="btn-primary mt-2"
-                                                            onClick={() => handleRegisterForEvent(event.id)}
-                                                        >
-                                                            Register Now
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            )) : (
-                                                <div className="no-data">
-                                                    <p>No events available at the moment</p>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="col-lg-4">
-                                    <div className="dashboard-card">
-                                        <div className="card-header">
-                                            <h4>Event Categories</h4>
-                                        </div>
-                                        <div className="event-categories">
-                                            <div className="category-item">
-                                                <i className="fas fa-laptop-code"></i>
-                                                <span>Workshops</span>
-                                            </div>
-                                            <div className="category-item">
-                                                <i className="fas fa-users"></i>
-                                                <span>Networking</span>
-                                            </div>
-                                            <div className="category-item">
-                                                <i className="fas fa-trophy"></i>
-                                                <span>Competitions</span>
-                                            </div>
-                                            <div className="category-item">
-                                                <i className="fas fa-microphone"></i>
-                                                <span>Conferences</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
                     {/* Profile Tab */}
                     {activeTab === 'profile' && (
                         <div className="tab-content">
@@ -884,11 +1018,20 @@ const CandidateDashboard = () => {
                                         <div className="card-header">
                                             <h4>Profile Information</h4>
                                             {!isEditingProfile ? (
-                                                <button className="btn-edit" onClick={handleEditProfile}>Edit Profile</button>
+                                                <button className="btn-edit" onClick={handleEditProfile}>
+                                                    <i className="fas fa-edit"></i>
+                                                    Edit Profile
+                                                </button>
                                             ) : (
                                                 <div className="edit-actions">
-                                                    <button className="btn-save" onClick={handleSaveProfile}>Save</button>
-                                                    <button className="btn-cancel" onClick={handleCancelEdit}>Cancel</button>
+                                                    <button className="btn-save" onClick={handleSaveProfile}>
+                                                        <i className="fas fa-check"></i>
+                                                        Save
+                                                    </button>
+                                                    <button className="btn-cancel" onClick={handleCancelEdit}>
+                                                        <i className="fas fa-times"></i>
+                                                        Cancel
+                                                    </button>
                                                 </div>
                                             )}
                                         </div>

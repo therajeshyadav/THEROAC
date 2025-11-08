@@ -12416,7 +12416,7 @@ img {
   position: relative;
   z-index: 1;
   border-radius: var(--rounded-lg, 8px);
-  background: #232323;
+  background: #232323 !important;
   padding: 32px;
 }
 .attent10-section-area .event6-widget-boxarea .img1 img {

@@ -10,7 +10,7 @@ export const eventsData = [
         location: "Bangalore, India",
         type: "job",
         data: {
-          id: "static-job-1",
+          id: "11111111-1111-1111-1111-111111111111",
           title: "Frontend Developer Role",
           company: "Dev Innovations Labs",
           location: "Bangalore, India",
@@ -24,7 +24,7 @@ export const eventsData = [
         location: "Pune, India",
         type: "job",
         data: {
-          id: "static-job-2",
+          id: "22222222-2222-2222-2222-222222222222",
           title: "UI/UX Designer Position",
           company: "PixelStudio",
           location: "Pune, India",
@@ -38,7 +38,7 @@ export const eventsData = [
         location: "Delhi, India",
         type: "job",
         data: {
-          id: "static-job-3",
+          id: "33333333-3333-3333-3333-333333333333",
           title: "Marketing Associate",
           company: "The Growth Hub",
           location: "Delhi, India",
@@ -52,7 +52,7 @@ export const eventsData = [
         location: "New York, USA",
         type: "job",
         data: {
-          id: "static-job-4",
+          id: "44444444-4444-4444-4444-444444444444",
           title: "Backend Engineer (Node.js)",
           company: "CloudNext Systems",
           location: "New York, USA",
@@ -66,7 +66,7 @@ export const eventsData = [
         location: "London, UK",
         type: "job",
         data: {
-          id: "static-job-5",
+          id: "55555555-5555-5555-5555-555555555555",
           title: "Product Manager Internship",
           company: "InnovateAI",
           location: "London, UK",
@@ -86,7 +86,7 @@ export const eventsData = [
         location: "Silicon Valley Convention Center",
         type: "event",
         data: {
-          id: "static-event-1",
+          id: "66666666-6666-6666-6666-666666666666",
           title: "Future of AI: Industry 5.0 Conference 2025",
           organization: "Silicon Valley Convention Center",
           location: "Silicon Valley Convention Center",
@@ -100,7 +100,7 @@ export const eventsData = [
         location: "Microsoft HQ, Seattle",
         type: "event",
         data: {
-          id: "static-event-2",
+          id: "77777777-7777-7777-7777-777777777777",
           title: "Tech Leaders Meetup – Building the Future",
           organization: "Microsoft HQ",
           location: "Microsoft HQ, Seattle",
@@ -114,7 +114,7 @@ export const eventsData = [
         location: "Online Event",
         type: "event",
         data: {
-          id: "static-event-3",
+          id: "88888888-8888-8888-8888-888888888888",
           title: "Women in Tech Summit 2025",
           organization: "Women in Tech",
           location: "Online Event",
@@ -128,7 +128,7 @@ export const eventsData = [
         location: "CoLab Space, Berlin",
         type: "event",
         data: {
-          id: "static-event-4",
+          id: "99999999-9999-9999-9999-999999999999",
           title: "Web3 Developer Bootcamp",
           organization: "CoLab Space",
           location: "CoLab Space, Berlin",
@@ -142,7 +142,7 @@ export const eventsData = [
         location: "Dubai World Trade Center",
         type: "event",
         data: {
-          id: "static-event-5",
+          id: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
           title: "SaaS Growth Summit 2025",
           organization: "Dubai World Trade Center",
           location: "Dubai World Trade Center",
@@ -162,7 +162,7 @@ export const eventsData = [
         location: "Virtual Launch Event",
         type: "hub-content",
         data: {
-          id: "static-hub-1",
+          id: "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
           title: "Launch of ROAC Prime Talent Network",
           company: "ROAC Prime",
           location: "Virtual Launch Event",
@@ -177,7 +177,7 @@ export const eventsData = [
         location: "Dev Innovations Labs HQ, Mumbai",
         type: "hub-content",
         data: {
-          id: "static-hub-2",
+          id: "cccccccc-cccc-cccc-cccc-cccccccccccc",
           title: "Talent Accelerator Workshop: AI & ML Careers",
           company: "ROAC Prime",
           location: "Dev Innovations Labs HQ, Mumbai",
@@ -192,7 +192,7 @@ export const eventsData = [
         location: "ROAC Studio, Los Angeles",
         type: "hub-content",
         data: {
-          id: "static-hub-3",
+          id: "dddddddd-dddd-dddd-dddd-dddddddddddd",
           title: "Creator Collaboration Program 2025",
           company: "ROAC Prime",
           location: "ROAC Studio, Los Angeles",
@@ -207,7 +207,7 @@ export const eventsData = [
         location: "New Delhi, India",
         type: "hub-content",
         data: {
-          id: "static-hub-4",
+          id: "eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee",
           title: "Influencer & Brand Partnership Meetup",
           company: "ROAC Prime",
           location: "New Delhi, India",
@@ -222,7 +222,7 @@ export const eventsData = [
         location: "Online Event",
         type: "hub-content",
         data: {
-          id: "static-hub-5",
+          id: "ffffffff-ffff-ffff-ffff-ffffffffffff",
           title: "Talent Hub Mentorship Program Launch",
           company: "ROAC Prime",
           location: "Online Event",

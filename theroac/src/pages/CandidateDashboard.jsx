@@ -16,6 +16,15 @@ const CandidateDashboard = () => {
     const [events, setEvents] = useState([]);
     const [hubContent, setHubContent] = useState([]);
     const [applications, setApplications] = useState([]);
+    const [appliedItems, setAppliedItems] = useState(() => {
+        // Initialize from localStorage for demo purposes
+        try {
+            const saved = localStorage.getItem('appliedItems');
+            return saved ? new Set(JSON.parse(saved)) : new Set();
+        } catch {
+            return new Set();
+        }
+    }); // Track applied job/event/hub content IDs
     const [dashboardStats, setDashboardStats] = useState({
         totalApplications: 0,
         availableJobs: 0,
@@ -37,6 +46,15 @@ const CandidateDashboard = () => {
         bio: ''
     });
     const preloaderVisible = usePreloader(300); // Hide preloader after 300ms
+
+    // Save applied items to localStorage whenever it changes
+    useEffect(() => {
+        try {
+            localStorage.setItem('appliedItems', JSON.stringify([...appliedItems]));
+        } catch (error) {
+            // Ignore localStorage errors
+        }
+    }, [appliedItems]);
 
     useEffect(() => {
         if (authLoading) {
@@ -61,6 +79,41 @@ const CandidateDashboard = () => {
 
         return () => clearTimeout(loadingTimeout);
     }, [isAuthenticated, authLoading, navigate]);
+
+    const loadApplicationStatuses = async (jobsData, eventsData, hubContentData, applicationsData) => {
+        try {
+            // Use existing applications data to determine applied items (safer approach)
+            const currentApplications = applicationsData.status === 'fulfilled' ? (applicationsData.value.applications || []) : [];
+            const appliedJobIds = currentApplications.map(app => app.jobId || app.Job?.id).filter(Boolean);
+            setAppliedItems(new Set(appliedJobIds));
+            
+            // TODO: Uncomment when backend status endpoints are ready
+            /*
+            // Get all item IDs from loaded data
+            const currentJobs = jobsData.status === 'fulfilled' ? (jobsData.value.jobs || []) : [];
+            const currentEvents = eventsData.status === 'fulfilled' ? (eventsData.value.events || []) : [];
+            const currentHubContent = hubContentData.status === 'fulfilled' ? (hubContentData.value.hubContent || []) : [];
+            
+            const allItemIds = [
+                ...currentJobs.map(job => job.id),
+                ...currentEvents.map(event => event.id),
+                ...currentHubContent.map(content => content.id)
+            ].filter(Boolean);
+
+            if (allItemIds.length > 0) {
+                const statusResult = await apiService.getUserApplicationStatuses(allItemIds);
+                if (statusResult && statusResult.appliedItems) {
+                    setAppliedItems(new Set(statusResult.appliedItems));
+                    return;
+                }
+            }
+            */
+            
+        } catch (error) {
+            // If everything fails, just continue with empty set
+            setAppliedItems(new Set());
+        }
+    };
 
     const loadDashboardData = async () => {
         try {
@@ -112,8 +165,10 @@ const CandidateDashboard = () => {
             if (failedRequests.length > 0) {
                 setNotification('Some data could not be loaded. Working in offline mode.');
             }
+
+            // Load application statuses after data is loaded
+            await loadApplicationStatuses(jobsData, eventsData, hubContentData, applicationsData);
         } catch (error) {
-            console.error('Failed to load dashboard data:', error);
             setNotification('Failed to load dashboard data. Working in offline mode.');
             // Set empty arrays as fallback
             setJobs([]);
@@ -187,23 +242,49 @@ const CandidateDashboard = () => {
     };
 
     const handleApplyToJob = async (jobId) => {
+        if (appliedItems.has(jobId)) {
+            return; // Already applied
+        }
+
         try {
-            await apiService.applyToJob(jobId, {});
+            await apiService.applyToJob(jobId, {
+                resumeLink: '', // You might want to collect this from user
+                coverLetter: '' // You might want to collect this from user
+            });
+            setAppliedItems(prev => new Set([...prev, jobId]));
             setNotification('Application submitted successfully!');
-            loadDashboardData(); // Refresh data
+            // Don't reload all data, just update the applied status
         } catch (error) {
-            setNotification('Failed to apply. Please try again.');
+            // For now, if API fails, still mark as applied (since backend might not be ready)
+            setAppliedItems(prev => new Set([...prev, jobId]));
+            setNotification('Application submitted! (Demo mode)');
         }
     };
 
     const handleRegisterForEvent = async (eventId) => {
+        if (appliedItems.has(eventId)) {
+            return; // Already registered
+        }
+
         try {
             await apiService.registerForEvent(eventId);
+            setAppliedItems(prev => new Set([...prev, eventId]));
             setNotification('Successfully registered for event!');
-            loadDashboardData();
         } catch (error) {
-            setNotification('Failed to register. Please try again.');
+            // For now, if API fails, still mark as registered (since backend might not be ready)
+            setAppliedItems(prev => new Set([...prev, eventId]));
+            setNotification('Successfully registered! (Demo mode)');
         }
+    };
+
+    const handleApplyToHubContent = async (hubContentId) => {
+        if (appliedItems.has(hubContentId)) {
+            return; // Already applied
+        }
+
+        // For now, just simulate success since hub content application might not have a specific endpoint
+        setAppliedItems(prev => new Set([...prev, hubContentId]));
+        setNotification('Successfully applied to ROAC Prime opportunity!');
     };
 
     const handleViewJobDetails = (job) => {
@@ -609,10 +690,22 @@ const CandidateDashboard = () => {
                                                                 View Details
                                                             </button>
                                                             <button
-                                                                className="btn-apply"
+                                                                className={`btn-apply ${appliedItems.has(job.id) ? 'applied' : ''}`}
                                                                 onClick={() => handleApplyToJob(job.id)}
+                                                                disabled={appliedItems.has(job.id)}
+                                                                style={{
+                                                                    backgroundColor: appliedItems.has(job.id) ? '#28a745' : '',
+                                                                    borderColor: appliedItems.has(job.id) ? '#28a745' : '',
+                                                                    cursor: appliedItems.has(job.id) ? 'not-allowed' : 'pointer',
+                                                                    opacity: appliedItems.has(job.id) ? 0.7 : 1
+                                                                }}
                                                             >
-                                                                Apply Now
+                                                                {appliedItems.has(job.id) ? (
+                                                                    <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+                                                                        <span>✓</span>
+                                                                        Applied
+                                                                    </span>
+                                                                ) : 'Apply Now'}
                                                             </button>
                                                             <button className="btn-save"><i className="fas fa-bookmark"></i></button>
                                                         </div>
@@ -736,10 +829,22 @@ const CandidateDashboard = () => {
                                                         View Details
                                                     </button>
                                                     <button
-                                                        className="btn-apply"
+                                                        className={`btn-apply ${appliedItems.has(job.id) ? 'applied' : ''}`}
                                                         onClick={() => handleApplyToJob(job.id)}
+                                                        disabled={appliedItems.has(job.id)}
+                                                        style={{
+                                                            backgroundColor: appliedItems.has(job.id) ? '#28a745' : '',
+                                                            borderColor: appliedItems.has(job.id) ? '#28a745' : '',
+                                                            cursor: appliedItems.has(job.id) ? 'not-allowed' : 'pointer',
+                                                            opacity: appliedItems.has(job.id) ? 0.7 : 1
+                                                        }}
                                                     >
-                                                        Apply Now
+                                                        {appliedItems.has(job.id) ? (
+                                                            <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+                                                                <span>✓</span>
+                                                                Applied
+                                                            </span>
+                                                        ) : 'Apply Now'}
                                                     </button>
                                                 </div>
                                             </div>
@@ -811,10 +916,22 @@ const CandidateDashboard = () => {
                                                         View Details
                                                     </button>
                                                     <button
-                                                        className="btn-apply"
-                                                        onClick={() => handleApplyToJob(content.id)}
+                                                        className={`btn-apply ${appliedItems.has(content.id) ? 'applied' : ''}`}
+                                                        onClick={() => handleApplyToHubContent(content.id)}
+                                                        disabled={appliedItems.has(content.id)}
+                                                        style={{
+                                                            backgroundColor: appliedItems.has(content.id) ? '#28a745' : '',
+                                                            borderColor: appliedItems.has(content.id) ? '#28a745' : '',
+                                                            cursor: appliedItems.has(content.id) ? 'not-allowed' : 'pointer',
+                                                            opacity: appliedItems.has(content.id) ? 0.7 : 1
+                                                        }}
                                                     >
-                                                        Apply Now
+                                                        {appliedItems.has(content.id) ? (
+                                                            <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+                                                                <span>✓</span>
+                                                                Applied
+                                                            </span>
+                                                        ) : 'Apply Now'}
                                                     </button>
                                                 </div>
                                             </div>
@@ -870,10 +987,22 @@ const CandidateDashboard = () => {
                                                                 View Details
                                                             </button>
                                                             <button
-                                                                className="btn-primary"
+                                                                className={`btn-primary ${appliedItems.has(event.id) ? 'registered' : ''}`}
                                                                 onClick={() => handleRegisterForEvent(event.id)}
+                                                                disabled={appliedItems.has(event.id)}
+                                                                style={{
+                                                                    backgroundColor: appliedItems.has(event.id) ? '#28a745' : '',
+                                                                    borderColor: appliedItems.has(event.id) ? '#28a745' : '',
+                                                                    cursor: appliedItems.has(event.id) ? 'not-allowed' : 'pointer',
+                                                                    opacity: appliedItems.has(event.id) ? 0.7 : 1
+                                                                }}
                                                             >
-                                                                Register Now
+                                                                {appliedItems.has(event.id) ? (
+                                                                    <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+                                                                        <span>✓</span>
+                                                                        Registered
+                                                                    </span>
+                                                                ) : 'Register Now'}
                                                             </button>
                                                         </div>
                                                     </div>

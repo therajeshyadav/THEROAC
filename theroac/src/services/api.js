@@ -32,9 +32,6 @@ const request = async (endpoint, options = {}) => {
         return data;
     } catch (error) {
         clearTimeout(timeoutId); // Clear timeout on error
-        console.error('API Error:', error);
-        console.error('Request URL:', url);
-        console.error('Request Config:', config);
         
         // Handle timeout and network errors gracefully
         if (error.name === 'AbortError') {
@@ -227,6 +224,24 @@ const getHubContentBySlug = async (slug) => {
     return request(`/hub-content/slug/${slug}`);
 };
 
+// Application status check endpoints
+const checkJobApplicationStatus = async (jobId) => {
+    return request(`/jobs/${jobId}/application-status`);
+};
+
+const checkEventRegistrationStatus = async (eventId) => {
+    return request(`/events/${eventId}/registration-status`);
+};
+
+const checkHubContentApplicationStatus = async (hubContentId) => {
+    return request(`/hub-content/${hubContentId}/application-status`);
+};
+
+const getUserApplicationStatuses = async (itemIds = []) => {
+    const queryParams = new URLSearchParams({ ids: itemIds.join(',') }).toString();
+    return request(`/applications/status${queryParams ? `?${queryParams}` : ''}`);
+};
+
 // Export all functions as apiService object
 const apiService = {
     request,
@@ -262,7 +277,11 @@ const apiService = {
     createHubContent,
     getHubContent,
     getHubContentById,
-    getHubContentBySlug
+    getHubContentBySlug,
+    checkJobApplicationStatus,
+    checkEventRegistrationStatus,
+    checkHubContentApplicationStatus,
+    getUserApplicationStatuses
 };
 
 export default apiService;

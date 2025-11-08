@@ -1,5 +1,6 @@
 import React from 'react';
 
+
 const WhyAttend = () => {
   return (
     <div className="attent10-section-area sp3">
@@ -16,7 +17,7 @@ const WhyAttend = () => {
 
 				<div className="row">
 					<div className="col-lg-12">
-						<div className="event6-widget-boxarea" data-aos="fade-left" data-aos-duration="1000">
+						<div className="event6-widget-boxarea force-dark-background" data-aos="fade-left" data-aos-duration="1000">
 							<div className="row align-items-center">
 								<div className="col-lg-5">
 									<div className="content-area">

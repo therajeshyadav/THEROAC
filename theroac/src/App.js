@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import PublicRoute from "./components/PublicRoute";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 
@@ -78,14 +79,16 @@ function App() {
           <Route path="/schedule" element={<Schedule />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="/verify-email" element={<VerifyEmail />} />
-          <Route path="/resend-verification" element={<ResendVerification />} />
-          <Route path="/verification-pending" element={<VerificationPending />} />
+          
+          {/* Public routes - redirect to dashboard if already logged in */}
+          <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+          <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
+          <Route path="/signup" element={<PublicRoute><Signup /></PublicRoute>} />
+          <Route path="/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
+          <Route path="/reset-password" element={<PublicRoute><ResetPassword /></PublicRoute>} />
+          <Route path="/verify-email" element={<PublicRoute><VerifyEmail /></PublicRoute>} />
+          <Route path="/resend-verification" element={<PublicRoute><ResendVerification /></PublicRoute>} />
+          <Route path="/verification-pending" element={<PublicRoute><VerificationPending /></PublicRoute>} />
           <Route path="/event-detail/:type/:slug" element={<UnifiedDetailsPage />} />
           <Route
             path="/dashboard"

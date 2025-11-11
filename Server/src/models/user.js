@@ -3,10 +3,6 @@ const sequelize = require('../config/database');
 const bcrypt = require('bcryptjs');
 
 class User extends Model {
-  async checkPassword(password) {
-    if (!this.passwordHash) return false;
-    return bcrypt.compare(password, this.passwordHash);
-  }
 }
 
 User.init({

@@ -10,6 +10,7 @@ const jobRoutes = require('./routes/jobs');
 const userRoutes = require('./routes/users');
 const adminRoutes = require('./routes/admin');
 const dashboardRoutes = require('./routes/dashboard');
+const gmailRoutes = require('./routes/gmailRoutes');
 const hubContentRoutes = require('./routes/hubContent');
 const errorHandler = require('./middlewares/errorHandler');
 
@@ -28,6 +29,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/hub-content', hubContentRoutes);
+app.use('/api/gmail', gmailRoutes);
 
 // health check
 app.get('/health', (req, res) => res.json({ ok: true }));
@@ -39,6 +41,7 @@ const PORT = process.env.PORT || 4000;
 (async () => {
   try {
     await sequelize.authenticate();
+    await sequelize.sync({ alter: true });
     console.log('DB connected');
     // optionally sync in dev: await sequelize.sync({ alter: true });
     app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

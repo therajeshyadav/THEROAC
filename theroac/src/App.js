@@ -23,6 +23,7 @@ import CandidateDashboard from "./pages/CandidateDashboard";
 import RecruiterDashboard from "./pages/RecruiterDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import UnifiedDetailsPage from './pages/UnifiedDetailsPage';
+import Callback from "./pages/OAuth2Callback";
 import NotFound from './pages/NotFound';
 // ✅ Helper component to handle smooth scrolling to hash IDs
 function ScrollToHashElement() {
@@ -79,7 +80,7 @@ function App() {
           <Route path="/schedule" element={<Schedule />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/contact" element={<Contact />} />
-          
+          <Route path= "/oauth2callback" element={<Callback />} />
           {/* Public routes - redirect to dashboard if already logged in */}
           <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
           <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />

@@ -33,6 +33,16 @@ const AdminDashboard = () => {
     const [users, setUsers] = useState([]);
     const [jobs, setJobs] = useState([]);
     const [events, setEvents] = useState([]);
+    const [isEditingProfile, setIsEditingProfile] = useState(false);
+    const [profileData, setProfileData] = useState({
+        fullName: '',
+        email: '',
+        phone: '',
+        city: '',
+        state: '',
+        country: '',
+        bio: ''
+    });
     const preloaderVisible = usePreloader(300);
 
 
@@ -291,7 +301,10 @@ const AdminDashboard = () => {
                                 <Download className="w-5 h-5" />
                                 <span>Reports</span>
                             </button>
-                            <button className="admin-nav-item">
+                            <button 
+                                className={`admin-nav-item ${activeTab === "settings" ? "admin-active" : ""}`}
+                                onClick={() => setActiveTab("settings")}
+                            >
                                 <Settings className="w-5 h-5" />
                                 <span>Settings</span>
                             </button>
@@ -632,6 +645,238 @@ const AdminDashboard = () => {
                                     </div>
                                 </div>
                             )}
+
+                            {/* Settings Tab */}
+                            {activeTab === "settings" && (
+                                <div className="settings-section">
+                                    <div className="section-header" style={{ marginBottom: '2rem' }}>
+                                        <div className="header-left">
+                                            <h2 style={{ color: '#fff', fontSize: '1.5rem', fontWeight: '600', margin: 0 }}>
+                                                Profile Settings
+                                            </h2>
+                                            <p style={{ color: 'rgba(255,255,255,0.7)', margin: '0.5rem 0 0 0' }}>
+                                                Manage your admin profile information
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="profile-card" style={{ background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,214,0,0.2)', borderRadius: '20px', padding: '2rem', maxWidth: '800px' }}>
+                                        {/* Profile Header */}
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '2rem', marginBottom: '2rem', paddingBottom: '2rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                                            <div className="admin-user-avatar" style={{ width: '80px', height: '80px', fontSize: '2rem' }}>
+                                                {authUser?.profilePicture ? (
+                                                    <img src={authUser.profilePicture} alt={authUser.fullName} className="profile-image" />
+                                                ) : (
+                                                    <span className="profile-initials">
+                                                        {getUserInitials(authUser?.fullName || authUser?.name)}
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <div style={{ flex: 1 }}>
+                                                <h3 style={{ color: '#fff', fontSize: '1.5rem', fontWeight: '600', margin: '0 0 0.5rem 0' }}>
+                                                    {authUser?.fullName || authUser?.name || 'Admin User'}
+                                                </h3>
+                                                <span style={{ color: 'rgba(255,214,0,0.9)', fontSize: '0.9rem', background: 'rgba(255,214,0,0.2)', padding: '0.25rem 0.75rem', borderRadius: '12px', display: 'inline-block' }}>
+                                                    Admin
+                                                </span>
+                                            </div>
+                                            {!isEditingProfile && (
+                                                <button 
+                                                    className="admin-btn-host"
+                                                    onClick={() => {
+                                                        setProfileData({
+                                                            fullName: authUser?.fullName || authUser?.name || '',
+                                                            email: authUser?.email || '',
+                                                            phone: authUser?.phone || '',
+                                                            city: authUser?.city || '',
+                                                            state: authUser?.state || '',
+                                                            country: authUser?.country || '',
+                                                            bio: authUser?.bio || ''
+                                                        });
+                                                        setIsEditingProfile(true);
+                                                    }}
+                                                >
+                                                    Edit Profile
+                                                </button>
+                                            )}
+                                        </div>
+
+                                        {/* Profile Form */}
+                                        {isEditingProfile ? (
+                                            <div className="profile-form">
+                                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1.5rem', marginBottom: '1.5rem' }}>
+                                                    <div>
+                                                        <label style={{ display: 'block', color: 'rgba(255,255,255,0.8)', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: '500' }}>
+                                                            Full Name
+                                                        </label>
+                                                        <input
+                                                            type="text"
+                                                            className="form-control"
+                                                            value={profileData.fullName}
+                                                            onChange={(e) => setProfileData({ ...profileData, fullName: e.target.value })}
+                                                            style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,214,0,0.3)', borderRadius: '8px', color: '#fff' }}
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label style={{ display: 'block', color: 'rgba(255,255,255,0.8)', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: '500' }}>
+                                                            Email
+                                                        </label>
+                                                        <input
+                                                            type="email"
+                                                            className="form-control"
+                                                            value={profileData.email}
+                                                            readOnly
+                                                            style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'rgba(255,255,255,0.5)', cursor: 'not-allowed' }}
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label style={{ display: 'block', color: 'rgba(255,255,255,0.8)', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: '500' }}>
+                                                            Phone
+                                                        </label>
+                                                        <input
+                                                            type="tel"
+                                                            className="form-control"
+                                                            value={profileData.phone}
+                                                            onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })}
+                                                            style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,214,0,0.3)', borderRadius: '8px', color: '#fff' }}
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label style={{ display: 'block', color: 'rgba(255,255,255,0.8)', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: '500' }}>
+                                                            City
+                                                        </label>
+                                                        <input
+                                                            type="text"
+                                                            className="form-control"
+                                                            value={profileData.city}
+                                                            onChange={(e) => setProfileData({ ...profileData, city: e.target.value })}
+                                                            style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,214,0,0.3)', borderRadius: '8px', color: '#fff' }}
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label style={{ display: 'block', color: 'rgba(255,255,255,0.8)', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: '500' }}>
+                                                            State
+                                                        </label>
+                                                        <input
+                                                            type="text"
+                                                            className="form-control"
+                                                            value={profileData.state}
+                                                            onChange={(e) => setProfileData({ ...profileData, state: e.target.value })}
+                                                            style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,214,0,0.3)', borderRadius: '8px', color: '#fff' }}
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label style={{ display: 'block', color: 'rgba(255,255,255,0.8)', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: '500' }}>
+                                                            Country
+                                                        </label>
+                                                        <input
+                                                            type="text"
+                                                            className="form-control"
+                                                            value={profileData.country}
+                                                            onChange={(e) => setProfileData({ ...profileData, country: e.target.value })}
+                                                            style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,214,0,0.3)', borderRadius: '8px', color: '#fff' }}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div style={{ marginBottom: '1.5rem' }}>
+                                                    <label style={{ display: 'block', color: 'rgba(255,255,255,0.8)', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: '500' }}>
+                                                        Bio
+                                                    </label>
+                                                    <textarea
+                                                        className="form-control"
+                                                        value={profileData.bio}
+                                                        onChange={(e) => setProfileData({ ...profileData, bio: e.target.value })}
+                                                        rows="4"
+                                                        style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,214,0,0.3)', borderRadius: '8px', color: '#fff', resize: 'vertical' }}
+                                                    />
+                                                </div>
+                                                <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+                                                    <button
+                                                        className="btn-cancel"
+                                                        onClick={() => setIsEditingProfile(false)}
+                                                        style={{ background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.8)', border: '1px solid rgba(255,255,255,0.2)', padding: '0.75rem 1.5rem', borderRadius: '25px', cursor: 'pointer', fontWeight: '600' }}
+                                                    >
+                                                        Cancel
+                                                    </button>
+                                                    <button
+                                                        className="admin-btn-host"
+                                                        onClick={async () => {
+                                                            try {
+                                                                const response = await fetch('http://localhost:4000/api/users/me', {
+                                                                    method: 'PUT',
+                                                                    headers: {
+                                                                        'Content-Type': 'application/json',
+                                                                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                                                                    },
+                                                                    body: JSON.stringify(profileData)
+                                                                });
+                                                                if (response.ok) {
+                                                                    setIsEditingProfile(false);
+                                                                    alert('Profile updated successfully!');
+                                                                    window.location.reload();
+                                                                } else {
+                                                                    alert('Failed to update profile');
+                                                                }
+                                                            } catch (error) {
+                                                                alert('Failed to update profile');
+                                                            }
+                                                        }}
+                                                    >
+                                                        Save Changes
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="profile-view">
+                                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1.5rem' }}>
+                                                    <div>
+                                                        <label style={{ display: 'block', color: 'rgba(255,255,255,0.6)', marginBottom: '0.5rem', fontSize: '0.85rem' }}>
+                                                            Full Name
+                                                        </label>
+                                                        <p style={{ color: '#fff', margin: 0, fontSize: '1rem' }}>
+                                                            {authUser?.fullName || authUser?.name || 'Not set'}
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <label style={{ display: 'block', color: 'rgba(255,255,255,0.6)', marginBottom: '0.5rem', fontSize: '0.85rem' }}>
+                                                            Email
+                                                        </label>
+                                                        <p style={{ color: '#fff', margin: 0, fontSize: '1rem' }}>
+                                                            {authUser?.email || 'Not set'}
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <label style={{ display: 'block', color: 'rgba(255,255,255,0.6)', marginBottom: '0.5rem', fontSize: '0.85rem' }}>
+                                                            Phone
+                                                        </label>
+                                                        <p style={{ color: '#fff', margin: 0, fontSize: '1rem' }}>
+                                                            {authUser?.phone || 'Not set'}
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <label style={{ display: 'block', color: 'rgba(255,255,255,0.6)', marginBottom: '0.5rem', fontSize: '0.85rem' }}>
+                                                            Location
+                                                        </label>
+                                                        <p style={{ color: '#fff', margin: 0, fontSize: '1rem' }}>
+                                                            {[authUser?.city, authUser?.state, authUser?.country].filter(Boolean).join(', ') || 'Not set'}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                {authUser?.bio && (
+                                                    <div style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+                                                        <label style={{ display: 'block', color: 'rgba(255,255,255,0.6)', marginBottom: '0.5rem', fontSize: '0.85rem' }}>
+                                                            Bio
+                                                        </label>
+                                                        <p style={{ color: '#fff', margin: 0, fontSize: '1rem', lineHeight: '1.6' }}>
+                                                            {authUser.bio}
+                                                        </p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -649,10 +894,6 @@ const AdminDashboard = () => {
                                         <span>A</span>
                                     </div>
                                 </div>
-                                <button className="btn-contact">
-                                    <Settings className="w-4 h-4" />
-                                    System Settings
-                                </button>
                             </div>
 
                             {/* Quick Stats */}

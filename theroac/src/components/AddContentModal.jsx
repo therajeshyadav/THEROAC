@@ -14,7 +14,7 @@ const AddContentModal = ({ isOpen, onClose, type, onSuccess }) => {
         requirements: '',
         benefits: '',
         jobType: 'full-time',
-        experienceLevel: 'entry',
+        experienceLevel: 'fresher',
         // Event specific fields
         date: '',
         time: '',
@@ -144,7 +144,7 @@ const AddContentModal = ({ isOpen, onClose, type, onSuccess }) => {
                 requirements: '',
                 benefits: '',
                 jobType: 'full-time',
-                experienceLevel: 'entry',
+                experienceLevel: 'fresher',
                 date: '',
                 time: '',
                 venue: '',
@@ -306,10 +306,10 @@ const AddContentModal = ({ isOpen, onClose, type, onSuccess }) => {
                                     value={formData.experienceLevel}
                                     onChange={handleInputChange}
                                 >
-                                    <option value="entry">Entry Level</option>
+                                    <option value="fresher">Fresher</option>
+                                    <option value="junior">Junior</option>
                                     <option value="mid">Mid Level</option>
                                     <option value="senior">Senior Level</option>
-                                    <option value="lead">Lead/Principal</option>
                                 </select>
                             </div>
 

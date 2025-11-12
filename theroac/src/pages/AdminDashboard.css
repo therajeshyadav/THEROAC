@@ -1053,6 +1053,7 @@ Additional Interactive Elements */
 
 /* Enhanced Stat Cards with Gradient Backgrounds */
 .admin-stat-card {
+    
     position: relative;
     overflow: hidden;
 }
@@ -1335,9 +1336,18 @@ b Content */
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #fff;
+    color: #1A1719;
     flex-shrink: 0;
     background: #FFD600;
+}
+
+/* Ensure SVG icons inside admin-stat-icon are visible */
+.admin-stat-icon svg {
+    color: #1A1719 !important;
+    fill: currentColor;
+    stroke: currentColor;
+    width: 24px;
+    height: 24px;
 }
 
 .admin-stat-number {

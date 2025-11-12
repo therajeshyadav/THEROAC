@@ -1896,3 +1896,97 @@ select::-ms-expand {
         color: #fff !important;
     }
 }
+
+
+/* ========================================
+   COMING SOON PAGES
+   ======================================== */
+
+.coming-soon-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 200px);
+    padding: 2rem;
+}
+
+.coming-soon-content {
+    text-align: center;
+    max-width: 500px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 214, 0, 0.2);
+    border-radius: 24px;
+    padding: 4rem 3rem;
+    animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.coming-soon-icon {
+    color: #FFD600;
+    margin: 0 auto 2rem;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.05);
+    }
+}
+
+.coming-soon-content h2 {
+    color: #fff;
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.coming-soon-content p {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+.coming-soon-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #FFD600, #FFA500);
+    color: #1A1719;
+    padding: 0.75rem 2rem;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 15px rgba(255, 214, 0, 0.3);
+    animation: glow 2s ease-in-out infinite;
+}
+
+/* Ensure buttons in coming soon are centered */
+.coming-soon-content .btn-host {
+    margin: 0 auto;
+    display: inline-flex;
+}
+
+@keyframes glow {
+    0%, 100% {
+        box-shadow: 0 4px 15px rgba(255, 214, 0, 0.3);
+    }
+    50% {
+        box-shadow: 0 4px 25px rgba(255, 214, 0, 0.5);
+    }
+}

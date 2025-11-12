@@ -81,11 +81,25 @@ const Login = () => {
             navigate('/resend-verification');
           }, 1500);
         } else {
-          setError(result.error || 'Login failed');
+          toast.error(result.error || 'Login failed', {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+          });
         }
       }
     } catch (err) {
-      setError('Login failed. Please try again.');
+      toast.error('Login failed. Please try again.', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
     } finally {
       setSubmitLoading(false);
     }
@@ -120,13 +134,6 @@ const Login = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="auth-form">
-            {error && (
-              <div className="error-message">
-                <i className="fas fa-exclamation-circle"></i>
-                {error}
-              </div>
-            )}
-            
             <div className="form-group has-icon">
               <input
                 type="email"

@@ -53,7 +53,7 @@
   background: rgba(42, 42, 42, 1);
   backdrop-filter: blur(20px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-  border-bottom: 1px solid rgba(255, 214, 0, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .details-page .nav-container {
@@ -90,7 +90,7 @@
   padding: 0.25rem;
   background: rgba(255, 255, 255, 0.1);
   border-radius: 25px;
-  border: 1px solid rgba(255, 214, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   visibility: visible !important;
   opacity: 1 !important;
 }
@@ -220,7 +220,7 @@
 .details-page .header-card {
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 214, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 20px;
   padding: 2rem;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
@@ -234,16 +234,6 @@
   width: 100%;
   margin-bottom: 1.5rem;
   flex-shrink: 0;
-}
-
-.header-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: #FFD600;
 }
 
 .header-left {
@@ -375,7 +365,7 @@
 .content-area {
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 214, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 16px;
   padding: 2rem;
 }
@@ -658,7 +648,7 @@
 .info-card {
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 214, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 16px;
   padding: 1.5rem;
 }
@@ -1132,12 +1122,11 @@
 .gap-4 {
   gap: 1rem;
 }
-/* Cri
-tical scoped classes for navigation tabs */
+/* Critical scoped classes for navigation tabs */
 .details-page .header-card {
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 214, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 20px;
   padding: 2rem;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
@@ -1150,16 +1139,6 @@ tical scoped classes for navigation tabs */
   width: 100%;
   margin-bottom: 1.5rem;
   flex-shrink: 0;
-}
-
-.details-page .header-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: #FFD600;
 }
 
 .details-page .header-left {
@@ -1276,7 +1255,7 @@ tical scoped classes for navigation tabs */
 .details-page .content-area {
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 214, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 16px;
   padding: 2rem;
 }
@@ -1304,7 +1283,7 @@ tical scoped classes for navigation tabs */
 .details-page .info-card {
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 214, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 16px;
   padding: 1.5rem;
 }

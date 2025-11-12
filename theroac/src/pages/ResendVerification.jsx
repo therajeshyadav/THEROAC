@@ -52,9 +52,6 @@ const ResendVerification = () => {
         </div>
         <div className="col-6">
           <div className="auth-header">
-            <Link to="/login" className="back-btn">
-              <i className="fa-solid fa-arrow-left"></i>
-            </Link>
             <h2>Resend Verification</h2>
             <p className="auth-subtitle">
               Enter your email address and we'll send you a new verification link.

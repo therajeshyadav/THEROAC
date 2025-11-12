@@ -248,6 +248,9 @@ exports.getJobBySlug = async (req, res, next) => {
       return res.status(404).json({ error: 'Job not found' });
     }
 
+    // Increment view counter
+    await job.increment('views');
+    
     res.json(job);
   } catch (err) {
     console.error('Error fetching job by slug:', err);

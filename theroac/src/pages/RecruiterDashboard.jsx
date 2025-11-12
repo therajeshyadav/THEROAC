@@ -48,6 +48,18 @@ const RecruiterDashboard = () => {
   const [modalType, setModalType] = useState('job');
   const [showHostDropdown, setShowHostDropdown] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
+  const [myJobs, setMyJobs] = useState([]);
+  const [jobsLoading, setJobsLoading] = useState(false);
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [profileData, setProfileData] = useState({
+    fullName: '',
+    email: '',
+    phone: '',
+    city: '',
+    state: '',
+    country: '',
+    bio: ''
+  });
   const hostButtonRef = useRef(null);
   const preloaderVisible = usePreloader(300);
 
@@ -80,6 +92,27 @@ const RecruiterDashboard = () => {
       // Error fetching dashboard data
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchMyJobs = async () => {
+    try {
+      setJobsLoading(true);
+      // Fetch jobs created by this recruiter
+      const response = await fetch('http://localhost:4000/api/jobs', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      const data = await response.json();
+      // Filter jobs created by current user
+      const userJobs = data.jobs?.filter(job => job.createdBy === authUser?.id) || [];
+      setMyJobs(userJobs);
+    } catch (error) {
+      // Error fetching jobs
+      setMyJobs([]);
+    } finally {
+      setJobsLoading(false);
     }
   };
 
@@ -127,6 +160,13 @@ const RecruiterDashboard = () => {
     fetchDashboardData();
     fetchCandidates();
   }, [isAuthenticated, authLoading, authUser, navigate]);
+
+  // Fetch jobs when jobs tab is active
+  useEffect(() => {
+    if (activeTab === "jobs" && authUser?.id) {
+      fetchMyJobs();
+    }
+  }, [activeTab, authUser?.id]);
 
   // Fetch candidates when search or filter changes
   useEffect(() => {
@@ -426,7 +466,10 @@ const RecruiterDashboard = () => {
                 <Download className="w-5 h-5" />
                 <span>My Download(s)</span>
               </button>
-              <button className="nav-item">
+              <button 
+                className={`nav-item ${activeTab === "settings" ? "active" : ""}`}
+                onClick={() => setActiveTab("settings")}
+              >
                 <Settings className="w-5 h-5" />
                 <span>Settings</span>
               </button>
@@ -436,6 +479,10 @@ const RecruiterDashboard = () => {
           {/* Main Content */}
           <div className="organizer-main">
             <div className="max-w-[1200px]">
+              
+              {/* Dashboard Tab */}
+              {activeTab === "dashboard" && (
+                <>
               {/* Welcome Section */}
               <div className="welcome-section">
                 <div className="welcome-text">
@@ -1069,6 +1116,362 @@ const RecruiterDashboard = () => {
                   )}
                 </div>
               </div>
+              </>
+              )}
+
+              {/* Jobs & Internships Tab */}
+              {activeTab === "jobs" && (
+                <div className="jobs-internships-section">
+                  <div className="section-header" style={{ marginBottom: '2rem' }}>
+                    <div className="header-left">
+                      <h2 style={{ color: '#fff', fontSize: '1.5rem', fontWeight: '600', margin: 0 }}>
+                        My Jobs & Internships
+                      </h2>
+                      <p style={{ color: 'rgba(255,255,255,0.7)', margin: '0.5rem 0 0 0' }}>
+                        Manage your job postings and internship opportunities
+                      </p>
+                    </div>
+                    <button 
+                      className="btn-host"
+                      onClick={() => handleOpenModal('job')}
+                      style={{ marginLeft: 'auto' }}
+                    >
+                      <Plus className="w-4 h-4" /> Add New Job
+                    </button>
+                  </div>
+
+                  {/* Jobs List */}
+                  <div className="jobs-grid">
+                    {jobsLoading ? (
+                      <div style={{ textAlign: 'center', padding: '3rem', color: 'rgba(255,255,255,0.7)' }}>
+                        <div className="loading"></div>
+                        <p>Loading your jobs...</p>
+                      </div>
+                    ) : myJobs.length > 0 ? (
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '1.5rem' }}>
+                        {myJobs.map((job) => (
+                          <div key={job.id} className="event-card" style={{ background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,214,0,0.2)', borderRadius: '16px', padding: '1.5rem' }}>
+                            <div className="event-header" style={{ marginBottom: '1rem' }}>
+                              <div className="event-info">
+                                <h3 style={{ color: '#fff', fontSize: '1.1rem', fontWeight: '600', marginBottom: '0.5rem' }}>{job.title}</h3>
+                                <p style={{ color: '#FFD600', fontSize: '0.9rem', marginBottom: '0.5rem' }}>{job.companyName}</p>
+                                <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.85rem' }}>
+                                  {job.location || 'Remote'} • {job.jobType || 'Full-time'}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="event-meta" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1rem' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'rgba(255,255,255,0.7)', fontSize: '0.85rem' }}>
+                                <Eye className="w-4 h-4" style={{ color: '#FFD600' }} />
+                                <span>{job.views || 0} views</span>
+                              </div>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'rgba(255,255,255,0.7)', fontSize: '0.85rem' }}>
+                                <Users className="w-4 h-4" style={{ color: '#FFD600' }} />
+                                <span>{job.applications || 0} applications</span>
+                              </div>
+                            </div>
+                            <div className="event-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+                              <span className="status-badge" style={{ padding: '0.3rem 0.8rem', borderRadius: '15px', fontSize: '0.8rem', fontWeight: '600', background: job.status === 'open' ? 'rgba(16,185,129,0.2)' : 'rgba(255,68,68,0.2)', color: job.status === 'open' ? '#10B981' : '#FF4444', textTransform: 'uppercase' }}>
+                                {job.status || 'open'}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="coming-soon-container">
+                        <div className="coming-soon-content">
+                          <Briefcase className="coming-soon-icon" size={64} />
+                          <h2>No Jobs Yet</h2>
+                          <p>Jobs and internships you create will appear here</p>
+                          <button 
+                            className="btn-host"
+                            onClick={() => handleOpenModal('job')}
+                            style={{ marginTop: '1rem' }}
+                          >
+                            <Plus className="w-4 h-4" /> Create Your First Job
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Evaluate Candidates Tab */}
+              {activeTab === "evaluate" && (
+                <div className="coming-soon-container">
+                  <div className="coming-soon-content">
+                    <UserCheck className="coming-soon-icon" size={64} />
+                    <h2>Evaluate Candidates</h2>
+                    <p>Review and assess candidate applications</p>
+                    <span className="coming-soon-badge">Coming Soon</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Opportunities Tab */}
+              {activeTab === "opportunities" && (
+                <div className="coming-soon-container">
+                  <div className="coming-soon-content">
+                    <Star className="coming-soon-icon" size={64} />
+                    <h2>Opportunities</h2>
+                    <p>Manage career opportunities and openings</p>
+                    <span className="coming-soon-badge">Coming Soon</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Festivals Tab */}
+              {activeTab === "festivals" && (
+                <div className="coming-soon-container">
+                  <div className="coming-soon-content">
+                    <Calendar className="coming-soon-icon" size={64} />
+                    <h2>Festivals & Events</h2>
+                    <p>Create and manage recruitment festivals</p>
+                    <span className="coming-soon-badge">Coming Soon</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Assessments Tab */}
+              {activeTab === "assessments" && (
+                <div className="coming-soon-container">
+                  <div className="coming-soon-content">
+                    <ClipboardCheck className="coming-soon-icon" size={64} />
+                    <h2>Assessments</h2>
+                    <p>Create and manage candidate assessments</p>
+                    <span className="coming-soon-badge">Coming Soon</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Talent Pipeline Tab */}
+              {activeTab === "talent" && (
+                <div className="coming-soon-container">
+                  <div className="coming-soon-content">
+                    <Users className="coming-soon-icon" size={64} />
+                    <h2>Talent Pipeline</h2>
+                    <p>Build and manage your talent pipeline</p>
+                    <span className="coming-soon-badge">Coming Soon</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Settings Tab */}
+              {activeTab === "settings" && (
+                <div className="settings-section">
+                  <div className="section-header" style={{ marginBottom: '2rem' }}>
+                    <div className="header-left">
+                      <h2 style={{ color: '#fff', fontSize: '1.5rem', fontWeight: '600', margin: 0 }}>
+                        Profile Settings
+                      </h2>
+                      <p style={{ color: 'rgba(255,255,255,0.7)', margin: '0.5rem 0 0 0' }}>
+                        Manage your account information and preferences
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="profile-card" style={{ background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,214,0,0.2)', borderRadius: '20px', padding: '2rem', maxWidth: '800px' }}>
+                    {/* Profile Header */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '2rem', marginBottom: '2rem', paddingBottom: '2rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                      <div className="user-avatar" style={{ width: '80px', height: '80px', fontSize: '2rem' }}>
+                        {authUser?.profilePicture ? (
+                          <img src={authUser.profilePicture} alt={authUser.fullName} className="profile-image" />
+                        ) : (
+                          <span className="profile-initials">
+                            {getUserInitials(authUser?.fullName || authUser?.name)}
+                          </span>
+                        )}
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <h3 style={{ color: '#fff', fontSize: '1.5rem', fontWeight: '600', margin: '0 0 0.5rem 0' }}>
+                          {authUser?.fullName || authUser?.name || 'Recruiter'}
+                        </h3>
+                        <p style={{ color: 'rgba(255,255,255,0.7)', margin: 0 }}>
+                          {authUser?.email}
+                        </p>
+                        <span style={{ display: 'inline-block', marginTop: '0.5rem', padding: '0.25rem 0.75rem', background: 'rgba(255,214,0,0.2)', color: '#FFD600', borderRadius: '12px', fontSize: '0.85rem', fontWeight: '600' }}>
+                          {authUser?.role || 'Recruiter'}
+                        </span>
+                      </div>
+                      {!isEditingProfile && (
+                        <button 
+                          className="btn-host"
+                          onClick={() => {
+                            setProfileData({
+                              fullName: authUser?.fullName || authUser?.name || '',
+                              email: authUser?.email || '',
+                              phone: authUser?.phone || '',
+                              city: authUser?.city || '',
+                              state: authUser?.state || '',
+                              country: authUser?.country || '',
+                              bio: authUser?.bio || ''
+                            });
+                            setIsEditingProfile(true);
+                          }}
+                        >
+                          Edit Profile
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Profile Form */}
+                    {isEditingProfile ? (
+                      <div className="profile-form">
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1.5rem', marginBottom: '1.5rem' }}>
+                          <div>
+                            <label style={{ display: 'block', color: 'rgba(255,255,255,0.8)', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: '500' }}>
+                              Full Name
+                            </label>
+                            <input
+                              type="text"
+                              className="form-control"
+                              value={profileData.fullName}
+                              onChange={(e) => setProfileData({ ...profileData, fullName: e.target.value })}
+                              style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,214,0,0.3)', borderRadius: '8px', color: '#fff' }}
+                            />
+                          </div>
+                          <div>
+                            <label style={{ display: 'block', color: 'rgba(255,255,255,0.8)', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: '500' }}>
+                              Email
+                            </label>
+                            <input
+                              type="email"
+                              className="form-control"
+                              value={profileData.email}
+                              readOnly
+                              style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'rgba(255,255,255,0.5)', cursor: 'not-allowed' }}
+                            />
+                          </div>
+                          <div>
+                            <label style={{ display: 'block', color: 'rgba(255,255,255,0.8)', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: '500' }}>
+                              Phone
+                            </label>
+                            <input
+                              type="tel"
+                              className="form-control"
+                              value={profileData.phone}
+                              onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })}
+                              style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,214,0,0.3)', borderRadius: '8px', color: '#fff' }}
+                            />
+                          </div>
+                          <div>
+                            <label style={{ display: 'block', color: 'rgba(255,255,255,0.8)', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: '500' }}>
+                              City
+                            </label>
+                            <input
+                              type="text"
+                              className="form-control"
+                              value={profileData.city}
+                              onChange={(e) => setProfileData({ ...profileData, city: e.target.value })}
+                              style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,214,0,0.3)', borderRadius: '8px', color: '#fff' }}
+                            />
+                          </div>
+                          <div>
+                            <label style={{ display: 'block', color: 'rgba(255,255,255,0.8)', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: '500' }}>
+                              State
+                            </label>
+                            <input
+                              type="text"
+                              className="form-control"
+                              value={profileData.state}
+                              onChange={(e) => setProfileData({ ...profileData, state: e.target.value })}
+                              style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,214,0,0.3)', borderRadius: '8px', color: '#fff' }}
+                            />
+                          </div>
+                          <div>
+                            <label style={{ display: 'block', color: 'rgba(255,255,255,0.8)', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: '500' }}>
+                              Country
+                            </label>
+                            <input
+                              type="text"
+                              className="form-control"
+                              value={profileData.country}
+                              onChange={(e) => setProfileData({ ...profileData, country: e.target.value })}
+                              style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,214,0,0.3)', borderRadius: '8px', color: '#fff' }}
+                            />
+                          </div>
+                        </div>
+                        <div style={{ marginBottom: '1.5rem' }}>
+                          <label style={{ display: 'block', color: 'rgba(255,255,255,0.8)', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: '500' }}>
+                            Bio
+                          </label>
+                          <textarea
+                            className="form-control"
+                            value={profileData.bio}
+                            onChange={(e) => setProfileData({ ...profileData, bio: e.target.value })}
+                            rows={4}
+                            style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,214,0,0.3)', borderRadius: '8px', color: '#fff', resize: 'vertical' }}
+                          />
+                        </div>
+                        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+                          <button
+                            className="btn-secondary"
+                            onClick={() => setIsEditingProfile(false)}
+                            style={{ padding: '0.75rem 1.5rem', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '8px', color: '#fff', cursor: 'pointer' }}
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            className="btn-host"
+                            onClick={async () => {
+                              try {
+                                const response = await fetch('http://localhost:4000/api/users/me', {
+                                  method: 'PUT',
+                                  headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                                  },
+                                  body: JSON.stringify(profileData)
+                                });
+                                if (response.ok) {
+                                  setIsEditingProfile(false);
+                                  window.location.reload();
+                                }
+                              } catch (error) {
+                                // Error updating profile
+                              }
+                            }}
+                          >
+                            Save Changes
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="profile-details">
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1.5rem' }}>
+                          <div>
+                            <label style={{ display: 'block', color: 'rgba(255,255,255,0.6)', marginBottom: '0.5rem', fontSize: '0.85rem' }}>
+                              Phone
+                            </label>
+                            <p style={{ color: '#fff', margin: 0, fontSize: '1rem' }}>
+                              {authUser?.phone || 'Not provided'}
+                            </p>
+                          </div>
+                          <div>
+                            <label style={{ display: 'block', color: 'rgba(255,255,255,0.6)', marginBottom: '0.5rem', fontSize: '0.85rem' }}>
+                              Location
+                            </label>
+                            <p style={{ color: '#fff', margin: 0, fontSize: '1rem' }}>
+                              {[authUser?.city, authUser?.state, authUser?.country].filter(Boolean).join(', ') || 'Not provided'}
+                            </p>
+                          </div>
+                          <div style={{ gridColumn: '1 / -1' }}>
+                            <label style={{ display: 'block', color: 'rgba(255,255,255,0.6)', marginBottom: '0.5rem', fontSize: '0.85rem' }}>
+                              Bio
+                            </label>
+                            <p style={{ color: '#fff', margin: 0, fontSize: '1rem', lineHeight: '1.6' }}>
+                              {authUser?.bio || 'No bio added yet'}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
             </div>
           </div>
         </div>

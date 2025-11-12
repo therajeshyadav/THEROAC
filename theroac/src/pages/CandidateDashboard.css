@@ -1517,6 +1517,30 @@ input:-moz-autofill {
     box-shadow: 0 12px 35px rgba(255, 214, 0, 0.4);
 }
 
+/* Profile Icon Circle - CSS Based */
+.profile-icon-circle {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: #FFD600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 4px solid #FFD600;
+    box-shadow: 0 8px 25px rgba(255, 214, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+.profile-icon-circle svg {
+    color: #1A1719;
+    stroke-width: 1.5;
+}
+
+.profile-icon-circle:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 35px rgba(255, 214, 0, 0.4);
+}
+
 .change-photo-btn {
     position: absolute;
     bottom: 5px;
@@ -1810,6 +1834,40 @@ input:-moz-autofill {
 .no-data p {
     font-size: 1rem;
     margin: 0;
+}
+
+.no-data .btn-primary {
+    margin: 1.5rem auto 0;
+    display: inline-block;
+}
+
+/* Remove hover border from dashboard cards */
+.dashboard-card:hover {
+    border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Remove ::before pseudo-element hover effect */
+.dashboard-card::before {
+    display: none !important;
+}
+
+.dashboard-card:hover::before {
+    opacity: 0 !important;
+    display: none !important;
+}
+
+/* Remove hover border from profile card */
+.profile-card:hover {
+    border-color: rgba(255, 214, 0, 0.2) !important;
+}
+
+.profile-card::before {
+    display: none !important;
+}
+
+.profile-card:hover::before {
+    opacity: 0 !important;
+    display: none !important;
 }
 
 /* Responsive Design */

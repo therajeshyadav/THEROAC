@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { User } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import apiService from '../services/api';
 import { usePreloader } from '../hooks/usePreloader';
@@ -1216,9 +1217,9 @@ const CandidateDashboard = () => {
                                     <div className="dashboard-card">
                                         <div className="profile-summary">
                                             <div className="profile-image-section">
-                                                <img src={authUser?.profileImage || '/assets/img/profile-placeholder.jpg'} alt="Profile" onError={(e) => {
-                                                    e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxjaXJjbGUgY3g9IjUwIiBjeT0iNTAiIHI9IjUwIiBmaWxsPSIjRkZENjAwIi8+Cjxzdmcgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik0xMiAxMkMxNC4yMDkxIDEyIDE2IDEwLjIwOTEgMTYgOEMxNiA1Ljc5MDg2IDE0LjIwOTEgNCAxMiA0QzkuNzkwODYgNCA4IDUuNzkwODYgOCA4QzggMTAuMjA5MSA5Ljc5MDg2IDEyIDEyIDEyWiIgZmlsbD0iIzFBMTcxOSIvPgo8cGF0aCBkPSJNMTIgMTRDOS4zMyAxMy45OSA3LjAxIDE1LjYyIDYgMThWMjBIMThWMThDMTYuOTkgMTUuNjIgMTQuNjcgMTMuOTkgMTIgMTRaIiBmaWxsPSIjMUExNzE5Ii8+Cjwvc3ZnPgo8L3N2Zz4K';
-                                                }} />
+                                                <div className="profile-icon-circle">
+                                                    <User size={80} strokeWidth={1.5} />
+                                                </div>
                                                 <button className="change-photo-btn">
                                                     <i className="fas fa-camera"></i>
                                                 </button>
@@ -1238,152 +1239,188 @@ const CandidateDashboard = () => {
                                     </div>
                                 </div>
                                 <div className="col-lg-8">
-                                    <div className="dashboard-card">
-                                        <div className="card-header">
-                                            <h4>Profile Information</h4>
-                                            {!isEditingProfile ? (
-                                                <button className="btn-edit" onClick={handleEditProfile}>
-                                                    <i className="fas fa-edit"></i>
+                                    <div className="dashboard-card" style={{ background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,214,0,0.2)', borderRadius: '20px', padding: '2rem' }}>
+                                        {/* Profile Header */}
+                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem', paddingBottom: '2rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                                            <div>
+                                                <h3 style={{ color: '#fff', fontSize: '1.5rem', fontWeight: '600', margin: '0 0 0.5rem 0' }}>
+                                                    {authUser?.fullName || authUser?.name || 'Candidate'}
+                                                </h3>
+                                                <span style={{ color: 'rgba(255,214,0,0.9)', fontSize: '0.9rem', background: 'rgba(255,214,0,0.2)', padding: '0.25rem 0.75rem', borderRadius: '12px', display: 'inline-block' }}>
+                                                    Candidate
+                                                </span>
+                                            </div>
+                                            {!isEditingProfile && (
+                                                <button 
+                                                    className="btn-host"
+                                                    onClick={handleEditProfile}
+                                                    style={{ background: '#FFD600', color: '#1A1719', border: 'none', padding: '0.75rem 1.5rem', borderRadius: '25px', fontWeight: '600', cursor: 'pointer' }}
+                                                >
                                                     Edit Profile
                                                 </button>
-                                            ) : (
-                                                <div className="edit-actions">
-                                                    <button className="btn-save" onClick={handleSaveProfile}>
-                                                        <i className="fas fa-check"></i>
-                                                        Save
-                                                    </button>
-                                                    <button className="btn-cancel" onClick={handleCancelEdit}>
-                                                        <i className="fas fa-times"></i>
-                                                        Cancel
-                                                    </button>
-                                                </div>
                                             )}
                                         </div>
-                                        <div className="profile-form">
-                                            <div className="row">
-                                                <div className="col-md-6 mb-3">
-                                                    <label>Full Name</label>
+
+                                        {/* Profile Form/View */}
+                                        {isEditingProfile ? (
+                                            <div className="profile-form">
+                                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1.5rem', marginBottom: '1.5rem' }}>
+                                                <div>
+                                                    <label style={{ display: 'block', color: 'rgba(255,255,255,0.8)', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: '500' }}>
+                                                        Full Name
+                                                    </label>
                                                     <input
                                                         type="text"
                                                         className="form-control"
-                                                        value={isEditingProfile ? profileData.fullName : (authUser?.fullName || authUser?.name || '')}
-                                                        readOnly={!isEditingProfile}
+                                                        value={profileData.fullName}
                                                         onChange={(e) => handleProfileInputChange('fullName', e.target.value)}
+                                                        style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,214,0,0.3)', borderRadius: '8px', color: '#fff' }}
                                                     />
                                                 </div>
-                                                <div className="col-md-6 mb-3">
-                                                    <label>Email</label>
+                                                <div>
+                                                    <label style={{ display: 'block', color: 'rgba(255,255,255,0.8)', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: '500' }}>
+                                                        Email
+                                                    </label>
                                                     <input
                                                         type="email"
                                                         className="form-control"
-                                                        value={isEditingProfile ? profileData.email : (authUser?.email || '')}
-                                                        readOnly={!isEditingProfile}
-                                                        onChange={(e) => handleProfileInputChange('email', e.target.value)}
+                                                        value={profileData.email}
+                                                        readOnly
+                                                        style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'rgba(255,255,255,0.5)', cursor: 'not-allowed' }}
                                                     />
                                                 </div>
-                                                <div className="col-md-6 mb-3">
-                                                    <label>Phone</label>
-                                                    <div className="phone-input-wrapper" style={{ position: 'relative' }}>
-                                                        <span className="phone-prefix" style={{
-                                                            position: 'absolute',
-                                                            left: '1rem',
-                                                            top: '50%',
-                                                            transform: 'translateY(-50%)',
-                                                            color: '#ffffff',
-                                                            fontSize: '0.9rem',
-                                                            fontWeight: '500',
-                                                            zIndex: 1,
-                                                            pointerEvents: 'none'
-                                                        }}>+91</span>
-                                                        <input
-                                                            type="tel"
-                                                            className="form-control"
-                                                            style={{ paddingLeft: '3.5rem' }}
-                                                            value={(() => {
-                                                                // Use profileData.phone if available (from edit or after load), otherwise authUser.phone
-                                                                const phone = profileData.phone || authUser?.phone || '';
-                                                                if (!phone) return '';
-                                                                // Remove +91 if present, otherwise return as is
-                                                                return String(phone).replace(/^\+91/, '');
-                                                            })()}
-                                                            placeholder="Enter 10 digit number"
-                                                            readOnly={!isEditingProfile}
-                                                            maxLength="10"
-                                                            pattern="[0-9]{10}"
-                                                            onChange={(e) => {
-                                                                const digitsOnly = e.target.value.replace(/\D/g, '');
-                                                                if (digitsOnly.length <= 10) {
-                                                                    handleProfileInputChange('phone', `+91${digitsOnly}`);
-                                                                }
-                                                            }}
-                                                        />
-                                                    </div>
+                                                <div>
+                                                    <label style={{ display: 'block', color: 'rgba(255,255,255,0.8)', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: '500' }}>
+                                                        Phone
+                                                    </label>
+                                                    <input
+                                                        type="tel"
+                                                        className="form-control"
+                                                        value={profileData.phone}
+                                                        onChange={(e) => handleProfileInputChange('phone', e.target.value)}
+                                                        style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,214,0,0.3)', borderRadius: '8px', color: '#fff' }}
+                                                    />
                                                 </div>
-                                                <div className="col-md-6 mb-3">
-                                                    <label>City</label>
+                                                <div>
+                                                    <label style={{ display: 'block', color: 'rgba(255,255,255,0.8)', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: '500' }}>
+                                                        City
+                                                    </label>
                                                     <input
                                                         type="text"
                                                         className="form-control"
-                                                        value={isEditingProfile ? profileData.city : (authUser?.city || '')}
+                                                        value={profileData.city}
                                                         placeholder="Add city"
-                                                        readOnly={!isEditingProfile}
                                                         onChange={(e) => handleProfileInputChange('city', e.target.value)}
+                                                        style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,214,0,0.3)', borderRadius: '8px', color: '#fff' }}
                                                     />
                                                 </div>
-                                                <div className="col-md-6 mb-3">
-                                                    <label>State</label>
+                                                <div>
+                                                    <label style={{ display: 'block', color: 'rgba(255,255,255,0.8)', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: '500' }}>
+                                                        State
+                                                    </label>
                                                     <input
                                                         type="text"
                                                         className="form-control"
-                                                        value={isEditingProfile ? profileData.state : (authUser?.state || '')}
+                                                        value={profileData.state}
                                                         placeholder="Add state"
-                                                        readOnly={!isEditingProfile}
                                                         onChange={(e) => handleProfileInputChange('state', e.target.value)}
+                                                        style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,214,0,0.3)', borderRadius: '8px', color: '#fff' }}
                                                     />
                                                 </div>
-                                                <div className="col-md-6 mb-3">
-                                                    <label>Country</label>
+                                                <div>
+                                                    <label style={{ display: 'block', color: 'rgba(255,255,255,0.8)', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: '500' }}>
+                                                        Country
+                                                    </label>
                                                     <input
                                                         type="text"
                                                         className="form-control"
-                                                        value={isEditingProfile ? profileData.country : (authUser?.country || '')}
+                                                        value={profileData.country}
                                                         placeholder="Add country"
-                                                        readOnly={!isEditingProfile}
                                                         onChange={(e) => handleProfileInputChange('country', e.target.value)}
+                                                        style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,214,0,0.3)', borderRadius: '8px', color: '#fff' }}
                                                     />
                                                 </div>
+                                            </div>
+                                            <div style={{ marginBottom: '1.5rem' }}>
                                                 <div className="col-12 mb-3">
-                                                    <label>Professional Summary</label>
+                                                    <label style={{ display: 'block', color: 'rgba(255,255,255,0.8)', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: '500' }}>
+                                                        Professional Summary
+                                                    </label>
                                                     <textarea
                                                         className="form-control"
                                                         rows="4"
-                                                        value={isEditingProfile ? profileData.bio : (authUser?.bio || '')}
+                                                        value={profileData.bio}
                                                         placeholder="Tell us about yourself..."
-                                                        readOnly={!isEditingProfile}
                                                         onChange={(e) => handleProfileInputChange('bio', e.target.value)}
+                                                        style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,214,0,0.3)', borderRadius: '8px', color: '#fff', resize: 'vertical' }}
                                                     />
                                                 </div>
-                                                <div className="col-md-6 mb-3">
-                                                    <label>Experience Level</label>
-                                                    <select className="form-control">
-                                                        <option>Select experience</option>
-                                                        <option>Entry Level (0-2 years)</option>
-                                                        <option>Mid Level (2-5 years)</option>
-                                                        <option>Senior Level (5+ years)</option>
-                                                    </select>
-                                                </div>
-                                                <div className="col-md-6 mb-3">
-                                                    <label>Preferred Job Type</label>
-                                                    <select className="form-control">
-                                                        <option>Select job type</option>
-                                                        <option>Full-time</option>
-                                                        <option>Part-time</option>
-                                                        <option>Contract</option>
-                                                        <option>Freelance</option>
-                                                    </select>
-                                                </div>
+                                            </div>
+                                            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', marginTop: '1.5rem' }}>
+                                                <button
+                                                    className="btn-cancel"
+                                                    onClick={handleCancelEdit}
+                                                    style={{ background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.8)', border: '1px solid rgba(255,255,255,0.2)', padding: '0.75rem 1.5rem', borderRadius: '25px', cursor: 'pointer', fontWeight: '600' }}
+                                                >
+                                                    Cancel
+                                                </button>
+                                                <button
+                                                    className="btn-host"
+                                                    onClick={handleSaveProfile}
+                                                    style={{ background: '#FFD600', color: '#1A1719', border: 'none', padding: '0.75rem 1.5rem', borderRadius: '25px', fontWeight: '600', cursor: 'pointer' }}
+                                                >
+                                                    Save Changes
+                                                </button>
                                             </div>
                                         </div>
+                                        ) : (
+                                            <div className="profile-view">
+                                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1.5rem' }}>
+                                                    <div>
+                                                        <label style={{ display: 'block', color: 'rgba(255,255,255,0.6)', marginBottom: '0.5rem', fontSize: '0.85rem' }}>
+                                                            Full Name
+                                                        </label>
+                                                        <p style={{ color: '#fff', margin: 0, fontSize: '1rem' }}>
+                                                            {authUser?.fullName || authUser?.name || 'Not set'}
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <label style={{ display: 'block', color: 'rgba(255,255,255,0.6)', marginBottom: '0.5rem', fontSize: '0.85rem' }}>
+                                                            Email
+                                                        </label>
+                                                        <p style={{ color: '#fff', margin: 0, fontSize: '1rem' }}>
+                                                            {authUser?.email || 'Not set'}
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <label style={{ display: 'block', color: 'rgba(255,255,255,0.6)', marginBottom: '0.5rem', fontSize: '0.85rem' }}>
+                                                            Phone
+                                                        </label>
+                                                        <p style={{ color: '#fff', margin: 0, fontSize: '1rem' }}>
+                                                            {authUser?.phone || 'Not set'}
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <label style={{ display: 'block', color: 'rgba(255,255,255,0.6)', marginBottom: '0.5rem', fontSize: '0.85rem' }}>
+                                                            Location
+                                                        </label>
+                                                        <p style={{ color: '#fff', margin: 0, fontSize: '1rem' }}>
+                                                            {[authUser?.city, authUser?.state, authUser?.country].filter(Boolean).join(', ') || 'Not set'}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                {authUser?.bio && (
+                                                    <div style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+                                                        <label style={{ display: 'block', color: 'rgba(255,255,255,0.6)', marginBottom: '0.5rem', fontSize: '0.85rem' }}>
+                                                            Professional Summary
+                                                        </label>
+                                                        <p style={{ color: '#fff', margin: 0, fontSize: '1rem', lineHeight: '1.6' }}>
+                                                            {authUser.bio}
+                                                        </p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>

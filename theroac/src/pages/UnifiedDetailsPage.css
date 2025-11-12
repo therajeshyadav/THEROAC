@@ -9,6 +9,22 @@
   padding: 0;
 }
 
+/* Performance Optimization - Reduce backdrop-filter impact during scroll */
+.details-page * {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* GPU acceleration for elements with backdrop-filter */
+.details-page [style*="backdrop-filter"],
+.details-page .header-card,
+.details-page .content-area,
+.details-page .info-card {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
 /* Loading State */
 .details-page .loading {
   display: flex;
@@ -191,6 +207,9 @@
   padding-right: 0.5rem;
   -ms-overflow-style: none;
   scrollbar-width: none;
+  /* Performance optimization for smooth scrolling */
+  will-change: scroll-position;
+  -webkit-overflow-scrolling: touch;
 }
 
 .details-page .left-content::-webkit-scrollbar {
@@ -1272,6 +1291,9 @@ tical scoped classes for navigation tabs */
   padding-right: 0.5rem;
   -ms-overflow-style: none;
   scrollbar-width: none;
+  /* Performance optimization for smooth scrolling */
+  will-change: scroll-position;
+  -webkit-overflow-scrolling: touch;
 }
 
 .details-page .right-sidebar::-webkit-scrollbar {

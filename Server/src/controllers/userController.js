@@ -5,7 +5,13 @@ exports.getProfile = async (req, res, next) => {
       return res.status(401).json({ success: false, error: 'Unauthorized: User not found.' });
     }
 
-    const user = req.user.toJSON();
+    // Reload user from database to get all fields including phone
+    const freshUser = await User.findByPk(req.user.id);
+    if (!freshUser) {
+      return res.status(404).json({ success: false, error: 'User not found.' });
+    }
+
+    const user = freshUser.toJSON();
     delete user.passwordHash;
     delete user.resetPasswordToken;
     delete user.resetPasswordExpires;
@@ -30,6 +36,7 @@ exports.updateProfile = async (req, res, next) => {
     const allowedFields = [
       'fullName',
       'username',
+      'phone',
       'bio',
       'city',
       'state',
@@ -42,6 +49,40 @@ exports.updateProfile = async (req, res, next) => {
     for (const field of allowedFields) {
       if (req.body[field] !== undefined && req.body[field] !== null) {
         updates[field] = req.body[field];
+      }
+    }
+
+    // Check if phone number is being updated and if it already exists for another user
+    if (updates.phone) {
+      const existingUser = await User.findOne({
+        where: {
+          phone: updates.phone,
+        }
+      });
+
+      // If phone exists and belongs to a different user, return error
+      if (existingUser && existingUser.id !== req.user.id) {
+        return res.status(400).json({
+          success: false,
+          error: 'Phone number already registered with another account'
+        });
+      }
+    }
+
+    // Check if username is being updated and if it already exists for another user
+    if (updates.username) {
+      const existingUser = await User.findOne({
+        where: {
+          username: updates.username,
+        }
+      });
+
+      // If username exists and belongs to a different user, return error
+      if (existingUser && existingUser.id !== req.user.id) {
+        return res.status(400).json({
+          success: false,
+          error: 'Username already taken'
+        });
       }
     }
 
@@ -59,7 +100,29 @@ exports.updateProfile = async (req, res, next) => {
     });
   } catch (err) {
     console.error('Error in updateProfile:', err);
-    next(err);
+    
+    // Handle Sequelize unique constraint errors
+    if (err.name === 'SequelizeUniqueConstraintError') {
+      const field = err.errors[0]?.path || 'field';
+      return res.status(400).json({
+        success: false,
+        error: `This ${field} is already registered with another account`
+      });
+    }
+
+    // Handle validation errors
+    if (err.name === 'SequelizeValidationError') {
+      return res.status(400).json({
+        success: false,
+        error: err.errors[0]?.message || 'Validation error'
+      });
+    }
+
+    // Generic error response
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to update profile. Please try again.'
+    });
   }
 };
 

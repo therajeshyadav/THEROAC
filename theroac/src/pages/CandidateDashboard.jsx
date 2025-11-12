@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { useAuth } from '../context/AuthContext';
 import apiService from '../services/api';
 import { usePreloader } from '../hooks/usePreloader';
 import { createJobURL, createEventURL, createHubContentURL } from '../utils/urlUtils';
 import './CandidateDashboard.css';
-// import DashboardHeader from '../components/DashboardHeader';
 
 const CandidateDashboard = () => {
     const navigate = useNavigate();
@@ -118,6 +118,28 @@ const CandidateDashboard = () => {
     const loadDashboardData = async () => {
         try {
             setLoading(true);
+            
+            // Load user profile data first to get phone number
+            try {
+                const profileResponse = await apiService.getProfile();
+                
+                if (profileResponse) {
+                    // The response might be nested in a 'user' property
+                    const userData = profileResponse.user || profileResponse;
+                    
+                    setProfileData({
+                        fullName: userData.fullName || userData.name || '',
+                        email: userData.email || '',
+                        phone: userData.phone || '+91',
+                        city: userData.city || '',
+                        state: userData.state || '',
+                        country: userData.country || '',
+                        bio: userData.bio || ''
+                    });
+                }
+            } catch (profileError) {
+                // Failed to load profile
+            }
             
             const [jobsData, eventsData, hubContentData, applicationsData, statsData] = await Promise.allSettled([
                 apiService.getJobs().catch((error) => {
@@ -305,10 +327,18 @@ const CandidateDashboard = () => {
 
 
     const handleEditProfile = () => {
+        // Ensure phone has +91 prefix
+        let phoneValue = authUser?.phone || '';
+        if (phoneValue && !phoneValue.startsWith('+91')) {
+            phoneValue = `+91${phoneValue}`;
+        } else if (!phoneValue) {
+            phoneValue = '+91';
+        }
+        
         setProfileData({
             fullName: authUser?.fullName || authUser?.name || '',
             email: authUser?.email || '',
-            phone: authUser?.phone || '',
+            phone: phoneValue,
             city: authUser?.city || '',
             state: authUser?.state || '',
             country: authUser?.country || '',
@@ -318,14 +348,62 @@ const CandidateDashboard = () => {
     };
 
     const handleSaveProfile = async () => {
+        let loadingToast = null;
         try {
+            // Validate phone number - must be exactly 10 digits after +91
+            const phoneDigits = profileData.phone?.replace('+91', '') || '';
+            if (phoneDigits.length !== 10) {
+                toast.error('Phone number must be exactly 10 digits', {
+                    position: "top-center",
+                    autoClose: 3000,
+                });
+                return;
+            }
+            
+            // Show loading toast
+            loadingToast = toast.loading('Updating profile...');
+            
             const updatedUser = await apiService.updateProfile(profileData);
-            setNotification('Profile updated successfully!');
+            
+            // Dismiss loading and show success
+            toast.dismiss(loadingToast);
+            toast.success('Profile updated successfully! Refreshing...', {
+                position: "top-center",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+            });
+            
             setIsEditingProfile(false);
-            // Update the auth context with new user data
-            // You might need to add an updateUser method to AuthContext
+            
+            // Reload page to refresh authUser data from backend
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
         } catch (error) {
-            setNotification('Failed to update profile. Please try again.');
+            // IMPORTANT: Dismiss loading toast on error
+            if (loadingToast) {
+                toast.dismiss(loadingToast);
+            }
+            
+            let errorMessage = 'Failed to update profile. Please try again.';
+            
+            if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+                errorMessage = 'Network error. Please check your internet connection and try again.';
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+            
+            toast.error(errorMessage, {
+                position: "top-center",
+                autoClose: 4000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+            });
         }
     };
 
@@ -604,8 +682,8 @@ const CandidateDashboard = () => {
                                             {applications.length > 0 ? applications.slice(0, 3).map(app => (
                                                 <div key={app.id} className="application-item">
                                                     <div className="application-info">
-                                                        <h5>{app.Job?.title || 'Job Title'}</h5>
-                                                        <p>{app.Job?.company || 'Company Name'}</p>
+                                                        <h5>{app.job?.title || app.Job?.title || 'Job Title'}</h5>
+                                                        <p>{app.job?.companyName || app.Job?.company || 'Company Name'}</p>
                                                         <span className="applied-date">Applied: {new Date(app.createdAt).toLocaleDateString()}</span>
                                                     </div>
                                                     <div className="application-status">
@@ -1080,8 +1158,8 @@ const CandidateDashboard = () => {
                                         <div key={app.id} className="application-detailed-item">
                                             <div className="application-content">
                                                 <div className="application-main">
-                                                    <h5>{app.Job?.title || 'Job Title'}</h5>
-                                                    <p className="company-name">{app.Job?.company || 'Company Name'}</p>
+                                                    <h5>{app.job?.title || app.Job?.title || 'Job Title'}</h5>
+                                                    <p className="company-name">{app.job?.companyName || app.Job?.company || 'Company Name'}</p>
                                                     <div className="application-meta">
                                                         <span>Applied: {new Date(app.createdAt).toLocaleDateString()}</span>
                                                     </div>
@@ -1098,8 +1176,25 @@ const CandidateDashboard = () => {
                                                     </div>
                                                 </div>
                                                 <div className="application-actions">
-                                                    <button className="btn-secondary">View Details</button>
-                                                    <button className="btn-primary">Follow Up</button>
+                                                    <button 
+                                                        className="btn-secondary"
+                                                        onClick={() => {
+                                                            const jobTitle = app.job?.title || app.Job?.title;
+                                                            const companyName = app.job?.companyName || app.Job?.company;
+                                                            
+                                                            if (jobTitle && companyName) {
+                                                                // Create job object for createJobURL function
+                                                                const jobObj = {
+                                                                    title: jobTitle,
+                                                                    companyName: companyName
+                                                                };
+                                                                const url = createJobURL(jobObj);
+                                                                navigate(url);
+                                                            }
+                                                        }}
+                                                    >
+                                                        View Details
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
@@ -1188,14 +1283,41 @@ const CandidateDashboard = () => {
                                                 </div>
                                                 <div className="col-md-6 mb-3">
                                                     <label>Phone</label>
-                                                    <input
-                                                        type="tel"
-                                                        className="form-control"
-                                                        value={isEditingProfile ? profileData.phone : (authUser?.phone || '')}
-                                                        placeholder="Add phone number"
-                                                        readOnly={!isEditingProfile}
-                                                        onChange={(e) => handleProfileInputChange('phone', e.target.value)}
-                                                    />
+                                                    <div className="phone-input-wrapper" style={{ position: 'relative' }}>
+                                                        <span className="phone-prefix" style={{
+                                                            position: 'absolute',
+                                                            left: '1rem',
+                                                            top: '50%',
+                                                            transform: 'translateY(-50%)',
+                                                            color: '#ffffff',
+                                                            fontSize: '0.9rem',
+                                                            fontWeight: '500',
+                                                            zIndex: 1,
+                                                            pointerEvents: 'none'
+                                                        }}>+91</span>
+                                                        <input
+                                                            type="tel"
+                                                            className="form-control"
+                                                            style={{ paddingLeft: '3.5rem' }}
+                                                            value={(() => {
+                                                                // Use profileData.phone if available (from edit or after load), otherwise authUser.phone
+                                                                const phone = profileData.phone || authUser?.phone || '';
+                                                                if (!phone) return '';
+                                                                // Remove +91 if present, otherwise return as is
+                                                                return String(phone).replace(/^\+91/, '');
+                                                            })()}
+                                                            placeholder="Enter 10 digit number"
+                                                            readOnly={!isEditingProfile}
+                                                            maxLength="10"
+                                                            pattern="[0-9]{10}"
+                                                            onChange={(e) => {
+                                                                const digitsOnly = e.target.value.replace(/\D/g, '');
+                                                                if (digitsOnly.length <= 10) {
+                                                                    handleProfileInputChange('phone', `+91${digitsOnly}`);
+                                                                }
+                                                            }}
+                                                        />
+                                                    </div>
                                                 </div>
                                                 <div className="col-md-6 mb-3">
                                                     <label>City</label>

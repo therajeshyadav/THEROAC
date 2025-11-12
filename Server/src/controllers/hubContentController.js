@@ -45,7 +45,16 @@ exports.createHubContent = async (req, res, next) => {
     res.status(201).json(hubContent);
   } catch (err) {
     console.error('Hub content creation error:', err);
-    next(err);
+    
+    if (err.name === 'SequelizeValidationError') {
+      return res.status(400).json({
+        error: err.errors[0]?.message || 'Validation error'
+      });
+    }
+    
+    return res.status(500).json({
+      error: 'Failed to create hub content. Please try again.'
+    });
   }
 };
 
@@ -72,7 +81,10 @@ exports.listHubContent = async (req, res, next) => {
 
     res.json(hubContent);
   } catch (err) {
-    next(err);
+    console.error('Error in listHubContent:', err);
+    return res.status(500).json({
+      error: 'Failed to fetch hub content. Please try again.'
+    });
   }
 };
 
@@ -95,7 +107,10 @@ exports.getHubContent = async (req, res, next) => {
     
     res.json(hubContent);
   } catch (err) {
-    next(err);
+    console.error('Error in getHubContent:', err);
+    return res.status(500).json({
+      error: 'Failed to fetch hub content details. Please try again.'
+    });
   }
 };
 
@@ -119,7 +134,17 @@ exports.updateHubContent = async (req, res, next) => {
 
     res.json(hubContent);
   } catch (err) {
-    next(err);
+    console.error('Error in updateHubContent:', err);
+    
+    if (err.name === 'SequelizeValidationError') {
+      return res.status(400).json({
+        error: err.errors[0]?.message || 'Validation error'
+      });
+    }
+    
+    return res.status(500).json({
+      error: 'Failed to update hub content. Please try again.'
+    });
   }
 };
 
@@ -133,6 +158,40 @@ exports.deleteHubContent = async (req, res, next) => {
     await hubContent.destroy();
     res.json({ message: 'Hub content deleted successfully' });
   } catch (err) {
-    next(err);
+    console.error('Error in deleteHubContent:', err);
+    return res.status(500).json({
+      error: 'Failed to delete hub content. Please try again.'
+    });
+  }
+};
+
+
+// Get hub content by slug
+exports.getHubContentBySlug = async (req, res, next) => {
+  try {
+    const { slug } = req.params;
+    
+    const hubContent = await HubContent.findOne({
+      where: { slug },
+      include: [{
+        model: User,
+        as: 'author',
+        attributes: ['id', 'fullName', 'email']
+      }]
+    });
+    
+    if (!hubContent) {
+      return res.status(404).json({ error: 'Hub content not found' });
+    }
+
+    // Increment view counter
+    await hubContent.increment('views');
+    
+    res.json(hubContent);
+  } catch (err) {
+    console.error('Error fetching hub content by slug:', err);
+    return res.status(500).json({
+      error: 'Failed to fetch hub content. Please try again.'
+    });
   }
 };

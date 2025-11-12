@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import apiService from '../services/api';
 import './Auth.css';
 
@@ -7,9 +8,7 @@ const ForgotPassword = () => {
 
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
   const [error, setError] = useState('');
-  const [isSubmitted, setIsSubmitted] = useState(false);
 
 
 
@@ -17,13 +16,27 @@ const ForgotPassword = () => {
     e.preventDefault();
     setLoading(true);
     setError('');
-    setMessage('');
 
     try {
       await apiService.forgotPassword({ email });
-      setIsSubmitted(true);
-      setMessage('Password reset instructions have been sent to your email address.');
+      
+      // Show success toast
+      toast.success(
+        `Password reset instructions have been sent to ${email}. Please check your inbox.`,
+        {
+          position: "top-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        }
+      );
+      
+      // Clear email field
+      setEmail('');
     } catch (err) {
+      toast.error(err.message || 'Failed to send reset email. Please try again.');
       setError(err.message || 'Failed to send reset email. Please try again.');
     } finally {
       setLoading(false);
@@ -35,37 +48,6 @@ const ForgotPassword = () => {
   };
 
 
-
-  if (isSubmitted) {
-    return (
-      <div className="auth-container">
-        <div className="container row justify-content-between auth-card">
-          <div className="col-5 align-content-center">
-            <img src="assets/img/login/Login-pana.svg" alt="Check Email" />
-          </div>
-          <div className="col-6">
-            <div className="auth-header">
-              <h2>Check Your Email</h2>
-            </div>
-
-            <div className="success-message">
-              <i className="fas fa-check-circle"></i>
-              <p>{message}</p>
-              <p className="text-muted">
-                If you don't see the email in your inbox, please check your spam folder.
-              </p>
-            </div>
-
-            <div className="auth-footer">
-              <p>
-                Remember your password? <Link to="/login">Back to Login</Link>
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="auth-container">

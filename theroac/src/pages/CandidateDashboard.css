@@ -1587,76 +1587,134 @@ input:-moz-autofill {
 }
 
 .btn-edit {
-    background: rgba(255, 214, 0, 0.1);
+    background: rgba(255, 214, 0, 0.12);
     color: #FFD600;
-    border: 1px solid rgba(255, 214, 0, 0.3);
-    border-radius: 12px;
-    padding: 0.75rem 1.5rem;
-    font-weight: 500;
+    border: 2px solid rgba(255, 214, 0, 0.4);
+    border-radius: 16px;
+    padding: 1rem 2.5rem;
+    font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 0.9rem;
-    display: flex;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 1rem;
+    display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
+    justify-content: center;
+    gap: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    min-width: 160px;
 }
 
 .btn-edit:hover {
-    background: rgba(255, 214, 0, 0.2);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(255, 214, 0, 0.2);
+    background: rgba(255, 214, 0, 0.25);
+    border-color: rgba(255, 214, 0, 0.6);
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 6px 20px rgba(255, 214, 0, 0.4);
+}
+
+.btn-edit:active {
+    transform: translateY(-1px) scale(1);
+    box-shadow: 0 3px 10px rgba(255, 214, 0, 0.3);
+}
+
+.btn-edit i {
+    font-size: 1.2rem;
 }
 
 .edit-actions {
     display: flex;
-    gap: 0.75rem;
+    gap: 1.5rem;
     align-items: center;
+    flex-wrap: wrap;
+    margin-top: 0.5rem;
 }
 
 .btn-save {
     background: linear-gradient(135deg, #FFD600, #FFA500);
     color: #1A1719;
     border: none;
-    border-radius: 12px;
-    padding: 0.75rem 1.5rem;
-    font-weight: 600;
+    border-radius: 16px;
+    padding: 1rem 2.5rem;
+    font-weight: 700;
     cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 0.9rem;
-    display: flex;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 1rem;
+    display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    box-shadow: 0 4px 12px rgba(255, 214, 0, 0.2);
+    justify-content: center;
+    gap: 0.75rem;
+    box-shadow: 0 4px 20px rgba(255, 214, 0, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: relative;
+    overflow: hidden;
+    min-width: 140px;
+}
+
+.btn-save::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transition: left 0.5s ease;
+}
+
+.btn-save:hover::before {
+    left: 100%;
 }
 
 .btn-save:hover {
     background: linear-gradient(135deg, #FFA500, #FFD600);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(255, 214, 0, 0.4);
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 8px 30px rgba(255, 214, 0, 0.6);
 }
 
 .btn-save:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 8px rgba(255, 214, 0, 0.3);
+    transform: translateY(-1px) scale(1);
+    box-shadow: 0 4px 15px rgba(255, 214, 0, 0.5);
+}
+
+.btn-save i {
+    font-size: 1.2rem;
 }
 
 .btn-cancel {
-    background: rgba(255, 255, 255, 0.1);
-    color: rgba(255, 255, 255, 0.8);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 12px;
-    padding: 0.75rem 1.5rem;
-    font-weight: 500;
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.9);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 16px;
+    padding: 1rem 2.5rem;
+    font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 0.9rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    min-width: 140px;
 }
 
 .btn-cancel:hover {
-    background: rgba(255, 255, 255, 0.15);
-    color: #fff;
-    border-color: rgba(255, 255, 255, 0.3);
-    transform: translateY(-1px);
+    background: rgba(255, 68, 68, 0.15);
+    color: #ff4444;
+    border-color: rgba(255, 68, 68, 0.5);
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 6px 20px rgba(255, 68, 68, 0.3);
+}
+
+.btn-cancel:active {
+    transform: translateY(-1px) scale(1);
+    box-shadow: 0 3px 10px rgba(255, 68, 68, 0.2);
+}
+
+.btn-cancel i {
+    font-size: 1.2rem;
 }
 
 .profile-form {
@@ -2007,4 +2065,82 @@ pplied Button States */
 .btn-primary:disabled:hover {
   background-color: #28a745 !important;
   border-color: #28a745 !important;
+}
+
+/* ========================================
+   COMPREHENSIVE DROPDOWN FIX FOR ALL SELECTS
+   ======================================== */
+
+/* Enhanced global select styling */
+select {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 214, 0, 0.3) !important;
+    color: #fff !important;
+    padding: 0.75rem 1rem !important;
+    border-radius: 8px !important;
+    font-size: 0.9rem !important;
+    cursor: pointer !important;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+/* All option elements - CRITICAL FIX FOR VISIBILITY */
+select option {
+    background: #2a2a2a !important;
+    color: #fff !important;
+    padding: 0.75rem 1rem !important;
+    font-size: 0.9rem !important;
+    font-weight: 500 !important;
+}
+
+/* Hover state for options */
+select option:hover {
+    background: rgba(255, 214, 0, 0.3) !important;
+    color: #FFD600 !important;
+}
+
+/* Selected/checked option - Blue highlight like Image 1 */
+select option:checked,
+select option:focus {
+    background: #3B82F6 !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+}
+
+/* Focus state for select */
+select:focus {
+    background: rgba(255, 255, 255, 0.15) !important;
+    border-color: #FFD600 !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(255, 214, 0, 0.2) !important;
+}
+
+/* Custom arrow for select dropdown */
+select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23FFD600' d='M6 9L1 4h10z'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 1rem center !important;
+    padding-right: 2.5rem !important;
+}
+
+/* Remove default arrow */
+select::-ms-expand {
+    display: none;
+}
+
+/* Firefox specific */
+@-moz-document url-prefix() {
+    select option {
+        background: #2a2a2a !important;
+        color: #fff !important;
+    }
+}
+
+/* Webkit specific (Chrome, Safari, Edge) */
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+    select option {
+        background: #2a2a2a !important;
+        color: #fff !important;
+    }
 }

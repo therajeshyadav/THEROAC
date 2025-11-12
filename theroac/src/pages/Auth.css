@@ -603,3 +603,28 @@
     font-size: 14px;
   }
 }
+/* 
+Phone input with +91 prefix */
+.phone-input-group {
+  position: relative;
+}
+
+.phone-prefix {
+  position: absolute;
+  left: 44px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 500;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.phone-input-group input {
+  padding-left: 80px !important;
+}
+
+.phone-input-group .input-icon {
+  left: 14px;
+}

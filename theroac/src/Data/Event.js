@@ -1,4 +1,5 @@
 export const eventsData = [
+  /* STATIC DATA COMMENTED OUT - USE REAL DATA FROM API
   {
     title: "Jobs",
     titleId:"Jobs",
@@ -232,4 +233,5 @@ export const eventsData = [
       },
     ],
   },
+  */
 ];

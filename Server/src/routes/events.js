@@ -5,6 +5,7 @@ const { authenticate } = require('../middlewares/auth');
 const { requireRole } = require('../middlewares/roles');
 
 router.get('/', eventController.listEvents);
+router.get('/slug/:slug', eventController.getEventBySlug);
 router.get('/:id', eventController.getEvent);
 
 // Protected

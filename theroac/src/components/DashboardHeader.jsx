@@ -13,7 +13,7 @@ const DashboardHeader = ({ user, activeTab, setActiveTab, isAdmin = false, onTab
             await logout();
             navigate('/login');
         } catch (error) {
-            console.error('Logout failed:', error);
+            // Logout failed
         }
     };
 

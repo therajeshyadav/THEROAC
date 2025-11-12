@@ -5,6 +5,9 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import './toast-custom.css';
 
 import Home from "./pages/Home";
 import Speakers from "./pages/Speakers";
@@ -69,6 +72,7 @@ function App() {
 
   return (
     <AuthProvider>
+      <ToastContainer />
       <ScrollToHashElement />
 
       {showHeaderFooter && <Header />}

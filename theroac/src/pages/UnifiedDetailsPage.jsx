@@ -477,13 +477,7 @@ const UnifiedDetailsPage = () => {
             return;
         }
 
-        // For now, skip the API call and assume not applied
-        // This prevents API errors while the backend is being developed
-        setHasApplied(false);
-        setCheckingStatus(false);
-        
-        // TODO: Uncomment when backend endpoints are ready
-        /*
+        // Check application status from backend
         try {
             let statusResult = null;
 
@@ -503,14 +497,21 @@ const UnifiedDetailsPage = () => {
 
             if (statusResult && statusResult.hasApplied) {
                 setHasApplied(true);
+            } else {
+                setHasApplied(false);
             }
         } catch (error) {
-            // If API call fails, assume not applied (graceful degradation)
-            setHasApplied(false);
+            // If API call fails, check localStorage as fallback
+            try {
+                const saved = localStorage.getItem('appliedItems');
+                const appliedItems = saved ? JSON.parse(saved) : [];
+                setHasApplied(appliedItems.includes(data.id));
+            } catch {
+                setHasApplied(false);
+            }
         } finally {
             setCheckingStatus(false);
         }
-        */
     };
 
     const handleApply = async () => {

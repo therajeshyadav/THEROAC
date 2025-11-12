@@ -651,6 +651,15 @@ html, body {
     flex-shrink: 0;
 }
 
+/* Ensure SVG icons inside stat-icon are visible */
+.stat-icon svg {
+    color: #fff !important;
+    fill: currentColor;
+    stroke: currentColor;
+    width: 24px;
+    height: 24px;
+}
+
 .stat-number {
     font-size: 1.5rem;
     font-weight: 600;
@@ -665,18 +674,42 @@ html, body {
 
 .stat-card.blue .stat-icon {
     background: #FFD600;
+    color: #1A1719;
+}
+
+.stat-card.blue .stat-icon svg {
+    color: #1A1719 !important;
+    stroke: #1A1719 !important;
 }
 
 .stat-card.pink .stat-icon {
     background: #FFD600;
+    color: #1A1719;
+}
+
+.stat-card.pink .stat-icon svg {
+    color: #1A1719 !important;
+    stroke: #1A1719 !important;
 }
 
 .stat-card.yellow .stat-icon {
     background: #FFD600;
+    color: #1A1719;
+}
+
+.stat-card.yellow .stat-icon svg {
+    color: #1A1719 !important;
+    stroke: #1A1719 !important;
 }
 
 .stat-card.orange .stat-icon {
     background: #FFD600;
+    color: #1A1719;
+}
+
+.stat-card.orange .stat-icon svg {
+    color: #1A1719 !important;
+    stroke: #1A1719 !important;
 }
 
 .stat-info {
@@ -979,6 +1012,25 @@ html, body {
     padding: 0.75rem 1rem;
     font-size: 0.9rem;
     cursor: pointer;
+}
+
+/* Dropdown Options Styling - CRITICAL FIX */
+.filter-select.modern option {
+    background: #2a2a2a;
+    color: #fff;
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+}
+
+.filter-select.modern option:hover {
+    background: rgba(255, 214, 0, 0.2);
+    color: #FFD600;
+}
+
+.filter-select.modern option:checked {
+    background: #3B82F6;
+    color: #fff;
+    font-weight: 600;
 }
 
 .export-btn.modern {
@@ -1729,5 +1781,118 @@ nts/Festivals Section */
 
     .empty-state {
         padding: 2rem 1rem;
+    }
+}
+
+
+/* ========================================
+   COMPREHENSIVE DROPDOWN FIX FOR ALL SELECTS
+   ======================================== */
+
+/* Global select styling */
+select {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 214, 0, 0.3) !important;
+    color: #fff !important;
+    padding: 0.75rem 1rem !important;
+    border-radius: 8px !important;
+    font-size: 0.9rem !important;
+    cursor: pointer !important;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+/* All option elements - CRITICAL FIX */
+select option {
+    background: #2a2a2a !important;
+    color: #fff !important;
+    padding: 0.75rem 1rem !important;
+    font-size: 0.9rem !important;
+    font-weight: 500 !important;
+}
+
+/* Hover state for options (works in some browsers) */
+select option:hover {
+    background: rgba(255, 214, 0, 0.3) !important;
+    color: #FFD600 !important;
+}
+
+/* Selected/checked option */
+select option:checked,
+select option:focus {
+    background: #3B82F6 !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+}
+
+/* Focus state for select */
+select:focus {
+    background: rgba(255, 255, 255, 0.15) !important;
+    border-color: #FFD600 !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(255, 214, 0, 0.2) !important;
+}
+
+/* Disabled state */
+select:disabled {
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
+}
+
+select:disabled option {
+    opacity: 0.5 !important;
+}
+
+/* Custom arrow for select dropdown */
+select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23FFD600' d='M6 9L1 4h10z'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 1rem center !important;
+    padding-right: 2.5rem !important;
+}
+
+/* Form control selects */
+.form-control select,
+select.form-control {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 214, 0, 0.3) !important;
+    color: #fff !important;
+}
+
+.form-control select option,
+select.form-control option {
+    background: #2a2a2a !important;
+    color: #fff !important;
+    padding: 0.75rem 1rem !important;
+}
+
+/* Modern filter select - specific override */
+.filter-select.modern option {
+    background: #2a2a2a !important;
+    color: #fff !important;
+    padding: 0.75rem 1rem !important;
+    font-size: 0.9rem !important;
+    font-weight: 500 !important;
+}
+
+/* Ensure dropdown list has proper background */
+select::-ms-expand {
+    display: none;
+}
+
+/* Firefox specific */
+@-moz-document url-prefix() {
+    select option {
+        background: #2a2a2a !important;
+        color: #fff !important;
+    }
+}
+
+/* Webkit specific (Chrome, Safari, Edge) */
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+    select option {
+        background: #2a2a2a !important;
+        color: #fff !important;
     }
 }

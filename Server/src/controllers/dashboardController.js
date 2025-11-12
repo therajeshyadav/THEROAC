@@ -78,7 +78,10 @@ exports.getOrganizerStats = async (req, res, next) => {
             activeJobApplications
         });
     } catch (err) {
-        next(err);
+        console.error('Error in getOrganizerStats:', err);
+        return res.status(500).json({
+            error: 'Failed to fetch organizer stats. Please try again.'
+        });
     }
 };
 
@@ -156,7 +159,10 @@ exports.getCandidates = async (req, res, next) => {
             currentPage: parseInt(page)
         });
     } catch (err) {
-        next(err);
+        console.error('Error in getCandidates:', err);
+        return res.status(500).json({
+            error: 'Failed to fetch candidates. Please try again.'
+        });
     }
 };
 
@@ -229,7 +235,10 @@ exports.getAnalytics = async (req, res, next) => {
 
         res.json({ monthlyData });
     } catch (err) {
-        next(err);
+        console.error('Error in getAnalytics:', err);
+        return res.status(500).json({
+            error: 'Failed to fetch analytics. Please try again.'
+        });
     }
 };
 
@@ -304,7 +313,10 @@ exports.getCandidateStats = async (req, res, next) => {
             }))
         });
     } catch (err) {
-        next(err);
+        console.error('Error in getCandidateStats:', err);
+        return res.status(500).json({
+            error: 'Failed to fetch candidate stats. Please try again.'
+        });
     }
 };
 

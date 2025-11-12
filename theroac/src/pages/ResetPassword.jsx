@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import apiService from '../services/api';
 import './Auth.css';
 
@@ -15,16 +16,17 @@ const ResetPassword = () => {
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isValidToken, setIsValidToken] = useState(true);
 
   const token = searchParams.get('token');
 
   useEffect(() => {
     if (!token) {
-      setIsValidToken(false);
-      setError('Invalid or missing reset token.');
+      toast.error('Invalid or missing reset token. Please request a new password reset link.');
+      setTimeout(() => {
+        navigate('/forgot-password');
+      }, 2000);
     }
-  }, [token]);
+  }, [token, navigate]);
 
 
 
@@ -67,9 +69,25 @@ const ResetPassword = () => {
         password: formData.password
       });
 
-      // Redirect to login with success message
-      navigate('/login?reset=success');
+      // Show success toast
+      toast.success(
+        'Password reset successful! You can now login with your new password.',
+        {
+          position: "top-center",
+          autoClose: 4000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        }
+      );
+
+      // Redirect to login
+      setTimeout(() => {
+        navigate('/login');
+      }, 1500);
     } catch (err) {
+      toast.error(err.message || 'Failed to reset password. Please try again.');
       setError(err.message || 'Failed to reset password. Please try again.');
     } finally {
       setLoading(false);
@@ -78,33 +96,8 @@ const ResetPassword = () => {
 
 
 
-  if (!isValidToken) {
-    return (
-      <div className="auth-container">
-        <div className="container row justify-content-between auth-card">
-          <div className="col-5 align-content-center">
-            <img src="assets/img/login/Login-pana.svg" alt="Invalid Reset Link" />
-          </div>
-          <div className="col-6">
-            <div className="auth-header">
-              <h2>Invalid Reset Link</h2>
-            </div>
-
-            <div className="error-message">
-              <i className="fas fa-exclamation-circle"></i>
-              <p>This password reset link is invalid or has expired.</p>
-            </div>
-
-            <div className="auth-footer">
-              <p>
-                <Link to="/forgot-password">Request a new reset link</Link> or{' '}
-                <Link to="/login">Back to Login</Link>
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+  if (!token) {
+    return null; // Will redirect via useEffect
   }
 
   return (

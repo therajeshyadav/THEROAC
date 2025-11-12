@@ -6,6 +6,7 @@ const { requireRole } = require('../middlewares/roles');
 
 // Public routes
 router.get('/', hubContentController.listHubContent);
+router.get('/slug/:slug', hubContentController.getHubContentBySlug);
 router.get('/:id', hubContentController.getHubContent);
 
 // Protected routes (require authentication)

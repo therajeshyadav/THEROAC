@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { useAuth } from '../context/AuthContext';
 import { usePreloader } from '../hooks/usePreloader';
 import './Auth.css';
@@ -16,20 +17,7 @@ const Login = () => {
   const [submitLoading, setSubmitLoading] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
   const preloaderVisible = usePreloader(300);
-
-  // Check for success messages
-  useEffect(() => {
-    const resetSuccess = searchParams.get('reset');
-    const verifiedSuccess = searchParams.get('verified');
-    
-    if (resetSuccess === 'success') {
-      setSuccessMessage('Password reset successful! You can now login with your new password.');
-    } else if (verifiedSuccess === 'success') {
-      setSuccessMessage('Email verified successfully! You can now login to your account.');
-    }
-  }, [searchParams]);
 
 
 
@@ -66,15 +54,32 @@ const Login = () => {
           navigate('/candidate-dashboard', { replace: true });
         }
       } else {
-        if (result.needsVerification) {
-          setError(
-            <span>
-              {result.error}{' '}
-              <Link to="/resend-verification" style={{ color: '#FFD600', textDecoration: 'underline' }}>
-                Resend verification email
-              </Link>
-            </span>
+        // Check if error message contains verification-related keywords
+        const errorMsg = result.error || '';
+        const isVerificationError = 
+          result.needsVerification || 
+          errorMsg.toLowerCase().includes('verify') || 
+          errorMsg.toLowerCase().includes('verification') ||
+          errorMsg.toLowerCase().includes('not verified');
+        
+        if (isVerificationError) {
+          // Show warning toast for unverified email
+          toast.warning(
+            'Please verify your email before logging in. Redirecting to resend verification...',
+            {
+              position: "top-center",
+              autoClose: 3000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+            }
           );
+          
+          // Don't set error state, just redirect
+          setTimeout(() => {
+            navigate('/resend-verification');
+          }, 1500);
         } else {
           setError(result.error || 'Login failed');
         }
@@ -119,13 +124,6 @@ const Login = () => {
               <div className="error-message">
                 <i className="fas fa-exclamation-circle"></i>
                 {error}
-              </div>
-            )}
-            
-            {successMessage && (
-              <div className="success-message">
-                <i className="fas fa-check-circle"></i>
-                {successMessage}
               </div>
             )}
             

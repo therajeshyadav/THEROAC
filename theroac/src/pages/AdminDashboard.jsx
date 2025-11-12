@@ -62,7 +62,7 @@ const AdminDashboard = () => {
             await logout();
             navigate("/login");
         } catch (error) {
-            console.error("Logout failed:", error);
+            // Logout failed
         }
     };
 

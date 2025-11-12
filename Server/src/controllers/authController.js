@@ -18,15 +18,13 @@ exports.register = async (req, res, next) => {
       return res.status(400).json({ message: 'Email or phone already registered' });
     }
 
-    const passwordHash = await bcrypt.hash(password, 10);
-
     const emailVerificationToken = crypto.randomBytes(32).toString('hex');
 
     const user = await User.create({
       fullName: fullName || name,
       email,
       phone,
-      passwordHash,
+      passwordHash: password, // Model hook will hash it automatically
       role,
       provider,
       emailVerificationToken,
@@ -57,7 +55,25 @@ exports.register = async (req, res, next) => {
     });
   } catch (err) {
     console.error('Error in register:', err);
-    next(err);
+    
+    // Handle Sequelize unique constraint errors
+    if (err.name === 'SequelizeUniqueConstraintError') {
+      const field = err.errors[0]?.path || 'field';
+      return res.status(400).json({
+        message: `This ${field} is already registered`
+      });
+    }
+
+    // Handle validation errors
+    if (err.name === 'SequelizeValidationError') {
+      return res.status(400).json({
+        message: err.errors[0]?.message || 'Validation error'
+      });
+    }
+
+    return res.status(500).json({
+      message: 'Registration failed. Please try again.'
+    });
   }
 };
 
@@ -98,6 +114,11 @@ exports.login = async (req, res, next) => {
       id: user.id,
       name: user.fullName,
       email: user.email,
+      phone: user.phone,
+      city: user.city,
+      state: user.state,
+      country: user.country,
+      bio: user.bio,
       role: user.role,
       isVerified: user.isVerified,
     };
@@ -109,10 +130,38 @@ exports.login = async (req, res, next) => {
     });
   } catch (err) {
     console.error('Error in login:', err);
-    next(err);
+    return res.status(500).json({
+      message: 'Login failed. Please try again.'
+    });
   }
 };
 
+exports.me = async (req, res, next) => {
+  try {
+    const user = await User.findByPk(req.user.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    const userResponse = {
+      id: user.id,
+      name: user.fullName,
+      email: user.email,
+      phone: user.phone,
+      city: user.city,
+      state: user.state,
+      country: user.country,
+      bio: user.bio,
+      role: user.role,
+      isVerified: user.isVerified,
+    };
+
+    res.json(userResponse);
+  } catch (err) {
+    console.error('Error in me:', err);
+    return res.status(500).json({
+      message: 'Failed to fetch user data. Please try again.'
+    });
+  }
+};
 
 exports.verifyEmail = async (req, res, next) => {
   try {
@@ -143,7 +192,9 @@ exports.verifyEmail = async (req, res, next) => {
     return res.status(200).json({ message: 'Email verified successfully!' });
   } catch (err) {
     console.error('Error in verifyEmail:', err);
-    next(err);
+    return res.status(500).json({
+      message: 'Email verification failed. Please try again.'
+    });
   }
 };
 
@@ -166,7 +217,9 @@ exports.resendVerification = async (req, res, next) => {
     return res.status(200).json({ message: 'Verification email sent successfully!' });
   } catch (err) {
     console.error('Error in resendVerification:', err);
-    next(err);
+    return res.status(500).json({
+      message: 'Failed to resend verification email. Please try again.'
+    });
   }
 };
 
@@ -196,7 +249,9 @@ exports.forgotPassword = async (req, res, next) => {
     });
   } catch (err) {
     console.error('Error in forgotPassword:', err);
-    next(err);
+    return res.status(500).json({
+      message: 'Failed to process password reset request. Please try again.'
+    });
   }
 };
 
@@ -217,9 +272,7 @@ exports.resetPassword = async (req, res, next) => {
     if (!user)
       return res.status(400).json({ message: 'Invalid or expired reset token' });
 
-    const passwordHash = await bcrypt.hash(password, 10);
-
-    user.passwordHash = passwordHash;
+    user.passwordHash = password; // Model hook will hash it automatically
     user.resetPasswordToken = null;
     user.resetPasswordExpires = null;
     user.failedLoginAttempts = 0;
@@ -228,6 +281,8 @@ exports.resetPassword = async (req, res, next) => {
     return res.status(200).json({ message: 'Password reset successfully!' });
   } catch (err) {
     console.error('Error in resetPassword:', err);
-    next(err);
+    return res.status(500).json({
+      message: 'Password reset failed. Please try again.'
+    });
   }
 };

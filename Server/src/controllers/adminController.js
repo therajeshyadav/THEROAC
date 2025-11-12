@@ -57,7 +57,10 @@ exports.getDashboardStats = async (req, res, next) => {
       }
     });
   } catch (err) {
-    next(err);
+    console.error('Error in getDashboardStats:', err);
+    return res.status(500).json({
+      error: 'Failed to fetch dashboard stats. Please try again.'
+    });
   }
 };
 
@@ -95,7 +98,10 @@ exports.getAllUsers = async (req, res, next) => {
       }
     });
   } catch (err) {
-    next(err);
+    console.error('Error in getAllUsers:', err);
+    return res.status(500).json({
+      error: 'Failed to fetch users. Please try again.'
+    });
   }
 };
 
@@ -113,7 +119,10 @@ exports.updateUserStatus = async (req, res, next) => {
 
     res.json({ message: 'User status updated successfully', user });
   } catch (err) {
-    next(err);
+    console.error('Error in updateUserStatus:', err);
+    return res.status(500).json({
+      error: 'Failed to update user status. Please try again.'
+    });
   }
 };
 
@@ -154,7 +163,10 @@ exports.getAllJobs = async (req, res, next) => {
       }
     });
   } catch (err) {
-    next(err);
+    console.error('Error in getAllJobs:', err);
+    return res.status(500).json({
+      error: 'Failed to fetch jobs. Please try again.'
+    });
   }
 };
 
@@ -189,7 +201,10 @@ exports.getAllEvents = async (req, res, next) => {
       }
     });
   } catch (err) {
-    next(err);
+    console.error('Error in getAllEvents:', err);
+    return res.status(500).json({
+      error: 'Failed to fetch events. Please try again.'
+    });
   }
 };
 
@@ -224,7 +239,10 @@ exports.getAnalytics = async (req, res, next) => {
       applicationStats
     });
   } catch (err) {
-    next(err);
+    console.error('Error in getAnalytics:', err);
+    return res.status(500).json({
+      error: 'Failed to fetch analytics. Please try again.'
+    });
   }
 };
 

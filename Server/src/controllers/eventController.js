@@ -62,7 +62,16 @@ exports.createEvent = async (req, res, next) => {
     res.status(201).json(event);
   } catch (err) {
     console.error('Event creation error:', err);
-    next(err);
+    
+    if (err.name === 'SequelizeValidationError') {
+      return res.status(400).json({
+        error: err.errors[0]?.message || 'Validation error'
+      });
+    }
+    
+    return res.status(500).json({
+      error: 'Failed to create event. Please try again.'
+    });
   }
 };
 
@@ -81,7 +90,12 @@ exports.listEvents = async (req, res, next) => {
       order: [['startDate', 'ASC']]
     });
     res.json(events);
-  } catch (err) { next(err); }
+  } catch (err) {
+    console.error('Error in listEvents:', err);
+    return res.status(500).json({
+      error: 'Failed to fetch events. Please try again.'
+    });
+  }
 };
 
 exports.getEvent = async (req, res, next) => {
@@ -91,7 +105,12 @@ exports.getEvent = async (req, res, next) => {
     // increment view counter (atomic increment)
     await event.increment('views');
     res.json(event);
-  } catch (err) { next(err); }
+  } catch (err) {
+    console.error('Error in getEvent:', err);
+    return res.status(500).json({
+      error: 'Failed to fetch event details. Please try again.'
+    });
+  }
 };
 
 exports.registerForEvent = async (req, res, next) => {
@@ -106,5 +125,49 @@ exports.registerForEvent = async (req, res, next) => {
     // increment registration count
     await Event.increment('registrations', { where: { id: eventId } });
     res.status(201).json(registration);
-  } catch (err) { next(err); }
+  } catch (err) {
+    console.error('Error in registerForEvent:', err);
+    
+    if (err.name === 'SequelizeUniqueConstraintError') {
+      return res.status(400).json({
+        error: 'You have already registered for this event'
+      });
+    }
+    
+    if (err.name === 'SequelizeForeignKeyConstraintError') {
+      return res.status(404).json({
+        error: 'Event not found'
+      });
+    }
+    
+    return res.status(500).json({
+      error: 'Failed to register for event. Please try again.'
+    });
+  }
+};
+
+
+// Get event by slug
+exports.getEventBySlug = async (req, res, next) => {
+  try {
+    const { slug } = req.params;
+    
+    const event = await Event.findOne({
+      where: { slug }
+    });
+
+    if (!event) {
+      return res.status(404).json({ error: 'Event not found' });
+    }
+
+    // Increment view counter
+    await event.increment('views');
+    
+    res.json(event);
+  } catch (err) {
+    console.error('Error fetching event by slug:', err);
+    return res.status(500).json({
+      error: 'Failed to fetch event. Please try again.'
+    });
+  }
 };

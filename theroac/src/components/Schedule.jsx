@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import EventSlider from './EventSlider';
-import { eventsData } from '../Data/Event.js';
+// import { eventsData } from '../Data/Event.js'; // COMMENTED OUT - Using backend data only
 import apiService from '../services/api';
 
 const Schedule = () => {
-	// Initialize with static data or empty array as fallback
-	const [dynamicEventsData, setDynamicEventsData] = useState(() => {
-		return Array.isArray(eventsData) ? eventsData : [];
-	});
+	// Initialize with empty array - will load from backend only
+	const [dynamicEventsData, setDynamicEventsData] = useState([]);
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
@@ -59,7 +57,7 @@ const Schedule = () => {
 							});
 							formattedDateTime = `${dateStr} • ${timeStr}`;
 						} catch (error) {
-							console.error('Error formatting date:', error);
+							// Error formatting date
 						}
 					}
 
@@ -84,72 +82,40 @@ const Schedule = () => {
 					data: content
 				}));
 
-			// Create enhanced events data with dynamic content using the imported static data
-			const baseEventsData = Array.isArray(eventsData) ? eventsData : [];
-			const enhancedEventsData = [...baseEventsData];
+			// Create events data structure using ONLY backend data (no static data)
+			const enhancedEventsData = [];
 
-			// Add dynamic jobs to the Jobs section
-			const jobsIndex = enhancedEventsData.findIndex(section => section.titleId === "Jobs");
-			if (jobsIndex !== -1 && enhancedEventsData[jobsIndex]) {
-				const existingJobs = Array.isArray(enhancedEventsData[jobsIndex].events)
-					? enhancedEventsData[jobsIndex].events
-					: [];
-
-				// Add dynamic jobs to existing static jobs
-				const combinedJobs = [
-					...existingJobs,
-					...(jobs.length > 0 ? jobs.slice(0, 5) : []) // Add up to 5 recent jobs from backend if available
-				];
-
-				enhancedEventsData[jobsIndex] = {
-					...enhancedEventsData[jobsIndex],
-					events: combinedJobs
-				};
+			// Add Jobs section with backend data only
+			if (jobs.length > 0) {
+				enhancedEventsData.push({
+					title: "Jobs",
+					titleId: "Jobs",
+					events: jobs
+				});
 			}
 
-			// Add dynamic events to the Events section
-			const eventsIndex = enhancedEventsData.findIndex(section => section.titleId === "Events");
-			if (eventsIndex !== -1 && enhancedEventsData[eventsIndex]) {
-				const existingEvents = Array.isArray(enhancedEventsData[eventsIndex].events)
-					? enhancedEventsData[eventsIndex].events
-					: [];
-
-				// Add dynamic events to existing static events
-				const combinedEvents = [
-					...existingEvents,
-					...(events.length > 0 ? events.slice(0, 3) : []) // Add up to 3 recent events from backend if available
-				];
-
-				enhancedEventsData[eventsIndex] = {
-					...enhancedEventsData[eventsIndex],
-					events: combinedEvents
-				};
+			// Add Events section with backend data only
+			if (events.length > 0) {
+				enhancedEventsData.push({
+					title: "Events",
+					titleId: "Events",
+					events: events
+				});
 			}
 
-			// Add dynamic content to ROAC Prime Talent Hub section
-			const roacHubIndex = enhancedEventsData.findIndex(section => section.titleId === "ROAC");
-			if (roacHubIndex !== -1 && enhancedEventsData[roacHubIndex]) {
-				const existingRoacEvents = Array.isArray(enhancedEventsData[roacHubIndex].events)
-					? enhancedEventsData[roacHubIndex].events
-					: [];
-
-				// Add hub content to ROAC section
-				const combinedRoacEvents = [
-					...existingRoacEvents,
-					...(hubContent.length > 0 ? hubContent.slice(0, 3) : []) // Add up to 3 hub content items if available
-				];
-
-				enhancedEventsData[roacHubIndex] = {
-					...enhancedEventsData[roacHubIndex],
-					events: combinedRoacEvents
-				};
+			// Add ROAC Prime Talent Hub section with backend data only
+			if (hubContent.length > 0) {
+				enhancedEventsData.push({
+					title: "ROAC Prime Talent Hub",
+					titleId: "ROAC",
+					events: hubContent
+				});
 			}
 
 			setDynamicEventsData(enhancedEventsData);
 		} catch (error) {
-			// Fallback to static data with safety check
-			const fallbackData = Array.isArray(eventsData) ? eventsData : [];
-			setDynamicEventsData(fallbackData);
+			// Set empty array on error - no static fallback
+			setDynamicEventsData([]);
 		} finally {
 			setLoading(false);
 		}

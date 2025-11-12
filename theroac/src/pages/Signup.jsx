@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { toast } from 'react-toastify';
 import './Auth.css';
 
 const Signup = () => {
@@ -24,6 +25,19 @@ const Signup = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    
+    // Handle phone number input - only allow 10 digits
+    if (name === 'phone') {
+      const digitsOnly = value.replace(/\D/g, '');
+      if (digitsOnly.length <= 10) {
+        setFormData((prev) => ({
+          ...prev,
+          [name]: digitsOnly,
+        }));
+      }
+      return;
+    }
+    
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -47,6 +61,16 @@ const Signup = () => {
       return;
     }
 
+    // Validate phone number - must be exactly 10 digits
+    if (formData.phone.length !== 10) {
+      setError('Phone number must be exactly 10 digits');
+      toast.error('Phone number must be exactly 10 digits', {
+        position: "top-center",
+        autoClose: 3000,
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -54,7 +78,7 @@ const Signup = () => {
         name: `${formData.firstName} ${formData.lastName}`,
         email: formData.email,
         password: formData.password,
-        phone: formData.phone,
+        phone: `+91${formData.phone}`,
         role: userType,
         ...(userType === 'candidate' && {
           university: formData.university,
@@ -74,15 +98,41 @@ const Signup = () => {
 
       if (result.success) {
         if (result.needsVerification) {
-          // Redirect to a verification pending page or show message
-          navigate('/verification-pending', { 
-            state: { 
-              email: formData.email, 
-              message: result.message 
-            } 
-          });
+          // Show success toast notification
+          toast.success(
+            `Registration successful! Please check your email (${formData.email}) to verify your account.`,
+            {
+              position: "top-center",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+            }
+          );
+          
+          // Show info toast about resending
+          setTimeout(() => {
+            toast.info(
+              "Didn't receive the email? You can resend it from the login page or resend verification page.",
+              {
+                position: "top-center",
+                autoClose: 6000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+              }
+            );
+          }, 1000);
+          
+          // Redirect to login page after a short delay
+          setTimeout(() => {
+            navigate('/login');
+          }, 2500);
         } else {
           // For users who don't need verification (shouldn't happen now)
+          toast.success('Registration successful!');
           if (userType === 'recruiter') {
             navigate('/recruiter-dashboard');
           } else {
@@ -172,13 +222,16 @@ const Signup = () => {
               <i className="fa-solid fa-envelope input-icon"></i>
             </div>
 
-            <div className="form-group has-icon">
+            <div className="form-group has-icon phone-input-group">
+              <span className="phone-prefix">+91</span>
               <input
                 type="tel"
                 name="phone"
-                placeholder="Phone Number"
+                placeholder="Enter 10 digit number"
                 value={formData.phone}
                 onChange={handleChange}
+                maxLength="10"
+                pattern="[0-9]{10}"
                 required
               />
               <i className="fa-solid fa-phone input-icon"></i>
@@ -242,6 +295,9 @@ const Signup = () => {
           <div className="auth-footer">
             <p>
               Already have an account? <Link to="/login">Login</Link>
+            </p>
+            <p style={{ marginTop: '10px', fontSize: '13px', color: 'rgba(255, 255, 255, 0.6)' }}>
+              Didn't receive verification email? <Link to="/resend-verification" style={{ color: '#FFD600' }}>Resend</Link>
             </p>
           </div>
         </div>

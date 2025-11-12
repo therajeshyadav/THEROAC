@@ -158,7 +158,6 @@ const AddContentModal = ({ isOpen, onClose, type, onSuccess }) => {
             onSuccess && onSuccess(response);
             onClose();
         } catch (error) {
-            console.error('Error creating content:', error);
             setErrors({ submit: error.message || 'Failed to create content' });
         } finally {
             setLoading(false);

@@ -45,14 +45,19 @@ const Login = () => {
       });
       
       if (result.success) {
-        // Redirect based on user role
-        if (result.user.role === 'admin') {
-          navigate('/admin-dashboard', { replace: true });
-        } else if (result.user.role === 'recruiter') {
-          navigate('/recruiter-dashboard', { replace: true });
+        // Check if there's a redirect URL stored (from Quick Apply or other pages)
+        const redirectUrl = sessionStorage.getItem('redirectAfterLogin');
+        
+        if (redirectUrl) {
+          // Clear the stored redirect URL
+          sessionStorage.removeItem('redirectAfterLogin');
+          // Redirect to the stored page
+          window.location.href = redirectUrl;
         } else {
-          navigate('/candidate-dashboard', { replace: true });
+          // Normal login - redirect to home page
+          window.location.href = '/';
         }
+        return;
       } else {
         // Check if error message contains verification-related keywords
         const errorMsg = result.error || '';
@@ -76,9 +81,9 @@ const Login = () => {
             }
           );
           
-          // Don't set error state, just redirect
+          // Don't set error state, just redirect with email as query parameter
           setTimeout(() => {
-            navigate('/resend-verification');
+            navigate(`/resend-verification?email=${encodeURIComponent(formData.email)}`);
           }, 1500);
         } else {
           toast.error(result.error || 'Login failed', {
@@ -180,7 +185,10 @@ const Login = () => {
                 <span className="checkmark"></span>
                 Remember me
               </label>
-              <Link to="/forgot-password" className="forgot-link">
+              <Link 
+                to={formData.email ? `/forgot-password?email=${encodeURIComponent(formData.email)}` : "/forgot-password"} 
+                className="forgot-link"
+              >
                 Forgot Password?
               </Link>
             </div>

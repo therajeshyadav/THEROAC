@@ -234,7 +234,7 @@
     justify-content: center;
 }
 
-.nav-btn {
+.dashboard-container .nav-btn {
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -251,18 +251,18 @@
     min-width: fit-content;
 }
 
-.nav-btn:hover {
+.dashboard-container .nav-btn:hover {
     background: rgba(255, 214, 0, 0.1);
     color: #FFD600;
 }
 
-.nav-btn.active {
+.dashboard-container .nav-btn.active {
     background: rgba(255, 214, 0, 0.15);
     color: #FFD600;
     font-weight: 600;
 }
 
-.nav-btn i {
+.dashboard-container .nav-btn i {
     font-size: 1rem;
 }
 

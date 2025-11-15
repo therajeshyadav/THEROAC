@@ -6,6 +6,19 @@ exports.createJob = async (req, res, next) => {
     const payload = { ...req.body };
     payload.createdBy = req.user.id;
     
+    // Auto-populate company info from recruiter profile if not provided
+    if (req.user.role === 'recruiter') {
+      if (!payload.companyName && req.user.companyName) {
+        payload.companyName = req.user.companyName;
+      }
+      if (!payload.companyLogo && req.user.companyLogo) {
+        payload.companyLogo = req.user.companyLogo;
+      }
+      if (!payload.sociallinks && req.user.companySocialLinks) {
+        payload.sociallinks = req.user.companySocialLinks;
+      }
+    }
+    
     // Map company field to companyName first
     if (payload.company && !payload.companyName) {
       payload.companyName = payload.company;

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { User } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -10,22 +10,15 @@ import './CandidateDashboard.css';
 
 const CandidateDashboard = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const { user: authUser, isAuthenticated, loading: authLoading, logout } = useAuth();
-    const [activeTab, setActiveTab] = useState('internships');
+    const [activeTab, setActiveTab] = useState(location.state?.activeTab || 'internships');
     const [notification, setNotification] = useState('');
     const [jobs, setJobs] = useState([]);
     const [events, setEvents] = useState([]);
     const [hubContent, setHubContent] = useState([]);
     const [applications, setApplications] = useState([]);
-    const [appliedItems, setAppliedItems] = useState(() => {
-        // Initialize from localStorage for demo purposes
-        try {
-            const saved = localStorage.getItem('appliedItems');
-            return saved ? new Set(JSON.parse(saved)) : new Set();
-        } catch {
-            return new Set();
-        }
-    }); // Track applied job/event/hub content IDs
+    const [appliedItems, setAppliedItems] = useState(new Set()); // Track applied job/event/hub content IDs from API
     const [dashboardStats, setDashboardStats] = useState({
         totalApplications: 0,
         availableJobs: 0,
@@ -37,6 +30,7 @@ const CandidateDashboard = () => {
     });
     const [loading, setLoading] = useState(true);
     const [isEditingProfile, setIsEditingProfile] = useState(false);
+    const [profileCompletion, setProfileCompletion] = useState(0);
     const [profileData, setProfileData] = useState({
         fullName: '',
         email: '',
@@ -48,14 +42,13 @@ const CandidateDashboard = () => {
     });
     const preloaderVisible = usePreloader(300); // Hide preloader after 300ms
 
-    // Save applied items to localStorage whenever it changes
+    // Calculate profile completion when authUser changes
     useEffect(() => {
-        try {
-            localStorage.setItem('appliedItems', JSON.stringify([...appliedItems]));
-        } catch (error) {
-            // Ignore localStorage errors
+        if (authUser) {
+            const completion = calculateProfileCompletion(authUser);
+            setProfileCompletion(completion);
         }
-    }, [appliedItems]);
+    }, [authUser]);
 
     useEffect(() => {
         if (authLoading) {
@@ -220,7 +213,7 @@ const CandidateDashboard = () => {
             color: 'yellow',
             details: [
                 { label: 'Total Applications', value: (dashboardStats.totalApplications || 0).toString() },
-                { label: 'This Month', value: Math.floor((dashboardStats.totalApplications || 0) * 0.3).toString() }
+                { label: 'This Month', value: (dashboardStats.applicationsThisMonth || 0).toString() }
             ]
         },
         {
@@ -230,7 +223,7 @@ const CandidateDashboard = () => {
             color: 'blue',
             details: [
                 { label: 'Open Positions', value: (dashboardStats.availableJobs || 0).toString() },
-                { label: 'New This Week', value: Math.floor((dashboardStats.availableJobs || 0) * 0.1).toString() }
+                { label: 'New This Week', value: (dashboardStats.newJobsThisWeek || 0).toString() }
             ]
         },
         {
@@ -250,10 +243,30 @@ const CandidateDashboard = () => {
             color: 'orange',
             details: [
                 { label: 'Total Views', value: (dashboardStats.profileViews || 0).toString() },
-                { label: 'This Week', value: Math.floor((dashboardStats.profileViews || 0) * 0.2).toString() }
+                { label: 'This Week', value: (dashboardStats.profileViewsThisWeek || 0).toString() }
             ]
         }
     ];
+
+    // Calculate profile completion percentage
+    const calculateProfileCompletion = (user) => {
+        if (!user) return 0;
+        
+        const fields = [
+            user.fullName || user.name,
+            user.email,
+            user.phone,
+            user.city,
+            user.state,
+            user.country,
+            user.bio
+        ];
+        
+        const filledFields = fields.filter(field => field && field.trim() !== '' && field !== '+91').length;
+        const totalFields = fields.length;
+        
+        return Math.round((filledFields / totalFields) * 100);
+    };
 
     const getStatusColor = (status) => {
         switch (status?.toLowerCase()) {
@@ -470,7 +483,7 @@ const CandidateDashboard = () => {
             <header className="candidate-header">
                 <div className="header-content">
                     <div className="header-left">
-                        <div className="logo-section">
+                        <div className="logo-section" onClick={() => window.location.href = '/'} style={{ cursor: 'pointer' }}>
                             <img
                                 src="assets/img/logo/logo5.png"
                                 alt="ROAC Logo"
@@ -534,7 +547,12 @@ const CandidateDashboard = () => {
                                 <span className="notification-badge">3</span>
                             </button>
                             <div className="user-menu">
-                                <div className="user-avatar">
+                                <div 
+                                    className="user-avatar" 
+                                    onClick={() => setActiveTab('profile')}
+                                    style={{ cursor: 'pointer' }}
+                                    title="View Profile"
+                                >
                                     {authUser?.profilePicture || authUser?.avatar ? (
                                         <img 
                                             src={authUser.profilePicture || authUser.avatar} 
@@ -553,7 +571,7 @@ const CandidateDashboard = () => {
                                 className="logout-btn"
                                 onClick={() => {
                                     logout();
-                                    navigate('/login');
+                                    window.location.href = '/';
                                 }}
                             >
                                 <i className="fas fa-sign-out-alt"></i>
@@ -1227,11 +1245,11 @@ const CandidateDashboard = () => {
                                             <h4>{authUser?.fullName || authUser?.name || 'User'}</h4>
                                             <p>{authUser?.email || 'user@example.com'}</p>
                                             <div className="profile-completion-mini">
-                                                <span>Profile: 75% Complete</span>
+                                                <span>Profile: {profileCompletion}% Complete</span>
                                                 <div className="mini-progress">
                                                     <div
                                                         className="mini-progress-fill"
-                                                        style={{ width: '75%' }}
+                                                        style={{ width: `${profileCompletion}%` }}
                                                     ></div>
                                                 </div>
                                             </div>

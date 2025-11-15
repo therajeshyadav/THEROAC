@@ -88,7 +88,7 @@ export const parseSlugForLookup = (slug) => {
     
     for (let i = parts.length - 1; i >= 0; i--) {
         const part = parts[i];
-        // Check if this part looks like a UUID or numeric ID
+        // Check if this part looks like a UUID (NOT numeric ID - we use slug-based routing now)
         if (/^[0-9a-f]{8}$/.test(part) && i < parts.length - 4) {
             // Potential UUID start, check if next 4 parts form a complete UUID
             const potentialUuid = parts.slice(i, i + 5).join('-');
@@ -97,16 +97,12 @@ export const parseSlugForLookup = (slug) => {
                 idIndex = i;
                 break;
             }
-        } else if (/^\d+$/.test(part)) {
-            // Numeric ID
-            foundId = part;
-            idIndex = i;
-            break;
         }
+        // REMOVED: Numeric ID check - we now use slug-based routing only
     }
     
     if (foundId && idIndex >= 0) {
-        // Old format with ID - extract ID and reconstruct slug without ID
+        // Old format with UUID - extract UUID and reconstruct slug without UUID
         const slugWithoutId = parts.slice(0, idIndex).join('-');
         return { 
             title: null, 
@@ -154,32 +150,35 @@ export const createDetailsURLWithId = (type, title, organization, id) => {
 
 /**
  * Helper function to create SEO-friendly URL for jobs (without ID)
- * @param {Object} job - Job object with title and company
+ * @param {Object} job - Job object with title and slug
  * @returns {string} - SEO-friendly URL
  */
 export const createJobURL = (job) => {
-    const company = job.company || job.companyName || 'Company';
-    return createDetailsURL('jobs', job.title, company);
+    // Jobs use slug directly from database
+    const slug = job.slug || createSEOSlug(job.title, job.company || job.companyName || 'Company');
+    return `/event-detail/jobs/${slug}`;
 };
 
 /**
  * Helper function to create SEO-friendly URL for events (without ID)
- * @param {Object} event - Event object with title and organization/organizer
+ * @param {Object} event - Event object with title and slug
  * @returns {string} - SEO-friendly URL
  */
 export const createEventURL = (event) => {
-    const organization = event.organization || event.organizer || event.company || event.companyName || event.venue || 'Event';
-    return createDetailsURL('events', event.title, organization);
+    // Events use slug directly from database (no organization in slug)
+    const slug = event.slug || createSEOSlug(event.title, 'Event');
+    return `/event-detail/events/${slug}`;
 };
 
 /**
  * Helper function to create SEO-friendly URL for ROAC Prime Talent Hub content (without ID)
- * @param {Object} content - Hub content object with title and company/organization
+ * @param {Object} content - Hub content object with title and slug
  * @returns {string} - SEO-friendly URL
  */
 export const createHubContentURL = (content) => {
-    const organization = content.company || content.companyName || content.organization || content.organizer || 'ROAC Prime';
-    return createDetailsURL('internships', content.title, organization);
+    // Hub content uses slug directly from database
+    const slug = content.slug || createSEOSlug(content.title, 'ROAC Prime');
+    return `/event-detail/internships/${slug}`;
 };
 
 /**

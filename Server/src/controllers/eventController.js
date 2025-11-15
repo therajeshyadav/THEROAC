@@ -58,6 +58,11 @@ exports.createEvent = async (req, res, next) => {
       createdBy: req.user.id
     };
 
+    // Auto-populate company social links from recruiter profile
+    if (req.user.role === 'recruiter' && req.user.companySocialLinks) {
+      payload.sociallinks = req.user.companySocialLinks;
+    }
+
     const event = await Event.create(payload);
     res.status(201).json(event);
   } catch (err) {
@@ -142,6 +147,28 @@ exports.registerForEvent = async (req, res, next) => {
     
     return res.status(500).json({
       error: 'Failed to register for event. Please try again.'
+    });
+  }
+};
+
+// Check if user has registered for event
+exports.checkEventRegistrationStatus = async (req, res, next) => {
+  try {
+    const eventId = req.params.id;
+    const userId = req.user.id;
+
+    const registration = await EventRegistration.findOne({
+      where: { userId, eventId }
+    });
+
+    res.json({
+      hasRegistered: !!registration,
+      hasApplied: !!registration
+    });
+  } catch (err) {
+    console.error('Error checking event registration status:', err);
+    return res.status(500).json({
+      error: 'Failed to check registration status. Please try again.'
     });
   }
 };

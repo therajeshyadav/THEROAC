@@ -143,6 +143,45 @@ const registerForEvent = async (eventId) => {
     });
 };
 
+// Hub Content endpoints
+const applyToHubContent = async (hubContentId) => {
+    return request(`/hub-content/${hubContentId}/apply`, {
+        method: 'POST',
+    });
+};
+
+// Bookmark endpoints
+const toggleBookmark = async (itemId, itemType) => {
+    return request('/bookmarks/toggle', {
+        method: 'POST',
+        body: JSON.stringify({ itemId, itemType }),
+    });
+};
+
+const checkBookmarkStatus = async (itemId, itemType) => {
+    return request(`/bookmarks/status/${itemType}/${itemId}`);
+};
+
+const getMyBookmarks = async () => {
+    return request('/bookmarks/my-bookmarks');
+};
+
+// Like endpoints
+const toggleLike = async (itemId, itemType) => {
+    return request('/likes/toggle', {
+        method: 'POST',
+        body: JSON.stringify({ itemId, itemType }),
+    });
+};
+
+const checkLikeStatus = async (itemId, itemType) => {
+    return request(`/likes/status/${itemType}/${itemId}`);
+};
+
+const getMyLikes = async () => {
+    return request('/likes/my-likes');
+};
+
 // Hackathons endpoints
 const getHackathons = async () => {
     return request('/hackathons');
@@ -263,6 +302,7 @@ const apiService = {
     getEventBySlug,
     createEvent,
     registerForEvent,
+    applyToHubContent,
     getHackathons,
     registerForHackathon,
     getProfile,
@@ -281,7 +321,13 @@ const apiService = {
     checkJobApplicationStatus,
     checkEventRegistrationStatus,
     checkHubContentApplicationStatus,
-    getUserApplicationStatuses
+    getUserApplicationStatuses,
+    toggleBookmark,
+    checkBookmarkStatus,
+    getMyBookmarks,
+    toggleLike,
+    checkLikeStatus,
+    getMyLikes
 };
 
 export default apiService;

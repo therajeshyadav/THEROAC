@@ -19,6 +19,7 @@ Event.init({
   tags: { type: DataTypes.ARRAY(DataTypes.STRING), allowNull: true },
   prizes: { type: DataTypes.JSON, allowNull: true },
   registrationLink: { type: DataTypes.TEXT, allowNull: true },
+  media: { type: DataTypes.JSON, allowNull: true }, // Array of {type: 'image'|'video', url: string, thumbnail?: string}
   views: { type: DataTypes.INTEGER, defaultValue: 0 },
   registrations: { type: DataTypes.INTEGER, defaultValue: 0 },
   createdBy: { type: DataTypes.UUID, allowNull: false }

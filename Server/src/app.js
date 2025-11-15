@@ -12,6 +12,9 @@ const adminRoutes = require('./routes/admin');
 const dashboardRoutes = require('./routes/dashboard');
 const gmailRoutes = require('./routes/gmailRoutes');
 const hubContentRoutes = require('./routes/hubContent');
+const bookmarkRoutes = require('./routes/bookmarks');
+const likeRoutes = require('./routes/likes');
+const profileViewRoutes = require('./routes/profileViews');
 const errorHandler = require('./middlewares/errorHandler');
 
 const app = express();
@@ -30,6 +33,9 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/hub-content', hubContentRoutes);
 app.use('/api/gmail', gmailRoutes);
+app.use('/api/bookmarks', bookmarkRoutes);
+app.use('/api/likes', likeRoutes);
+app.use('/api/profile-views', profileViewRoutes);
 
 // health check
 app.get('/health', (req, res) => res.json({ ok: true }));

@@ -13,9 +13,10 @@ exports.register = async (req, res, next) => {
       return res.status(400).json({ message: 'Email and password are required' });
     }
 
-    const existing = await User.findOne({ where: { [Op.or]: [{ email }, { phone }] } });
+    // Check only email uniqueness, phone can be shared by multiple users
+    const existing = await User.findOne({ where: { email } });
     if (existing) {
-      return res.status(400).json({ message: 'Email or phone already registered' });
+      return res.status(400).json({ message: 'Email already registered' });
     }
 
     const emailVerificationToken = crypto.randomBytes(32).toString('hex');
@@ -213,8 +214,17 @@ exports.resendVerification = async (req, res, next) => {
     user.emailVerificationToken = token;
     await user.save();
 
-    await emailService.sendVerificationEmail(email, token, user.fullName);
-    return res.status(200).json({ message: 'Verification email sent successfully!' });
+    try {
+      await emailService.sendVerificationEmail(email, token, user.fullName);
+      return res.status(200).json({ message: 'Verification email sent successfully!' });
+    } catch (emailError) {
+      console.error('Failed to send verification email:', emailError.message);
+      // Still return success since token is saved, but inform about email issue
+      return res.status(200).json({ 
+        message: 'Verification token generated. Email service temporarily unavailable.',
+        warning: 'Please try again in a few moments or contact support.'
+      });
+    }
   } catch (err) {
     console.error('Error in resendVerification:', err);
     return res.status(500).json({

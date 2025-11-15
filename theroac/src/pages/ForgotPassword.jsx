@@ -1,14 +1,24 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import apiService from '../services/api';
 import './Auth.css';
 
 const ForgotPassword = () => {
-
-  const [email, setEmail] = useState('');
+  const [searchParams] = useSearchParams();
+  const emailFromUrl = searchParams.get('email') || '';
+  
+  const [email, setEmail] = useState(emailFromUrl);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const isEmailPrefilled = !!emailFromUrl;
+
+  useEffect(() => {
+    // Update email if URL parameter changes
+    if (emailFromUrl) {
+      setEmail(emailFromUrl);
+    }
+  }, [emailFromUrl]);
 
 
 
@@ -57,9 +67,13 @@ const ForgotPassword = () => {
         </div>
         <div className="col-6">
           <div className="auth-header">
-
             <h2>Forgot Password</h2>
-
+            <p className="auth-subtitle">
+              {isEmailPrefilled 
+                ? "We'll send password reset instructions to your email."
+                : "Enter your email address and we'll send you instructions to reset your password."
+              }
+            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="auth-form">
@@ -79,8 +93,28 @@ const ForgotPassword = () => {
                 onChange={handleChange}
                 required
                 disabled={loading}
+                readOnly={isEmailPrefilled}
+                style={isEmailPrefilled ? { 
+                  cursor: 'not-allowed', 
+                  backgroundColor: 'rgba(255, 255, 255, 0.05)' 
+                } : {}}
               />
               <i className="fa-solid fa-envelope input-icon"></i>
+              {isEmailPrefilled && (
+                <i 
+                  className="fa-solid fa-lock" 
+                  style={{ 
+                    position: 'absolute', 
+                    right: '14px', 
+                    top: '50%', 
+                    transform: 'translateY(-50%)', 
+                    color: 'rgba(255, 214, 0, 0.7)',
+                    fontSize: '14px',
+                    zIndex: 1
+                  }}
+                  title="Email is locked from login page"
+                ></i>
+              )}
             </div>
 
             <button type="submit" className="auth-btn" disabled={loading || !email}>

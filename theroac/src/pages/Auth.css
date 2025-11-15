@@ -294,6 +294,25 @@
   color: rgba(255, 255, 255, 0.6);
 }
 
+/* Fix autocomplete visibility - ensure text is visible when browser shows suggestions */
+.form-group input:-webkit-autofill,
+.form-group input:-webkit-autofill:hover,
+.form-group input:-webkit-autofill:focus,
+.form-group input:-webkit-autofill:active {
+  -webkit-text-fill-color: #ffffff !important;
+  -webkit-box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.15) inset !important;
+  box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.15) inset !important;
+  transition: background-color 5000s ease-in-out 0s;
+  caret-color: #ffffff;
+}
+
+/* Ensure input text is always visible and on top */
+.form-group input {
+  position: relative;
+  z-index: 2;
+  -webkit-text-fill-color: #ffffff;
+}
+
 .input-icon {
   position: absolute;
   left: 14px;
@@ -316,10 +335,13 @@
   border: none;
   color: rgba(255, 255, 255, 0.6);
   cursor: pointer;
-  padding: 4px;
-  font-size: 15px;
+  padding: 8px;
+  font-size: 16px;
   transition: color 0.3s ease;
-  z-index: 1;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .password-toggle:hover {

@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Building, MapPin, Calendar, Briefcase, Clock, Heart, Share2, Bookmark, Award, Wallet } from 'lucide-react';
+import { Building, MapPin, Calendar, Briefcase, Clock, Heart, Share2, Bookmark, Award, Wallet, Bell } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import apiService from '../services/api';
 import { extractIdFromSlug, createSEOSlug, parseSlugForLookup } from '../utils/urlUtils';
+import ModernDetailsPage from './ModernDetailsPage';
 import './UnifiedDetailsPage.css';
 
 const UnifiedDetailsPage = () => {
@@ -17,25 +18,76 @@ const UnifiedDetailsPage = () => {
     const { isAuthenticated, user } = useAuth();
     const [activeTab, setActiveTab] = useState('');
     const [isHeaderSticky, setIsHeaderSticky] = useState(false);
+    const [isBookmarked, setIsBookmarked] = useState(false);
+    const [isLiked, setIsLiked] = useState(false);
+    const [showShareMenu, setShowShareMenu] = useState(false);
     const headerRef = useRef(null);
     const leftContentRef = useRef(null);
+
+    // Listen to scroll events from ModernDetailsPage
+    useEffect(() => {
+        const handleModernDetailsScroll = (event) => {
+            setIsHeaderSticky(event.detail.isHeaderSticky);
+            setActiveTab(event.detail.activeTab || activeTab);
+        };
+
+        window.addEventListener('modernDetailsScroll', handleModernDetailsScroll);
+        return () => window.removeEventListener('modernDetailsScroll', handleModernDetailsScroll);
+    }, [activeTab]);
     const [data, setData] = useState(null);
     const [isApplying, setIsApplying] = useState(false);
     const [hasApplied, setHasApplied] = useState(false);
     const [checkingStatus, setCheckingStatus] = useState(true);
 
-    // Check localStorage for applied status on component mount
+    // Check application status from backend (user-specific)
     useEffect(() => {
-        if (data?.id) {
-            try {
-                const saved = localStorage.getItem('appliedItems');
-                const appliedItems = saved ? JSON.parse(saved) : [];
-                setHasApplied(appliedItems.includes(data.id));
-            } catch {
+        const checkApplicationStatus = async () => {
+            if (!data?.id || !isAuthenticated || !user) {
                 setHasApplied(false);
+                setCheckingStatus(false);
+                return;
             }
-        }
-    }, [data?.id]);
+
+            // Only candidates can apply - recruiters/admins cannot
+            if (user.role === 'recruiter' || user.role === 'admin') {
+                setHasApplied(false);
+                setCheckingStatus(false);
+                return;
+            }
+
+            try {
+                // Check application status based on type
+                let hasAppliedStatus = false;
+                
+                switch (type) {
+                    case 'jobs':
+                        const jobStatus = await apiService.checkJobApplicationStatus(data.id);
+                        hasAppliedStatus = jobStatus?.hasApplied || false;
+                        break;
+                    case 'events':
+                        const eventStatus = await apiService.checkEventRegistrationStatus(data.id);
+                        hasAppliedStatus = eventStatus?.hasRegistered || eventStatus?.hasApplied || false;
+                        break;
+                    case 'internships':
+                        const hubStatus = await apiService.checkHubContentApplicationStatus(data.id);
+                        hasAppliedStatus = hubStatus?.hasApplied || false;
+                        break;
+                    default:
+                        hasAppliedStatus = false;
+                }
+                
+                setHasApplied(hasAppliedStatus);
+            } catch (error) {
+                console.error('Error checking application status:', error);
+                // If API fails, assume not applied
+                setHasApplied(false);
+            } finally {
+                setCheckingStatus(false);
+            }
+        };
+
+        checkApplicationStatus();
+    }, [data?.id, isAuthenticated, user]);
 
     // Configuration for different types
     const typeConfig = {
@@ -78,8 +130,8 @@ const UnifiedDetailsPage = () => {
         }
     };
 
-    // Mock data - replace with actual API calls
-    const getJobData = (identifier) => {
+    // MOCK DATA REMOVED - Using only database data
+    /* const getJobData = (identifier) => {
         const jobs = [
             {
                 id: '11111111-1111-1111-1111-111111111111',
@@ -150,9 +202,9 @@ const UnifiedDetailsPage = () => {
         });
         
         return job || jobs[0];
-    };
+    }; */
 
-    const mockData = {
+    /* const mockData = {
         jobs: getJobData(id || slug),
         events: (() => {
             const events = [
@@ -324,9 +376,9 @@ const UnifiedDetailsPage = () => {
             
             return program || programs[0];
         })()
-    };
+    }; */
 
-    // Initialize data and active tab
+    // Initialize data and active tab - USING ONLY DATABASE DATA
     useEffect(() => {
         const fetchData = async () => {
             if (!type || !slug) return;
@@ -381,12 +433,14 @@ const UnifiedDetailsPage = () => {
                         return;
                     }
                 } else {
-                    // Fallback to mock data if API fails
-                    setData(mockData[type]);
+                    // No data found - show error
+                    console.error(`${type} not found`);
+                    setData(null);
                 }
             } catch (error) {
-                // Fallback to mock data on error
-                setData(mockData[type]);
+                // Error fetching data
+                console.error(`Error fetching ${type}:`, error);
+                setData(null);
             }
 
             setActiveTab(typeConfig[type]?.defaultTab || '');
@@ -456,6 +510,32 @@ const UnifiedDetailsPage = () => {
         }
     }, [data, isAuthenticated]);
 
+    // Check bookmark and like status on load
+    useEffect(() => {
+        const checkStatus = async () => {
+            if (data?.id && isAuthenticated) {
+                try {
+                    const [bookmarkStatus, likeStatus] = await Promise.all([
+                        apiService.checkBookmarkStatus(data.id, type),
+                        apiService.checkLikeStatus(data.id, type)
+                    ]);
+                    
+                    setIsBookmarked(bookmarkStatus.bookmarked);
+                    setIsLiked(likeStatus.liked);
+                } catch (error) {
+                    console.error('Error checking bookmark/like status:', error);
+                    setIsBookmarked(false);
+                    setIsLiked(false);
+                }
+            } else {
+                setIsBookmarked(false);
+                setIsLiked(false);
+            }
+        };
+
+        checkStatus();
+    }, [data?.id, type, isAuthenticated]);
+
     const scrollToSection = (sectionId) => {
         const section = document.getElementById(sectionId);
         if (section && leftContentRef.current) {
@@ -501,14 +581,8 @@ const UnifiedDetailsPage = () => {
                 setHasApplied(false);
             }
         } catch (error) {
-            // If API call fails, check localStorage as fallback
-            try {
-                const saved = localStorage.getItem('appliedItems');
-                const appliedItems = saved ? JSON.parse(saved) : [];
-                setHasApplied(appliedItems.includes(data.id));
-            } catch {
-                setHasApplied(false);
-            }
+            console.error('Error checking application status:', error);
+            setHasApplied(false);
         } finally {
             setCheckingStatus(false);
         }
@@ -519,6 +593,12 @@ const UnifiedDetailsPage = () => {
             // Store the current page info before redirecting to login
             sessionStorage.setItem('redirectAfterLogin', window.location.pathname);
             navigate('/login');
+            return;
+        }
+
+        // Only candidates can apply
+        if (user?.role === 'recruiter' || user?.role === 'admin') {
+            alert('Recruiters and admins cannot apply. Only candidates can apply.');
             return;
         }
 
@@ -541,9 +621,7 @@ const UnifiedDetailsPage = () => {
                     result = await apiService.registerForEvent(data.id);
                     break;
                 case 'internships':
-                    // For hub content, you might want to create a different endpoint
-                    // For now, we'll just show a success message
-                    result = { success: true };
+                    result = await apiService.applyToHubContent(data.id);
                     break;
                 default:
                     throw new Error('Unknown application type');
@@ -551,35 +629,22 @@ const UnifiedDetailsPage = () => {
 
             if (result) {
                 setHasApplied(true);
-                // Save to localStorage for demo purposes
-                try {
-                    const saved = localStorage.getItem('appliedItems');
-                    const appliedItems = saved ? JSON.parse(saved) : [];
-                    if (!appliedItems.includes(data.id)) {
-                        appliedItems.push(data.id);
-                        localStorage.setItem('appliedItems', JSON.stringify(appliedItems));
-                    }
-                } catch (error) {
-                    // Ignore localStorage errors
-                }
                 alert(`Successfully applied for ${data.title}!`);
             }
 
         } catch (error) {
-            // For demo purposes, if API fails, still mark as applied
-            setHasApplied(true);
-            // Save to localStorage for demo purposes
-            try {
-                const saved = localStorage.getItem('appliedItems');
-                const appliedItems = saved ? JSON.parse(saved) : [];
-                if (!appliedItems.includes(data.id)) {
-                    appliedItems.push(data.id);
-                    localStorage.setItem('appliedItems', JSON.stringify(appliedItems));
-                }
-            } catch (error) {
-                // Ignore localStorage errors
+            const errorMessage = error.message || 'Please try again later.';
+            console.error('Application error:', error);
+            
+            // Show user-friendly error message
+            if (errorMessage.includes('Already applied')) {
+                alert('You have already applied to this position.');
+                setHasApplied(true);
+            } else if (errorMessage.includes('not found')) {
+                alert('This position is no longer available.');
+            } else {
+                alert(`Failed to apply: ${errorMessage}`);
             }
-            alert(`Successfully applied for ${data.title}! (Demo mode)`);
         } finally {
             setIsApplying(false);
         }
@@ -642,6 +707,60 @@ const UnifiedDetailsPage = () => {
         return salary;
     };
 
+    // Share functions
+    const handleShare = (platform) => {
+        const url = encodeURIComponent(window.location.href);
+        const title = encodeURIComponent(data?.title || 'Check this out');
+        
+        const shareUrls = {
+            facebook: `https://www.facebook.com/sharer/sharer.php?u=${url}`,
+            twitter: `https://twitter.com/intent/tweet?url=${url}&text=${title}`,
+            linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${url}`,
+            copy: null
+        };
+
+        if (platform === 'copy') {
+            navigator.clipboard.writeText(window.location.href);
+            alert('Link copied to clipboard!');
+        } else {
+            window.open(shareUrls[platform], '_blank', 'width=600,height=400');
+        }
+    };
+
+    // Bookmark function
+    const handleBookmark = async () => {
+        if (!isAuthenticated) {
+            alert('Please login to bookmark');
+            return;
+        }
+
+        try {
+            const result = await apiService.toggleBookmark(data?.id, type);
+            setIsBookmarked(result.bookmarked);
+        } catch (error) {
+            console.error('Error toggling bookmark:', error);
+            alert('Failed to update bookmark');
+        }
+    };
+
+    // Like function
+    const handleLike = async () => {
+        if (!isAuthenticated) {
+            alert('Please login to like');
+            return;
+        }
+
+        try {
+            const result = await apiService.toggleLike(data?.id, type);
+            setIsLiked(result.liked);
+        } catch (error) {
+            console.error('Error toggling like:', error);
+            alert('Failed to update like');
+        }
+    };
+
+
+
     // Get price/fee display
     const getPriceDisplay = () => {
         switch (type) {
@@ -692,13 +811,11 @@ const UnifiedDetailsPage = () => {
 
     return (
         <div className="details-page unified-details-page">
-            <div className={`top-nav ${isHeaderSticky ? 'sticky' : ''}`}>
+            <div className={`top-nav ${isHeaderSticky ? 'sticky visible' : 'hidden'}`}>
                 <div className="nav-container">
                     <div className="nav-left">
-                        <div className="site-logo">
-                            <a href="/">
-                                <img src="/assets/img/logo/logo5.png" alt="ROAC Logo" />
-                            </a>
+                        <div className="site-logo" onClick={() => window.location.href = '/'} style={{ cursor: 'pointer' }}>
+                            <img src="/assets/img/logo/logo5.png" alt="ROAC Logo" />
                         </div>
                         {/* Show tabs in header only when sticky */}
                         {isHeaderSticky && (
@@ -717,371 +834,127 @@ const UnifiedDetailsPage = () => {
 
                     </div>
                     <div className="nav-right">
-                        <button className="nav-icon">🔔</button>
-                        <div className="profile-avatar">
-                            {isAuthenticated && user ? (
-                                user.profilePicture || user.avatar ? (
-                                    <img 
-                                        src={user.profilePicture || user.avatar} 
-                                        alt={user.name || user.firstName || 'User'} 
-                                        className="profile-image"
-                                    />
-                                ) : (
-                                    <span className="profile-initials">
-                                        {(user.name || user.firstName || user.email || 'U').charAt(0).toUpperCase()}
-                                    </span>
-                                )
-                            ) : (
-                                <span className="profile-initials">U</span>
-                            )}
-                        </div>
+                        {isAuthenticated && user ? (
+                            <>
+                                <button className="notification-btn">
+                                    <Bell className="w-5 h-5" />
+                                    <span className="notification-badge">3</span>
+                                </button>
+                                <div 
+                                    className="profile-avatar"
+                                    onClick={() => {
+                                        // Redirect to profile tab in appropriate dashboard
+                                        if (user.role === 'admin') {
+                                            navigate('/admin-dashboard', { state: { activeTab: 'profile' } });
+                                        } else if (user.role === 'recruiter') {
+                                            navigate('/recruiter-dashboard', { state: { activeTab: 'profile' } });
+                                        } else {
+                                            navigate('/candidate-dashboard', { state: { activeTab: 'profile' } });
+                                        }
+                                    }}
+                                    style={{ cursor: 'pointer' }}
+                                    title="View Profile"
+                                >
+                                    {user.profilePicture || user.avatar ? (
+                                        <img 
+                                            src={user.profilePicture || user.avatar} 
+                                            alt={user.name || user.firstName || 'User'} 
+                                            className="profile-image"
+                                        />
+                                    ) : (
+                                        <span className="profile-initials">
+                                            {(user.name || user.firstName || user.email || 'U').charAt(0).toUpperCase()}
+                                        </span>
+                                    )}
+                                </div>
+                            </>
+                        ) : (
+                            <div className="auth-buttons">
+                                <button 
+                                    className="login-btn"
+                                    onClick={() => navigate('/login')}
+                                >
+                                    Login
+                                </button>
+                                <button 
+                                    className="signup-btn"
+                                    onClick={() => navigate('/register')}
+                                >
+                                    Join as Recruiter
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
 
-            {/* Main Content Container */}
-            <div className="main-container">
-                {/* Left Content Area */}
-                <div ref={leftContentRef} className="left-content">
-                    {/* Header Card */}
-                    <div ref={headerRef} className="header-card">
-                        <div className="header-left">
-                            <div className="logo" style={{ background: config.logoGradient }}>
-                                <span>{getOrganizationName().charAt(0)}</span>
-                            </div>
-                            <div className="info">
-                                <h1 className="title">{data.title}</h1>
-                                <div className="meta">
-                                    <div className="meta-row">
-                                        <Building size={16} />
-                                        <span>{getOrganizationName()}</span>
-                                    </div>
-                                    <div className="meta-row">
-                                        <MapPin size={16} />
-                                        <span>{data.location}</span>
-                                    </div>
-                                    {type === 'jobs' && (
-                                        <div className="meta-row">
-                                            <Briefcase size={16} />
-                                            <span>{data.type}</span>
-                                        </div>
-                                    )}
-                                    {type === 'internships' && (
-                                        <div className="meta-row">
-                                            <Clock size={16} />
-                                            <span>{data.duration} • {data.timing}</span>
-                                        </div>
-                                    )}
-                                    <div className="meta-row">
-                                        <Calendar size={16} />
-                                        <span>Updated On: {data.posted || (data.createdAt ? new Date(data.createdAt).toLocaleDateString() : 'Recently')}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="header-right">
-                            <div className="days-left">
-                                <span className="days-number">{getDeadlineDisplay()}</span>
-                                <span className="days-text">Days Left</span>
-                            </div>
+            {/* Page Content Wrapper - Scrollable */}
+            <div className="page-content-wrapper">
+                {/* Hero Image Section - Full Width, Above Grid */}
+                {data && (
+                    <div className="hero-section-wrapper">
+                        <div className="hero-section" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+                            <img 
+                                src={data.image || data.coverImage || data.bannerImage || 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200&h=400&fit=crop'} 
+                                alt={data.title}
+                                className="hero-section-image"
+                                onError={(e) => {
+                                    e.target.style.display = 'none';
+                                }}
+                            />
+                            <div className="hero-section-overlay"></div>
                         </div>
                     </div>
+                )}
 
-                    {/* Navigation Tabs - Only show when header is not sticky */}
-                    {!isHeaderSticky && (
-                        <div className="content-tabs">
-                            {config.tabs.map(tab => (
-                                <button
-                                    key={tab.id}
-                                    className={`content-tab ${activeTab === tab.id ? 'active' : ''}`}
-                                    onClick={() => scrollToSection(tab.id)}
-                                >
-                                    {tab.label}
-                                </button>
-                            ))}
-                        </div>
-                    )}
-
-                    {/* Content Area */}
-                    <div className="content-area">
-                        {/* Render sections based on type */}
-                        {type === 'events' && (
-                            <>
-                                {/* Stages Section */}
-                                <div id="stages" className="content-section">
-                                    <div className="section-header">
-                                        <div className="section-indicator"></div>
-                                        <h2 className="section-title">Stages and Timelines</h2>
-                                    </div>
-
-                                    {Array.isArray(data.stages) ? data.stages.map((stage, index) => (
-                                        <div key={index} className="stage-item">
-                                            <div className="stage-date">{stage.date}</div>
-                                            <div className="stage-content">
-                                                <h3 className="stage-title">{stage.title}</h3>
-                                                <p className="stage-description">{stage.description}</p>
-                                                <div className="stage-timing">
-                                                    <span>Start: {stage.startDate}</span>
-                                                    <span>End: {stage.endDate}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )) : (
-                                        <div className="stage-item">
-                                            <div className="stage-content">
-                                                <p>No stages information available</p>
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    <div className="content-subsection">
-                                        <div className="subsection-header">
-                                            <span className="subsection-icon">📋</span>
-                                            <h3 className="subsection-title">Everything you need to know</h3>
-                                        </div>
-
-                                        <div className="subsection-content">
-                                            <ul className="content-list">
-                                                {Array.isArray(data.about) ? data.about.map((item, index) => (
-                                                    <li key={index}>{item}</li>
-                                                )) : (
-                                                    <li>{data.about || 'No additional information available'}</li>
-                                                )}
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Event Details Section */}
-                                <div id="details" className="content-section">
-                                    <div className="section-header">
-                                        <div className="section-indicator"></div>
-                                        <h2 className="section-title">Details</h2>
-                                    </div>
-
-                                    <div className="section-content">
-                                        <h3 className="subsection-title">Guidelines & Rules:</h3>
-                                        <ul className="content-list">
-                                            {Array.isArray(data.guidelines) ? data.guidelines.map((item, index) => (
-                                                <li key={index}>{item}</li>
-                                            )) : (
-                                                <li>{data.guidelines || 'No guidelines available'}</li>
-                                            )}
-                                        </ul>
-
-                                        <div className="warning-box">
-                                            <span className="warning-icon">⚠️</span>
-                                            <p>If an employer asks you to pay any kind of fee, please notify us immediately.</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Prizes Section */}
-                                <div id="prizes" className="content-section">
-                                    <div className="section-header">
-                                        <div className="section-indicator"></div>
-                                        <h2 className="section-title">Rewards and Prizes</h2>
-                                    </div>
-
-                                    <div className="prizes-grid">
-                                        <div className="prize-card winner">
-                                            <Award size={48} />
-                                            <h3>Winner</h3>
-                                            <div className="prize-amount">{data.prizes?.winner}</div>
-                                            <div className="prize-badge">📜 Certificate</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </>
-                        )}
-
-                        {/* Job Description Section */}
-                        {type === 'jobs' && (
-                            <div id="description" className="content-section">
-                                <div className="section-header">
-                                    <div className="section-indicator"></div>
-                                    <h2 className="section-title">Job Description</h2>
-                                </div>
-
-                                <div className="content-subsection">
-                                    <div className="subsection-header">
-                                        <span className="subsection-icon">📋</span>
-                                        <h3 className="subsection-title">Details</h3>
-                                    </div>
-                                    <div className="subsection-content">
-                                        <p>{data.description}</p>
-                                    </div>
-                                </div>
-
-                                <div className="content-subsection">
-                                    <div className="subsection-header">
-                                        <span className="subsection-icon">💼</span>
-                                        <h3 className="subsection-title">Responsibilities</h3>
-                                    </div>
-                                    <div className="subsection-content">
-                                        <ul className="content-list">
-                                            {Array.isArray(data.responsibilities) ? data.responsibilities.map((item, index) => (
-                                                <li key={index}>{item}</li>
-                                            )) : (
-                                                <li>{data.responsibilities || 'No responsibilities listed'}</li>
-                                            )}
-                                        </ul>
-                                    </div>
-                                </div>
-
-                                <div className="content-subsection">
-                                    <div className="subsection-header">
-                                        <span className="subsection-icon">✅</span>
-                                        <h3 className="subsection-title">Requirements</h3>
-                                    </div>
-                                    <div className="subsection-content">
-                                        <ul className="content-list">
-                                            {Array.isArray(data.requirements) ? data.requirements.map((item, index) => (
-                                                <li key={index}>{item}</li>
-                                            )) : (
-                                                <li>{data.requirements || 'No requirements listed'}</li>
-                                            )}
-                                        </ul>
-                                    </div>
-                                </div>
-
-                                <div className="warning-box">
-                                    <span className="warning-icon">⚠️</span>
-                                    <p>If an employer asks you to pay any kind of fee, please notify us immediately.</p>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Internship Details Section */}
-                        {type === 'internships' && (
-                            <div id="details" className="content-section">
-                                <div className="section-header">
-                                    <div className="section-indicator"></div>
-                                    <h2 className="section-title">Internship Details</h2>
-                                </div>
-
-                                <div className="content-subsection">
-                                    <div className="subsection-header">
-                                        <span className="subsection-icon">📋</span>
-                                        <h3 className="subsection-title">Details</h3>
-                                    </div>
-                                    <div className="subsection-content">
-                                        <p>{data.description}</p>
-                                    </div>
-                                </div>
-
-                                <div className="content-subsection">
-                                    <div className="subsection-header">
-                                        <span className="subsection-icon">💼</span>
-                                        <h3 className="subsection-title">Responsibilities</h3>
-                                    </div>
-                                    <div className="subsection-content">
-                                        <ul className="content-list">
-                                            {data.responsibilities?.map((item, index) => (
-                                                <li key={index}>{item}</li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                </div>
-
-                                <div className="content-subsection">
-                                    <div className="subsection-header">
-                                        <span className="subsection-icon">💰</span>
-                                        <h3 className="subsection-title">Additional Information</h3>
-                                    </div>
-
-                                    <div className="prizes-grid">
-                                        <div className="prize-card">
-                                            <Clock size={48} />
-                                            <h3>Duration</h3>
-                                            <div className="prize-amount">{data.duration}</div>
-                                        </div>
-
-                                        <div className="prize-card">
-                                            <Wallet size={48} />
-                                            <h3>Stipend</h3>
-                                            <div className="prize-amount">
-                                                {data.stipend?.min && data.stipend?.max 
-                                                    ? `${formatCurrency(data.stipend.min)} - ${formatCurrency(data.stipend.max)}`
-                                                    : formatSalaryRange(data.stipend) || 'Unpaid'
-                                                }
-                                            </div>
-                                            <div className="prize-badge">Per Month</div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="warning-box">
-                                    <span className="warning-icon">⚠️</span>
-                                    <p>If an employer asks you to pay any kind of fee, please notify us immediately.</p>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Common Dates Section */}
-                        {(type === 'jobs' || type === 'events') && (
-                            <div id="dates" className="content-section">
-                                <div className="section-header">
-                                    <div className="section-indicator"></div>
-                                    <h2 className="section-title">Important dates & deadlines</h2>
-                                </div>
-
-                                <div className="deadline-item">
-                                    <Calendar size={20} />
-                                    <div className="deadline-info">
-                                        <span className="deadline-label">Application Deadline</span>
-                                        <span className="deadline-date">{getDeadlineDisplay()} days left</span>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Common Reviews Section */}
-                        <div id="reviews" className="content-section">
-                            <div className="section-header">
-                                <div className="section-indicator"></div>
-                                <h2 className="section-title">Reviews</h2>
-                            </div>
-                            <p>No reviews yet. Be the first to review!</p>
-                        </div>
-
-                        {/* Common FAQs Section */}
-                        <div id="faqs" className="content-section">
-                            <div className="section-header">
-                                <div className="section-indicator"></div>
-                                <h2 className="section-title">FAQs & Discussions</h2>
-                            </div>
-                            <p>No discussions yet. Start a conversation!</p>
-                        </div>
-
-                        {/* Skills Section */}
-                        {data.skills && (
-                            <div className="content-subsection">
-                                <div className="subsection-header">
-                                    <span className="subsection-icon">🎯</span>
-                                    <h3 className="subsection-title">Skills Required</h3>
-                                </div>
-
-                                <div className="tags-container">
-                                    {Array.isArray(data.skills) ? data.skills.map((skill, index) => (
-                                        <span key={index} className="tag">{skill}</span>
-                                    )) : (
-                                        <span className="tag">{data.skills}</span>
-                                    )}
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </div>
+                {/* Main Content Container */}
+                <div className="main-container">
+                {/* Left Content Area - NEW MODERN DESIGN */}
+                <ModernDetailsPage />
 
                 {/* Right Sidebar */}
                 <div className="right-sidebar">
                     {/* Action Card */}
                     <div className="action-card">
                         <div className="action-header">
-                            <Heart size={20} />
-                            <Bookmark size={20} />
-                            <Share2 size={20} />
+                            <Heart 
+                                size={20} 
+                                fill={isLiked ? '#ff4444' : 'none'}
+                                color={isLiked ? '#ff4444' : 'currentColor'}
+                                style={{ cursor: 'pointer' }}
+                                onClick={handleLike}
+                                title={isLiked ? 'Unlike' : 'Like'}
+                            />
+                            <Bookmark 
+                                size={20}
+                                fill={isBookmarked ? '#FFD600' : 'none'}
+                                color={isBookmarked ? '#FFD600' : 'currentColor'}
+                                style={{ cursor: 'pointer' }}
+                                onClick={handleBookmark}
+                                title={isBookmarked ? 'Remove bookmark' : 'Bookmark'}
+                            />
+                            <Share2 
+                                size={20}
+                                style={{ cursor: 'pointer' }}
+                                onClick={() => setShowShareMenu(!showShareMenu)}
+                                title="Share"
+                            />
+                            {showShareMenu && (
+                                <div className="share-dropdown">
+                                    <button onClick={() => { handleShare('facebook'); setShowShareMenu(false); }}>
+                                        Facebook
+                                    </button>
+                                    <button onClick={() => { handleShare('twitter'); setShowShareMenu(false); }}>
+                                        Twitter
+                                    </button>
+                                    <button onClick={() => { handleShare('linkedin'); setShowShareMenu(false); }}>
+                                        LinkedIn
+                                    </button>
+                                    <button onClick={() => { handleShare('copy'); setShowShareMenu(false); }}>
+                                        Copy Link
+                                    </button>
+                                </div>
+                            )}
                         </div>
 
                         <div className="price-section">
@@ -1363,6 +1236,8 @@ const UnifiedDetailsPage = () => {
                         </div>
                     </div>
                 </div>
+            </div>
+            {/* End Page Content Wrapper */}
             </div>
         </div>
     );

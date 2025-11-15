@@ -10,7 +10,7 @@ User.init({
   fullName: { type: DataTypes.STRING, allowNull: false },
   username: { type: DataTypes.STRING, allowNull: true, unique: true },
   email: { type: DataTypes.STRING, allowNull: false, unique: true, validate: { isEmail: true } },
-  phone: { type: DataTypes.STRING, allowNull: true, unique: true },
+  phone: { type: DataTypes.STRING, allowNull: true },
   passwordHash: { type: DataTypes.STRING, allowNull: true },
   provider: { type: DataTypes.ENUM('email','google','linkedin','github','apple'), defaultValue: 'email' },
   providerId: { type: DataTypes.STRING, allowNull: true },

@@ -7,10 +7,12 @@ const { requireRole } = require('../middlewares/roles');
 // Public routes
 router.get('/', hubContentController.listHubContent);
 router.get('/slug/:slug', hubContentController.getHubContentBySlug);
+router.get('/:id/application-status', authenticate, hubContentController.checkHubContentApplicationStatus);
 router.get('/:id', hubContentController.getHubContent);
 
 // Protected routes (require authentication)
 router.post('/', authenticate, requireRole(['admin', 'recruiter']), hubContentController.createHubContent);
+router.post('/:id/apply', authenticate, hubContentController.applyToHubContent);
 router.put('/:id', authenticate, requireRole(['admin', 'recruiter']), hubContentController.updateHubContent);
 router.delete('/:id', authenticate, requireRole(['admin']), hubContentController.deleteHubContent);
 

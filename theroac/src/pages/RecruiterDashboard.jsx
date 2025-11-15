@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { usePreloader } from "../hooks/usePreloader";
 import dashboardService from "../services/dashboardService";
@@ -31,8 +31,9 @@ import "./RecruiterDashboard.css";
 
 const RecruiterDashboard = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user: authUser, isAuthenticated, loading: authLoading, logout } = useAuth();
-  const [activeTab, setActiveTab] = useState("dashboard");
+  const [activeTab, setActiveTab] = useState(location.state?.activeTab || "dashboard");
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
   const [notifications] = useState(3);
   const [searchQuery, setSearchQuery] = useState("");
@@ -66,8 +67,8 @@ const RecruiterDashboard = () => {
   const handleLogout = () => {
     // Use the AuthContext logout function to properly clear state
     logout();
-    // Redirect to home page and replace history
-    navigate("/", { replace: true });
+    // Redirect to home page with full page reload
+    window.location.href = '/';
   };
 
   const getUserInitials = (name) => {
@@ -388,7 +389,7 @@ const RecruiterDashboard = () => {
         {/* Top Header */}
         <div className="organizer-header">
           <div className="header-left">
-            <div className="logo-section">
+            <div className="logo-section" onClick={() => window.location.href = '/'} style={{ cursor: 'pointer' }}>
               <img
                 src="assets/img/logo/logo5.png"
                 alt="ROAC Logo"
@@ -415,7 +416,12 @@ const RecruiterDashboard = () => {
                 )}
               </button>
               <div className="user-profile">
-                <div className="user-avatar">
+                <div 
+                  className="user-avatar"
+                  onClick={() => setActiveTab('profile')}
+                  style={{ cursor: 'pointer' }}
+                  title="View Profile"
+                >
                   {authUser?.profilePicture || authUser?.avatar ? (
                     <img 
                       src={authUser.profilePicture || authUser.avatar} 

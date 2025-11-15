@@ -1,4 +1,4 @@
-const { Job, JobApplication, Event, EventRegistration, User } = require('../models');
+const { Job, JobApplication, Event, EventRegistration, User, ProfileView } = require('../models');
 const { Op } = require('sequelize');
 
 exports.getOrganizerStats = async (req, res, next) => {
@@ -251,6 +251,17 @@ exports.getCandidateStats = async (req, res, next) => {
             where: { userId: candidateId }
         });
 
+        // Get applications this month
+        const oneMonthAgo = new Date();
+        oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+
+        const applicationsThisMonth = await JobApplication.count({
+            where: {
+                userId: candidateId,
+                createdAt: { [Op.gte]: oneMonthAgo }
+            }
+        });
+
         // Get applications by status
         const applicationsByStatus = await JobApplication.findAll({
             where: { userId: candidateId },
@@ -268,6 +279,17 @@ exports.getCandidateStats = async (req, res, next) => {
             where: { status: 'open' }
         });
 
+        // Get new jobs this week
+        const oneWeekAgo = new Date();
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+        const newJobsThisWeek = await Job.count({
+            where: {
+                status: 'open',
+                createdAt: { [Op.gte]: oneWeekAgo }
+            }
+        });
+
         // Get upcoming events count
         const upcomingEvents = await Event.count({
             where: {
@@ -281,8 +303,18 @@ exports.getCandidateStats = async (req, res, next) => {
             where: { userId: candidateId }
         });
 
-        // Mock profile views for now (could be implemented with a views tracking system)
-        const profileViews = Math.floor(Math.random() * 100) + 20;
+        // Get real profile views count from database
+        const profileViews = await ProfileView.count({
+            where: { profileUserId: candidateId }
+        });
+
+        // Get profile views in last 7 days (reuse oneWeekAgo from above)
+        const profileViewsThisWeek = await ProfileView.count({
+            where: {
+                profileUserId: candidateId,
+                viewedAt: { [Op.gte]: oneWeekAgo }
+            }
+        });
 
         // Get recent applications with job details
         const recentApplications = await JobApplication.findAll({
@@ -300,9 +332,12 @@ exports.getCandidateStats = async (req, res, next) => {
 
         res.json({
             totalApplications,
+            applicationsThisMonth,
             availableJobs,
+            newJobsThisWeek,
             upcomingEvents,
             profileViews,
+            profileViewsThisWeek,
             statusCounts,
             candidateEventRegistrations,
             recentApplications: recentApplications.map(app => ({

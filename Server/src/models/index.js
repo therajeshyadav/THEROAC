@@ -9,6 +9,10 @@ const HackathonTeam = require('./hackathonTeam');
 const TeamMember = require('./teamMember');
 const Submission = require('./submission');
 const JobApplication = require('./jobApplication');
+const HubContentApplication = require('./HubContentApplication');
+const Bookmark = require('./Bookmark');
+const Like = require('./Like');
+const ProfileView = require('./ProfileView');
 
 // Associations
 User.hasMany(Event, { foreignKey: 'createdBy', as: 'createdEvents' });
@@ -53,6 +57,29 @@ EventRegistration.belongsTo(Event, { foreignKey: 'eventId', as: 'event' });
 User.hasMany(EventRegistration, { foreignKey: 'userId', as: 'eventRegistrations' });
 Event.hasMany(EventRegistration, { foreignKey: 'eventId', as: 'eventRegistrations' });
 
+// Hub Content Application associations
+HubContent.belongsToMany(User, { through: HubContentApplication, foreignKey: 'hubContentId', otherKey: 'userId' });
+User.belongsToMany(HubContent, { through: HubContentApplication, foreignKey: 'userId', otherKey: 'hubContentId' });
+
+// Direct associations for HubContentApplication
+HubContentApplication.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+HubContentApplication.belongsTo(HubContent, { foreignKey: 'hubContentId', as: 'hubContent' });
+User.hasMany(HubContentApplication, { foreignKey: 'userId', as: 'hubContentApplications' });
+HubContent.hasMany(HubContentApplication, { foreignKey: 'hubContentId', as: 'hubContentApplications' });
+
+// Bookmark and Like associations
+Bookmark.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+User.hasMany(Bookmark, { foreignKey: 'userId', as: 'bookmarks' });
+
+Like.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+User.hasMany(Like, { foreignKey: 'userId', as: 'likes' });
+
+// ProfileView associations
+ProfileView.belongsTo(User, { foreignKey: 'profileUserId', as: 'profileOwner' });
+ProfileView.belongsTo(User, { foreignKey: 'viewerUserId', as: 'viewer' });
+User.hasMany(ProfileView, { foreignKey: 'profileUserId', as: 'profileViews' });
+User.hasMany(ProfileView, { foreignKey: 'viewerUserId', as: 'viewedProfiles' });
+
 module.exports = {
   sequelize,
   User,
@@ -64,5 +91,9 @@ module.exports = {
   HackathonTeam,
   TeamMember,
   Submission,
-  JobApplication
+  JobApplication,
+  HubContentApplication,
+  Bookmark,
+  Like,
+  ProfileView
 };

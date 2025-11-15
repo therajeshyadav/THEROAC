@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { usePreloader } from "../hooks/usePreloader";
 import apiService from "../services/api";
@@ -24,8 +24,9 @@ import "./AdminDashboard.css";
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const { user: authUser, isAuthenticated, loading: authLoading, logout } = useAuth();
-    const [activeTab, setActiveTab] = useState("dashboard");
+    const [activeTab, setActiveTab] = useState(location.state?.activeTab || "dashboard");
     const [sidebarExpanded, setSidebarExpanded] = useState(false);
     const [notifications] = useState(5);
     const [loading, setLoading] = useState(true);
@@ -70,7 +71,7 @@ const AdminDashboard = () => {
     const handleLogout = async () => {
         try {
             await logout();
-            navigate("/login");
+            window.location.href = '/';
         } catch (error) {
             // Logout failed
         }
@@ -219,7 +220,7 @@ const AdminDashboard = () => {
                 {/* Top Header */}
                 <div className="admin-organizer-header">
                     <div className="admin-header-left">
-                        <div className="admin-logo-section">
+                        <div className="admin-logo-section" onClick={() => window.location.href = '/'} style={{ cursor: 'pointer' }}>
                             <img
                                 src="assets/img/logo/logo5.png"
                                 alt="ROAC Logo"
@@ -246,7 +247,12 @@ const AdminDashboard = () => {
                                 )}
                             </button>
                             <div className="admin-user-profile">
-                                <div className="admin-user-avatar">
+                                <div 
+                                    className="admin-user-avatar"
+                                    onClick={() => setActiveTab('profile')}
+                                    style={{ cursor: 'pointer' }}
+                                    title="View Profile"
+                                >
                                     {authUser?.profilePicture || authUser?.avatar ? (
                                         <img 
                                             src={authUser.profilePicture || authUser.avatar} 

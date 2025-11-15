@@ -1,4 +1,4 @@
-const { HubContent, User } = require('../models');
+const { HubContent, User, HubContentApplication } = require('../models');
 const { Op } = require('sequelize');
 
 exports.createHubContent = async (req, res, next) => {
@@ -192,6 +192,75 @@ exports.getHubContentBySlug = async (req, res, next) => {
     console.error('Error fetching hub content by slug:', err);
     return res.status(500).json({
       error: 'Failed to fetch hub content. Please try again.'
+    });
+  }
+};
+
+// Apply to hub content
+exports.applyToHubContent = async (req, res, next) => {
+  try {
+    const hubContentId = req.params.id;
+    const userId = req.user.id;
+
+    // Check if hub content exists
+    const hubContent = await HubContent.findByPk(hubContentId);
+    if (!hubContent) {
+      return res.status(404).json({ error: 'Hub content not found' });
+    }
+
+    // Check if already applied
+    const existingApplication = await HubContentApplication.findOne({
+      where: { userId, hubContentId }
+    });
+
+    if (existingApplication) {
+      return res.status(400).json({ error: 'Already applied to this content' });
+    }
+
+    // Create application
+    const application = await HubContentApplication.create({
+      userId,
+      hubContentId,
+      status: 'pending'
+    });
+
+    res.status(201).json({
+      success: true,
+      message: 'Successfully applied to hub content',
+      application
+    });
+  } catch (err) {
+    console.error('Error applying to hub content:', err);
+    
+    if (err.name === 'SequelizeUniqueConstraintError') {
+      return res.status(400).json({
+        error: 'You have already applied to this content'
+      });
+    }
+    
+    return res.status(500).json({
+      error: 'Failed to apply. Please try again.'
+    });
+  }
+};
+
+// Check if user has applied to hub content
+exports.checkHubContentApplicationStatus = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.id;
+
+    const application = await HubContentApplication.findOne({
+      where: { userId, hubContentId: id }
+    });
+
+    res.json({ 
+      hasApplied: !!application
+    });
+  } catch (err) {
+    console.error('Error checking hub content application status:', err);
+    return res.status(500).json({
+      error: 'Failed to check application status. Please try again.'
     });
   }
 };

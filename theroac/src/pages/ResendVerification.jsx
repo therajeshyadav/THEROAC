@@ -1,18 +1,26 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import apiService from '../services/api';
 import './Auth.css';
 
 const ResendVerification = () => {
-  const [email, setEmail] = useState('');
+  const [searchParams] = useSearchParams();
+  const emailFromUrl = searchParams.get('email') || '';
+  const [email, setEmail] = useState(emailFromUrl);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const isEmailPrefilled = !!emailFromUrl;
+
+  useEffect(() => {
+    // Update email if URL parameter changes
+    if (emailFromUrl) {
+      setEmail(emailFromUrl);
+    }
+  }, [emailFromUrl]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
 
     try {
       const response = await apiService.resendVerification({ email });
@@ -30,11 +38,20 @@ const ResendVerification = () => {
         }
       );
       
-      // Clear the email field
-      setEmail('');
+      // Clear the email field if not prefilled
+      if (!isEmailPrefilled) {
+        setEmail('');
+      }
     } catch (err) {
-      setError(err.message || 'Failed to send verification email. Please try again.');
-      toast.error(err.message || 'Failed to send verification email. Please try again.');
+      // Only show toast notification, no error box
+      toast.error(err.message || 'Failed to send verification email. Please try again.', {
+        position: "top-center",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
     } finally {
       setLoading(false);
     }
@@ -54,18 +71,14 @@ const ResendVerification = () => {
           <div className="auth-header">
             <h2>Resend Verification</h2>
             <p className="auth-subtitle">
-              Enter your email address and we'll send you a new verification link.
+              {isEmailPrefilled 
+                ? "We'll send a new verification link to your email address."
+                : "Enter your email address and we'll send you a new verification link."
+              }
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="auth-form">
-            {error && (
-              <div className="error-message">
-                <i className="fas fa-exclamation-circle"></i>
-                {error}
-              </div>
-            )}
-
             <div className="form-group has-icon">
               <input
                 type="email"
@@ -75,8 +88,27 @@ const ResendVerification = () => {
                 onChange={handleChange}
                 required
                 disabled={loading}
+                readOnly={isEmailPrefilled}
+                style={isEmailPrefilled ? { 
+                  cursor: 'not-allowed', 
+                  backgroundColor: 'rgba(255, 255, 255, 0.05)' 
+                } : {}}
               />
               <i className="fa-solid fa-envelope input-icon"></i>
+              {isEmailPrefilled && (
+                <i 
+                  className="fa-solid fa-lock" 
+                  style={{ 
+                    position: 'absolute', 
+                    right: '14px', 
+                    top: '50%', 
+                    transform: 'translateY(-50%)', 
+                    color: 'rgba(255, 214, 0, 0.7)',
+                    fontSize: '14px'
+                  }}
+                  title="Email is locked from login attempt"
+                ></i>
+              )}
             </div>
 
             <button type="submit" className="auth-btn" disabled={loading || !email}>

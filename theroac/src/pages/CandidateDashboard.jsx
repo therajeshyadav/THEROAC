@@ -544,7 +544,7 @@ const CandidateDashboard = () => {
                         <div className="header-actions">
                             <button className="notification-btn">
                                 <i className="fas fa-bell"></i>
-                                <span className="notification-badge">3</span>
+                                {/* Notification badge removed - will be dynamic when backend is ready */}
                             </button>
                             <div className="user-menu">
                                 <div 

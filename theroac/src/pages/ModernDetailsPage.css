@@ -1003,3 +1003,133 @@
         font-size: 20px;
     }
 }
+
+/* Reviews Section Styles */
+.reviews-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.reviews-summary {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+}
+
+.rating-overview {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.rating-score {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #FFD600;
+    line-height: 1;
+}
+
+.rating-stars-display {
+    font-size: 1.5rem;
+    color: #FFD600;
+    letter-spacing: 0.25rem;
+}
+
+.rating-count {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.reviews-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.review-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.reviewer-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.reviewer-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #FFD600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1a1a1a;
+    font-weight: 600;
+}
+
+.reviewer-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.reviewer-name {
+    font-weight: 600;
+    color: #fff;
+}
+
+.review-date {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.review-rating {
+    color: #FFD600;
+    font-size: 1rem;
+}
+
+.review-text {
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+/* Responsive Reviews */
+@media (max-width: 768px) {
+    .reviews-summary {
+        padding: 1.5rem;
+    }
+    
+    .rating-score {
+        font-size: 2.5rem;
+    }
+    
+    .rating-stars-display {
+        font-size: 1.25rem;
+    }
+    
+    .review-item {
+        padding: 1rem;
+    }
+    
+    .review-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+}

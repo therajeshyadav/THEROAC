@@ -132,7 +132,7 @@ const ModernDetailsPage = () => {
         }
     }, [type]);
 
-    // Handle scroll to make header sticky after image crosses
+    // Handle scroll to make header sticky and update active tab (scroll spy)
     useEffect(() => {
         const handleScroll = () => {
             // Find the page-content-wrapper element
@@ -145,6 +145,31 @@ const ModernDetailsPage = () => {
             // Make header sticky when hero image is scrolled past
             const shouldBeSticky = scrollTop > heroHeight - 50;
             setIsHeaderSticky(shouldBeSticky);
+            
+            // Scroll spy - find which section is currently in view
+            const config = typeConfig[type];
+            if (config && config.tabs) {
+                const sections = config.tabs.map(tab => ({
+                    id: tab.id,
+                    element: document.getElementById(tab.id)
+                })).filter(s => s.element);
+                
+                // Find the section that's currently most visible
+                let currentSection = activeTab;
+                const viewportTop = pageWrapper.scrollTop + 150; // Offset for header
+                
+                for (let i = sections.length - 1; i >= 0; i--) {
+                    const section = sections[i];
+                    if (section.element.offsetTop <= viewportTop) {
+                        currentSection = section.id;
+                        break;
+                    }
+                }
+                
+                if (currentSection !== activeTab) {
+                    setActiveTab(currentSection);
+                }
+            }
             
             // Dispatch custom event to parent (UnifiedDetailsPage) to show/hide main header
             window.dispatchEvent(new CustomEvent('modernDetailsScroll', { 
@@ -159,26 +184,54 @@ const ModernDetailsPage = () => {
         const pageWrapper = document.querySelector('.page-content-wrapper');
         if (pageWrapper) {
             pageWrapper.addEventListener('scroll', handleScroll);
+            // Initial check
+            handleScroll();
             return () => pageWrapper.removeEventListener('scroll', handleScroll);
         }
-    }, [activeTab]);
+    }, [activeTab, type]);
 
     // Scroll to section
     const scrollToSection = (sectionId) => {
+        console.log('Scrolling to section:', sectionId); // Debug log
+        
+        // Update active tab immediately for better UX
+        setActiveTab(sectionId);
+        
         const section = document.getElementById(sectionId);
-        if (section && contentRef.current) {
-            const containerRect = contentRef.current.getBoundingClientRect();
+        const pageWrapper = document.querySelector('.page-content-wrapper');
+        
+        if (!section) {
+            console.error('Section not found:', sectionId);
+            return;
+        }
+        
+        if (pageWrapper) {
+            // Calculate the absolute position of the section
+            const pageWrapperRect = pageWrapper.getBoundingClientRect();
             const sectionRect = section.getBoundingClientRect();
-            const scrollTop = contentRef.current.scrollTop;
-            const targetScrollTop = scrollTop + sectionRect.top - containerRect.top - 20;
-
-            contentRef.current.scrollTo({
-                top: targetScrollTop,
+            const currentScroll = pageWrapper.scrollTop;
+            
+            // Calculate target scroll position
+            const targetScroll = currentScroll + sectionRect.top - pageWrapperRect.top - 100;
+            
+            console.log('Current scroll:', currentScroll, 'Target scroll:', targetScroll); // Debug log
+            
+            pageWrapper.scrollTo({
+                top: targetScroll,
                 behavior: 'smooth'
             });
+        } else {
+            console.error('Page wrapper not found');
         }
-        setActiveTab(sectionId);
     };
+
+    // Make scrollToSection available globally for UnifiedDetailsPage
+    useEffect(() => {
+        window.modernDetailsScrollToSection = scrollToSection;
+        return () => {
+            delete window.modernDetailsScrollToSection;
+        };
+    }, []);
 
     // Tab configuration
     const typeConfig = {
@@ -800,37 +853,42 @@ const ModernDetailsPage = () => {
                         <div id="prizes" className="details-section">
                             <h2 className="section-title">Rewards and Prizes</h2>
                             <div className="details-content">
-                                <p className="details-description">{data.prizes.winner || 'Prize details coming soon'}</p>
+                                <p className="details-description">{data.prizes.winner || 'No data'}</p>
                             </div>
                         </div>
                     )}
 
-                    {/* Similar Opportunities Section */}
-                    <div id="similar" className="details-section">
-                        <h2 className="section-title">Similar Opportunities</h2>
-                        <div className="similar-grid">
-                            <p className="details-description">Loading similar opportunities...</p>
-                        </div>
-                    </div>
-
-                    {/* Feedback & Rating Section */}
-                    <div id="feedback" className="details-section">
-                        <h2 className="section-title">Feedback & rating</h2>
-                        <div className="feedback-form">
-                            <textarea 
-                                className="feedback-textarea"
-                                placeholder="Write a feedback"
-                                rows="4"
-                            ></textarea>
-                            <div className="feedback-actions">
-                                <div className="rating-stars">
-                                    {[1, 2, 3, 4, 5].map((star) => (
-                                        <button key={star} className="star-btn">
-                                            ⭐
-                                        </button>
-                                    ))}
+                    {/* Reviews Section */}
+                    <div id="reviews" className="details-section">
+                        <h2 className="section-title">Reviews</h2>
+                        <div className="details-content">
+                            <div className="reviews-container">
+                                {/* Reviews will be loaded from backend when available */}
+                                <div className="reviews-list">
+                                    <p className="no-details-message">No reviews yet. Be the first to review!</p>
                                 </div>
-                                <button className="feedback-submit-btn">Enter</button>
+
+                                {/* Add Review Form - Only show if user is authenticated */}
+                                {isAuthenticated && (
+                                    <div className="feedback-form">
+                                        <h3 className="subsection-title">Write a Review</h3>
+                                        <textarea 
+                                            className="feedback-textarea"
+                                            placeholder="Share your experience..."
+                                            rows="4"
+                                        ></textarea>
+                                        <div className="feedback-actions">
+                                            <div className="rating-stars">
+                                                {[1, 2, 3, 4, 5].map((star) => (
+                                                    <button key={star} className="star-btn">
+                                                        ⭐
+                                                    </button>
+                                                ))}
+                                            </div>
+                                            <button className="feedback-submit-btn">Submit Review</button>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -839,7 +897,7 @@ const ModernDetailsPage = () => {
                     <div id="faqs" className="details-section">
                         <h2 className="section-title">FAQs & Discussions</h2>
                         <div className="details-content">
-                            <p className="details-description">No discussions yet. Start a conversation!</p>
+                            <p className="no-details-message">No data</p>
                         </div>
                     </div>
 

@@ -537,17 +537,43 @@ const UnifiedDetailsPage = () => {
     }, [data?.id, type, isAuthenticated]);
 
     const scrollToSection = (sectionId) => {
+        console.log('UnifiedDetailsPage - Scrolling to section:', sectionId); // Debug log
+        
+        // Try to use ModernDetailsPage's scroll function if available
+        if (window.modernDetailsScrollToSection) {
+            window.modernDetailsScrollToSection(sectionId);
+            return;
+        }
+        
+        // Fallback to direct scroll
         const section = document.getElementById(sectionId);
-        if (section && leftContentRef.current) {
-            const containerRect = leftContentRef.current.getBoundingClientRect();
+        const pageWrapper = document.querySelector('.page-content-wrapper');
+        
+        if (!section) {
+            console.error('Section not found:', sectionId);
+            return;
+        }
+        
+        if (pageWrapper) {
+            // Update active tab
+            setActiveTab(sectionId);
+            
+            // Calculate the absolute position of the section
+            const pageWrapperRect = pageWrapper.getBoundingClientRect();
             const sectionRect = section.getBoundingClientRect();
-            const scrollTop = leftContentRef.current.scrollTop;
-            const targetScrollTop = scrollTop + sectionRect.top - containerRect.top - 20;
-
-            leftContentRef.current.scrollTo({
-                top: targetScrollTop,
+            const currentScroll = pageWrapper.scrollTop;
+            
+            // Calculate target scroll position
+            const targetScroll = currentScroll + sectionRect.top - pageWrapperRect.top - 100;
+            
+            console.log('Scrolling to:', targetScroll); // Debug log
+            
+            pageWrapper.scrollTo({
+                top: targetScroll,
                 behavior: 'smooth'
             });
+        } else {
+            console.error('Page wrapper not found');
         }
     };
 
@@ -838,7 +864,7 @@ const UnifiedDetailsPage = () => {
                             <>
                                 <button className="notification-btn">
                                     <Bell className="w-5 h-5" />
-                                    <span className="notification-badge">3</span>
+                                    {/* Notification badge removed - will be dynamic when backend is ready */}
                                 </button>
                                 <div 
                                     className="profile-avatar"

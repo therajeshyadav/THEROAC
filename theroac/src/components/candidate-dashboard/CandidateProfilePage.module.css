@@ -1,0 +1,227 @@
+.page {
+  padding: 30px;
+  color: #ffffff;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+}
+
+/* ---------- COVER ---------- */
+.cover {
+  background: linear-gradient(135deg, #050608, #16131a);
+  border-radius: 20px;
+  padding: 24px 28px;
+  border: 1px solid rgba(255, 214, 0, 0.22);
+  box-shadow: 0 0 26px rgba(255, 214, 0, 0.18);
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.coverLeft {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+}
+
+.avatar {
+  width: 86px;
+  height: 86px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #ffd600, #ff8a00);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1a1719;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.75);
+}
+
+.userInfo h2 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.userInfo p {
+  margin: 2px 0;
+}
+
+.coverRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.muted {
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.85rem;
+}
+
+/* buttons */
+.primaryBtn {
+  background: #ffd600;
+  color: #1a1719;
+  border-radius: 999px;
+  border: none;
+  padding: 8px 20px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.cancelBtn {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.9);
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  padding: 8px 18px;
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.actionRow {
+  display: flex;
+  gap: 10px;
+}
+
+/* inputs */
+.inputBig {
+  width: 100%;
+  padding: 8px 10px;
+  margin-bottom: 4px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 214, 0, 0.4);
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  font-size: 1rem;
+}
+
+.input {
+  width: 100%;
+  padding: 7px 10px;
+  margin-top: 4px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 214, 0, 0.35);
+  background: rgba(255, 255, 255, 0.04);
+  color: #fff;
+  font-size: 0.9rem;
+}
+
+.textarea {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 214, 0, 0.35);
+  background: rgba(255, 255, 255, 0.04);
+  color: #fff;
+  padding: 10px 12px;
+  font-size: 0.9rem;
+  resize: vertical;
+}
+
+/* ---------- sections ---------- */
+.section {
+  margin-top: 28px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 18px;
+  border: 1px solid rgba(255, 214, 0, 0.18);
+  padding: 18px 20px;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.sectionHeader h3 {
+  color: #ffd600;
+  font-size: 1rem;
+}
+
+.sectionBody {
+  font-size: 0.9rem;
+}
+
+.text {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.textSmall {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+}
+
+.mutedSmall {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.8rem;
+}
+
+/* ---------- skills ---------- */
+.skillInputRow {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.skillWrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.skill {
+  background: rgba(255, 214, 0, 0.1);
+  border: 1px solid rgba(255, 214, 0, 0.6);
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 0.8rem;
+  color: #ffd600;
+  cursor: pointer;
+}
+
+/* ---------- cards (experience / education) ---------- */
+.cardRow {
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 214, 0, 0.22);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+
+.smallRemove {
+  margin-top: 8px;
+  background: transparent;
+  border: none;
+  color: #ff6b6b;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.linkBtn {
+  background: none;
+  border: none;
+  color: #ffd600;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+/* resume */
+.resumeRow {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* responsive */
+@media (max-width: 768px) {
+  .cover {
+    align-items: flex-start;
+  }
+
+  .coverRight {
+    align-items: flex-start;
+  }
+}

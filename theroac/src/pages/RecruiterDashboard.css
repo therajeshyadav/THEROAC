@@ -2006,3 +2006,18 @@ select::-ms-expand {
         box-shadow: 0 4px 25px rgba(255, 214, 0, 0.5);
     }
 }
+
+/* Clickable stat cards */
+/* .stat-card.clickable {
+  transition: all 0.3s ease;
+}
+
+.stat-card.clickable:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(255, 214, 0, 0.3);
+  border-color: rgba(255, 214, 0, 0.5);
+}
+
+.stat-card.clickable:active {
+  transform: translateY(-2px);
+} */

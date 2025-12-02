@@ -1,11 +1,11 @@
 // src/components/candidate-dashboard/DashboardTabs.jsx
-import React from 'react';
-import HomeTab from './HomeTab';
-import JobsTab from './JobsTab';
-import EventsTab from './EventsTab';
-import PrimeHubTab from './PrimeHubTab';
-import ApplicationsTab from './ApplicationsTab';
-import ProfileTab from './ProfileTab';
+import React from "react";
+import HomeTab from "./HomeTab";
+import JobsTab from "./JobsTab";
+import EventsTab from "./EventsTab";
+import PrimeHubTab from "./PrimeHubTab";
+import ApplicationsTab from "./ApplicationsTab";
+import ProfileTab from "./CandidateProfilePage";
 
 const DashboardTabs = ({
   activeTab,
@@ -31,9 +31,9 @@ const DashboardTabs = ({
   onSaveProfile,
   onCancelEdit,
   onProfileInputChange,
-  setActiveTab
+  setActiveTab,
 }) => {
-  if (activeTab === 'internships') {
+  if (activeTab === "internships") {
     return (
       <HomeTab
         quickStats={quickStats}
@@ -42,15 +42,18 @@ const DashboardTabs = ({
         jobs={jobs}
         dashboardStats={dashboardStats}
         appliedItems={appliedItems}
+        authUser={authUser}
+        profileCompletion={profileCompletion}
         getStatusColor={getStatusColor}
         onApplyJob={onApplyJob}
         onViewJobDetails={onViewJobDetails}
         onViewEventDetails={onViewEventDetails}
+        setActiveTab={setActiveTab}
       />
     );
   }
 
-  if (activeTab === 'jobs') {
+  if (activeTab === "jobs") {
     return (
       <JobsTab
         jobs={jobs}
@@ -62,7 +65,7 @@ const DashboardTabs = ({
     );
   }
 
-  if (activeTab === 'events') {
+  if (activeTab === "events") {
     return (
       <EventsTab
         events={events}
@@ -73,7 +76,7 @@ const DashboardTabs = ({
     );
   }
 
-  if (activeTab === 'prime-hub') {
+  if (activeTab === "prime-hub") {
     return (
       <PrimeHubTab
         hubContent={hubContent}
@@ -85,7 +88,7 @@ const DashboardTabs = ({
     );
   }
 
-  if (activeTab === 'applications') {
+  if (activeTab === "applications") {
     return (
       <ApplicationsTab
         applications={applications}
@@ -95,17 +98,11 @@ const DashboardTabs = ({
     );
   }
 
-  if (activeTab === 'profile') {
+  if (activeTab === "profile") {
     return (
       <ProfileTab
-        authUser={authUser}
-        profileCompletion={profileCompletion}
-        isEditingProfile={isEditingProfile}
-        profileData={profileData}
-        onEditProfile={onEditProfile}
+        initialProfile={authUser}
         onSaveProfile={onSaveProfile}
-        onCancelEdit={onCancelEdit}
-        onProfileInputChange={onProfileInputChange}
       />
     );
   }

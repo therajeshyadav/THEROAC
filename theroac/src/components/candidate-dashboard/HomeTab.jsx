@@ -8,13 +8,55 @@ const HomeTab = ({
   jobs,
   dashboardStats,
   appliedItems,
+  authUser,
+  profileCompletion = 0,
   getStatusColor,
   onApplyJob,
   onViewJobDetails,
-  onViewEventDetails
+  onViewEventDetails,
+  setActiveTab
 }) => {
   return (
     <div className="tab-content">
+      {/* Profile Completion Banner */}
+      {profileCompletion < 100 && (
+        <div className="profile-completion-banner mb-4">
+          <div className="completion-content">
+            <div className="completion-text">
+              <h5>Complete Your Profile</h5>
+              <p>A complete profile increases your chances of getting hired by {100 - profileCompletion}%</p>
+            </div>
+            <div className="completion-progress">
+              <div className="progress-circle">
+                <svg width="80" height="80">
+                  <circle cx="40" cy="40" r="35" fill="none" stroke="#e0e0e0" strokeWidth="6" />
+                  <circle 
+                    cx="40" 
+                    cy="40" 
+                    r="35" 
+                    fill="none" 
+                    stroke="#FFD600" 
+                    strokeWidth="6"
+                    strokeDasharray={`${2 * Math.PI * 35}`}
+                    strokeDashoffset={`${2 * Math.PI * 35 * (1 - profileCompletion / 100)}`}
+                    transform="rotate(-90 40 40)"
+                  />
+                  <text x="40" y="45" textAnchor="middle" fontSize="18" fontWeight="bold" fill="#FFD600">
+                    {profileCompletion}%
+                  </text>
+                </svg>
+              </div>
+              <button 
+                className="btn btn-primary"
+                onClick={() => setActiveTab && setActiveTab('profile')}
+              >
+                Complete Profile
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Quick Stats */}
       <div className="stats-grid mb-4">
         {quickStats.map((stat, index) => (

@@ -256,6 +256,7 @@ const RecruiterDashboard = () => {
                   }
                   getUserInitials={getUserInitials}
                   onOpenModal={handleOpenModal}
+                  onTabChange={setActiveTab}
                 />
               )}
 

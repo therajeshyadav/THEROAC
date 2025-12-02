@@ -145,6 +145,7 @@ exports.me = async (req, res, next) => {
     const userResponse = {
       id: user.id,
       name: user.fullName,
+      fullName: user.fullName,
       email: user.email,
       phone: user.phone,
       city: user.city,
@@ -153,6 +154,14 @@ exports.me = async (req, res, next) => {
       bio: user.bio,
       role: user.role,
       isVerified: user.isVerified,
+      // Profile fields
+      headline: user.headline,
+      location: user.location,
+      about: user.about,
+      resumePath: user.resumePath,
+      skills: user.skills || [],
+      experiences: user.experiences || [],
+      education: user.education || [],
     };
 
     res.json(userResponse);

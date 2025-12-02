@@ -36,7 +36,15 @@ User.init({
   deviceInfo: { type: DataTypes.JSON, allowNull: true },
   signupSource: { type: DataTypes.ENUM('website','mobile-app','referral','campaign'), defaultValue: 'website' },
   referralCode: { type: DataTypes.STRING, allowNull: true },
-  referredBy: { type: DataTypes.UUID, allowNull: true }
+  referredBy: { type: DataTypes.UUID, allowNull: true },
+  // Profile fields
+  headline: { type: DataTypes.STRING, allowNull: true },
+  location: { type: DataTypes.STRING, allowNull: true },
+  about: { type: DataTypes.TEXT, allowNull: true },
+  resumePath: { type: DataTypes.STRING, allowNull: true },
+  skills: { type: DataTypes.JSON, defaultValue: [] },
+  experiences: { type: DataTypes.JSON, defaultValue: [] },
+  education: { type: DataTypes.JSON, defaultValue: [] }
 }, {
   sequelize,
   modelName: 'User',

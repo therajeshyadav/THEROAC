@@ -33,6 +33,7 @@ const DashboardTab = ({
   onChangePage,
   getUserInitials,
   onOpenModal,
+  onTabChange,
 }) => {
   const [showHostDropdown, setShowHostDropdown] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
@@ -61,6 +62,29 @@ const DashboardTab = ({
     return `M${points.join(" L")}`;
   };
 
+  const handleStatCardClick = (title) => {
+    switch (title) {
+      case "Total Candidates":
+        // Scroll to candidates table on same page
+        const candidatesSection = document.querySelector('.candidates-management-section');
+        if (candidatesSection) {
+          candidatesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        break;
+      case "Active Events":
+        if (onTabChange) onTabChange("festivals"); // Festivals tab
+        break;
+      case "Active Job & Internships":
+        if (onTabChange) onTabChange("jobs"); // Jobs & Internships tab
+        break;
+      case "Active Assessments":
+        if (onTabChange) onTabChange("assessments"); // Assessments tab (coming soon)
+        break;
+      default:
+        break;
+    }
+  };
+
   const getStatsData = () => {
     if (!stats) {
       return [
@@ -69,6 +93,7 @@ const DashboardTab = ({
           value: "0",
           icon: Users,
           color: "blue",
+          clickable: true,
           details: [
             { label: "Active Applications", value: "0" },
             { label: "New This Week", value: "0" },
@@ -79,16 +104,18 @@ const DashboardTab = ({
           value: "0",
           icon: Briefcase,
           color: "pink",
+          clickable: true,
           details: [
             { label: "Total", value: "0" },
             { label: "Registrations", value: "0" },
           ],
         },
         {
-          title: "Active Opportunities",
+          title: "Active Job & Internships",
           value: "0",
           icon: Trophy,
           color: "yellow",
+          clickable: true,
           details: [
             { label: "Total", value: "0" },
             { label: "Applications", value: "0" },
@@ -99,6 +126,7 @@ const DashboardTab = ({
           value: "0",
           icon: ClipboardCheck,
           color: "orange",
+          clickable: true,
           details: [{ label: "Upgrade to unlock", value: "" }],
         },
       ];
@@ -110,6 +138,7 @@ const DashboardTab = ({
         value: stats.totalCandidates.toString(),
         icon: Users,
         color: "blue",
+        clickable: true,
         details: [
           {
             label: "Active Applications",
@@ -126,6 +155,7 @@ const DashboardTab = ({
         value: stats.activeEvents.toString(),
         icon: Briefcase,
         color: "pink",
+        clickable: true,
         details: [
           { label: "Total", value: stats.activeEvents.toString() },
           {
@@ -135,10 +165,11 @@ const DashboardTab = ({
         ],
       },
       {
-        title: "Active Opportunities",
+        title: "Active Job & Internships",
         value: stats.activeOpportunities.toString(),
         icon: Trophy,
         color: "yellow",
+        clickable: true,
         details: [
           { label: "Total", value: stats.activeOpportunities.toString() },
           {
@@ -152,6 +183,7 @@ const DashboardTab = ({
         value: "0",
         icon: ClipboardCheck,
         color: "orange",
+        clickable: true,
         details: [{ label: "Upgrade to unlock", value: "" }],
       },
     ];
@@ -275,7 +307,12 @@ const DashboardTab = ({
       {/* Stats Cards */}
       <div className="stats-grid">
         {getStatsData().map((stat, index) => (
-          <div key={index} className={`stat-card ${stat.color} enhanced-card`}>
+          <div 
+            key={index} 
+            className={`stat-card ${stat.color} enhanced-card ${stat.clickable ? 'clickable' : ''}`}
+            onClick={() => stat.clickable && handleStatCardClick(stat.title)}
+            style={{ cursor: stat.clickable ? 'pointer' : 'default' }}
+          >
             <div className="stat-icon-row">
               <div className="stat-icon">
                 <stat.icon className="w-6 h-6" />

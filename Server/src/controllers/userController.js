@@ -33,6 +33,8 @@ exports.updateProfile = async (req, res, next) => {
       return res.status(401).json({ success: false, error: 'Unauthorized: User not found.' });
     }
 
+    console.log('Update profile request body:', req.body);
+
     const allowedFields = [
       'fullName',
       'username',
@@ -43,14 +45,39 @@ exports.updateProfile = async (req, res, next) => {
       'country',
       'preferences',
       'profilePicture',
+      'headline',
+      'location',
+      'about',
+      'resumePath',
+      'skills',
+      'experiences',
+      'education',
     ];
 
     const updates = {};
     for (const field of allowedFields) {
       if (req.body[field] !== undefined && req.body[field] !== null) {
-        updates[field] = req.body[field];
+        // Parse JSON strings for array fields
+        if (['skills', 'experiences', 'education'].includes(field)) {
+          if (typeof req.body[field] === 'string') {
+            try {
+              updates[field] = JSON.parse(req.body[field]);
+            } catch (e) {
+              updates[field] = req.body[field];
+            }
+          } else {
+            // Already an array
+            updates[field] = req.body[field];
+          }
+        } else {
+          // For text fields, only update if not empty string
+          // Empty strings will be stored as-is (not converted to null)
+          updates[field] = req.body[field];
+        }
       }
     }
+
+    console.log('Updates to be applied:', updates);
 
     // Check if phone number is being updated and if it already exists for another user
     if (updates.phone) {

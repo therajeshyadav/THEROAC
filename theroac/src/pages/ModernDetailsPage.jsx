@@ -694,7 +694,7 @@ const ModernDetailsPage = () => {
                     </div>
 
                     {/* Important Dates & Deadlines Section */}
-                    <div id="dates" className="details-section">
+                    {/* <div id="dates" className="details-section">
                         <h2 className="section-title">Important dates & deadlines</h2>
                         <div className="deadline-list">
                             <div className="deadline-item">
@@ -710,7 +710,7 @@ const ModernDetailsPage = () => {
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> */}
 
                     {/* Additional Information Section - Job/Internship specific */}
                     {(type === 'jobs' || type === 'internships') && (

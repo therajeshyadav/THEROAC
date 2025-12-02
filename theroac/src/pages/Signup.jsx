@@ -10,7 +10,6 @@ const Signup = () => {
   const { register } = useAuth();
   const userType = searchParams.get('type') || 'candidate';
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -54,16 +53,17 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
 
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match!');
+      toast.error('Passwords do not match!', {
+        position: "top-center",
+        autoClose: 3000,
+      });
       return;
     }
 
     // Validate phone number - must be exactly 10 digits
     if (formData.phone.length !== 10) {
-      setError('Phone number must be exactly 10 digits');
       toast.error('Phone number must be exactly 10 digits', {
         position: "top-center",
         autoClose: 3000,
@@ -140,10 +140,16 @@ const Signup = () => {
           }
         }
       } else {
-        setError(result.error || 'Registration failed');
+        toast.error(result.error || 'Registration failed', {
+          position: "top-center",
+          autoClose: 3000,
+        });
       }
     } catch (err) {
-      setError('Registration failed. Please try again.');
+      toast.error('Registration failed. Please try again.', {
+        position: "top-center",
+        autoClose: 3000,
+      });
     } finally {
       setLoading(false);
     }
@@ -176,13 +182,6 @@ const Signup = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="auth-form signup-form">
-            {error && (
-              <div className="error-message">
-                <i className="fas fa-exclamation-circle"></i>
-                {error}
-              </div>
-            )}
-
             <div className="form-row">
               <div className="form-group">
                 <input

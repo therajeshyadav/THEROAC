@@ -418,7 +418,7 @@ const RecruiterDashboard = () => {
               <div className="user-profile">
                 <div 
                   className="user-avatar"
-                  onClick={() => setActiveTab('profile')}
+                  onClick={() => setActiveTab('settings')}
                   style={{ cursor: 'pointer' }}
                   title="View Profile"
                 >

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Building, MapPin, Calendar, Briefcase, Clock, Heart, Share2, Bookmark, Award, Wallet, Bell } from 'lucide-react';
+import { Building, MapPin, Calendar, Briefcase, Clock, Heart, Share2, Bookmark, Award, Wallet, Bell, LogOut, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import apiService from '../services/api';
 import { extractIdFromSlug, createSEOSlug, parseSlugForLookup } from '../utils/urlUtils';
@@ -38,6 +38,7 @@ const UnifiedDetailsPage = () => {
     const [isApplying, setIsApplying] = useState(false);
     const [hasApplied, setHasApplied] = useState(false);
     const [checkingStatus, setCheckingStatus] = useState(true);
+    const [preloaderVisible, setPreloaderVisible] = useState(true);
 
     // Check application status from backend (user-specific)
     useEffect(() => {
@@ -383,6 +384,8 @@ const UnifiedDetailsPage = () => {
         const fetchData = async () => {
             if (!type || !slug) return;
 
+            setPreloaderVisible(true); // Show preloader when fetching starts
+
             try {
                 let fetchedData = null;
 
@@ -415,6 +418,7 @@ const UnifiedDetailsPage = () => {
                         }
                         break;
                     default:
+                        setPreloaderVisible(false);
                         return;
                 }
 
@@ -441,6 +445,9 @@ const UnifiedDetailsPage = () => {
                 // Error fetching data
                 console.error(`Error fetching ${type}:`, error);
                 setData(null);
+            } finally {
+                // Hide preloader after data is loaded or error occurs
+                setTimeout(() => setPreloaderVisible(false), 500); // Small delay for smooth transition
             }
 
             setActiveTab(typeConfig[type]?.defaultTab || '');
@@ -836,8 +843,26 @@ const UnifiedDetailsPage = () => {
     };
 
     return (
-        <div className="details-page unified-details-page">
-            <div className={`top-nav ${isHeaderSticky ? 'sticky visible' : 'hidden'}`}>
+        <>
+            {preloaderVisible && (
+                <div className="preloader">
+                    <div className="loading-container">
+                        <div className="loading"></div>
+                        <div id="loading-icon">
+                            <img src="/assets/img/logo/preloader.png" alt="" />
+                        </div>
+                    </div>
+                </div>
+            )}
+            <div className="paginacontainer">
+                <div className="progress-wrap warp2">
+                    <svg className="progress-circle svg-content" width="100%" height="100%" viewBox="-1 -1 102 102">
+                        <path d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98" />
+                    </svg>
+                </div>
+            </div>
+            <div className="details-page unified-details-page">
+                <div className={`top-nav visible ${isHeaderSticky ? 'sticky' : ''}`}>
                 <div className="nav-container">
                     <div className="nav-left">
                         <div className="site-logo" onClick={() => window.location.href = '/'} style={{ cursor: 'pointer' }}>
@@ -861,39 +886,33 @@ const UnifiedDetailsPage = () => {
                     </div>
                     <div className="nav-right">
                         {isAuthenticated && user ? (
-                            <>
-                                <button className="notification-btn">
-                                    <Bell className="w-5 h-5" />
-                                    {/* Notification badge removed - will be dynamic when backend is ready */}
-                                </button>
-                                <div 
-                                    className="profile-avatar"
+                            <div className="auth-buttons">
+                                <button 
+                                    className="dashboard-btn"
                                     onClick={() => {
-                                        // Redirect to profile tab in appropriate dashboard
+                                        // Redirect to appropriate dashboard
                                         if (user.role === 'admin') {
-                                            navigate('/admin-dashboard', { state: { activeTab: 'profile' } });
+                                            navigate('/admin-dashboard');
                                         } else if (user.role === 'recruiter') {
-                                            navigate('/recruiter-dashboard', { state: { activeTab: 'profile' } });
+                                            navigate('/recruiter-dashboard');
                                         } else {
-                                            navigate('/candidate-dashboard', { state: { activeTab: 'profile' } });
+                                            navigate('/candidate-dashboard');
                                         }
                                     }}
-                                    style={{ cursor: 'pointer' }}
-                                    title="View Profile"
                                 >
-                                    {user.profilePicture || user.avatar ? (
-                                        <img 
-                                            src={user.profilePicture || user.avatar} 
-                                            alt={user.name || user.firstName || 'User'} 
-                                            className="profile-image"
-                                        />
-                                    ) : (
-                                        <span className="profile-initials">
-                                            {(user.name || user.firstName || user.email || 'U').charAt(0).toUpperCase()}
-                                        </span>
-                                    )}
-                                </div>
-                            </>
+                                    Dashboard
+                                </button>
+                                <button 
+                                    className="logout-btn"
+                                    onClick={() => {
+                                        // Logout and redirect to home
+                                        localStorage.removeItem('token');
+                                        window.location.href = '/';
+                                    }}
+                                >
+                                    Logout
+                                </button>
+                            </div>
                         ) : (
                             <div className="auth-buttons">
                                 <button 
@@ -987,48 +1006,51 @@ const UnifiedDetailsPage = () => {
                             <span className="price">{getPriceDisplay()}</span>
                         </div>
 
-                        <button
-                            className={`apply-button ${hasApplied ? 'applied' : ''}`}
-                            onClick={handleApply}
-                            disabled={isApplying || hasApplied || checkingStatus}
-                            style={{
-                                opacity: (isApplying || checkingStatus) ? 0.8 : hasApplied ? 0.7 : 1,
-                                cursor: (isApplying || hasApplied || checkingStatus) ? 'not-allowed' : 'pointer',
-                                backgroundColor: hasApplied ? '#28a745' : '',
-                                borderColor: hasApplied ? '#28a745' : ''
-                            }}
-                        >
-                            {checkingStatus ? (
-                                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                                    <span style={{ 
-                                        width: '16px', 
-                                        height: '16px', 
-                                        border: '2px solid #1A1719', 
-                                        borderTop: '2px solid transparent', 
-                                        borderRadius: '50%', 
-                                        animation: 'spin 1s linear infinite' 
-                                    }}></span>
-                                    Checking...
-                                </span>
-                            ) : isApplying ? (
-                                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                                    <span style={{ 
-                                        width: '16px', 
-                                        height: '16px', 
-                                        border: '2px solid #1A1719', 
-                                        borderTop: '2px solid transparent', 
-                                        borderRadius: '50%', 
-                                        animation: 'spin 1s linear infinite' 
-                                    }}></span>
-                                    Applying...
-                                </span>
-                            ) : hasApplied ? (
-                                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                                    <span style={{ color: 'white' }}>✓</span>
-                                    Applied
-                                </span>
-                            ) : 'Quick Apply'}
-                        </button>
+                        {/* Only show apply button for candidates (not recruiters or admins) */}
+                        {(!user || user.role === 'candidate') && (
+                            <button
+                                className={`apply-button ${hasApplied ? 'applied' : ''}`}
+                                onClick={handleApply}
+                                disabled={isApplying || hasApplied || checkingStatus}
+                                style={{
+                                    opacity: (isApplying || checkingStatus) ? 0.8 : hasApplied ? 0.7 : 1,
+                                    cursor: (isApplying || hasApplied || checkingStatus) ? 'not-allowed' : 'pointer',
+                                    backgroundColor: hasApplied ? '#28a745' : '',
+                                    borderColor: hasApplied ? '#28a745' : ''
+                                }}
+                            >
+                                {checkingStatus ? (
+                                    <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                                        <span style={{ 
+                                            width: '16px', 
+                                            height: '16px', 
+                                            border: '2px solid #1A1719', 
+                                            borderTop: '2px solid transparent', 
+                                            borderRadius: '50%', 
+                                            animation: 'spin 1s linear infinite' 
+                                        }}></span>
+                                        Checking...
+                                    </span>
+                                ) : isApplying ? (
+                                    <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                                        <span style={{ 
+                                            width: '16px', 
+                                            height: '16px', 
+                                            border: '2px solid #1A1719', 
+                                            borderTop: '2px solid transparent', 
+                                            borderRadius: '50%', 
+                                            animation: 'spin 1s linear infinite' 
+                                        }}></span>
+                                        Applying...
+                                    </span>
+                                ) : hasApplied ? (
+                                    <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                                        <span style={{ color: 'white' }}>✓</span>
+                                        Applied
+                                    </span>
+                                ) : 'Quick Apply'}
+                            </button>
+                        )}
 
                         <div className="stats-section individual">
                             {/* Show different stats based on type */}
@@ -1054,7 +1076,7 @@ const UnifiedDetailsPage = () => {
                                         </div>
                                     </div>
 
-                                    <div className="stat-item-individual">
+                                    {/* <div className="stat-item-individual">
                                         <div className="stat-icon">
                                             <Share2 size={20} />
                                         </div>
@@ -1062,7 +1084,7 @@ const UnifiedDetailsPage = () => {
                                             <span className="stat-label">Impressions</span>
                                             <span className="stat-number">{data.impressions?.toLocaleString()}</span>
                                         </div>
-                                    </div>
+                                    </div> */}
 
                                     <div className="stat-item-individual">
                                         <div className="stat-icon">
@@ -1097,7 +1119,7 @@ const UnifiedDetailsPage = () => {
                                             <span className="stat-number">{data.experience}</span>
                                         </div>
                                     </div>
-
+{/* 
                                     <div className="stat-item-individual">
                                         <div className="stat-icon">
                                             <Share2 size={20} />
@@ -1106,7 +1128,7 @@ const UnifiedDetailsPage = () => {
                                             <span className="stat-label">Impressions</span>
                                             <span className="stat-number">{data.impressions?.toLocaleString()}</span>
                                         </div>
-                                    </div>
+                                    </div> */}
 
                                     <div className="stat-item-individual">
                                         <div className="stat-icon">
@@ -1142,7 +1164,7 @@ const UnifiedDetailsPage = () => {
                                         </div>
                                     </div>
 
-                                    <div className="stat-item-individual">
+                                    {/* <div className="stat-item-individual">
                                         <div className="stat-icon">
                                             <Share2 size={20} />
                                         </div>
@@ -1150,7 +1172,7 @@ const UnifiedDetailsPage = () => {
                                             <span className="stat-label">Impressions</span>
                                             <span className="stat-number">{data.impressions?.toLocaleString()}</span>
                                         </div>
-                                    </div>
+                                    </div> */}
 
                                     <div className="stat-item-individual">
                                         <div className="stat-icon">
@@ -1167,7 +1189,7 @@ const UnifiedDetailsPage = () => {
                     </div>
 
                     {/* Details Card */}
-                    <div className="info-card compact">
+                    {/* <div className="info-card compact">
                         <h3 className="card-title">
                             <Briefcase size={16} />
                             {type === 'jobs' ? 'Job Details' : type === 'internships' ? 'Internship Details' : 'Event Details'}
@@ -1215,7 +1237,7 @@ const UnifiedDetailsPage = () => {
                                 <span className="info-value">{data.location}</span>
                             </div>
                         </div>
-                    </div>
+                    </div> */}
 
                     {/* Eligibility Card */}
                     <div className="info-card compact">
@@ -1266,6 +1288,7 @@ const UnifiedDetailsPage = () => {
             {/* End Page Content Wrapper */}
             </div>
         </div>
+        </>
     );
 };
 

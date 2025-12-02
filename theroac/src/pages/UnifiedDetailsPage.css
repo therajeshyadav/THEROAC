@@ -239,7 +239,9 @@
 }
 
 .details-page .login-btn,
-.details-page .signup-btn {
+.details-page .signup-btn,
+.details-page .dashboard-btn,
+.details-page .logout-btn {
   color: var(--ztc-text-text-2);
   font-family: var(--ztc-family-font1);
   font-size: 16px;
@@ -253,6 +255,16 @@
   border: none;
   text-decoration: none;
   display: inline-block;
+  transition: all 0.3s ease;
+}
+
+.details-page .login-btn:hover,
+.details-page .signup-btn:hover,
+.details-page .dashboard-btn:hover,
+.details-page .logout-btn:hover {
+  background: #FFC107;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 214, 0, 0.3);
 }
 
 .details-page .profile-initials {

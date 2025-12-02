@@ -15,7 +15,6 @@ const Login = () => {
     rememberMe: false
   });
   const [submitLoading, setSubmitLoading] = useState(false);
-  const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const preloaderVisible = usePreloader(300);
 
@@ -36,7 +35,6 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitLoading(true);
-    setError('');
     
     try {
       const result = await login({

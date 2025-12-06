@@ -37,7 +37,29 @@ const DashboardTab = ({
 }) => {
   const [showHostDropdown, setShowHostDropdown] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
+  const [heatmapData, setHeatmapData] = useState(null);
+  const [chartPeriod, setChartPeriod] = useState('year');
   const hostButtonRef = useRef(null);
+  
+  // Fetch activity heatmap data
+  useEffect(() => {
+    const fetchHeatmap = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000/api';
+        const response = await fetch(`${API_URL}/dashboard/activity-heatmap`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setHeatmapData(data.heatmap);
+        }
+      } catch (error) {
+        console.error('Failed to fetch heatmap:', error);
+      }
+    };
+    fetchHeatmap();
+  }, []);
 
   const getAnalyticsData = () => {
     if (!analytics?.monthlyData) {
@@ -47,14 +69,39 @@ const DashboardTab = ({
         interviews: 0,
       }));
     }
-    return analytics.monthlyData;
+    
+    // Filter data based on selected period
+    const allData = analytics.monthlyData;
+    const currentMonth = new Date().getMonth();
+    
+    switch (chartPeriod) {
+      case 'today':
+        // Show only current month for "today" view
+        return [allData[currentMonth] || { month: new Date().toLocaleString("default", { month: "short" }), applications: 0, interviews: 0 }];
+      
+      case 'week':
+        // Show last month data (approximation for week)
+        return allData.slice(-2);
+      
+      case 'month':
+        // Show last 3 months
+        return allData.slice(-3);
+      
+      case 'year':
+      default:
+        // Show all 12 months
+        return allData;
+    }
   };
 
   const generateChartPath = (data, key, maxValue) => {
-    if (!data || data.length === 0) return "M0,300 L800,300";
+    if (!data || data.length === 0) return "M40,300 L760,300";
 
+    const padding = 40;
+    const availableWidth = 800 - (padding * 2);
+    
     const points = data.map((item, index) => {
-      const x = (index / (data.length - 1)) * 800;
+      const x = padding + (index / (data.length - 1)) * availableWidth;
       const y = 300 - (item[key] / maxValue) * 250;
       return `${x},${y}`;
     });
@@ -65,11 +112,7 @@ const DashboardTab = ({
   const handleStatCardClick = (title) => {
     switch (title) {
       case "Total Candidates":
-        // Scroll to candidates table on same page
-        const candidatesSection = document.querySelector('.candidates-management-section');
-        if (candidatesSection) {
-          candidatesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+        if (onTabChange) onTabChange("evaluate"); // Navigate to Evaluate Candidates tab
         break;
       case "Active Events":
         if (onTabChange) onTabChange("festivals"); // Festivals tab
@@ -225,7 +268,9 @@ const DashboardTab = ({
   const chartData = getAnalyticsData();
   const maxApplications = Math.max(...chartData.map((d) => d.applications), 1);
   const maxInterviews = Math.max(...chartData.map((d) => d.interviews), 1);
-  const maxValue = Math.max(maxApplications, maxInterviews, 10);
+  const actualMax = Math.max(maxApplications, maxInterviews);
+  // Round up to next nice number for better scale
+  const maxValue = actualMax <= 5 ? 5 : actualMax <= 10 ? 10 : Math.ceil(actualMax / 10) * 10;
   const applicationsPath = generateChartPath(chartData, "applications", maxValue);
   const interviewsPath = generateChartPath(chartData, "interviews", maxValue);
 
@@ -263,12 +308,22 @@ const DashboardTab = ({
                 <button
                   className="dropdown-item"
                   onClick={() => {
-                    onOpenModal("job");
+                    if (onTabChange) onTabChange("jobs", "job");
                     setShowHostDropdown(false);
                   }}
                 >
                   <Briefcase className="w-4 h-4" />
                   Add Job Posting
+                </button>
+                <button
+                  className="dropdown-item"
+                  onClick={() => {
+                    if (onTabChange) onTabChange("jobs", "internship");
+                    setShowHostDropdown(false);
+                  }}
+                >
+                  <Users className="w-4 h-4" />
+                  Add Internship
                 </button>
                 {(authUser?.role === "recruiter" ||
                   authUser?.role === "organizer" ||
@@ -277,7 +332,7 @@ const DashboardTab = ({
                   <button
                     className="dropdown-item"
                     onClick={() => {
-                      onOpenModal("event");
+                      if (onTabChange) onTabChange("events", "event");
                       setShowHostDropdown(false);
                     }}
                   >
@@ -342,10 +397,30 @@ const DashboardTab = ({
               <p>Track hiring trends and performance</p>
             </div>
             <div className="chart-tabs">
-              <button className="chart-tab">Today</button>
-              <button className="chart-tab">Last week</button>
-              <button className="chart-tab">Last month</button>
-              <button className="chart-tab active">Year</button>
+              <button 
+                className={`chart-tab ${chartPeriod === 'today' ? 'active' : ''}`}
+                onClick={() => setChartPeriod('today')}
+              >
+                Today
+              </button>
+              <button 
+                className={`chart-tab ${chartPeriod === 'week' ? 'active' : ''}`}
+                onClick={() => setChartPeriod('week')}
+              >
+                Last week
+              </button>
+              <button 
+                className={`chart-tab ${chartPeriod === 'month' ? 'active' : ''}`}
+                onClick={() => setChartPeriod('month')}
+              >
+                Last month
+              </button>
+              <button 
+                className={`chart-tab ${chartPeriod === 'year' ? 'active' : ''}`}
+                onClick={() => setChartPeriod('year')}
+              >
+                Year
+              </button>
             </div>
           </div>
           <div className="analytics-chart-container">
@@ -443,37 +518,70 @@ const DashboardTab = ({
                 />
               </>
 
-              {/* Sample points */}
-              <circle
-                cx="400"
-                cy="150"
-                r="5"
-                fill="#FFD600"
-                stroke="#1a1a1a"
-                strokeWidth="2"
-              />
-              <circle
-                cx="400"
-                cy="190"
-                r="5"
-                fill="#F59E0B"
-                stroke="#1a1a1a"
-                strokeWidth="2"
-              />
+              {/* Dynamic data points for Applications */}
+              {chartData.map((item, index) => {
+                if (item.applications > 0) {
+                  const padding = 40;
+                  const availableWidth = 800 - (padding * 2);
+                  const x = padding + (index / (chartData.length - 1)) * availableWidth;
+                  const y = 300 - (item.applications / maxValue) * 250;
+                  return (
+                    <circle
+                      key={`app-${index}`}
+                      cx={x}
+                      cy={y}
+                      r="5"
+                      fill="#FFD600"
+                      stroke="#1a1a1a"
+                      strokeWidth="2"
+                    />
+                  );
+                }
+                return null;
+              })}
+              
+              {/* Dynamic data points for Interviews */}
+              {chartData.map((item, index) => {
+                if (item.interviews > 0) {
+                  const padding = 40;
+                  const availableWidth = 800 - (padding * 2);
+                  const x = padding + (index / (chartData.length - 1)) * availableWidth;
+                  const y = 300 - (item.interviews / maxValue) * 250;
+                  return (
+                    <circle
+                      key={`int-${index}`}
+                      cx={x}
+                      cy={y}
+                      r="5"
+                      fill="#F59E0B"
+                      stroke="#1a1a1a"
+                      strokeWidth="2"
+                    />
+                  );
+                }
+                return null;
+              })}
 
               {/* Month labels */}
-              {chartData.map((item, index) => (
-                <text
-                  key={index}
-                  x={(index / (chartData.length - 1)) * 800}
-                  y="295"
-                  fill="rgba(255,255,255,0.5)"
-                  fontSize="12"
-                  textAnchor="middle"
-                >
-                  {item.month}
-                </text>
-              ))}
+              {chartData.map((item, index) => {
+                // Add padding: 40px from edges, distribute remaining 720px
+                const padding = 40;
+                const availableWidth = 800 - (padding * 2);
+                const x = padding + (index / (chartData.length - 1)) * availableWidth;
+                
+                return (
+                  <text
+                    key={index}
+                    x={x}
+                    y="295"
+                    fill="rgba(255,255,255,0.5)"
+                    fontSize="12"
+                    textAnchor="middle"
+                  >
+                    {item.month}
+                  </text>
+                );
+              })}
             </svg>
           </div>
           <div className="chart-legend">
@@ -510,285 +618,37 @@ const DashboardTab = ({
               <span>08:00</span>
             </div>
             <div className="calendar-days">
-              {/* Same static cells as original */}
-              {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(
-                (day, idx) => (
+              {heatmapData ? (
+                // Dynamic heatmap from backend
+                heatmapData.map((dayData) => (
+                  <div className="day-column" key={dayData.day}>
+                    <span className="day-label">{dayData.day}</span>
+                    {dayData.hours.map((hourData, idx) => (
+                      <div 
+                        key={idx} 
+                        className={`activity-cell ${hourData.level === 0 ? 'empty' : `level-${hourData.level}`}`}
+                        title={`${dayData.day} ${hourData.time}: ${hourData.count} activities`}
+                      ></div>
+                    ))}
+                  </div>
+                ))
+              ) : (
+                // Loading state - show empty cells
+                ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
                   <div className="day-column" key={day}>
                     <span className="day-label">{day}</span>
-                    {idx === 0 || idx === 6 ? (
-                      Array.from({ length: 6 }).map((_, i) => (
-                        <div key={i} className="activity-cell empty"></div>
-                      ))
-                    ) : idx === 1 ? (
-                      <>
-                        <div className="activity-cell level-1"></div>
-                        <div className="activity-cell level-2"></div>
-                        <div className="activity-cell level-3"></div>
-                        <div className="activity-cell level-3"></div>
-                        <div className="activity-cell level-2"></div>
-                        <div className="activity-cell level-1"></div>
-                      </>
-                    ) : idx === 2 ? (
-                      <>
-                        <div className="activity-cell level-2"></div>
-                        <div className="activity-cell level-3"></div>
-                        <div className="activity-cell level-4"></div>
-                        <div className="activity-cell level-3"></div>
-                        <div className="activity-cell level-2"></div>
-                        <div className="activity-cell level-1"></div>
-                      </>
-                    ) : idx === 3 ? (
-                      <>
-                        <div className="activity-cell level-1"></div>
-                        <div className="activity-cell level-2"></div>
-                        <div className="activity-cell level-3"></div>
-                        <div className="activity-cell level-4"></div>
-                        <div className="activity-cell level-3"></div>
-                        <div className="activity-cell level-2"></div>
-                      </>
-                    ) : idx === 4 ? (
-                      <>
-                        <div className="activity-cell level-2"></div>
-                        <div className="activity-cell level-3"></div>
-                        <div className="activity-cell level-4"></div>
-                        <div className="activity-cell level-4"></div>
-                        <div className="activity-cell level-3"></div>
-                        <div className="activity-cell level-2"></div>
-                      </>
-                    ) : (
-                      <>
-                        <div className="activity-cell level-1"></div>
-                        <div className="activity-cell level-2"></div>
-                        <div className="activity-cell level-3"></div>
-                        <div className="activity-cell level-2"></div>
-                        <div className="activity-cell level-1"></div>
-                        <div className="activity-cell empty"></div>
-                      </>
-                    )}
+                    {Array.from({ length: 6 }).map((_, i) => (
+                      <div key={i} className="activity-cell empty"></div>
+                    ))}
                   </div>
-                )
+                ))
               )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Candidates Table */}
-      <div className="candidates-management-section">
-        <div className="section-header">
-          <div className="header-actions">
-            <div className="search-box enhanced">
-              <Search className="w-4 h-4" />
-              <input
-                type="text"
-                placeholder="Search candidates..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            <select
-              className="filter-select modern"
-              value={selectedStage}
-              onChange={(e) => setSelectedStage(e.target.value)}
-            >
-              <option value="">All Stages</option>
-              <option value="applied">Applied</option>
-              <option value="shortlisted">Shortlisted</option>
-              <option value="interview">Interview</option>
-              <option value="offered">Offered</option>
-              <option value="hired">Hired</option>
-              <option value="rejected">Rejected</option>
-            </select>
-            <button className="export-btn modern">
-              <Download className="w-4 h-4" />
-              Export Data
-            </button>
-          </div>
-        </div>
 
-        <div className="candidates-table modern">
-          {candidatesLoading ? (
-            <div
-              className="preloader"
-              style={{ position: "relative", height: "200px" }}
-            >
-              <div className="loading-container">
-                <div className="loading"></div>
-                <div id="loading-icon">
-                  <img src="assets/img/logo/preloader.png" alt="" />
-                </div>
-              </div>
-            </div>
-          ) : (
-            <table>
-              <thead>
-                <tr>
-                  <th>Candidate</th>
-                  <th>Position</th>
-                  <th>Stage</th>
-                  <th>Applied Date</th>
-                  <th>Score</th>
-                  <th>Next Action</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {candidates.length === 0 ? (
-                  <tr>
-                    <td colSpan="7" style={{ textAlign: "center", padding: "2rem" }}>
-                      No candidates found
-                    </td>
-                  </tr>
-                ) : (
-                  candidates.map((candidate, index) => (
-                    <tr key={index} className="candidate-row">
-                      <td>
-                        <div className="candidate-info">
-                          <div className="candidate-avatar">
-                            <span>{getUserInitials(candidate.name)}</span>
-                          </div>
-                          <div className="candidate-details">
-                            <div className="candidate-name">{candidate.name}</div>
-                            <div className="candidate-email">{candidate.email}</div>
-                            <div className="candidate-location">
-                              {candidate.location}
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <div className="position-info">
-                          <div className="position-title">
-                            {candidate.position}
-                          </div>
-                          <div className="position-department">
-                            {candidate.department}
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <span
-                          className={`stage-badge ${candidate.stage.toLowerCase()}`}
-                        >
-                          {candidate.stage}
-                        </span>
-                      </td>
-                      <td>
-                        <div className="date-info">
-                          <div>{candidate.appliedDate}</div>
-                          <div className="time-ago">
-                            {candidate.daysAgo} days ago
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <div className="score-display">
-                          <div className="score-number">{candidate.score}</div>
-                          <div className="score-bar">
-                            <div
-                              className="score-fill"
-                              style={{ width: `${candidate.score}%` }}
-                            ></div>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <div className="next-action">
-                          {candidate.stage === "interview" ? (
-                            <Calendar className="w-4 h-4" />
-                          ) : candidate.stage === "applied" ? (
-                            <Phone className="w-4 h-4" />
-                          ) : (
-                            <UserCheck className="w-4 h-4" />
-                          )}
-                          {candidate.nextAction}
-                        </div>
-                      </td>
-                      <td>
-                        <div className="action-buttons">
-                          <button
-                            className="action-btn view"
-                            title="View Profile"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </button>
-                          <button
-                            className="action-btn message"
-                            title="Send Message"
-                          >
-                            <MessageSquare className="w-4 h-4" />
-                          </button>
-                          <button
-                            className="action-btn more"
-                            title="More Options"
-                          >
-                            <MoreVertical className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          )}
-
-          {!candidatesLoading && candidates.length > 0 && totalPages > 1 && (
-            <div
-              className="pagination-container"
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                gap: "1rem",
-                padding: "1rem",
-                borderTop: "1px solid rgba(255,255,255,0.1)",
-              }}
-            >
-              <button
-                onClick={() => onChangePage(currentPage - 1)}
-                disabled={currentPage === 1}
-                style={{
-                  padding: "0.5rem 1rem",
-                  backgroundColor:
-                    currentPage === 1 ? "rgba(255,255,255,0.1)" : "#FFD600",
-                  color:
-                    currentPage === 1 ? "rgba(255,255,255,0.5)" : "#000",
-                  border: "none",
-                  borderRadius: "4px",
-                  cursor: currentPage === 1 ? "not-allowed" : "pointer",
-                }}
-              >
-                Previous
-              </button>
-              <span style={{ color: "rgba(255,255,255,0.8)" }}>
-                Page {currentPage} of {totalPages}
-              </span>
-              <button
-                onClick={() => onChangePage(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                style={{
-                  padding: "0.5rem 1rem",
-                  backgroundColor:
-                    currentPage === totalPages
-                      ? "rgba(255,255,255,0.1)"
-                      : "#FFD600",
-                  color:
-                    currentPage === totalPages
-                      ? "rgba(255,255,255,0.5)"
-                      : "#000",
-                  border: "none",
-                  borderRadius: "4px",
-                  cursor:
-                    currentPage === totalPages ? "not-allowed" : "pointer",
-                }}
-              >
-                Next
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
     </>
   );
 };

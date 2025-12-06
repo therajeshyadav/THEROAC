@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
+import { NotificationProvider } from "./contexts/NotificationContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
 import Header from "./components/Header";
@@ -26,6 +27,7 @@ import CandidateDashboard from "./pages/CandidateDashboard";
 import RecruiterDashboard from "./pages/RecruiterDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import UnifiedDetailsPage from './pages/UnifiedDetailsPage';
+import NotificationsPage from './pages/NotificationsPage';
 import Callback from "./pages/OAuth2Callback";
 import NotFound from './pages/NotFound';
 // ✅ Helper component to handle smooth scrolling to hash IDs
@@ -72,8 +74,9 @@ function App() {
 
   return (
     <AuthProvider>
-      <ToastContainer />
-      <ScrollToHashElement />
+      <NotificationProvider>
+        <ToastContainer />
+        <ScrollToHashElement />
 
       {showHeaderFooter && <Header />}
 
@@ -95,6 +98,14 @@ function App() {
           <Route path="/resend-verification" element={<PublicRoute><ResendVerification /></PublicRoute>} />
           <Route path="/verification-pending" element={<PublicRoute><VerificationPending /></PublicRoute>} />
           <Route path="/event-detail/:type/:slug" element={<UnifiedDetailsPage />} />
+          <Route
+            path="/notifications"
+            element={
+              <ProtectedRoute>
+                <NotificationsPage />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/dashboard"
             element={
@@ -133,6 +144,7 @@ function App() {
       </main>
 
       {showHeaderFooter && <Footer />}
+      </NotificationProvider>
     </AuthProvider>
   );
 }

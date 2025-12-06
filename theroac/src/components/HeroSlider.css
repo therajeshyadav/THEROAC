@@ -1,4 +1,4 @@
-.section {
+.hero-slider-section {
   width: 100%;
   height: 700px;
   margin: 0 auto;
@@ -6,13 +6,13 @@
   overflow: hidden;
 }
 
-.section .slide {
+.hero-slider-section .slide {
   height: 100%;
   width: 100%;
   position: relative;
 }
 
-.section .slide .item {
+.hero-slider-section .slide .item {
   width: 200px;
   height: 250px;
   position: absolute;

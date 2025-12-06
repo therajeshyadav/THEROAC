@@ -373,3 +373,91 @@ function getNextAction(status) {
             return 'Review';
     }
 }
+
+// Get activity heatmap data for recruiter dashboard
+exports.getActivityHeatmap = async (req, res, next) => {
+    try {
+        const recruiterId = req.user.id;
+        
+        // Get last 7 days of activity
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        sevenDaysAgo.setHours(0, 0, 0, 0);
+        
+        // Fetch all content created in last 7 days
+        const [jobs, events] = await Promise.all([
+            Job.findAll({
+                where: {
+                    createdBy: recruiterId,
+                    createdAt: { [Op.gte]: sevenDaysAgo }
+                },
+                attributes: ['createdAt'],
+                raw: true
+            }),
+            Event.findAll({
+                where: {
+                    createdBy: recruiterId,
+                    createdAt: { [Op.gte]: sevenDaysAgo }
+                },
+                attributes: ['createdAt'],
+                raw: true
+            })
+        ]);
+        
+        // Combine all activities
+        const allActivities = [...jobs, ...events];
+        
+        // Create heatmap data structure
+        // Group by day of week (0-6) and hour (0-23)
+        const heatmapData = {};
+        
+        allActivities.forEach(activity => {
+            const date = new Date(activity.createdAt);
+            const dayOfWeek = date.getDay(); // 0 = Sunday, 6 = Saturday
+            const hour = date.getHours();
+            
+            const key = `${dayOfWeek}-${hour}`;
+            heatmapData[key] = (heatmapData[key] || 0) + 1;
+        });
+        
+        // Convert to array format for frontend
+        // Create 6 time slots from 10:30 to 8:00 (descending order to match frontend labels)
+        const timeSlots = ['10:30', '10:00', '09:30', '09:00', '08:30', '08:00'];
+        
+        const heatmap = [];
+        for (let day = 0; day < 7; day++) {
+            const dayData = {
+                day: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][day],
+                hours: []
+            };
+            
+            // For each time slot, check activity in that hour range
+            timeSlots.forEach((timeSlot) => {
+                const hour = parseInt(timeSlot.split(':')[0]); // Extract hour from time string
+                const key = `${day}-${hour}`;
+                const count = heatmapData[key] || 0;
+                
+                dayData.hours.push({
+                    time: timeSlot,
+                    count: count,
+                    level: count === 0 ? 0 : count <= 2 ? 1 : count <= 4 ? 2 : count <= 6 ? 3 : 4
+                });
+            });
+            
+            heatmap.push(dayData);
+        }
+        
+        return res.status(200).json({
+            success: true,
+            heatmap: heatmap,
+            totalActivities: allActivities.length
+        });
+        
+    } catch (err) {
+        console.error('Error in getActivityHeatmap:', err);
+        return res.status(500).json({
+            success: false,
+            error: 'Failed to fetch activity heatmap. Please try again.'
+        });
+    }
+};

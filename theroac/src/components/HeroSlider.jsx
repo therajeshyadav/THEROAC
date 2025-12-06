@@ -70,7 +70,7 @@ const HeroSlider = () => {
   }, []);
 
   return (
-    <div className="section">
+    <div className="hero-slider-section">
       <div className="slide" ref={slideRef}>
         {slides.map((slide, index) => (
           <div

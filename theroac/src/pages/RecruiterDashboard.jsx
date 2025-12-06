@@ -17,9 +17,13 @@ import "./RecruiterDashboard.css";
 import RecruiterHeader from "../components/recruiter-dashboard/RecruiterHeader";
 import RecruiterSidebar from "../components/recruiter-dashboard/RecruiterSidebar";
 import DashboardTab from "../components/recruiter-dashboard/DashboardTab";
-import JobsTab from "../components/recruiter-dashboard/JobsTab";
+import ManageJobsTab from "../components/recruiter-dashboard/ManageJobsTab";
+import ManageEventsTab from "../components/recruiter-dashboard/ManageEventsTab";
+import TeamManagementTab from "../components/recruiter-dashboard/TeamManagementTab";
+import EvaluateCandidatesTab from "../components/recruiter-dashboard/EvaluateCandidatesTab";
 import ComingSoonTab from "../components/recruiter-dashboard/ComingSoonTab";
 import SettingsTab from "../components/recruiter-dashboard/SettingsTab";
+import TalentPipelineTab from "../components/recruiter-dashboard/TalentPipelineTab";
 
 const RecruiterDashboard = () => {
   const navigate = useNavigate();
@@ -27,9 +31,17 @@ const RecruiterDashboard = () => {
   const { user: authUser, isAuthenticated, loading: authLoading, logout } =
     useAuth();
 
-  const [activeTab, setActiveTab] = useState(
-    location.state?.activeTab || "dashboard"
-  );
+  const [activeTab, setActiveTab] = useState(() => {
+    // Check sessionStorage first (for page reloads)
+    const savedTab = sessionStorage.getItem('activeTab');
+    if (savedTab) {
+      sessionStorage.removeItem('activeTab'); // Clear after reading
+      return savedTab;
+    }
+    // Otherwise use location state or default
+    return location.state?.activeTab || "dashboard";
+  });
+  const [pendingModalType, setPendingModalType] = useState(null);
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
   const [notifications] = useState(3);
 
@@ -46,8 +58,9 @@ const RecruiterDashboard = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [modalType, setModalType] = useState("job");
 
-  const [myJobs, setMyJobs] = useState([]);
-  const [jobsLoading, setJobsLoading] = useState(false);
+  const [jobsTabLoading, setJobsTabLoading] = useState(false);
+  const [eventsTabLoading, setEventsTabLoading] = useState(false);
+  const [talentTabLoading, setTalentTabLoading] = useState(false);
 
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [profileData, setProfileData] = useState({
@@ -79,12 +92,110 @@ const RecruiterDashboard = () => {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
+      
+      // Get fresh user data from localStorage
+      const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+      console.log('Dashboard - storedUser:', storedUser);
+      console.log('Dashboard - authUser:', authUser);
+      console.log('Dashboard - organizationId:', storedUser?.organizationId || authUser?.organizationId);
+      
       const [statsData, analyticsData] = await Promise.all([
         dashboardService.getOrganizerStats(),
         dashboardService.getAnalytics("year"),
       ]);
       setStats(statsData);
       setAnalytics(analyticsData);
+      
+      // Use storedUser if authUser is not available
+      const currentUser = authUser || storedUser;
+      
+      // Fetch organization data for profile
+      console.log('Dashboard - using currentUser:', currentUser);
+      console.log('Dashboard - organizationId:', currentUser?.organizationId);
+      
+      if (currentUser?.organizationId) {
+        try {
+          const token = localStorage.getItem('token');
+          const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000/api';
+          const orgResponse = await fetch(`${API_URL}/organizations/${currentUser.organizationId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          console.log('Organization API response status:', orgResponse.status);
+          
+          if (orgResponse.ok) {
+            const orgData = await orgResponse.json();
+            console.log('Organization data received:', orgData);
+            
+            const updatedProfileData = {
+              fullName: currentUser.fullName || '',
+              email: currentUser.email || '',
+              phone: currentUser.phone || '',
+              city: currentUser.city || '',
+              state: currentUser.state || '',
+              country: currentUser.country || '',
+              bio: currentUser.bio || '',
+              role: currentUser.role || '',
+              companyName: orgData.name || '',
+              industryType: orgData.industry || '',
+              companySize: orgData.size || '',
+              foundedYear: orgData.foundedYear || '',
+              headOffice: orgData.location || '',
+              website: orgData.website || '',
+              aboutCompany: orgData.description || '',
+              // Load preferences data (flatten nested structure)
+              workLocations: currentUser?.preferences?.workLocations?.join(', ') || '',
+              hiringFor: currentUser?.preferences?.hiringFor?.join(', ') || '',
+              totalJobsPosted: currentUser?.preferences?.metrics?.totalJobsPosted || '',
+              activeJobs: currentUser?.preferences?.metrics?.activeJobs || '',
+              totalCandidatesHired: currentUser?.preferences?.metrics?.totalCandidatesHired || '',
+              responseRate: currentUser?.preferences?.metrics?.responseRate || '',
+              averageResponseTimeHours: currentUser?.preferences?.metrics?.averageResponseTimeHours || '',
+              allowDirectMessage: currentUser?.preferences?.communication?.allowDirectMessage ?? true,
+              preferredContact: currentUser?.preferences?.communication?.preferredContact || 'platform_chat',
+              supportEmail: currentUser?.preferences?.communication?.supportEmail || ''
+            };
+            
+            console.log('Setting profileData to:', updatedProfileData);
+            setProfileData(updatedProfileData);
+          }
+        } catch (err) {
+          console.error('Error fetching organization:', err);
+        }
+      } else {
+        // No organization, check if user has company data stored in profile
+        console.log('No organizationId, checking user.company data');
+        console.log('currentUser.company:', currentUser?.company);
+        
+        setProfileData({
+          fullName: currentUser?.fullName || '',
+          email: currentUser?.email || '',
+          phone: currentUser?.phone || '',
+          city: currentUser?.city || '',
+          state: currentUser?.state || '',
+          country: currentUser?.country || '',
+          bio: currentUser?.bio || '',
+          role: currentUser?.role || '',
+          // Load company data from user.company if exists
+          companyName: currentUser?.company?.name || '',
+          industryType: currentUser?.company?.industryType || '',
+          companySize: currentUser?.company?.companySize || '',
+          foundedYear: currentUser?.company?.foundedYear || '',
+          headOffice: currentUser?.company?.headOffice || '',
+          website: currentUser?.company?.website || '',
+          aboutCompany: currentUser?.company?.aboutCompany || '',
+          // Load preferences data (flatten nested structure)
+          workLocations: currentUser?.preferences?.workLocations?.join(', ') || '',
+          hiringFor: currentUser?.preferences?.hiringFor?.join(', ') || '',
+          totalJobsPosted: currentUser?.preferences?.metrics?.totalJobsPosted || '',
+          activeJobs: currentUser?.preferences?.metrics?.activeJobs || '',
+          totalCandidatesHired: currentUser?.preferences?.metrics?.totalCandidatesHired || '',
+          responseRate: currentUser?.preferences?.metrics?.responseRate || '',
+          averageResponseTimeHours: currentUser?.preferences?.metrics?.averageResponseTimeHours || '',
+          allowDirectMessage: currentUser?.preferences?.communication?.allowDirectMessage ?? true,
+          preferredContact: currentUser?.preferences?.communication?.preferredContact || 'platform_chat',
+          supportEmail: currentUser?.preferences?.communication?.supportEmail || ''
+        });
+      }
     } catch (error) {
       // error
     } finally {
@@ -92,24 +203,7 @@ const RecruiterDashboard = () => {
     }
   };
 
-  const fetchMyJobs = async () => {
-    try {
-      setJobsLoading(true);
-      const response = await fetch("http://localhost:4000/api/jobs", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-      const data = await response.json();
-      const userJobs =
-        data.jobs?.filter((job) => job.createdBy === authUser?.id) || [];
-      setMyJobs(userJobs);
-    } catch (error) {
-      setMyJobs([]);
-    } finally {
-      setJobsLoading(false);
-    }
-  };
+
 
   const fetchCandidates = async (page = 1, search = "", stage = "") => {
     try {
@@ -153,11 +247,7 @@ const RecruiterDashboard = () => {
     fetchCandidates();
   }, [isAuthenticated, authLoading, authUser, navigate]);
 
-  useEffect(() => {
-    if (activeTab === "jobs" && authUser?.id) {
-      fetchMyJobs();
-    }
-  }, [activeTab, authUser?.id]);
+
 
   useEffect(() => {
     if (isAuthenticated && authUser?.role === "recruiter") {
@@ -173,18 +263,28 @@ const RecruiterDashboard = () => {
     setShowAddModal(true);
   };
 
+  const handleTabChange = (tab, modalType = null) => {
+    setActiveTab(tab);
+    if (modalType) {
+      setPendingModalType(modalType);
+    }
+  };
+
   const handleModalSuccess = () => {
     fetchDashboardData();
   };
 
   if (authLoading) {
     return (
-      <div className="organizer-panel">
-        <div className="preloader">
-          <div className="loading-container">
-            <div className="loading"></div>
-            <div id="loading-icon">
-              <img src="assets/img/logo/preloader.png" alt="" />
+      <div className="auth-container">
+        <div className="organizer-panel">
+          <div className="dashboard-background"></div>
+          <div className="preloader">
+            <div className="loading-container">
+              <div className="loading"></div>
+              <div id="loading-icon">
+                <img src="assets/img/logo/preloader.png" alt="" />
+              </div>
             </div>
           </div>
         </div>
@@ -194,7 +294,7 @@ const RecruiterDashboard = () => {
 
   return (
     <div className="auth-container">
-      {preloaderVisible && (
+      {(preloaderVisible || jobsTabLoading || eventsTabLoading || talentTabLoading) && (
         <div className="preloader">
           <div className="loading-container">
             <div className="loading"></div>
@@ -256,24 +356,25 @@ const RecruiterDashboard = () => {
                   }
                   getUserInitials={getUserInitials}
                   onOpenModal={handleOpenModal}
-                  onTabChange={setActiveTab}
+                  onTabChange={handleTabChange}
                 />
               )}
 
               {activeTab === "jobs" && (
-                <JobsTab
-                  myJobs={myJobs}
-                  jobsLoading={jobsLoading}
-                  onAddJob={() => handleOpenModal("job")}
+                <ManageJobsTab 
+                  authUser={authUser} 
+                  setJobsTabLoading={setJobsTabLoading}
+                  pendingModalType={pendingModalType}
+                  onModalTypeHandled={() => setPendingModalType(null)}
                 />
               )}
 
+              {activeTab === "team" && (
+                <TeamManagementTab authUser={authUser} onTabChange={setActiveTab} />
+              )}
+
               {activeTab === "evaluate" && (
-                <ComingSoonTab
-                  icon={UserCheck}
-                  title="Evaluate Candidates"
-                  description="Review and assess candidate applications"
-                />
+                <EvaluateCandidatesTab authUser={authUser} />
               )}
 
               {activeTab === "opportunities" && (
@@ -284,11 +385,12 @@ const RecruiterDashboard = () => {
                 />
               )}
 
-              {activeTab === "festivals" && (
-                <ComingSoonTab
-                  icon={Calendar}
-                  title="Festivals & Events"
-                  description="Create and manage recruitment festivals"
+              {activeTab === "events" && (
+                <ManageEventsTab 
+                  authUser={authUser} 
+                  setEventsTabLoading={setEventsTabLoading}
+                  pendingModalType={pendingModalType}
+                  onModalTypeHandled={() => setPendingModalType(null)}
                 />
               )}
 
@@ -301,10 +403,9 @@ const RecruiterDashboard = () => {
               )}
 
               {activeTab === "talent" && (
-                <ComingSoonTab
-                  icon={Users}
-                  title="Talent Pipeline"
-                  description="Build and manage your talent pipeline"
+                <TalentPipelineTab 
+                  authUser={authUser} 
+                  setTalentTabLoading={setTalentTabLoading}
                 />
               )}
 
@@ -326,6 +427,7 @@ const RecruiterDashboard = () => {
           isOpen={showAddModal}
           onClose={() => setShowAddModal(false)}
           type={modalType}
+          authUser={authUser}
           onSuccess={handleModalSuccess}
         />
       </div>

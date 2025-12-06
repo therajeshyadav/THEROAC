@@ -1,0 +1,349 @@
+/* SettingsTab.css - Scoped styles for Settings Tab only */
+
+/* Main Container */
+.settings-tab-container {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* Section Header */
+.settings-section-header {
+    margin-bottom: 2rem;
+}
+
+.settings-section-header h2 {
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.settings-section-header p {
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0.5rem 0 0 0;
+}
+
+/* Profile Card */
+.settings-profile-card {
+    background: rgba(30, 30, 30, 0.6);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 214, 0, 0.2);
+    border-radius: 20px;
+    padding: 2rem;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 2rem;
+}
+
+/* Profile Header Section */
+.settings-profile-header {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.settings-profile-header .user-avatar {
+    width: 80px;
+    height: 80px;
+    font-size: 2rem;
+    background: #FFD600;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1A1719;
+    font-weight: 600;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.settings-profile-header .user-avatar .profile-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.settings-profile-header .user-avatar .profile-initials {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #1A1719;
+}
+
+.settings-profile-info {
+    flex: 1;
+}
+
+.settings-profile-info h3 {
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0 0 0.25rem 0;
+}
+
+.settings-profile-info .profile-email {
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.settings-profile-badges {
+    margin-top: 0.6rem;
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.settings-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    background: rgba(255, 214, 0, 0.15);
+    color: #FFD600;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.settings-badge.verified {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: rgba(76, 175, 80, 0.18);
+    color: #8BC34A;
+}
+
+/* Content Area */
+.settings-content-card {
+    background: transparent;
+    border: none;
+    padding: 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Form Sections */
+.settings-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.settings-section {
+    background: rgba(30, 30, 30, 0.6);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 214, 0, 0.2);
+    border-radius: 20px;
+    padding: 2rem;
+}
+
+.settings-section:last-child {
+    margin-bottom: 0;
+}
+
+.settings-section-title {
+    color: #FFD600;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+}
+
+/* Form Grid */
+.settings-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem;
+}
+
+.settings-form-grid.single-column {
+    grid-template-columns: 1fr;
+}
+
+/* Form Fields */
+.settings-form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.settings-input-label {
+    display: block;
+    color: #fff;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.settings-input-field {
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 1rem;
+    transition: all 0.3s;
+    font-family: inherit;
+}
+
+.settings-input-field:focus {
+    outline: none;
+    border-color: #FFD600;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.settings-input-field:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.settings-input-field::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+textarea.settings-input-field {
+    min-height: 100px;
+    resize: vertical;
+}
+
+/* Checkbox */
+.settings-checkbox-group {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.settings-checkbox-group input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.settings-checkbox-group label {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin: 0;
+}
+
+/* View Mode (Read-only) */
+.settings-view-label {
+    display: block;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 0.35rem;
+    font-size: 0.85rem;
+}
+
+.settings-view-value {
+    color: #fff;
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+/* Metric Cards */
+.settings-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.settings-metric-card {
+    background: rgba(0, 0, 0, 0.35);
+    border-radius: 14px;
+    padding: 0.85rem 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.settings-metric-label {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.8rem;
+    margin: 0 0 0.3rem 0;
+}
+
+.settings-metric-value {
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* Action Buttons */
+.settings-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    background: rgba(30, 30, 30, 0.6);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 214, 0, 0.2);
+    border-radius: 20px;
+    padding: 2rem;
+}
+
+.settings-btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 25px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+}
+
+.settings-btn-primary {
+    background: #FFD600;
+    color: #1A1719;
+}
+
+.settings-btn-primary:hover {
+    background: #FFC107;
+    transform: translateY(-2px);
+}
+
+.settings-btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.settings-btn-outline {
+    background: transparent;
+    color: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.settings-btn-outline:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .settings-profile-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .settings-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .settings-metrics-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .settings-profile-card,
+    .settings-content-card {
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .settings-metrics-grid {
+        grid-template-columns: 1fr;
+    }
+}

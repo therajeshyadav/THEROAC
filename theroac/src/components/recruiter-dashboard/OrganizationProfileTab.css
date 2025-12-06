@@ -1,0 +1,30 @@
+/* Organization Profile Tab Styles */
+.organization-profile-container input,
+.organization-profile-container textarea,
+.organization-profile-container select {
+  color: rgba(255, 255, 255, 0.9) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.organization-profile-container input:focus,
+.organization-profile-container textarea:focus,
+.organization-profile-container select:focus {
+  color: #fff !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: #FFD600 !important;
+}
+
+.organization-profile-container input::placeholder,
+.organization-profile-container textarea::placeholder {
+  color: rgba(255, 255, 255, 0.4) !important;
+}
+
+/* Autocomplete specific */
+.organization-profile-container input:-webkit-autofill,
+.organization-profile-container input:-webkit-autofill:hover,
+.organization-profile-container input:-webkit-autofill:focus {
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.9) !important;
+  -webkit-box-shadow: 0 0 0px 1000px rgba(30, 30, 30, 0.9) inset !important;
+  transition: background-color 5000s ease-in-out 0s;
+}

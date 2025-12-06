@@ -272,7 +272,7 @@ const CandidateProfilePage = ({ initialProfile, onSaveProfile }) => {
           </div>
         ) : profile.resumePath ? (
           <a
-            href={profile.resumePath}
+            href={`${(process.env.REACT_APP_API_URL || 'http://localhost:4000/api').replace('/api', '')}${profile.resumePath}`}
             className={styles.primaryBtn}
             target="_blank"
             rel="noreferrer"

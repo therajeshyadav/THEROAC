@@ -1,4 +1,5 @@
 import { Plus, Briefcase, Eye, Users } from "lucide-react";
+import LoadingSpinner from './LoadingSpinner';
 
 const JobsTab = ({ myJobs, jobsLoading, onAddJob }) => {
   return (
@@ -33,19 +34,11 @@ const JobsTab = ({ myJobs, jobsLoading, onAddJob }) => {
         </button>
       </div>
 
+      {jobsLoading ? (
+        <LoadingSpinner />
+      ) : (
       <div className="jobs-grid">
-        {jobsLoading ? (
-          <div
-            style={{
-              textAlign: "center",
-              padding: "3rem",
-              color: "rgba(255,255,255,0.7)",
-            }}
-          >
-            <div className="loading"></div>
-            <p>Loading your jobs...</p>
-          </div>
-        ) : myJobs.length > 0 ? (
+        {myJobs.length > 0 ? (
           <div
             style={{
               display: "grid",
@@ -178,6 +171,7 @@ const JobsTab = ({ myJobs, jobsLoading, onAddJob }) => {
           </div>
         )}
       </div>
+      )}
     </div>
   );
 };

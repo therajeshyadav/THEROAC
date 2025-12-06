@@ -744,8 +744,13 @@ const ModernDetailsPage = () => {
                                                 <div className="info-card-content">
                                                     <h4 className="info-card-title">Stipend</h4>
                                                     <p className="info-card-value">
-                                                        {data.stipend.min && data.stipend.max 
-                                                            ? `₹ ${data.stipend.min.toLocaleString()} - ₹ ${data.stipend.max.toLocaleString()} /Month`
+                                                        {typeof data.stipend === 'object' 
+                                                            ? (data.stipend.min && data.stipend.max 
+                                                                ? `₹ ${data.stipend.min.toLocaleString()} - ₹ ${data.stipend.max.toLocaleString()} /Month`
+                                                                : data.stipend.amount 
+                                                                    ? `₹ ${data.stipend.amount.toLocaleString()} /Month`
+                                                                    : 'Unpaid'
+                                                              )
                                                             : data.stipend
                                                         }
                                                     </p>
@@ -821,7 +826,17 @@ const ModernDetailsPage = () => {
                                             <div className="info-card-item">
                                                 <div className="info-card-content">
                                                     <h4 className="info-card-title">Salary</h4>
-                                                    <p className="info-card-value">{data.salary}</p>
+                                                    <p className="info-card-value">
+                                                        {typeof data.salary === 'object'
+                                                            ? (data.salary.min && data.salary.max
+                                                                ? `₹ ${data.salary.min.toLocaleString()} - ₹ ${data.salary.max.toLocaleString()} /Year`
+                                                                : data.salary.min
+                                                                    ? `₹ ${data.salary.min.toLocaleString()}+ /Year`
+                                                                    : 'Competitive'
+                                                              )
+                                                            : data.salary
+                                                        }
+                                                    </p>
                                                 </div>
                                                 <div className="info-card-icon">
                                                     💰

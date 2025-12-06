@@ -1,10 +1,19 @@
-const { Job, JobApplication } = require('../models');
+const { Job, JobApplication, User } = require('../models');
 const { Op } = require('sequelize');
+const { getNotificationService } = require('../socket');
 
 exports.createJob = async (req, res, next) => {
   try {
     const payload = { ...req.body };
     payload.createdBy = req.user.id;
+    
+    // Add organization context if available
+    if (req.currentOrganization) {
+      payload.organizationId = req.currentOrganization.id;
+      // Auto-populate from organization if not provided
+      if (!payload.companyName) payload.companyName = req.currentOrganization.name;
+      if (!payload.companyLogo) payload.companyLogo = req.currentOrganization.logo;
+    }
     
     // Auto-populate company info from recruiter profile if not provided
     if (req.user.role === 'recruiter') {
@@ -24,6 +33,37 @@ exports.createJob = async (req, res, next) => {
       payload.companyName = payload.company;
       delete payload.company;
     }
+    
+    // Validate and sanitize salary field
+    if (payload.salary) {
+      if (typeof payload.salary === 'string') {
+        try {
+          payload.salary = JSON.parse(payload.salary);
+        } catch (e) {
+          payload.salary = null;
+        }
+      }
+      // Ensure salary has proper structure
+      if (payload.salary && typeof payload.salary === 'object') {
+        payload.salary = {
+          min: payload.salary.min || '',
+          max: payload.salary.max || '',
+          currency: payload.salary.currency || 'USD',
+          period: payload.salary.period || 'yearly'
+        };
+      }
+    }
+    
+    // Validate and sanitize JSON fields
+    ['perks', 'skills', 'categories', 'media', 'companySocials', 'contactPerson'].forEach(field => {
+      if (payload[field] && typeof payload[field] === 'string') {
+        try {
+          payload[field] = JSON.parse(payload[field]);
+        } catch (e) {
+          payload[field] = field === 'perks' || field === 'skills' || field === 'categories' || field === 'media' ? [] : null;
+        }
+      }
+    });
     
     // Generate slug from title and company if not provided
     if (!payload.slug && payload.title && payload.companyName) {
@@ -72,6 +112,12 @@ exports.createJob = async (req, res, next) => {
     if (err.name === 'SequelizeValidationError') {
       return res.status(400).json({
         error: err.errors[0]?.message || 'Validation error'
+      });
+    }
+    
+    if (err.name === 'SequelizeUniqueConstraintError') {
+      return res.status(400).json({
+        error: 'A job with this slug already exists'
       });
     }
     
@@ -137,7 +183,7 @@ exports.applyToJob = async (req, res, next) => {
   try {
     const { jobId } = req.params;
     const userId = req.user.id;
-    const { resumeLink, coverLetter } = req.body;
+    const { resumeLink, coverLetter, metadata } = req.body;
     
     // Check if job exists first
     const job = await Job.findByPk(jobId);
@@ -151,15 +197,65 @@ exports.applyToJob = async (req, res, next) => {
       return res.status(400).json({ error: 'Already applied to this job' });
     }
 
-    const application = await JobApplication.create({ 
+    // Store all candidate data in metadata
+    const applicationData = {
       jobId, 
       userId, 
       resumeLink: resumeLink || '', 
       coverLetter: coverLetter || '',
-      status: 'applied'
-    });
+      status: 'applied',
+      metadata: metadata || {}
+    };
+
+    const application = await JobApplication.create(applicationData);
     
     await Job.increment('applications', { where: { id: jobId } });
+    
+    // Send notification to recruiter and organization members
+    try {
+      const { OrganizationMember } = require('../models');
+      const notificationService = getNotificationService();
+      const candidate = await User.findByPk(userId);
+      const candidateName = candidate?.fullName || candidate?.name || 'A candidate';
+      
+      // Notify job creator
+      await notificationService.notifyNewApplication(
+        job.createdBy,
+        candidateName,
+        job.title,
+        application.id
+      );
+      
+      // If job belongs to an organization, notify all active members with permission
+      if (job.organizationId) {
+        const members = await OrganizationMember.findAll({
+          where: { 
+            organizationId: job.organizationId, 
+            status: 'active'
+          }
+        });
+        
+        for (const member of members) {
+          // Skip the job creator (already notified) and members without permission
+          if (member.userId !== job.createdBy && 
+              (member.permissions?.canManageApplications || 
+               member.permissions?.canRespondToApplications ||
+               member.role === 'owner' || 
+               member.role === 'admin')) {
+            await notificationService.notifyNewApplication(
+              member.userId,
+              candidateName,
+              job.title,
+              application.id
+            );
+          }
+        }
+      }
+    } catch (notifError) {
+      console.error('Failed to send notification:', notifError);
+      // Don't fail the application if notification fails
+    }
+    
     res.status(201).json(application);
   } catch (err) { 
     console.error('Apply to job error:', err);
@@ -200,6 +296,142 @@ exports.getUserApplications = async (req, res, next) => {
   }
 };
 
+// Get applications for recruiter's jobs
+exports.getRecruiterApplications = async (req, res, next) => {
+  try {
+    const { User } = require('../models');
+    const recruiterId = req.user.id;
+    
+    // Get all jobs created by this recruiter
+    const recruiterJobs = await Job.findAll({
+      where: { createdBy: recruiterId },
+      attributes: ['id']
+    });
+    
+    const jobIds = recruiterJobs.map(job => job.id);
+    
+    // Get all applications for these jobs with full candidate details
+    const applications = await JobApplication.findAll({
+      where: { jobId: { [Op.in]: jobIds } },
+      include: [
+        {
+          model: Job,
+          as: 'job',
+          attributes: ['id', 'title', 'companyName', 'location', 'salary', 'jobType', 'experienceLevel']
+        },
+        {
+          model: User,
+          as: 'user',
+          attributes: [
+            'id', 'fullName', 'email', 'phone', 'headline', 'location',
+            'about', 'skills', 'experiences', 'education', 'resumePath',
+            'profilePicture', 'linkedinUrl', 'githubUrl'
+          ]
+        }
+      ],
+      order: [['createdAt', 'DESC']]
+    });
+
+    res.json({ applications });
+  } catch (err) {
+    console.error('Error in getRecruiterApplications:', err);
+    return res.status(500).json({
+      error: 'Failed to fetch applications. Please try again.'
+    });
+  }
+};
+
+// Update application status
+exports.updateApplicationStatus = async (req, res, next) => {
+  try {
+    const { applicationId } = req.params;
+    const { status } = req.body;
+    const recruiterId = req.user.id;
+    
+    // Find the application
+    const application = await JobApplication.findByPk(applicationId, {
+      include: [{
+        model: Job,
+        as: 'job',
+        attributes: ['createdBy']
+      }]
+    });
+    
+    if (!application) {
+      return res.status(404).json({ error: 'Application not found' });
+    }
+    
+    // Check if the recruiter owns this job
+    if (application.job.createdBy !== recruiterId) {
+      return res.status(403).json({ error: 'Unauthorized' });
+    }
+    
+    // Update status
+    application.status = status;
+    await application.save();
+    
+    // Send notification to candidate
+    try {
+      const notificationService = getNotificationService();
+      const job = await Job.findByPk(application.jobId);
+      
+      await notificationService.notifyApplicationStatusChange(
+        application.userId,
+        job.title,
+        status,
+        application.id
+      );
+    } catch (notifError) {
+      console.error('Failed to send notification:', notifError);
+    }
+    
+    res.json({ message: 'Application status updated', application });
+  } catch (err) {
+    console.error('Error in updateApplicationStatus:', err);
+    return res.status(500).json({
+      error: 'Failed to update application status. Please try again.'
+    });
+  }
+};
+
+// Update application notes
+exports.updateApplicationNotes = async (req, res, next) => {
+  try {
+    const { applicationId } = req.params;
+    const { notes } = req.body;
+    const recruiterId = req.user.id;
+    
+    // Find the application
+    const application = await JobApplication.findByPk(applicationId, {
+      include: [{
+        model: Job,
+        as: 'job',
+        attributes: ['createdBy']
+      }]
+    });
+    
+    if (!application) {
+      return res.status(404).json({ error: 'Application not found' });
+    }
+    
+    // Check if the recruiter owns this job
+    if (application.job.createdBy !== recruiterId) {
+      return res.status(403).json({ error: 'Unauthorized' });
+    }
+    
+    // Update notes
+    if (notes !== undefined) application.notes = notes;
+    await application.save();
+    
+    res.json({ message: 'Application notes updated', application });
+  } catch (err) {
+    console.error('Error in updateApplicationNotes:', err);
+    return res.status(500).json({
+      error: 'Failed to update application notes. Please try again.'
+    });
+  }
+};
+
 
 // Check if user has applied to a specific job
 exports.checkJobApplicationStatus = async (req, res, next) => {
@@ -232,17 +464,20 @@ exports.getJobBySlug = async (req, res, next) => {
   try {
     const { slug } = req.params;
     
-    // First try to find by slug field
-    let job = await Job.findOne({
+    // Try multiple matching strategies
+    let job = null;
+    
+    // Strategy 1: Exact match with DB slug field
+    job = await Job.findOne({
       where: { slug }
     });
 
-    // If not found, search all jobs and match by generated slug
+    // Strategy 2: Match with generated slug (title-company)
     if (!job) {
       const allJobs = await Job.findAll();
       
-      // Find job by comparing generated slug
       for (const j of allJobs) {
+        // Generate slug with company name
         const generatedSlug = `${j.title}-${j.companyName}`
           .toLowerCase()
           .replace(/[^a-z0-9\s-]/g, '')
@@ -250,7 +485,10 @@ exports.getJobBySlug = async (req, res, next) => {
           .replace(/-+/g, '-')
           .replace(/^-+|-+$/g, '');
         
-        if (generatedSlug === slug) {
+        // Also check if DB slug matches (for backward compatibility)
+        const dbSlug = j.slug || '';
+        
+        if (generatedSlug === slug || dbSlug === slug) {
           job = j;
           break;
         }
@@ -261,8 +499,10 @@ exports.getJobBySlug = async (req, res, next) => {
       return res.status(404).json({ error: 'Job not found' });
     }
 
-    // Increment view counter
-    await job.increment('views');
+    // Increment view counter only for candidates (not for recruiters viewing their own jobs)
+    if (req.user && req.user.role === 'candidate') {
+      await job.increment('views');
+    }
     
     res.json(job);
   } catch (err) {
@@ -270,5 +510,141 @@ exports.getJobBySlug = async (req, res, next) => {
     return res.status(500).json({
       error: 'Failed to fetch job. Please try again.'
     });
+  }
+};
+
+// Update job
+exports.updateJob = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const job = await Job.findByPk(id);
+    
+    if (!job) {
+      return res.status(404).json({ error: 'Job not found' });
+    }
+    
+    // Check if user is authorized to update
+    if (job.createdBy !== req.user.id && !['admin', 'superadmin'].includes(req.user.role)) {
+      return res.status(403).json({ error: 'Not authorized to update this job' });
+    }
+    
+    const payload = { ...req.body };
+    
+    // Validate and sanitize salary field
+    if (payload.salary) {
+      if (typeof payload.salary === 'string') {
+        try {
+          payload.salary = JSON.parse(payload.salary);
+        } catch (e) {
+          payload.salary = null;
+        }
+      }
+      // Ensure salary has proper structure
+      if (payload.salary && typeof payload.salary === 'object') {
+        payload.salary = {
+          min: payload.salary.min || '',
+          max: payload.salary.max || '',
+          currency: payload.salary.currency || 'USD',
+          period: payload.salary.period || 'yearly'
+        };
+      }
+    }
+    
+    // Validate and sanitize JSON fields
+    ['perks', 'skills', 'categories', 'media', 'companySocials', 'contactPerson'].forEach(field => {
+      if (payload[field] && typeof payload[field] === 'string') {
+        try {
+          payload[field] = JSON.parse(payload[field]);
+        } catch (e) {
+          payload[field] = field === 'perks' || field === 'skills' || field === 'categories' || field === 'media' ? [] : null;
+        }
+      }
+    });
+    
+    // Update slug if title or company changed
+    if ((payload.title || payload.companyName) && !payload.slug) {
+      const titleSlug = (payload.title || job.title)
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-+|-+$/g, '');
+      
+      const companySlug = (payload.companyName || job.companyName)
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-+|-+$/g, '');
+      
+      payload.slug = `${titleSlug}-${companySlug}`;
+    }
+    
+    await job.update(payload);
+    res.json(job);
+  } catch (err) {
+    console.error('Error in updateJob:', err);
+    
+    if (err.name === 'SequelizeValidationError') {
+      return res.status(400).json({
+        error: err.errors[0]?.message || 'Validation error'
+      });
+    }
+    
+    if (err.name === 'SequelizeUniqueConstraintError') {
+      return res.status(400).json({
+        error: 'A job with this slug already exists'
+      });
+    }
+    
+    return res.status(500).json({
+      error: 'Failed to update job. Please try again.'
+    });
+  }
+};
+
+// Delete job
+exports.deleteJob = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const job = await Job.findByPk(id);
+    
+    if (!job) {
+      return res.status(404).json({ error: 'Job not found' });
+    }
+    
+    // Check if user is authorized to delete
+    if (job.createdBy !== req.user.id && !['admin', 'superadmin'].includes(req.user.role)) {
+      return res.status(403).json({ error: 'Not authorized to delete this job' });
+    }
+    
+    await job.destroy();
+    res.json({ message: 'Job deleted successfully' });
+  } catch (err) {
+    console.error('Error in deleteJob:', err);
+    return res.status(500).json({
+      error: 'Failed to delete job. Please try again.'
+    });
+  }
+};
+
+// Upload image for job
+exports.uploadJobImage = async (req, res, next) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'No image file provided' });
+    }
+
+    // Generate image URL
+    const imageUrl = `${req.protocol}://${req.get('host')}/uploads/images/jobs/${req.file.filename}`;
+
+    res.status(200).json({
+      message: 'Image uploaded successfully',
+      imageUrl: imageUrl,
+      filename: req.file.filename
+    });
+  } catch (error) {
+    console.error('Error uploading job image:', error);
+    res.status(500).json({ message: 'Failed to upload image', error: error.message });
   }
 };

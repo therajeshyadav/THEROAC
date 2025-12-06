@@ -162,6 +162,10 @@ exports.me = async (req, res, next) => {
       skills: user.skills || [],
       experiences: user.experiences || [],
       education: user.education || [],
+      // Company information (for recruiters)
+      company: user.company || null,
+      // Preferences (hiring, communication, metrics)
+      preferences: user.preferences || null,
     };
 
     res.json(userResponse);

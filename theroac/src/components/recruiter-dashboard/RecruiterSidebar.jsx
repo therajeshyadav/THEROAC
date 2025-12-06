@@ -7,15 +7,17 @@ import {
   Download,
   Grid,
   ClipboardCheck,
-  Star
+  Star,
+  UsersRound
 } from "lucide-react";
 
 const navItems = [
   { id: "dashboard", icon: Grid, label: "Dashboard" },
   { id: "evaluate", icon: UserCheck, label: "Evaluate Candidates" },
   { id: "jobs", icon: Briefcase, label: "Jobs & Internships" },
+  { id: "team", icon: UsersRound, label: "Team Management" },
   { id: "opportunities", icon: Star, label: "Opportunities" },
-  { id: "festivals", icon: Calendar, label: "Festivals" },
+  { id: "events", icon: Calendar, label: "Events" },
   { id: "assessments", icon: ClipboardCheck, label: "Assessments" },
   { id: "talent", icon: Users, label: "Talent Pipeline" }
 ];

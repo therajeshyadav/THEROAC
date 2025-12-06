@@ -3,17 +3,59 @@ const { Op } = require('sequelize');
 
 exports.createHubContent = async (req, res, next) => {
   try {
-    const { title, description, content, category, tags } = req.body;
+    const payload = { ...req.body };
 
     // Validate required fields
-    if (!title || !description || !content) {
+    if (!payload.title || !payload.description || !payload.content) {
       return res.status(400).json({
         error: 'Missing required fields: title, description, and content are required'
       });
     }
 
+    // Add organization context if available
+    if (req.currentOrganization) {
+      payload.organizationId = req.currentOrganization.id;
+      if (!payload.companyName) payload.companyName = req.currentOrganization.name;
+      if (!payload.companyLogo) payload.companyLogo = req.currentOrganization.logo;
+    }
+
+    // Validate and sanitize stipend field for internships
+    if (payload.stipend) {
+      if (typeof payload.stipend === 'string') {
+        try {
+          payload.stipend = JSON.parse(payload.stipend);
+        } catch (e) {
+          payload.stipend = null;
+        }
+      }
+      // Ensure stipend has proper structure
+      if (payload.stipend && typeof payload.stipend === 'object') {
+        payload.stipend = {
+          amount: payload.stipend.amount || '',
+          currency: payload.stipend.currency || 'USD',
+          period: payload.stipend.period || 'monthly'
+        };
+      }
+    }
+
+    // Validate and sanitize JSON fields
+    ['tags', 'skills', 'media'].forEach(field => {
+      if (payload[field] && typeof payload[field] === 'string') {
+        try {
+          payload[field] = JSON.parse(payload[field]);
+        } catch (e) {
+          payload[field] = [];
+        }
+      }
+    });
+
+    // Handle tags - convert to array if string
+    if (payload.tags && !Array.isArray(payload.tags)) {
+      payload.tags = payload.tags.split(',').map(tag => tag.trim());
+    }
+
     // Generate slug from title
-    let baseSlug = title.toLowerCase()
+    let baseSlug = payload.title.toLowerCase()
       .replace(/[^a-z0-9\s-]/g, '')
       .replace(/\s+/g, '-')
       .replace(/-+/g, '-')
@@ -31,16 +73,12 @@ exports.createHubContent = async (req, res, next) => {
       counter++;
     }
 
-    const hubContent = await HubContent.create({
-      title,
-      slug,
-      description,
-      content,
-      category: category || 'career-tips',
-      tags: Array.isArray(tags) ? tags : (tags ? tags.split(',').map(tag => tag.trim()) : []),
-      status: 'published',
-      createdBy: req.user.id
-    });
+    payload.slug = slug;
+    payload.createdBy = req.user.id;
+    payload.status = payload.status || 'published';
+    payload.category = payload.category || 'career-tips';
+
+    const hubContent = await HubContent.create(payload);
 
     res.status(201).json(hubContent);
   } catch (err) {
@@ -52,6 +90,12 @@ exports.createHubContent = async (req, res, next) => {
       });
     }
     
+    if (err.name === 'SequelizeUniqueConstraintError') {
+      return res.status(400).json({
+        error: 'Content with this slug already exists'
+      });
+    }
+    
     return res.status(500).json({
       error: 'Failed to create hub content. Please try again.'
     });
@@ -60,12 +104,13 @@ exports.createHubContent = async (req, res, next) => {
 
 exports.listHubContent = async (req, res, next) => {
   try {
-    const { q, category, status, page = 1, perPage = 20 } = req.query;
+    const { q, category, status, contentType, page = 1, perPage = 20 } = req.query;
     const where = {};
     
     if (status) where.status = status;
     if (q) where.title = { [Op.iLike]: `%${q}%` };
     if (category) where.category = category;
+    if (contentType) where.contentType = contentType;
 
     const hubContent = await HubContent.findAll({
       where,
@@ -102,8 +147,10 @@ exports.getHubContent = async (req, res, next) => {
       return res.status(404).json({ error: 'Hub content not found' });
     }
 
-    // Increment view counter
-    await hubContent.increment('views');
+    // Increment view counter only for candidates
+    if (req.user && req.user.role === 'candidate') {
+      await hubContent.increment('views');
+    }
     
     res.json(hubContent);
   } catch (err) {
@@ -121,16 +168,49 @@ exports.updateHubContent = async (req, res, next) => {
       return res.status(404).json({ error: 'Hub content not found' });
     }
 
-    const { title, description, content, category, tags, status } = req.body;
-    
-    await hubContent.update({
-      title: title || hubContent.title,
-      description: description || hubContent.description,
-      content: content || hubContent.content,
-      category: category || hubContent.category,
-      tags: Array.isArray(tags) ? tags : (tags ? tags.split(',').map(tag => tag.trim()) : hubContent.tags),
-      status: status || hubContent.status
+    // Check if user is authorized to update
+    if (hubContent.createdBy !== req.user.id && !['admin', 'superadmin'].includes(req.user.role)) {
+      return res.status(403).json({ error: 'Not authorized to update this content' });
+    }
+
+    const payload = { ...req.body };
+
+    // Validate and sanitize stipend field for internships
+    if (payload.stipend) {
+      if (typeof payload.stipend === 'string') {
+        try {
+          payload.stipend = JSON.parse(payload.stipend);
+        } catch (e) {
+          payload.stipend = null;
+        }
+      }
+      // Ensure stipend has proper structure
+      if (payload.stipend && typeof payload.stipend === 'object') {
+        payload.stipend = {
+          amount: payload.stipend.amount || '',
+          currency: payload.stipend.currency || 'USD',
+          period: payload.stipend.period || 'monthly'
+        };
+      }
+    }
+
+    // Validate and sanitize JSON fields
+    ['tags', 'skills', 'media'].forEach(field => {
+      if (payload[field] && typeof payload[field] === 'string') {
+        try {
+          payload[field] = JSON.parse(payload[field]);
+        } catch (e) {
+          payload[field] = [];
+        }
+      }
     });
+
+    // Handle tags - convert to array if string
+    if (payload.tags && !Array.isArray(payload.tags)) {
+      payload.tags = payload.tags.split(',').map(tag => tag.trim());
+    }
+    
+    await hubContent.update(payload);
 
     res.json(hubContent);
   } catch (err) {
@@ -139,6 +219,12 @@ exports.updateHubContent = async (req, res, next) => {
     if (err.name === 'SequelizeValidationError') {
       return res.status(400).json({
         error: err.errors[0]?.message || 'Validation error'
+      });
+    }
+    
+    if (err.name === 'SequelizeUniqueConstraintError') {
+      return res.status(400).json({
+        error: 'Content with this slug already exists'
       });
     }
     
@@ -184,8 +270,10 @@ exports.getHubContentBySlug = async (req, res, next) => {
       return res.status(404).json({ error: 'Hub content not found' });
     }
 
-    // Increment view counter
-    await hubContent.increment('views');
+    // Increment view counter only for candidates
+    if (req.user && req.user.role === 'candidate') {
+      await hubContent.increment('views');
+    }
     
     res.json(hubContent);
   } catch (err) {

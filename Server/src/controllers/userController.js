@@ -52,13 +52,14 @@ exports.updateProfile = async (req, res, next) => {
       'skills',
       'experiences',
       'education',
+      'company', // Company information for recruiters
     ];
 
     const updates = {};
     for (const field of allowedFields) {
       if (req.body[field] !== undefined && req.body[field] !== null) {
-        // Parse JSON strings for array fields
-        if (['skills', 'experiences', 'education'].includes(field)) {
+        // Parse JSON strings for array/object fields
+        if (['skills', 'experiences', 'education', 'company', 'preferences'].includes(field)) {
           if (typeof req.body[field] === 'string') {
             try {
               updates[field] = JSON.parse(req.body[field]);
@@ -66,7 +67,7 @@ exports.updateProfile = async (req, res, next) => {
               updates[field] = req.body[field];
             }
           } else {
-            // Already an array
+            // Already an array/object
             updates[field] = req.body[field];
           }
         } else {
@@ -203,5 +204,37 @@ exports.deleteUser = async (req, res, next) => {
   } catch (err) {
     console.error('Error in deleteUser:', err);
     next(err);
+  }
+};
+
+exports.uploadResume = async (req, res, next) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ success: false, error: 'Unauthorized: User not found.' });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ success: false, error: 'No file uploaded.' });
+    }
+
+    // Generate the file URL/path
+    const resumePath = `/uploads/resumes/${req.file.filename}`;
+
+    // Update user's resumePath in database
+    await req.user.update({ resumePath });
+
+    return res.status(200).json({
+      success: true,
+      message: 'Resume uploaded successfully',
+      resumePath,
+      url: resumePath,
+      filename: req.file.filename,
+    });
+  } catch (err) {
+    console.error('Error in uploadResume:', err);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to upload resume. Please try again.'
+    });
   }
 };

@@ -1,5 +1,6 @@
 // src/components/recruiter-dashboard/SettingsTab.jsx
 import React from "react";
+import "./SettingsTab.css";
 
 const SettingsTab = ({
   authUser,
@@ -9,115 +10,260 @@ const SettingsTab = ({
   setIsEditingProfile,
   getUserInitials,
 }) => {
+  // Display ke liye: authUser + profileData merge
+  // Always merge authUser with profileData to show latest data
+  const displayProfile = {
+    ...(authUser || {}),
+    ...(profileData || {}),
+  };
+
+  // Debug: Check what data we have
+  console.log('SettingsTab - authUser:', authUser);
+  console.log('SettingsTab - authUser.company:', authUser?.company);
+  console.log('SettingsTab - profileData:', profileData);
+  console.log('SettingsTab - profileData.companyName:', profileData?.companyName);
+  console.log('SettingsTab - displayProfile:', displayProfile);
+  console.log('SettingsTab - displayProfile.companyName:', displayProfile?.companyName);
+  console.log('SettingsTab - displayProfile.company:', displayProfile?.company);
+
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setProfileData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const handleCommaSeparatedChange = (e) => {
+    const { name, value } = e.target;
+    setProfileData((prev) => ({
+      ...prev,
+      [name]: value,
+      // backend ko array chahiye to split use kar sakte ho:
+      // [name]: value.split(",").map(v => v.trim()).filter(Boolean)
+    }));
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditingProfile(false);
+  };
+
+  const handleSaveProfile = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem('token');
+      
+      // Include all fields - personal + company + preferences
+      const userFields = {
+        fullName: profileData.fullName,
+        phone: profileData.phone,
+        bio: profileData.bio,
+        city: profileData.city,
+        state: profileData.state,
+        country: profileData.country,
+        role: profileData.role,
+        // Company info stored in user profile
+        company: {
+          name: profileData.companyName,
+          industryType: profileData.industryType,
+          companySize: profileData.companySize,
+          foundedYear: profileData.foundedYear,
+          headOffice: profileData.headOffice,
+          website: profileData.website,
+          aboutCompany: profileData.aboutCompany
+        },
+        // Preferences and metrics
+        preferences: {
+          workLocations: profileData.workLocations ? profileData.workLocations.split(',').map(s => s.trim()).filter(Boolean) : [],
+          hiringFor: profileData.hiringFor ? profileData.hiringFor.split(',').map(s => s.trim()).filter(Boolean) : [],
+          metrics: {
+            totalJobsPosted: profileData.totalJobsPosted || 0,
+            activeJobs: profileData.activeJobs || 0,
+            totalCandidatesHired: profileData.totalCandidatesHired || 0,
+            responseRate: profileData.responseRate || '',
+            averageResponseTimeHours: profileData.averageResponseTimeHours || 0
+          },
+          communication: {
+            allowDirectMessage: profileData.allowDirectMessage ?? true,
+            preferredContact: profileData.preferredContact || 'platform_chat',
+            supportEmail: profileData.supportEmail || ''
+          }
+        }
+      };
+
+      console.log('Saving profile data:', userFields);
+
+      // Update user profile
+      const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000/api';
+      const userResponse = await fetch(`${API_URL}/users/me`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(userFields)
+      });
+
+      if (!userResponse.ok) {
+        throw new Error('Failed to update user profile');
+      }
+
+      const response = await userResponse.json();
+      console.log('Save response:', response);
+      
+      const updatedUser = response.user || response;
+      console.log('Updated user data:', updatedUser);
+      
+      // Fetch fresh user data from server to get company field
+      const freshUserResponse = await fetch(`${API_URL}/users/me`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (freshUserResponse.ok) {
+        const freshData = await freshUserResponse.json();
+        const freshUser = freshData.user || freshData;
+        console.log('Fresh user data from server:', freshUser);
+        
+        // Update local storage with fresh data
+        localStorage.setItem('user', JSON.stringify(freshUser));
+        
+        // Store current tab before reload so we come back to settings
+        sessionStorage.setItem('activeTab', 'settings');
+        
+        console.log("Profile updated successfully");
+        setIsEditingProfile(false);
+        
+        // Reload page to reflect changes
+        window.location.reload();
+      } else {
+        throw new Error('Failed to fetch updated profile');
+      }
+    } catch (err) {
+      console.error("Failed to save profile", err);
+      alert("Failed to update profile. Please try again.");
+    }
+  };
+
   return (
-    <div className="settings-section">
-      <div className="section-header" style={{ marginBottom: "2rem" }}>
-        <div className="header-left">
-          <h2
-            style={{
-              color: "#fff",
-              fontSize: "1.5rem",
-              fontWeight: "600",
-              margin: 0,
-            }}
-          >
-            Profile Settings
-          </h2>
-          <p
-            style={{
-              color: "rgba(255,255,255,0.7)",
-              margin: "0.5rem 0 0 0",
-            }}
-          >
-            Manage your account information and preferences
-          </p>
-        </div>
+    <div className="settings-tab-container">
+      {/* Header */}
+      <div className="settings-section-header">
+        <h2>Profile Settings</h2>
+        <p>Manage your recruiter profile, company details and hiring preferences</p>
       </div>
 
-      <div
-        className="profile-card"
-        style={{
-          background: "rgba(255,255,255,0.1)",
-          backdropFilter: "blur(20px)",
-          border: "1px solid rgba(255,214,0,0.2)",
-          borderRadius: "20px",
-          padding: "2rem",
-          maxWidth: "800px",
-        }}
-      >
-        {/* Profile Header */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "2rem",
-            marginBottom: "2rem",
-            paddingBottom: "2rem",
-            borderBottom: "1px solid rgba(255,255,255,0.1)",
-          }}
-        >
-          <div
-            className="user-avatar"
-            style={{ width: "80px", height: "80px", fontSize: "2rem" }}
-          >
-            {authUser?.profilePicture ? (
+      {/* Profile Header Card */}
+      <div className="settings-profile-card">
+        <div className="settings-profile-header">
+          <div className="user-avatar">
+            {displayProfile?.profilePicture ? (
               <img
-                src={authUser.profilePicture}
-                alt={authUser.fullName}
+                src={displayProfile.profilePicture}
+                alt={displayProfile.fullName}
                 className="profile-image"
               />
             ) : (
               <span className="profile-initials">
-                {getUserInitials(authUser?.fullName || authUser?.name)}
+                {getUserInitials(
+                  displayProfile?.fullName || displayProfile?.name
+                )}
               </span>
             )}
           </div>
-          <div style={{ flex: 1 }}>
-            <h3
-              style={{
-                color: "#fff",
-                fontSize: "1.5rem",
-                fontWeight: "600",
-                margin: "0 0 0.5rem 0",
-              }}
-            >
-              {authUser?.fullName || authUser?.name || "Recruiter"}
+
+          <div className="settings-profile-info">
+            <h3>
+              {displayProfile?.fullName ||
+                displayProfile?.name ||
+                "Recruiter"}
             </h3>
-            <p
-              style={{
-                color: "rgba(255,255,255,0.7)",
-                margin: 0,
-              }}
-            >
-              {authUser?.email}
+            <p className="profile-email">
+              {displayProfile?.email}
             </p>
-            <span
-              style={{
-                display: "inline-block",
-                marginTop: "0.5rem",
-                padding: "0.25rem 0.75rem",
-                background: "rgba(255,214,0,0.2)",
-                color: "#FFD600",
-                borderRadius: "12px",
-                fontSize: "0.85rem",
-                fontWeight: "600",
-              }}
-            >
-              {authUser?.role || "Recruiter"}
-            </span>
+            <div className="settings-profile-badges">
+              <span className="settings-badge">
+                {displayProfile?.role || "Recruiter"}
+              </span>
+
+              {displayProfile?.isVerifiedRecruiter && (
+                <span className="settings-badge verified">
+                  ✅ Verified Recruiter
+                </span>
+              )}
+            </div>
           </div>
+
           {!isEditingProfile && (
             <button
-              className="btn-host"
+              className="settings-btn settings-btn-primary"
               onClick={() => {
                 setProfileData({
-                  fullName: authUser?.fullName || authUser?.name || "",
+                  // Personal
+                  fullName:
+                    authUser?.fullName || authUser?.name || "",
                   email: authUser?.email || "",
                   phone: authUser?.phone || "",
                   city: authUser?.city || "",
                   state: authUser?.state || "",
                   country: authUser?.country || "",
                   bio: authUser?.bio || "",
+
+                  // Company
+                  companyName: authUser?.company?.name || "",
+                  companyLogo: authUser?.company?.logo || "",
+                  industryType:
+                    authUser?.company?.industryType || "",
+                  companySize:
+                    authUser?.company?.companySize || "",
+                  foundedYear:
+                    authUser?.company?.foundedYear || "",
+                  headOffice:
+                    authUser?.company?.headOffice || "",
+                  website: authUser?.company?.website || "",
+                  aboutCompany:
+                    authUser?.company?.aboutCompany || "",
+
+                  // Hiring & metrics
+                  totalJobsPosted:
+                    authUser?.metrics?.totalJobsPosted || "",
+                  activeJobs: authUser?.metrics?.activeJobs || "",
+                  totalCandidatesHired:
+                    authUser?.metrics?.totalCandidatesHired ||
+                    "",
+                  responseRate:
+                    authUser?.metrics?.responseRate || "",
+                  averageResponseTimeHours:
+                    authUser?.metrics
+                      ?.averageResponseTimeHours || "",
+
+                  // Preferences
+                  workLocations:
+                    authUser?.preferences?.workLocations?.join(
+                      ", "
+                    ) || "",
+                  hiringFor:
+                    authUser?.preferences?.hiringFor?.join(
+                      ", "
+                    ) || "",
+
+                  // Communication
+                  allowDirectMessage:
+                    authUser?.communication?.allowDirectMessage ??
+                    true,
+                  preferredContact:
+                    authUser?.communication?.preferredContact ||
+                    "platform_chat",
+                  supportEmail:
+                    authUser?.communication?.supportEmail || "",
+
+                  // Security & verification
+                  isVerifiedRecruiter:
+                    authUser?.isVerifiedRecruiter || false,
+                  kycStatus: authUser?.kycStatus || "pending",
+                  twoFactorAuthEnabled:
+                    authUser?.twoFactorAuthEnabled || false,
                 });
                 setIsEditingProfile(true);
               }}
@@ -126,95 +272,577 @@ const SettingsTab = ({
             </button>
           )}
         </div>
+      </div>
 
-        {/* Profile Form / View */}
+      {/* Content Card */}
+      <div className="settings-content-card">
         {isEditingProfile ? (
-          <div className="profile-form">
-            {/* yahan wo hi inputs jo tumne original file me rakhe the */}
-            {/* ... same as your existing edit form ... */}
-            {/* sirf ek jagah tumne fetch call likha tha, vo yahin reh sakta hai */}
-          </div>
-        ) : (
-          <div className="profile-details">
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(2, 1fr)",
-                gap: "1.5rem",
-              }}
-            >
-              <div>
-                <label
-                  style={{
-                    display: "block",
-                    color: "rgba(255,255,255,0.6)",
-                    marginBottom: "0.5rem",
-                    fontSize: "0.85rem",
-                  }}
-                >
-                  Phone
-                </label>
-                <p
-                  style={{
-                    color: "#fff",
-                    margin: 0,
-                    fontSize: "1rem",
-                  }}
-                >
-                  {authUser?.phone || "Not provided"}
-                </p>
+          <form className="settings-form" onSubmit={handleSaveProfile}>
+            {/* PERSONAL INFO */}
+            <section className="settings-section">
+              <h4 className="settings-section-title">
+                Personal Information
+              </h4>
+              <div className="settings-form-grid">
+                <div className="settings-form-group">
+                  <label className="settings-input-label">Full Name</label>
+                  <input
+                    type="text"
+                    name="fullName"
+                    className="settings-input-field"
+                    value={profileData?.fullName || ""}
+                    onChange={handleInputChange}
+                    placeholder="Enter your full name"
+                  />
+                </div>
+                <div className="settings-form-group">
+                  <label className="settings-input-label">Email</label>
+                  <input
+                    type="email"
+                    name="email"
+                    className="settings-input-field"
+                    value={profileData?.email || ""}
+                    onChange={handleInputChange}
+                    disabled
+                  />
+                </div>
+                <div className="settings-form-group">
+                  <label className="settings-input-label">Phone</label>
+                  <input
+                    type="text"
+                    name="phone"
+                    className="settings-input-field"
+                    value={profileData?.phone || ""}
+                    onChange={handleInputChange}
+                    placeholder="+91-XXXXXXXXXX"
+                  />
+                </div>
+                <div className="settings-form-group">
+                  <label className="settings-input-label">Role / Designation</label>
+                  <input
+                    type="text"
+                    name="role"
+                    className="settings-input-field"
+                    value={profileData?.role || ""}
+                    onChange={handleInputChange}
+                    placeholder="Talent Acquisition Manager"
+                  />
+                </div>
+                <div className="settings-form-group">
+                  <label className="settings-input-label">City</label>
+                  <input
+                    type="text"
+                    name="city"
+                    className="settings-input-field"
+                    value={profileData?.city || ""}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div className="settings-form-group">
+                  <label className="settings-input-label">State</label>
+                  <input
+                    type="text"
+                    name="state"
+                    className="settings-input-field"
+                    value={profileData?.state || ""}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div className="settings-form-group">
+                  <label className="settings-input-label">Country</label>
+                  <input
+                    type="text"
+                    name="country"
+                    className="settings-input-field"
+                    value={profileData?.country || ""}
+                    onChange={handleInputChange}
+                  />
+                </div>
               </div>
-              <div>
-                <label
-                  style={{
-                    display: "block",
-                    color: "rgba(255,255,255,0.6)",
-                    marginBottom: "0.5rem",
-                    fontSize: "0.85rem",
-                  }}
-                >
-                  Location
-                </label>
-                <p
-                  style={{
-                    color: "#fff",
-                    margin: 0,
-                    fontSize: "1rem",
-                  }}
-                >
-                  {[authUser?.city, authUser?.state, authUser?.country]
-                    .filter(Boolean)
-                    .join(", ") || "Not provided"}
-                </p>
+              <div className="settings-form-grid single-column" style={{ marginTop: "1rem" }}>
+                <div className="settings-form-group">
+                  <label className="settings-input-label">Short Bio</label>
+                  <textarea
+                    name="bio"
+                    className="settings-input-field"
+                    rows={3}
+                    value={profileData?.bio || ""}
+                    onChange={handleInputChange}
+                    placeholder="Describe your hiring experience, domains you hire for, etc."
+                  />
+                </div>
               </div>
-              <div style={{ gridColumn: "1 / -1" }}>
-                <label
-                  style={{
-                    display: "block",
-                    color: "rgba(255,255,255,0.6)",
-                    marginBottom: "0.5rem",
-                    fontSize: "0.85rem",
-                  }}
-                >
-                  Bio
-                </label>
-                <p
-                  style={{
-                    color: "#fff",
-                    margin: 0,
-                    fontSize: "1rem",
-                    lineHeight: "1.6",
-                  }}
-                >
-                  {authUser?.bio || "No bio added yet"}
-                </p>
+            </section>
+
+            {/* COMPANY INFO */}
+            <section className="settings-section">
+              <h4 className="settings-section-title">
+                Company Information
+              </h4>
+              <div className="settings-form-grid">
+                <div className="settings-form-group">
+                  <label className="settings-input-label">Company Name</label>
+                  <input
+                    type="text"
+                    name="companyName"
+                    className="settings-input-field"
+                    value={profileData?.companyName || ""}
+                    onChange={handleInputChange}
+                    placeholder="ABC Technologies Pvt Ltd"
+                  />
+                </div>
+                <div className="settings-form-group">
+                  <label className="settings-input-label">Industry Type</label>
+                  <input
+                    type="text"
+                    name="industryType"
+                    className="settings-input-field"
+                    value={profileData?.industryType || ""}
+                    onChange={handleInputChange}
+                    placeholder="IT Services, FinTech, etc."
+                  />
+                </div>
+                <div className="settings-form-group">
+                  <label className="settings-input-label">Company Size</label>
+                  <input
+                    type="text"
+                    name="companySize"
+                    className="settings-input-field"
+                    value={profileData?.companySize || ""}
+                    onChange={handleInputChange}
+                    placeholder="51–200 employees"
+                  />
+                </div>
+                <div className="settings-form-group">
+                  <label className="settings-input-label">Founded Year</label>
+                  <input
+                    type="number"
+                    name="foundedYear"
+                    className="settings-input-field"
+                    value={profileData?.foundedYear || ""}
+                    onChange={handleInputChange}
+                    placeholder="2016"
+                  />
+                </div>
+                <div className="settings-form-group">
+                  <label className="settings-input-label">Head Office</label>
+                  <input
+                    type="text"
+                    name="headOffice"
+                    className="settings-input-field"
+                    value={profileData?.headOffice || ""}
+                    onChange={handleInputChange}
+                    placeholder="Bengaluru, India"
+                  />
+                </div>
+                <div className="settings-form-group">
+                  <label className="settings-input-label">Website</label>
+                  <input
+                    type="url"
+                    name="website"
+                    className="settings-input-field"
+                    value={profileData?.website || ""}
+                    onChange={handleInputChange}
+                    placeholder="https://example.com"
+                  />
+                </div>
               </div>
+              <div className="settings-form-grid single-column" style={{ marginTop: "1rem" }}>
+                <div className="settings-form-group">
+                  <label className="settings-input-label">About Company</label>
+                  <textarea
+                    name="aboutCompany"
+                    className="settings-input-field"
+                  rows={3}
+                  value={profileData?.aboutCompany || ""}
+                  onChange={handleInputChange}
+                    placeholder="What does your company do? Mission, products, culture, etc."
+                  />
+                </div>
+              </div>
+            </section>
+
+            {/* HIRING PREFERENCES */}
+            <section className="settings-section">
+              <h4 className="settings-section-title">
+                Hiring Preferences
+              </h4>
+              <div className="settings-form-grid">
+                <div className="settings-form-group">
+                  <label className="settings-input-label">
+                    Work Locations (comma separated)
+                  </label>
+                  <input
+                    type="text"
+                    name="workLocations"
+                    className="settings-input-field"
+                    value={profileData?.workLocations || ""}
+                    onChange={handleCommaSeparatedChange}
+                    placeholder="Bengaluru, Hyderabad, Remote"
+                  />
+                </div>
+                <div className="settings-form-group">
+                  <label className="settings-input-label">
+                    Hiring For (comma separated)
+                  </label>
+                  <input
+                    type="text"
+                    name="hiringFor"
+                    className="settings-input-field"
+                    value={profileData?.hiringFor || ""}
+                    onChange={handleCommaSeparatedChange}
+                    placeholder="Full-time, Internship, Contract"
+                  />
+                </div>
+                <div className="settings-form-group">
+                  <label className="settings-input-label">
+                    Total Jobs Posted (optional)
+                  </label>
+                  <input
+                    type="number"
+                    name="totalJobsPosted"
+                    className="settings-input-field"
+                    value={profileData?.totalJobsPosted || ""}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div className="settings-form-group">
+                  <label className="settings-input-label">
+                    Total Candidates Hired (optional)
+                  </label>
+                  <input
+                    type="number"
+                    name="totalCandidatesHired"
+                    className="settings-input-field"
+                    value={profileData?.totalCandidatesHired || ""}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div className="settings-form-group">
+                  <label className="settings-input-label">
+                    Response Rate (in %)
+                  </label>
+                  <input
+                    type="text"
+                    name="responseRate"
+                    className="settings-input-field"
+                    value={profileData?.responseRate || ""}
+                    onChange={handleInputChange}
+                    placeholder="e.g., 85%"
+                  />
+                </div>
+                <div className="settings-form-group">
+                  <label className="settings-input-label">
+                    Avg. Response Time (hours)
+                  </label>
+                  <input
+                    type="number"
+                    name="averageResponseTimeHours"
+                    className="settings-input-field"
+                    value={
+                      profileData?.averageResponseTimeHours || ""
+                    }
+                    onChange={handleInputChange}
+                    placeholder="e.g., 18"
+                  />
+                </div>
+              </div>
+            </section>
+
+            {/* COMMUNICATION & SECURITY */}
+            <section className="settings-section">
+              <h4 className="settings-section-title">
+                Communication & Security
+              </h4>
+              <div className="settings-form-grid">
+                <div className="settings-form-group">
+                  <label className="settings-input-label">
+                    Support / HR Email (for candidates)
+                  </label>
+                  <input
+                    type="email"
+                    name="supportEmail"
+                    className="settings-input-field"
+                    value={profileData?.supportEmail || ""}
+                    onChange={handleInputChange}
+                    placeholder="hr@company.com"
+                  />
+                </div>
+                <div className="settings-form-group">
+                  <label className="settings-input-label">
+                    Preferred Contact Channel
+                  </label>
+                  <select
+                    name="preferredContact"
+                    className="settings-input-field"
+                    value={profileData?.preferredContact || "platform_chat"}
+                    onChange={handleInputChange}
+                  >
+                    <option value="platform_chat">Platform Chat</option>
+                    <option value="email">Email</option>
+                  </select>
+                </div>
+                <div className="settings-checkbox-group">
+                  <input
+                    type="checkbox"
+                    id="allowDirectMessage"
+                    name="allowDirectMessage"
+                    checked={!!profileData?.allowDirectMessage}
+                    onChange={handleInputChange}
+                  />
+                  <label htmlFor="allowDirectMessage">
+                    Allow candidates to send direct messages
+                  </label>
+                </div>
+                <div className="settings-checkbox-group">
+                  <input
+                    type="checkbox"
+                    id="twoFactorAuthEnabled"
+                    name="twoFactorAuthEnabled"
+                    checked={!!profileData?.twoFactorAuthEnabled}
+                    onChange={handleInputChange}
+                  />
+                  <label htmlFor="twoFactorAuthEnabled">
+                    Enable Two-Factor Authentication
+                  </label>
+                </div>
+              </div>
+            </section>
+
+            {/* ACTION BUTTONS */}
+            <div className="settings-actions">
+              <button
+                type="button"
+                className="settings-btn settings-btn-outline"
+                onClick={handleCancelEdit}
+              >
+                Cancel
+              </button>
+              <button type="submit" className="settings-btn settings-btn-primary">
+                Save Changes
+              </button>
             </div>
+          </form>
+        ) : (
+          /* READ-ONLY VIEW */
+          <div className="settings-form">
+            {/* PERSONAL */}
+            <section className="settings-section">
+              <h4 className="settings-section-title">
+                Personal Information
+              </h4>
+              <div className="settings-form-grid">
+                <InfoItem label="Phone" value={displayProfile?.phone} />
+                <InfoItem
+                  label="Location"
+                  value={
+                    [
+                      displayProfile?.city,
+                      displayProfile?.state,
+                      displayProfile?.country,
+                    ]
+                      .filter(Boolean)
+                      .join(", ") || ""
+                  }
+                />
+                <InfoItem
+                  label="Role / Designation"
+                  value={displayProfile?.role}
+                />
+                <InfoItem
+                  label="Email"
+                  value={displayProfile?.email}
+                />
+              </div>
+              <div className="settings-form-grid single-column" style={{ marginTop: "1rem" }}>
+                <div>
+                  <label className="settings-view-label">Bio</label>
+                  <p className="settings-view-value">
+                    {displayProfile?.bio || "No bio added yet"}
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            {/* COMPANY */}
+            <section className="settings-section">
+              <h4 className="settings-section-title">
+                Company Information
+              </h4>
+              <div className="settings-form-grid">
+                <InfoItem
+                  label="Company Name"
+                  value={
+                    displayProfile?.companyName ||
+                    displayProfile?.company?.name
+                  }
+                />
+                <InfoItem
+                  label="Industry Type"
+                  value={
+                    displayProfile?.industryType ||
+                    displayProfile?.company?.industryType
+                  }
+                />
+                <InfoItem
+                  label="Company Size"
+                  value={
+                    displayProfile?.companySize ||
+                    displayProfile?.company?.companySize
+                  }
+                />
+                <InfoItem
+                  label="Founded Year"
+                  value={
+                    displayProfile?.foundedYear ||
+                    displayProfile?.company?.foundedYear
+                  }
+                />
+                <InfoItem
+                  label="Head Office"
+                  value={
+                    displayProfile?.headOffice ||
+                    displayProfile?.company?.headOffice
+                  }
+                />
+                <InfoItem
+                  label="Website"
+                  value={
+                    displayProfile?.website ||
+                    displayProfile?.company?.website
+                  }
+                />
+              </div>
+              <div className="settings-form-grid single-column" style={{ marginTop: "1rem" }}>
+                <div>
+                  <label className="settings-view-label">About Company</label>
+                  <p className="settings-view-value">
+                    {displayProfile?.aboutCompany ||
+                      displayProfile?.company?.aboutCompany ||
+                      "No company description added yet"}
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            {/* HIRING PREFERENCES & METRICS */}
+            <section className="settings-section">
+              <h4 className="settings-section-title">
+                Hiring Preferences
+              </h4>
+              <div className="settings-form-grid">
+                <InfoItem
+                  label="Work Locations"
+                  value={
+                    displayProfile?.workLocations ||
+                    displayProfile?.preferences?.workLocations?.join(", ")
+                  }
+                />
+                <InfoItem
+                  label="Hiring For"
+                  value={
+                    displayProfile?.hiringFor ||
+                    displayProfile?.preferences?.hiringFor?.join(", ")
+                  }
+                />
+                <InfoItem
+                  label="Total Jobs Posted"
+                  value={
+                    displayProfile?.totalJobsPosted ||
+                    displayProfile?.metrics?.totalJobsPosted
+                  }
+                />
+                <InfoItem
+                  label="Total Candidates Hired"
+                  value={
+                    displayProfile?.totalCandidatesHired ||
+                    displayProfile?.metrics?.totalCandidatesHired
+                  }
+                />
+                <InfoItem
+                  label="Response Rate"
+                  value={
+                    displayProfile?.responseRate ||
+                    displayProfile?.metrics?.responseRate
+                  }
+                />
+                <InfoItem
+                  label="Avg. Response Time (hours)"
+                  value={
+                    displayProfile?.averageResponseTimeHours ||
+                    displayProfile?.metrics?.averageResponseTimeHours
+                  }
+                />
+              </div>
+            </section>
+
+            {/* COMMUNICATION & SECURITY */}
+            <section className="settings-section">
+              <h4 className="settings-section-title">
+                Communication & Security
+              </h4>
+              <div className="settings-form-grid">
+                <InfoItem
+                  label="Support Email"
+                  value={
+                    displayProfile?.supportEmail ||
+                    displayProfile?.communication?.supportEmail
+                  }
+                />
+                <InfoItem
+                  label="Preferred Contact"
+                  value={
+                    displayProfile?.preferredContact ||
+                    displayProfile?.communication?.preferredContact ||
+                    "Platform Chat"
+                  }
+                />
+              </div>
+              <div className="settings-form-grid" style={{ marginTop: "1rem", gridTemplateColumns: "repeat(3, minmax(0, 1fr))" }}>
+                <InfoItem
+                  label="Direct Messages"
+                  value={
+                    (displayProfile?.allowDirectMessage ??
+                      displayProfile?.communication
+                        ?.allowDirectMessage)
+                      ? "Allowed"
+                      : "Disabled"
+                  }
+                />
+                <InfoItem
+                  label="Two-Factor Authentication"
+                  value={
+                    displayProfile?.twoFactorAuthEnabled
+                      ? "Enabled"
+                      : "Disabled"
+                  }
+                />
+                <InfoItem
+                  label="KYC Status"
+                  value={displayProfile?.kycStatus || "Not verified"}
+                />
+              </div>
+            </section>
           </div>
         )}
       </div>
     </div>
   );
 };
+
+/** SMALL REUSABLE VIEW COMPONENTS **/
+const InfoItem = ({ label, value }) => (
+  <div>
+    <label className="settings-view-label">{label}</label>
+    <p className="settings-view-value">{value || "Not provided"}</p>
+  </div>
+);
+
+const MetricCard = ({ label, value }) => (
+  <div className="settings-metric-card">
+    <p className="settings-metric-label">{label}</p>
+    <p className="settings-metric-value">{value || "—"}</p>
+  </div>
+);
 
 export default SettingsTab;

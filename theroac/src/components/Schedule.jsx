@@ -72,9 +72,23 @@ const Schedule = () => {
 					};
 				});
 
-			const hubContent = (Array.isArray(hubContentData) ? hubContentData : [])
+			// Separate internships from other hub content
+			const allHubContent = Array.isArray(hubContentData) ? hubContentData : [];
+			const internships = allHubContent
+				.filter(content => content.contentType === 'internship')
 				.map(content => ({
-					img: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80",
+					img: content.companyLogo || content.thumbnailImage || "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80",
+					title: `${content.title} - ${content.companyName || 'Company'}`,
+					time: `${content.duration || 'Internship'} • ${content.locationType || 'Remote'}`,
+					location: content.location || 'Remote',
+					type: 'internship',
+					data: content
+				}));
+
+			const hubContent = allHubContent
+				.filter(content => content.contentType !== 'internship')
+				.map(content => ({
+					img: content.featuredImage || content.thumbnailImage || "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80",
 					title: content.title,
 					time: `${content.category?.replace('-', ' ') || 'Career Tips'} • ${new Date(content.createdAt || Date.now()).toLocaleDateString()}`,
 					location: "ROAC Talent Hub",
@@ -85,12 +99,21 @@ const Schedule = () => {
 			// Create events data structure using ONLY backend data (no static data)
 			const enhancedEventsData = [];
 
-			// Add Jobs section with backend data only
+			// Add Jobs section with backend data only (no internships)
 			if (jobs.length > 0) {
 				enhancedEventsData.push({
 					title: "Jobs",
 					titleId: "Jobs",
 					events: jobs
+				});
+			}
+
+			// Add Internships section separately
+			if (internships.length > 0) {
+				enhancedEventsData.push({
+					title: "Internships",
+					titleId: "Internships",
+					events: internships
 				});
 			}
 

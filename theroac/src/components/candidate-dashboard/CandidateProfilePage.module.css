@@ -7,11 +7,11 @@
 
 /* ---------- COVER ---------- */
 .cover {
-  background: linear-gradient(135deg, #050608, #16131a);
+  /* background: linear-gradient(135deg, #050608, #16131a); */
   border-radius: 20px;
   padding: 24px 28px;
   border: 1px solid rgba(255, 214, 0, 0.22);
-  box-shadow: 0 0 26px rgba(255, 214, 0, 0.18);
+  /* box-shadow: 0 0 26px rgba(255, 214, 0, 0.18); */
   display: flex;
   justify-content: space-between;
   gap: 20px;

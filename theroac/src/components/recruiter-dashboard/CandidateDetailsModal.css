@@ -1,0 +1,609 @@
+/* Candidate Details Modal - Perfect Design */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 20px;
+  overflow-y: auto;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.candidate-modal {
+  background: linear-gradient(135deg, #1e1e1e 0%, #252525 100%);
+  border-radius: 12px;
+  width: 100%;
+  max-width: 850px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 214, 0, 0.1);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Custom Scrollbar */
+.candidate-modal::-webkit-scrollbar {
+  width: 8px;
+}
+
+.candidate-modal::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+.candidate-modal::-webkit-scrollbar-thumb {
+  background: rgba(255, 214, 0, 0.3);
+  border-radius: 4px;
+}
+
+.candidate-modal::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 214, 0, 0.5);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 2px solid rgba(255, 214, 0, 0.2);
+  position: sticky;
+  top: 0;
+  background: linear-gradient(135deg, #1e1e1e 0%, #252525 100%);
+  z-index: 10;
+  backdrop-filter: blur(10px);
+}
+
+.header-left {
+  flex: 1;
+}
+
+.header-left h2 {
+  color: #fff;
+  margin: 0 0 4px 0;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.application-id {
+  color: #FFD600;
+  font-size: 12px;
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+.close-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.close-btn:hover {
+  background: rgba(255, 67, 54, 0.2);
+  border-color: rgba(255, 67, 54, 0.4);
+  color: #ff4336;
+  transform: scale(1.05);
+}
+
+.modal-body {
+  padding: 20px 24px 24px;
+}
+
+.section {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 18px;
+  margin-bottom: 16px;
+  transition: all 0.3s ease;
+}
+
+.section:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 214, 0, 0.2);
+  transform: translateY(-1px);
+}
+
+.section h4 {
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0 0 14px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 214, 0, 0.15);
+}
+
+.section h4 i {
+  color: #FFD600;
+  font-size: 16px;
+}
+
+/* Candidate Profile */
+.candidate-profile {
+  /* background: linear-gradient(135deg, rgba(255, 214, 0, 0.08) 0%, rgba(255, 214, 0, 0.03) 100%);
+  border-color: rgba(255, 214, 0, 0.25); */
+  border-width: 2px;
+}
+
+.profile-header {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+}
+
+.profile-avatar {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(255, 214, 0, 0.2) 0%, rgba(255, 214, 0, 0.1) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  border: 3px solid #FFD600;
+  box-shadow: 0 4px 12px rgba(255, 214, 0, 0.3);
+}
+
+.profile-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-avatar i {
+  font-size: 36px;
+  color: #FFD600;
+}
+
+.profile-info {
+  flex: 1;
+}
+
+.profile-info h3 {
+  color: #fff;
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 6px 0;
+  letter-spacing: -0.5px;
+}
+
+.profile-info .headline {
+  color: #FFD600;
+  font-size: 15px;
+  font-weight: 500;
+  margin: 0 0 12px 0;
+}
+
+.contact-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.contact-info span {
+  color: #e0e0e0;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.contact-info i {
+  color: #FFD600;
+  font-size: 14px;
+}
+
+.social-links {
+  display: flex;
+  gap: 10px;
+}
+
+.social-links a {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFD600;
+  transition: all 0.3s ease;
+  font-size: 16px;
+}
+
+.social-links a:hover {
+  background: #FFD600;
+  color: #000;
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(255, 214, 0, 0.4);
+}
+
+/* Details Grid */
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+}
+
+.detail-item {
+  background: rgba(255, 255, 255, 0.03);
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.3s ease;
+}
+
+.detail-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 214, 0, 0.2);
+}
+
+.detail-item label {
+  display: block;
+  color: #999;
+  font-size: 11px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+
+.detail-item p {
+  color: #fff;
+  font-size: 14px;
+  margin: 0;
+  font-weight: 500;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: capitalize;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.status-applied { background: #2196F3; color: #fff; }
+.status-pending { background: #FF9800; color: #fff; }
+.status-reviewing { background: #9C27B0; color: #fff; }
+.status-shortlisted { background: #00BCD4; color: #fff; }
+.status-interview { background: #FFD600; color: #000; }
+.status-offered { background: #4CAF50; color: #fff; }
+.status-hired { background: #4CAF50; color: #fff; }
+.status-rejected { background: #F44336; color: #fff; }
+
+/* Skills */
+.skills-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.skill-tag {
+  padding: 8px 14px;
+  background: linear-gradient(135deg, rgba(255, 214, 0, 0.15) 0%, rgba(255, 214, 0, 0.08) 100%);
+  border: 1px solid rgba(255, 214, 0, 0.4);
+  border-radius: 20px;
+  color: #FFD600;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  cursor: default;
+}
+
+.skill-tag:hover {
+  background: linear-gradient(135deg, rgba(255, 214, 0, 0.25) 0%, rgba(255, 214, 0, 0.15) 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(255, 214, 0, 0.2);
+}
+
+/* Education & Experience */
+.education-item,
+.experience-item {
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
+.education-item:last-child,
+.experience-item:last-child {
+  margin-bottom: 0;
+}
+
+.education-item h5,
+.experience-item h5 {
+  color: #fff;
+  font-size: 15px;
+  margin: 0 0 3px 0;
+}
+
+.institute,
+.company {
+  color: #FFD600;
+  font-size: 13px;
+  margin: 0 0 3px 0;
+}
+
+.details,
+.duration {
+  color: #999;
+  font-size: 12px;
+  margin: 0 0 6px 0;
+}
+
+.description {
+  color: #ccc;
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 6px 0 0 0;
+}
+
+/* Resume */
+.resume-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: #FFD600;
+  color: #000;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.resume-link:hover {
+  background: #FFC700;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 214, 0, 0.3);
+}
+
+/* Cover Letter */
+.cover-letter {
+  color: #ccc;
+  font-size: 14px;
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+
+/* Actions Section */
+.actions-section {
+  /* background: rgba(255, 214, 0, 0.05);
+  border-color: rgba(255, 214, 0, 0.2); */
+}
+
+.action-group {
+  margin-bottom: 16px;
+}
+
+.action-group:last-child {
+  margin-bottom: 0;
+}
+
+.action-group label {
+  display: block;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.status-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.status-select {
+  flex: 1;
+  padding: 10px 16px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 14px;
+}
+
+.status-select option {
+  background: #1e1e1e;
+  color: #fff;
+}
+
+.btn-primary,
+.btn-secondary {
+  padding: 10px 24px;
+  border-radius: 8px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background: #FFD600;
+  color: #000;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #FFC700;
+  transform: translateY(-1px);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.rating-stars {
+  display: flex;
+  gap: 8px;
+}
+
+.rating-stars i {
+  font-size: 24px;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.rating-stars i.active {
+  color: #FFD600;
+}
+
+.rating-stars i:hover {
+  color: #FFD600;
+  transform: scale(1.2);
+}
+
+textarea {
+  width: 100%;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+  margin-bottom: 12px;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: #FFD600;
+}
+
+/* About Section */
+.about-section p {
+  color: #ccc;
+  font-size: 14px;
+  line-height: 1.8;
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .candidate-modal {
+    max-width: 100%;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+
+  .profile-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .contact-info {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .social-links {
+    justify-content: center;
+  }
+
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .status-actions {
+    flex-direction: column;
+  }
+}
+
+/* Talent Pipeline Button */
+.btn-pipeline {
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  justify-content: center;
+}
+
+.btn-pipeline:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.btn-pipeline:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.help-text {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 8px;
+  margin-bottom: 0;
+}

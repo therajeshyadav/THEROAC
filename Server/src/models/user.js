@@ -44,7 +44,15 @@ User.init({
   resumePath: { type: DataTypes.STRING, allowNull: true },
   skills: { type: DataTypes.JSON, defaultValue: [] },
   experiences: { type: DataTypes.JSON, defaultValue: [] },
-  education: { type: DataTypes.JSON, defaultValue: [] }
+  education: { type: DataTypes.JSON, defaultValue: [] },
+  // Company information (for recruiters without organization)
+  company: { type: DataTypes.JSON, allowNull: true },
+  // Organization fields
+  currentOrganizationId: { type: DataTypes.UUID, allowNull: true },
+  companyWebsite: { type: DataTypes.STRING, allowNull: true },
+  linkedinUrl: { type: DataTypes.STRING, allowNull: true },
+  twitterUrl: { type: DataTypes.STRING, allowNull: true },
+  githubUrl: { type: DataTypes.STRING, allowNull: true }
 }, {
   sequelize,
   modelName: 'User',

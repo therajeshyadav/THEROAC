@@ -1,5 +1,6 @@
 // src/components/candidate-dashboard/DashboardHeader.jsx
 import React from 'react';
+import NotificationBell from '../notifications/NotificationBell';
 
 const DashboardHeader = ({ activeTab, setActiveTab, authUser, logout }) => {
   return (
@@ -69,9 +70,7 @@ const DashboardHeader = ({ activeTab, setActiveTab, authUser, logout }) => {
 
         <div className="header-right">
           <div className="header-actions">
-            <button className="notification-btn">
-              <i className="fas fa-bell" />
-            </button>
+            <NotificationBell />
             <div className="user-menu">
               <div
                 className="user-avatar"

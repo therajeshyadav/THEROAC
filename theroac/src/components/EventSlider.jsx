@@ -26,16 +26,19 @@ const EventSlider = ({ eventsData }) => {
 
     if (sectionTitle.toLowerCase().includes('event')) {
       type = 'events';
+    } else if (sectionTitle.toLowerCase().includes('internship')) {
+      type = 'internships';
     } else if (sectionTitle.toLowerCase().includes('roac') || sectionTitle.toLowerCase().includes('talent')) {
       type = 'internships';
     } else if (sectionTitle.toLowerCase().includes('job')) {
       type = 'jobs';
     }
 
-    // If event has a type property, use that
+    // If event has a type property, use that (this takes priority)
     if (event.type) {
       if (event.type === 'job') type = 'jobs';
       else if (event.type === 'event') type = 'events';
+      else if (event.type === 'internship') type = 'internships';
       else if (event.type === 'hub-content') type = 'internships';
     }
 

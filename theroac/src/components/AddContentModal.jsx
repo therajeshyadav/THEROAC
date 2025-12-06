@@ -1,15 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import apiService from '../services/api';
 import { X, Plus, Calendar, MapPin, DollarSign, Clock, Users, Building } from 'lucide-react';
 import './AddContentModal.css';
 
-const AddContentModal = ({ isOpen, onClose, type, onSuccess }) => {
-    const [formData, setFormData] = useState({
+const AddContentModal = ({ isOpen, onClose, type, authUser, onSuccess }) => {
+    // Get company info from authUser for prefilling
+    const getInitialFormData = () => {
+        console.log('AddContentModal - authUser:', authUser);
+        console.log('AddContentModal - authUser.company:', authUser?.company);
+        
+        const companyName = authUser?.company?.name || '';
+        const companyLogo = authUser?.company?.logo || '';
+        const location = authUser?.company?.headOffice || '';
+        
+        console.log('Prefilling - Company Name:', companyName);
+        console.log('Prefilling - Location:', location);
+        
+        return {
         title: '',
         description: '',
-        company: '',
-        companyLogo: '',
-        location: '',
+        company: companyName,
+        companyLogo: companyLogo,
+        location: location,
         salary: '',
         requirements: '',
         benefits: '',
@@ -25,10 +37,24 @@ const AddContentModal = ({ isOpen, onClose, type, onSuccess }) => {
         category: 'career-tips',
         content: '',
         tags: ''
-    });
+        };
+    };
+
+    const [formData, setFormData] = useState(getInitialFormData());
 
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
+
+    // Reset form with prefilled data when modal opens
+    useEffect(() => {
+        if (isOpen && authUser) {
+            console.log('useEffect triggered - Resetting form with prefilled data');
+            const initialData = getInitialFormData();
+            console.log('Initial form data:', initialData);
+            setFormData(initialData);
+            setErrors({});
+        }
+    }, [isOpen]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;

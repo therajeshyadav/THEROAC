@@ -1,9 +1,9 @@
 import {
-  Bell,
   LogOut,
   TrendingUp,
   MessageSquare
 } from "lucide-react";
+import NotificationBell from "../notifications/NotificationBell";
 
 const RecruiterHeader = ({
   authUser,
@@ -43,12 +43,7 @@ const RecruiterHeader = ({
             <MessageSquare className="w-5 h-5" />
           </button>
 
-          <button className="notification-btn">
-            <Bell className="w-5 h-5" />
-            {notifications > 0 && (
-              <span className="notification-badge">{notifications}</span>
-            )}
-          </button>
+          <NotificationBell />
 
           <div className="user-profile">
             <div

@@ -20,6 +20,7 @@ import EventsTab from "../components/candidate-dashboard/EventsTab";
 import PrimeHubTab from "../components/candidate-dashboard/PrimeHubTab";
 import ApplicationsTab from "../components/candidate-dashboard/ApplicationsTab";
 import ProfileTab from "../components/candidate-dashboard/CandidateProfilePage";
+import QuickApplyModal from "../components/QuickApplyModal";
 
 import "./CandidateDashboard.css";
 
@@ -54,6 +55,8 @@ const CandidateDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [profileCompletion, setProfileCompletion] = useState(0);
+  const [showQuickApply, setShowQuickApply] = useState(false);
+  const [selectedJob, setSelectedJob] = useState(null);
 
   // 🔹 profileData me ab resumePath + resumeFile bhi rakhenge
   const [profileData, setProfileData] = useState({
@@ -196,15 +199,26 @@ const CandidateDashboard = () => {
         })),
       ]);
 
-      setJobs(jobsData.status === "fulfilled" ? jobsData.value.jobs || [] : []);
+      // Get jobs from jobs API
+      const regularJobs = jobsData.status === "fulfilled" ? jobsData.value.jobs || [] : [];
+      
+      // Get all hub content
+      const allHubContent = hubContentData.status === "fulfilled" ? hubContentData.value.hubContent || [] : [];
+      
+      // Separate internships from other hub content
+      const internships = allHubContent.filter(item => item.contentType === 'internship');
+      const nonInternshipHubContent = allHubContent.filter(item => item.contentType !== 'internship');
+      
+      // Merge jobs with internships for the Jobs section
+      setJobs([...regularJobs, ...internships]);
+      
       setEvents(
         eventsData.status === "fulfilled" ? eventsData.value.events || [] : []
       );
-      setHubContent(
-        hubContentData.status === "fulfilled"
-          ? hubContentData.value.hubContent || []
-          : []
-      );
+      
+      // Only set non-internship content for Hub section
+      setHubContent(nonInternshipHubContent);
+      
       setApplications(
         applicationsData.status === "fulfilled"
           ? applicationsData.value.applications || []
@@ -270,16 +284,78 @@ const CandidateDashboard = () => {
   const handleApplyToJob = async (jobId) => {
     if (appliedItems.has(jobId)) return;
 
+    // Find the job data
+    const job = [...jobs, ...hubContent].find(j => j.id === jobId);
+    if (!job) {
+      console.error("Job not found for ID:", jobId);
+      setNotification("Job not found");
+      return;
+    }
+
+    console.log("Opening Quick Apply modal for job:", job);
+    // Open Quick Apply modal
+    setSelectedJob(job);
+    setShowQuickApply(true);
+  };
+
+  const handleQuickApplySubmit = async (formData) => {
+    if (!selectedJob) return;
+
     try {
-      await apiService.applyToJob(jobId, {
-        resumeLink: "",
-        coverLetter: "",
-      });
-      setAppliedItems((prev) => new Set([...prev, jobId]));
+      // First, update user profile with new data
+      const profileUpdates = {
+        fullName: formData.fullName,
+        phone: formData.phone,
+        gender: formData.gender,
+        location: formData.location,
+        education: [{
+          institute: formData.instituteName,
+          domain: formData.domain,
+          degree: formData.course,
+          specialization: formData.courseSpecialization,
+          graduationYear: formData.graduationYear,
+          duration: formData.courseDuration,
+        }],
+      };
+
+      // Update profile
+      await apiService.updateProfile(profileUpdates);
+
+      // Handle resume upload if provided
+      let resumeLink = "";
+      if (formData.resumeFile) {
+        const resumeFormData = new FormData();
+        resumeFormData.append('resume', formData.resumeFile);
+        const uploadResult = await apiService.uploadResume(resumeFormData);
+        resumeLink = uploadResult.resumePath || uploadResult.url;
+      }
+
+      // Submit application
+      const isInternship = selectedJob.contentType === 'internship';
+      
+      if (isInternship) {
+        await apiService.applyToHubContent(selectedJob.id);
+      } else {
+        await apiService.applyToJob(selectedJob.id, {
+          resumeLink: resumeLink,
+          coverLetter: formData.coverLetter,
+          metadata: {
+            userType: formData.userType,
+            differentlyAbled: formData.differentlyAbled,
+          }
+        });
+      }
+
+      setAppliedItems((prev) => new Set([...prev, selectedJob.id]));
+      setShowQuickApply(false);
+      setSelectedJob(null);
       setNotification("Application submitted successfully!");
+      
+      // Reload dashboard data to reflect changes
+      loadDashboardData();
     } catch (error) {
-      setAppliedItems((prev) => new Set([...prev, jobId]));
-      setNotification("Application submitted! (Demo mode)");
+      console.error("Application error:", error);
+      setNotification(error.message || "Failed to submit application. Please try again.");
     }
   };
 
@@ -299,8 +375,16 @@ const CandidateDashboard = () => {
   const handleApplyToHubContent = (hubContentId) => {
     if (appliedItems.has(hubContentId)) return;
 
-    setAppliedItems((prev) => new Set([...prev, hubContentId]));
-    setNotification("Successfully applied to ROAC Prime opportunity!");
+    // Find the hub content data
+    const content = hubContent.find(c => c.id === hubContentId);
+    if (!content) {
+      setNotification("Content not found");
+      return;
+    }
+
+    // Open Quick Apply modal (same as jobs)
+    setSelectedJob(content);
+    setShowQuickApply(true);
   };
 
   const handleViewJobDetails = (job) => {
@@ -389,35 +473,40 @@ const CandidateDashboard = () => {
 
       console.log('Data to send:', dataToSend);
 
-      // If there's a resume file, use FormData, otherwise use JSON
-      let body;
-      let headers = {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-      };
-
+      // If there's a resume file, upload it first
       if (profileDataFromComponent.resumeFile) {
-        // Use FormData for file upload
-        const formData = new FormData();
-        Object.keys(dataToSend).forEach(key => {
-          if (Array.isArray(dataToSend[key])) {
-            formData.append(key, JSON.stringify(dataToSend[key]));
-          } else {
-            formData.append(key, dataToSend[key]);
-          }
+        console.log('Uploading resume file...');
+        const resumeFormData = new FormData();
+        resumeFormData.append('resume', profileDataFromComponent.resumeFile);
+        
+        const resumeResponse = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:4000/api'}/users/upload-resume`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          },
+          body: resumeFormData,
         });
-        formData.append("resume", profileDataFromComponent.resumeFile);
-        body = formData;
-        // Don't set Content-Type for FormData
-      } else {
-        // Use JSON for regular data
-        headers['Content-Type'] = 'application/json';
-        body = JSON.stringify(dataToSend);
+        
+        const resumeData = await resumeResponse.json();
+        console.log('Resume upload response:', resumeData);
+        
+        if (!resumeResponse.ok) {
+          throw new Error(resumeData.message || 'Failed to upload resume');
+        }
+        
+        // Add resume path to profile data
+        dataToSend.resumePath = resumeData.resumePath || resumeData.url;
+        console.log('Resume uploaded successfully:', dataToSend.resumePath);
       }
 
+      // Now update profile with JSON data
       const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:4000/api'}/users/me`, {
         method: 'PUT',
-        headers: headers,
-        body: body,
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dataToSend),
       });
 
       const data = await response.json();
@@ -566,6 +655,18 @@ const CandidateDashboard = () => {
 
   return (
     <div className="dashboard-container">
+      {/* Quick Apply Modal */}
+      <QuickApplyModal
+        isOpen={showQuickApply}
+        onClose={() => {
+          setShowQuickApply(false);
+          setSelectedJob(null);
+        }}
+        jobData={selectedJob}
+        userData={authUser}
+        onSubmit={handleQuickApplySubmit}
+      />
+
       {preloaderVisible && (
         <div className="preloader">
           <div className="loading-container">

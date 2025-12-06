@@ -13,6 +13,14 @@ const HubContentApplication = require('./HubContentApplication');
 const Bookmark = require('./Bookmark');
 const Like = require('./Like');
 const ProfileView = require('./ProfileView');
+const Organization = require('./organization');
+const OrganizationMember = require('./organizationMember');
+const ActivityLog = require('./activityLog');
+const Notification = require('./notification');
+const Interview = require('./Interview');
+const SavedJob = require('./SavedJob');
+const Resume = require('./Resume');
+const TalentPipeline = require('./TalentPipeline');
 
 // Associations
 User.hasMany(Event, { foreignKey: 'createdBy', as: 'createdEvents' });
@@ -80,6 +88,68 @@ ProfileView.belongsTo(User, { foreignKey: 'viewerUserId', as: 'viewer' });
 User.hasMany(ProfileView, { foreignKey: 'profileUserId', as: 'profileViews' });
 User.hasMany(ProfileView, { foreignKey: 'viewerUserId', as: 'viewedProfiles' });
 
+// Organization associations
+Organization.belongsTo(User, { foreignKey: 'ownerId', as: 'owner' });
+User.hasMany(Organization, { foreignKey: 'ownerId', as: 'ownedOrganizations' });
+
+// Organization Members associations
+Organization.belongsToMany(User, { through: OrganizationMember, foreignKey: 'organizationId', otherKey: 'userId', as: 'members' });
+User.belongsToMany(Organization, { through: OrganizationMember, foreignKey: 'userId', otherKey: 'organizationId', as: 'organizations' });
+
+OrganizationMember.belongsTo(Organization, { foreignKey: 'organizationId', as: 'organization' });
+OrganizationMember.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+OrganizationMember.belongsTo(User, { foreignKey: 'invitedBy', as: 'inviter' });
+
+Organization.hasMany(OrganizationMember, { foreignKey: 'organizationId', as: 'organizationMembers' });
+User.hasMany(OrganizationMember, { foreignKey: 'userId', as: 'memberships' });
+
+// Organization content associations
+Organization.hasMany(Job, { foreignKey: 'organizationId', as: 'jobs' });
+Job.belongsTo(Organization, { foreignKey: 'organizationId', as: 'organization' });
+
+Organization.hasMany(Event, { foreignKey: 'organizationId', as: 'events' });
+Event.belongsTo(Organization, { foreignKey: 'organizationId', as: 'organization' });
+
+Organization.hasMany(HubContent, { foreignKey: 'organizationId', as: 'hubContents' });
+HubContent.belongsTo(Organization, { foreignKey: 'organizationId', as: 'organization' });
+
+// Activity Log associations
+ActivityLog.belongsTo(Organization, { foreignKey: 'organizationId', as: 'organization' });
+ActivityLog.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+Organization.hasMany(ActivityLog, { foreignKey: 'organizationId', as: 'activityLogs' });
+User.hasMany(ActivityLog, { foreignKey: 'userId', as: 'activities' });
+
+// User current organization
+User.belongsTo(Organization, { foreignKey: 'currentOrganizationId', as: 'currentOrganization' });
+
+// Notification associations
+Notification.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+User.hasMany(Notification, { foreignKey: 'userId', as: 'notifications' });
+
+// Interview associations
+Interview.belongsTo(JobApplication, { foreignKey: 'applicationId', as: 'application' });
+Interview.belongsTo(User, { foreignKey: 'candidateId', as: 'candidate' });
+Interview.belongsTo(User, { foreignKey: 'recruiterId', as: 'recruiter' });
+Interview.belongsTo(Job, { foreignKey: 'jobId', as: 'job' });
+JobApplication.hasMany(Interview, { foreignKey: 'applicationId', as: 'interviews' });
+User.hasMany(Interview, { foreignKey: 'candidateId', as: 'candidateInterviews' });
+User.hasMany(Interview, { foreignKey: 'recruiterId', as: 'recruiterInterviews' });
+
+// SavedJob associations
+SavedJob.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+User.hasMany(SavedJob, { foreignKey: 'userId', as: 'savedJobs' });
+
+// Resume associations
+Resume.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+User.hasMany(Resume, { foreignKey: 'userId', as: 'resumes' });
+
+// TalentPipeline associations
+TalentPipeline.belongsTo(User, { foreignKey: 'candidateId', as: 'candidate' });
+TalentPipeline.belongsTo(User, { foreignKey: 'addedBy', as: 'addedByUser' });
+TalentPipeline.belongsTo(Organization, { foreignKey: 'organizationId', as: 'organization' });
+User.hasMany(TalentPipeline, { foreignKey: 'candidateId', as: 'pipelineEntries' });
+Organization.hasMany(TalentPipeline, { foreignKey: 'organizationId', as: 'talentPipeline' });
+
 module.exports = {
   sequelize,
   User,
@@ -95,5 +165,13 @@ module.exports = {
   HubContentApplication,
   Bookmark,
   Like,
-  ProfileView
+  ProfileView,
+  Organization,
+  OrganizationMember,
+  ActivityLog,
+  Notification,
+  Interview,
+  SavedJob,
+  Resume,
+  TalentPipeline
 };

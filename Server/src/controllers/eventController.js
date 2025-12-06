@@ -12,6 +12,12 @@ exports.createEvent = async (req, res, next) => {
       });
     }
 
+    // Add organization context if available
+    let organizationId = null;
+    if (req.currentOrganization) {
+      organizationId = req.currentOrganization.id;
+    }
+
     // Generate base slug from title
     let baseSlug = title.toLowerCase()
       .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
@@ -55,7 +61,8 @@ exports.createEvent = async (req, res, next) => {
       registrationDeadline: registrationDeadline ? new Date(registrationDeadline) : null,
       locationType: venue ? 'offline' : 'online',
       tags: [],
-      createdBy: req.user.id
+      createdBy: req.user.id,
+      organizationId
     };
 
     // Auto-populate company social links from recruiter profile
@@ -196,5 +203,26 @@ exports.getEventBySlug = async (req, res, next) => {
     return res.status(500).json({
       error: 'Failed to fetch event. Please try again.'
     });
+  }
+};
+
+// Upload image for event
+exports.uploadEventImage = async (req, res, next) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'No image file provided' });
+    }
+
+    // Generate image URL
+    const imageUrl = `${req.protocol}://${req.get('host')}/uploads/images/events/${req.file.filename}`;
+
+    res.status(200).json({
+      message: 'Image uploaded successfully',
+      imageUrl: imageUrl,
+      filename: req.file.filename
+    });
+  } catch (error) {
+    console.error('Error uploading event image:', error);
+    res.status(500).json({ message: 'Failed to upload image', error: error.message });
   }
 };

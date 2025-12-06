@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { ProfileView } = require('../models');
+const { ProfileView, User } = require('../models');
 const { authenticate } = require('../middlewares/auth');
+const { getNotificationService } = require('../socket');
 
 // Track profile view
 router.post('/track', authenticate, async (req, res) => {
@@ -30,6 +31,36 @@ router.post('/track', authenticate, async (req, res) => {
             ipAddress,
             userAgent
         });
+
+        // Send notification to profile owner if viewer is authenticated
+        if (viewerUserId) {
+            try {
+                const viewer = await User.findByPk(viewerUserId);
+                const profileOwner = await User.findByPk(profileUserId);
+                
+                if (viewer && profileOwner) {
+                    const notificationService = getNotificationService();
+                    const viewerName = viewer.fullName || viewer.email;
+                    const viewerRole = viewer.role === 'recruiter' ? 'Recruiter' : 'User';
+                    
+                    await notificationService.createNotification(
+                        profileUserId,
+                        'application_viewed',
+                        'Profile Viewed',
+                        `${viewerRole} ${viewerName} viewed your profile`,
+                        { 
+                            viewerId: viewerUserId, 
+                            viewerName,
+                            viewerRole: viewer.role
+                        },
+                        `/candidate-dashboard?tab=profile`
+                    );
+                }
+            } catch (notifError) {
+                console.error('Error sending profile view notification:', notifError);
+                // Don't fail the request if notification fails
+            }
+        }
 
         res.json({ message: 'Profile view tracked successfully' });
     } catch (error) {

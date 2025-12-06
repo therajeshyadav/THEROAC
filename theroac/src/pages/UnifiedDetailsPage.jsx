@@ -9,6 +9,7 @@ import ModernDetailsPage from "./ModernDetailsPage";
 import DetailsTopNav from "../../src/components/details/DetailsTopNav";
 import DetailsHeroSection from "../../src/components/details/DetailsHeroSection";
 import DetailsRightSidebar from "../../src/components/details/DetailsRightSidebar";
+import QuickApplyModal from "../components/QuickApplyModal";
 import "./UnifiedDetailsPage.css";
 
 const UnifiedDetailsPage = () => {
@@ -31,6 +32,7 @@ const UnifiedDetailsPage = () => {
   const [hasApplied, setHasApplied] = useState(false);
   const [checkingStatus, setCheckingStatus] = useState(true);
   const [preloaderVisible, setPreloaderVisible] = useState(true);
+  const [showQuickApply, setShowQuickApply] = useState(false);
 
   // config per type
   const typeConfig = {
@@ -315,21 +317,41 @@ const UnifiedDetailsPage = () => {
 
   const formatSalaryRange = (salary) => {
     if (!salary) return "Competitive";
-    if (salary.includes("₹")) return salary;
-
-    const rangeMatch = salary.match(/(\d+)\s*[-to]\s*(\d+)/i);
-    if (rangeMatch) {
-      const min = rangeMatch[1];
-      const max = rangeMatch[2];
-      return `${formatCurrency(min)} - ${formatCurrency(max)}`;
+    
+    // Handle object format (new format from backend)
+    if (typeof salary === 'object') {
+      if (salary.min && salary.max) {
+        return `${formatCurrency(salary.min)} - ${formatCurrency(salary.max)}`;
+      }
+      if (salary.min) {
+        return `${formatCurrency(salary.min)}+`;
+      }
+      if (salary.amount) {
+        return formatCurrency(salary.amount);
+      }
+      return "Competitive";
     }
+    
+    // Handle string format (old format)
+    if (typeof salary === 'string') {
+      if (salary.includes("₹")) return salary;
 
-    const singleMatch = salary.match(/(\d+)/);
-    if (singleMatch) {
-      return formatCurrency(singleMatch[1]);
+      const rangeMatch = salary.match(/(\d+)\s*[-to]\s*(\d+)/i);
+      if (rangeMatch) {
+        const min = rangeMatch[1];
+        const max = rangeMatch[2];
+        return `${formatCurrency(min)} - ${formatCurrency(max)}`;
+      }
+
+      const singleMatch = salary.match(/(\d+)/);
+      if (singleMatch) {
+        return formatCurrency(singleMatch[1]);
+      }
+
+      return salary;
     }
-
-    return salary;
+    
+    return "Competitive";
   };
 
   const getPriceDisplay = () => {
@@ -345,10 +367,14 @@ const UnifiedDetailsPage = () => {
         return formatCurrency(eventPrice);
       }
       case "internships":
-        if (data.stipend?.min && data.stipend?.max) {
-          return `${formatCurrency(data.stipend.min)} - ${formatCurrency(
-            data.stipend.max
-          )}`;
+        // Handle object format for stipend
+        if (data.stipend && typeof data.stipend === 'object') {
+          if (data.stipend.min && data.stipend.max) {
+            return `${formatCurrency(data.stipend.min)} - ${formatCurrency(data.stipend.max)}`;
+          }
+          if (data.stipend.amount) {
+            return formatCurrency(data.stipend.amount);
+          }
         }
         if (data.stipend) return formatSalaryRange(data.stipend);
         return "Unpaid";
@@ -445,15 +471,52 @@ const UnifiedDetailsPage = () => {
 
     if (hasApplied) return;
 
+    // Open Quick Apply Modal
+    setShowQuickApply(true);
+  };
+
+  const handleQuickApplySubmit = async (formData) => {
     setIsApplying(true);
     try {
-      let result = null;
+      // First, update user profile with new data
+      const profileUpdates = {
+        fullName: formData.fullName,
+        phone: formData.phone,
+        gender: formData.gender,
+        location: formData.location,
+        education: [{
+          institute: formData.instituteName,
+          domain: formData.domain,
+          degree: formData.course,
+          specialization: formData.courseSpecialization,
+          graduationYear: formData.graduationYear,
+          duration: formData.courseDuration,
+        }],
+      };
 
+      // Update profile
+      await apiService.updateProfile(profileUpdates);
+
+      // Handle resume upload if provided
+      let resumeLink = "";
+      if (formData.resumeFile) {
+        const resumeFormData = new FormData();
+        resumeFormData.append('resume', formData.resumeFile);
+        const uploadResult = await apiService.uploadResume(resumeFormData);
+        resumeLink = uploadResult.resumePath || uploadResult.url;
+      }
+
+      // Submit application
+      let result = null;
       switch (type) {
         case "jobs":
           result = await apiService.applyToJob(data.id, {
-            resumeLink: "",
-            coverLetter: "",
+            resumeLink: resumeLink,
+            coverLetter: formData.coverLetter,
+            metadata: {
+              userType: formData.userType,
+              differentlyAbled: formData.differentlyAbled,
+            }
           });
           break;
         case "events":
@@ -468,6 +531,7 @@ const UnifiedDetailsPage = () => {
 
       if (result) {
         setHasApplied(true);
+        setShowQuickApply(false);
         alert(`Successfully applied for ${data.title}!`);
       }
     } catch (error) {
@@ -477,6 +541,7 @@ const UnifiedDetailsPage = () => {
       if (errorMessage.includes("Already applied")) {
         alert("You have already applied to this position.");
         setHasApplied(true);
+        setShowQuickApply(false);
       } else if (errorMessage.includes("not found")) {
         alert("This position is no longer available.");
       } else {
@@ -529,6 +594,15 @@ const UnifiedDetailsPage = () => {
       </div>
 
       <div className="details-page unified-details-page">
+        {/* Quick Apply Modal */}
+        <QuickApplyModal
+          isOpen={showQuickApply}
+          onClose={() => setShowQuickApply(false)}
+          jobData={data}
+          userData={user}
+          onSubmit={handleQuickApplySubmit}
+        />
+
         {/* 🔹 TOP NAV AS COMPONENT */}
         <DetailsTopNav
           isHeaderSticky={isHeaderSticky}

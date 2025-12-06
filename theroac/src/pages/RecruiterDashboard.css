@@ -10,8 +10,20 @@ html, body {
     overflow-x: visible;
 }
 
-.auth-container {
+/* Override Auth.css styles for dashboard */
+.organizer-panel .auth-container {
+    display: block;
+    align-items: initial;
+    justify-content: initial;
+    padding: 0;
+    min-height: auto;
     overflow: visible;
+    background: transparent;
+}
+
+/* Ensure auth-container in recruiter dashboard has consistent background */
+.auth-container {
+    background: #1a1a1a;
 }
 
 /* Loading State */
@@ -74,7 +86,7 @@ html, body {
     left: 0;
     right: 0;
     height: 70px;
-    background: rgba(42, 42, 42, 0.95);
+    background: rgba(26, 26, 26, 0.95);
     backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     display: grid;
@@ -104,7 +116,7 @@ html, body {
 }
 
 .organizer-header.scrolled {
-    background: rgba(42, 42, 42, 1);
+    background: rgba(26, 26, 26, 1);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 }
 
@@ -255,7 +267,7 @@ html, body {
     top: 70px;
     width: 70px;
     height: calc(100vh - 70px);
-    background: rgba(42, 42, 42, 0.95);
+    background: rgba(26, 26, 26, 0.95);
     backdrop-filter: blur(20px);
     border-right: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
@@ -343,20 +355,31 @@ html, body {
     padding: 1rem 0.5rem 0;
 }
 
+.sidebar-bottom .nav-item {
+    margin-bottom: 0.5rem;
+}
+
+.sidebar-bottom .nav-item:last-child {
+    margin-bottom: 0;
+}
+
 /* Main Content - SCROLLABLE WITH LEFT MARGIN */
 .organizer-main {
-    margin-left: 70px;
-    margin-right: 0;
-    flex: 1;
+    position: fixed;
+    top: 70px;
+    left: 70px;
+    right: 0;
+    bottom: 0;
     padding: 1.5rem 2rem 2rem 2rem;
     overflow-y: auto;
     overflow-x: visible;
-    height: 100%;
-    position: relative;
+    background: transparent;
+    z-index: 1;
 }
 
 .organizer-main > div {
     overflow: visible;
+    min-height: min-content;
 }
 
 .organizer-main::-webkit-scrollbar {
@@ -2021,3 +2044,76 @@ select::-ms-expand {
 .stat-card.clickable:active {
   transform: translateY(-2px);
 } */
+
+
+/* ========================================
+   IMPROVED SEARCH BOX STYLES (GLOBAL)
+   ======================================== */
+
+.search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 214, 0, 0.2);
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.search-box:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 214, 0, 0.4);
+}
+
+.search-box:focus-within {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #FFD600;
+    box-shadow: 0 0 0 3px rgba(255, 214, 0, 0.1);
+}
+
+.search-box svg {
+    color: #FFD600;
+    flex-shrink: 0;
+    margin-right: 0.75rem;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+.search-box:focus-within svg {
+    opacity: 1;
+}
+
+.search-box input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #fff;
+    font-size: 0.95rem;
+    padding: 0;
+}
+
+.search-box input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.search-box input:focus::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+/* Enhanced variant */
+.search-box.enhanced {
+    background: linear-gradient(135deg, rgba(255, 214, 0, 0.05) 0%, rgba(255, 214, 0, 0.02) 100%);
+    border: 1.5px solid rgba(255, 214, 0, 0.25);
+}
+
+.search-box.enhanced:hover {
+    border-color: rgba(255, 214, 0, 0.5);
+    background: linear-gradient(135deg, rgba(255, 214, 0, 0.08) 0%, rgba(255, 214, 0, 0.04) 100%);
+}
+
+.search-box.enhanced:focus-within {
+    border-color: #FFD600;
+    box-shadow: 0 0 0 4px rgba(255, 214, 0, 0.15);
+}

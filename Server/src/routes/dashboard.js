@@ -20,4 +20,7 @@ router.get('/candidates', dashboardController.getCandidates);
 // Get analytics data for charts
 router.get('/analytics', dashboardController.getAnalytics);
 
+// Get activity heatmap
+router.get('/activity-heatmap', dashboardController.getActivityHeatmap);
+
 module.exports = router;

@@ -117,6 +117,24 @@ const getUserApplications = async () => {
     return request('/jobs/applications');
 };
 
+const getRecruiterApplications = async () => {
+    return request('/jobs/recruiter/applications');
+};
+
+const updateApplicationStatus = async (applicationId, data) => {
+    return request(`/jobs/applications/${applicationId}/status`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+    });
+};
+
+const updateApplicationNotes = async (applicationId, data) => {
+    return request(`/jobs/applications/${applicationId}/notes`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+    });
+};
+
 // Events endpoints
 const getEvents = async () => {
     return request('/events');
@@ -206,9 +224,138 @@ const updateProfile = async (profileData) => {
     });
 };
 
+const uploadResume = async (formData) => {
+    const token = localStorage.getItem('token');
+    const url = `${API_BASE_URL}/users/upload-resume`;
+    
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            ...(token && { Authorization: `Bearer ${token}` }),
+        },
+        body: formData, // Don't set Content-Type, let browser set it with boundary
+    });
+    
+    const data = await response.json();
+    
+    if (!response.ok) {
+        throw new Error(data.message || 'Resume upload failed');
+    }
+    
+    return data;
+};
+
 // Dashboard endpoints
 const getCandidateStats = async () => {
-    return request('/dashboard/candidate/stats');
+    return request('/candidate-dashboard/stats');
+};
+
+const getJobRecommendations = async (limit = 10) => {
+    return request(`/candidate-dashboard/recommendations?limit=${limit}`);
+};
+
+const getApplicationAnalytics = async (period = 30) => {
+    return request(`/candidate-dashboard/analytics?period=${period}`);
+};
+
+// Saved Jobs endpoints
+const toggleSaveJob = async (jobId, jobType = 'job', collection = 'default') => {
+    return request('/saved-jobs/toggle', {
+        method: 'POST',
+        body: JSON.stringify({ jobId, jobType, collection }),
+    });
+};
+
+const getSavedJobs = async (collection = null) => {
+    const query = collection ? `?collection=${collection}` : '';
+    return request(`/saved-jobs${query}`);
+};
+
+const checkSavedStatus = async (jobId, jobType = 'job') => {
+    return request(`/saved-jobs/status/${jobType}/${jobId}`);
+};
+
+const updateSavedJob = async (id, data) => {
+    return request(`/saved-jobs/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+    });
+};
+
+const getCollections = async () => {
+    return request('/saved-jobs/collections');
+};
+
+// Interview endpoints
+const getCandidateInterviews = async (upcoming = false) => {
+    const query = upcoming ? '?upcoming=true' : '';
+    return request(`/interviews/candidate${query}`);
+};
+
+const scheduleInterview = async (interviewData) => {
+    return request('/interviews/schedule', {
+        method: 'POST',
+        body: JSON.stringify(interviewData),
+    });
+};
+
+const updateInterviewStatus = async (id, data) => {
+    return request(`/interviews/${id}/status`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+    });
+};
+
+const rescheduleInterview = async (id, data) => {
+    return request(`/interviews/${id}/reschedule`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+    });
+};
+
+// Resume endpoints
+const uploadResumeMultiple = async (formData) => {
+    const token = localStorage.getItem('token');
+    const url = `${API_BASE_URL}/resumes/upload`;
+    
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            ...(token && { Authorization: `Bearer ${token}` }),
+        },
+        body: formData,
+    });
+    
+    const data = await response.json();
+    
+    if (!response.ok) {
+        throw new Error(data.message || 'Resume upload failed');
+    }
+    
+    return data;
+};
+
+const getResumes = async () => {
+    return request('/resumes');
+};
+
+const setDefaultResume = async (id) => {
+    return request(`/resumes/${id}/default`, {
+        method: 'PUT',
+    });
+};
+
+const updateResumeTitle = async (id, title) => {
+    return request(`/resumes/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify({ title }),
+    });
+};
+
+const deleteResume = async (id) => {
+    return request(`/resumes/${id}`, {
+        method: 'DELETE',
+    });
 };
 
 // Admin endpoints
@@ -297,6 +444,9 @@ const apiService = {
     createJob,
     applyToJob,
     getUserApplications,
+    getRecruiterApplications,
+    updateApplicationStatus,
+    updateApplicationNotes,
     getEvents,
     getEventById,
     getEventBySlug,
@@ -307,7 +457,10 @@ const apiService = {
     registerForHackathon,
     getProfile,
     updateProfile,
+    uploadResume,
     getCandidateStats,
+    getJobRecommendations,
+    getApplicationAnalytics,
     getAdminStats,
     getAdminUsers,
     updateUserStatus,
@@ -327,7 +480,21 @@ const apiService = {
     getMyBookmarks,
     toggleLike,
     checkLikeStatus,
-    getMyLikes
+    getMyLikes,
+    toggleSaveJob,
+    getSavedJobs,
+    checkSavedStatus,
+    updateSavedJob,
+    getCollections,
+    getCandidateInterviews,
+    scheduleInterview,
+    updateInterviewStatus,
+    rescheduleInterview,
+    uploadResumeMultiple,
+    getResumes,
+    setDefaultResume,
+    updateResumeTitle,
+    deleteResume
 };
 
 export default apiService;

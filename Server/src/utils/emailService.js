@@ -12,7 +12,7 @@ class EmailService {
   async init() {
     this.oauth2Client = await getAccessToken();
     this.gmail = google.gmail({ version: 'v1', auth: this.oauth2Client });
-    console.log('✅ Gmail API EmailService initialized successfully.');
+    console.log('Gmail API EmailService initialized successfully.');
   }
 
   // --- Generic Gmail API Sender ---
@@ -40,10 +40,10 @@ class EmailService {
         requestBody: { raw: encodedMessage },
       });
 
-      console.log(`📧 Email sent successfully to ${to}. Gmail ID: ${response.data.id}`);
+      console.log(`Email sent successfully to ${to}. Gmail ID: ${response.data.id}`);
       return { success: true, messageId: response.data.id };
     } catch (error) {
-      console.error('❌ Error sending email via Gmail API:', error.message);
+      console.error('Error sending email via Gmail API:', error.message);
       throw new Error('Failed to send email');
     }
   }

@@ -14,7 +14,7 @@ function createOAuthClient() {
   const redirectUri = process.env.GMAIL_REDIRECT_URI || 'https://developers.google.com/oauthplayground';
 
   if (!clientId || !clientSecret) {
-    console.warn('⚠️  GMAIL_CLIENT_ID or GMAIL_CLIENT_SECRET not set in environment. Gmail features will be disabled until configured.');
+    console.warn('GMAIL_CLIENT_ID or GMAIL_CLIENT_SECRET not set in environment. Gmail features will be disabled until configured.');
     // Still create client (will fail if used) so callers can handle absence.
   }
 
@@ -38,12 +38,12 @@ async function loadTokenIfExists() {
       const tokenText = await fsp.readFile(TOKEN_PATH, 'utf8');
       const tokenData = JSON.parse(tokenText);
       oauth2Client.setCredentials(tokenData);
-      console.log('✅ Loaded existing Gmail token from gmail_token.json');
+      console.log('Loaded existing Gmail token from gmail_token.json');
       return oauth2Client;
     }
     return null;
   } catch (err) {
-    console.error('❌ Error while reading Gmail token file:', err.message);
+    console.error('Error while reading Gmail token file:', err.message);
     return null;
   }
 }
@@ -51,7 +51,7 @@ async function loadTokenIfExists() {
 async function getAccessToken() {
   // If environment variables missing, return null so caller can decide.
   if (!process.env.GMAIL_CLIENT_ID || !process.env.GMAIL_CLIENT_SECRET) {
-    console.warn('⚠️  Gmail client credentials not configured in environment.');
+    console.warn('Gmail client credentials not configured in environment.');
     return null;
   }
 
@@ -65,7 +65,7 @@ async function getAccessToken() {
     prompt: 'consent',
   });
 
-  console.warn('\n⚠️  No Gmail token found. To enable Gmail sending do the following:');
+  console.warn('\n  No Gmail token found. To enable Gmail sending do the following:');
   console.warn('1) Visit the following URL in your browser to authorize the application:\n');
   console.warn(authUrl);
   console.warn('\n2) After granting access, run:');

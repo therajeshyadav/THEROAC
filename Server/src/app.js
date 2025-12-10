@@ -73,7 +73,7 @@ app.use('/api/users', authenticate, attachOrganizationContext, userRoutes);
 app.use('/api/admin', authenticate, attachOrganizationContext, adminRoutes);
 app.use('/api/dashboard', authenticate, attachOrganizationContext, dashboardRoutes);
 app.use('/api/hub-content', authenticate, attachOrganizationContext, hubContentRoutes);
-app.use('/api/gmail', authenticate, attachOrganizationContext, gmailRoutes);
+app.use('/api/gmail', attachOrganizationContext, gmailRoutes);
 app.use('/api/bookmarks', authenticate, attachOrganizationContext, bookmarkRoutes);
 app.use('/api/likes', authenticate, attachOrganizationContext, likeRoutes);
 app.use('/api/profile-views', authenticate, attachOrganizationContext, profileViewRoutes);

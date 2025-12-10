@@ -26,10 +26,30 @@ const errorHandler = require('./middlewares/errorHandler');
 const { attachOrganizationContext } = require('./middlewares/organizationMiddleware');
 
 const app = express();
-app.use(helmet({
-  crossOriginResourcePolicy: { policy: "cross-origin" }
-}));
-app.use(cors());
+const allowedOrigins = [
+  'https://theroac.com',
+  'https://www.theroac.com',
+  'https://api.theroac.com',
+  'http://localhost:3000',
+];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error("CORS blocked"));
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Organization-Id'],
+  })
+);
+
+app.options('*', cors());
+app.use(helmet({ crossOriginResourcePolicy: false }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 

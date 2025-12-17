@@ -344,43 +344,7 @@
     box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
 }
 
-/* Action Buttons (Bookmark & Like) */
-.action-buttons {
-    display: flex;
-    gap: 0.75rem;
-    width: 100%;
-    justify-content: center;
-}
 
-.action-btn {
-    flex: 1;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: rgba(255, 255, 255, 0.7);
-    padding: 10px 16px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-}
-
-.action-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 214, 0, 0.3);
-    color: #FFD600;
-    transform: translateY(-2px);
-}
-
-.action-btn.active {
-    background: rgba(255, 214, 0, 0.1);
-    border-color: #FFD600;
-    color: #FFD600;
-}
 
 .action-btn.active:hover {
     background: rgba(255, 214, 0, 0.15);
@@ -685,24 +649,103 @@
     color: #ffd000;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
+/* ===================================================== */
+/* 🧠 COMPREHENSIVE RESPONSIVE DESIGN */
+/* ===================================================== */
+
+/* Large Desktop (1400px+) - Default styles already applied */
+
+/* Desktop (1200px - 1399px) */
+@media (max-width: 1399px) {
     .modern-container {
-        padding: 0;
+        padding: 0 1rem;
+    }
+
+    .top-section-grid {
+        grid-template-columns: 58% 42%;
+        gap: 1.5rem;
+        padding: 1.75rem;
+    }
+
+    .company-logo {
+        width: 100px;
+        height: 100px;
+    }
+
+    .event-title {
+        font-size: 26px;
+    }
+
+    .info-grid {
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 1.25rem;
+    }
+}
+
+/* Laptop/Tablet Landscape (1024px - 1199px) */
+@media (max-width: 1199px) {
+    .modern-container {
+        padding: 0 0.75rem;
+    }
+
+    .top-section-grid {
+        grid-template-columns: 55% 45%;
+        gap: 1.25rem;
+        padding: 1.5rem;
+    }
+
+    .company-logo {
+        width: 90px;
+        height: 90px;
+    }
+
+    .event-title {
+        font-size: 24px;
+    }
+
+    .section-title {
+        font-size: 19px;
+    }
+
+    .subscribe-btn {
+        padding: 10px 28px;
+        font-size: 14px;
+        min-width: 160px;
+    }
+
+    .qr-code-container {
+        width: 100px;
+        height: 100px;
+    }
+
+    .info-grid {
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+
+    .media-grid {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    }
+}
+
+/* Tablet Portrait / Small Laptop (768px - 1023px) */
+@media (max-width: 1023px) {
+    .modern-container {
+        padding: 0 0.5rem;
     }
 
     .top-section-grid {
         grid-template-columns: 1fr;
-        padding: 1.5rem;
+        padding: 1.25rem;
         gap: 1.5rem;
     }
 
-    .subscribe-card,
-    .details-section,
-    .media-section,
-    .host-card {
-        padding: 1.5rem;
-        border-radius: 10px;
+    .top-right-column {
+        justify-content: center;
+    }
+
+    .company-logo {
+        width: 80px;
+        height: 80px;
     }
 
     .event-title {
@@ -713,14 +756,604 @@
         font-size: 18px;
     }
 
-    .media-grid {
+    .subscribe-card,
+    .details-section,
+    .media-section,
+    .host-card {
+        padding: 1.25rem;
+        border-radius: 10px;
+    }
+
+    .modern-tabs {
+        gap: 0.375rem;
+        justify-content: flex-start;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+        padding-bottom: 0.25rem;
+    }
+
+    .modern-tabs::-webkit-scrollbar {
+        height: 3px;
+    }
+
+    .modern-tabs::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .modern-tabs::-webkit-scrollbar-thumb {
+        background: rgba(255, 214, 0, 0.5);
+        border-radius: 2px;
+    }
+
+    .modern-tab {
+        padding: 0.4rem 0.875rem;
+        font-size: 12px;
+        flex-shrink: 0;
+    }
+
+    .info-grid {
         grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .media-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 0.875rem;
     }
 
     .host-card {
         flex-direction: column;
         align-items: center;
         text-align: center;
+        gap: 1rem;
+    }
+}
+
+/* Mobile Landscape / Large Phone (640px - 767px) */
+@media (max-width: 767px) {
+    .modern-container {
+        padding: 0 0.375rem;
+    }
+
+    .top-section-grid {
+        padding: 1rem;
+        gap: 1.25rem;
+    }
+
+    .company-logo {
+        width: 70px;
+        height: 70px;
+    }
+
+    .event-title {
+        font-size: 20px;
+        line-height: 1.2;
+    }
+
+    .info-text,
+    .info-link {
+        font-size: 14px;
+    }
+
+    .section-title {
+        font-size: 17px;
+    }
+
+    .subsection-title {
+        font-size: 15px;
+    }
+
+    .subscribe-card,
+    .details-section,
+    .media-section,
+    .host-card {
+        padding: 1rem;
+        border-radius: 8px;
+    }
+
+    .subscribe-btn {
+        padding: 9px 24px;
+        font-size: 13px;
+        min-width: 140px;
+    }
+
+    .qr-code-container {
+        width: 90px;
+        height: 90px;
+    }
+
+    .qr-text {
+        font-size: 10px;
+        max-width: 140px;
+    }
+
+    .modern-tabs-wrapper {
+        padding: 0.75rem 1rem;
+    }
+
+    .modern-tab {
+        padding: 0.35rem 0.75rem;
+        font-size: 11px;
+    }
+
+    .details-text p,
+    .details-list li {
+        font-size: 13px;
+    }
+
+    .timeline-content h4 {
+        font-size: 15px;
+    }
+
+    .timeline-content p {
+        font-size: 13px;
+    }
+
+    .info-card-title {
+        font-size: 13px;
+    }
+
+    .info-card-value {
+        font-size: 15px;
+    }
+
+    .media-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    .host-name {
+        font-size: 16px;
+    }
+
+    .contact-value {
+        font-size: 13px;
+    }
+
+    .feedback-textarea {
+        font-size: 13px;
+        padding: 0.875rem;
+    }
+
+    .feedback-submit-btn {
+        padding: 0.625rem 1.5rem;
+        font-size: 14px;
+    }
+}
+
+/* Mobile Portrait / Small Phone (480px - 639px) */
+@media (max-width: 639px) {
+    .modern-container {
+        padding: 0 0.25rem;
+    }
+
+    .top-section-grid {
+        padding: 0.875rem;
+        gap: 1rem;
+    }
+
+    .company-logo {
+        width: 60px;
+        height: 60px;
+    }
+
+    .event-title {
+        font-size: 18px;
+    }
+
+    .info-text,
+    .info-link {
+        font-size: 13px;
+    }
+
+    .section-title {
+        font-size: 16px;
+    }
+
+    .subsection-title {
+        font-size: 14px;
+    }
+
+    .subscribe-card,
+    .details-section,
+    .media-section,
+    .host-card {
+        padding: 0.875rem;
+        border-radius: 6px;
+    }
+
+    .subscribe-btn {
+        padding: 8px 20px;
+        font-size: 12px;
+        min-width: 120px;
+    }
+
+    .qr-code-container {
+        width: 80px;
+        height: 80px;
+    }
+
+    .qr-text {
+        font-size: 9px;
+        max-width: 120px;
+    }
+
+    .modern-tabs-wrapper {
+        padding: 0.625rem 0.75rem;
+    }
+
+    .modern-tab {
+        padding: 0.3rem 0.625rem;
+        font-size: 10px;
+    }
+
+    .details-text p,
+    .details-list li {
+        font-size: 12px;
+    }
+
+    .timeline-date {
+        font-size: 11px;
+        min-width: 70px;
+    }
+
+    .timeline-content h4 {
+        font-size: 14px;
+    }
+
+    .timeline-content p {
+        font-size: 12px;
+    }
+
+    .info-card-item {
+        padding: 1rem;
+    }
+
+    .info-card-title {
+        font-size: 12px;
+    }
+
+    .info-card-value {
+        font-size: 14px;
+    }
+
+    .info-card-icon {
+        font-size: 32px;
+    }
+
+    .host-avatar {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+
+    .host-name {
+        font-size: 15px;
+    }
+
+    .contact-value {
+        font-size: 12px;
+    }
+
+    .share-btn {
+        width: 32px;
+        height: 32px;
+    }
+
+    .feedback-form {
+        gap: 0.875rem;
+    }
+
+    .feedback-textarea {
+        font-size: 12px;
+        padding: 0.75rem;
+        min-height: 80px;
+    }
+
+    .feedback-submit-btn {
+        padding: 0.5rem 1.25rem;
+        font-size: 13px;
+    }
+
+    .star-btn {
+        font-size: 20px;
+    }
+}
+
+/* Extra Small Mobile (320px - 479px) */
+@media (max-width: 479px) {
+    .modern-container {
+        padding: 0 0.125rem;
+    }
+
+    .top-section-grid {
+        padding: 0.75rem;
+        gap: 0.875rem;
+    }
+
+    .company-logo {
+        width: 55px;
+        height: 55px;
+    }
+
+    .event-title {
+        font-size: 16px;
+        line-height: 1.1;
+    }
+
+    .info-text,
+    .info-link {
+        font-size: 12px;
+    }
+
+    .section-title {
+        font-size: 15px;
+    }
+
+    .subsection-title {
+        font-size: 13px;
+    }
+
+    .subscribe-card,
+    .details-section,
+    .media-section,
+    .host-card {
+        padding: 0.75rem;
+        border-radius: 4px;
+    }
+
+    .subscribe-btn {
+        padding: 7px 16px;
+        font-size: 11px;
+        min-width: 100px;
+    }
+
+    .qr-code-container {
+        width: 70px;
+        height: 70px;
+    }
+
+    .qr-text {
+        font-size: 8px;
+        max-width: 100px;
+    }
+
+    .modern-tabs-wrapper {
+        padding: 0.5rem;
+    }
+
+    .modern-tab {
+        padding: 0.25rem 0.5rem;
+        font-size: 9px;
+    }
+
+    .details-text p,
+    .details-list li {
+        font-size: 11px;
+        line-height: 1.5;
+    }
+
+    .timeline-item {
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 0.75rem 0;
+    }
+
+    .timeline-date {
+        font-size: 10px;
+        min-width: auto;
+    }
+
+    .timeline-content h4 {
+        font-size: 13px;
+    }
+
+    .timeline-content p {
+        font-size: 11px;
+    }
+
+    .info-card-item {
+        padding: 0.875rem;
+        flex-direction: column;
+        text-align: center;
+        gap: 0.5rem;
+    }
+
+    .info-card-title {
+        font-size: 11px;
+    }
+
+    .info-card-value {
+        font-size: 13px;
+    }
+
+    .info-card-icon {
+        font-size: 28px;
+        margin-left: 0;
+    }
+
+    .host-avatar {
+        width: 45px;
+        height: 45px;
+        font-size: 18px;
+    }
+
+    .host-name {
+        font-size: 14px;
+    }
+
+    .contact-label {
+        font-size: 10px;
+    }
+
+    .contact-value {
+        font-size: 11px;
+    }
+
+    .share-buttons {
+        gap: 0.5rem;
+    }
+
+    .share-btn {
+        width: 28px;
+        height: 28px;
+    }
+
+    .action-btn {
+        padding: 8px 12px;
+        font-size: 12px;
+        gap: 4px;
+    }
+
+    .feedback-form {
+        gap: 0.75rem;
+    }
+
+    .feedback-textarea {
+        font-size: 11px;
+        padding: 0.625rem;
+        min-height: 70px;
+    }
+
+    .feedback-actions {
+        flex-direction: column;
+        gap: 0.75rem;
+        align-items: stretch;
+    }
+
+    .feedback-submit-btn {
+        padding: 0.5rem 1rem;
+        font-size: 12px;
+        width: 100%;
+    }
+
+    .star-btn {
+        font-size: 18px;
+    }
+
+    .rating-stars {
+        justify-content: center;
+    }
+
+    .media-modal {
+        padding: 0.5rem;
+    }
+
+    .media-modal-close {
+        top: -30px;
+        width: 30px;
+        height: 30px;
+        font-size: 18px;
+    }
+}
+
+/* Ultra Small Mobile (280px - 319px) */
+@media (max-width: 319px) {
+    .modern-container {
+        padding: 0;
+    }
+
+    .top-section-grid {
+        padding: 0.625rem;
+        gap: 0.75rem;
+    }
+
+    .company-logo {
+        width: 50px;
+        height: 50px;
+    }
+
+    .event-title {
+        font-size: 14px;
+    }
+
+    .info-text,
+    .info-link {
+        font-size: 11px;
+    }
+
+    .section-title {
+        font-size: 14px;
+    }
+
+    .subsection-title {
+        font-size: 12px;
+    }
+
+    .subscribe-card,
+    .details-section,
+    .media-section,
+    .host-card {
+        padding: 0.625rem;
+    }
+
+    .subscribe-btn {
+        padding: 6px 12px;
+        font-size: 10px;
+        min-width: 90px;
+    }
+
+    .qr-code-container {
+        width: 60px;
+        height: 60px;
+    }
+
+    .qr-text {
+        font-size: 7px;
+        max-width: 90px;
+    }
+
+    .modern-tab {
+        padding: 0.2rem 0.4rem;
+        font-size: 8px;
+    }
+
+    .details-text p,
+    .details-list li {
+        font-size: 10px;
+    }
+
+    .info-card-item {
+        padding: 0.75rem;
+    }
+
+    .info-card-title {
+        font-size: 10px;
+    }
+
+    .info-card-value {
+        font-size: 12px;
+    }
+
+    .host-avatar {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+
+    .host-name {
+        font-size: 13px;
+    }
+
+    .share-btn {
+        width: 24px;
+        height: 24px;
+    }
+
+    .feedback-textarea {
+        font-size: 10px;
+        padding: 0.5rem;
+        min-height: 60px;
+    }
+
+    .feedback-submit-btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 11px;
+    }
+
+    .star-btn {
+        font-size: 16px;
     }
 }
 

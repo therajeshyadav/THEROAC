@@ -1,0 +1,1112 @@
+/* Pending Approvals Tab Styles */
+.pending-approvals-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+  gap: 2rem;
+}
+
+.pending-approvals-header h2 {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.pending-approvals-header p {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+}
+
+.approval-stats {
+  display: flex;
+  gap: 2rem;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.stat-value {
+  color: #FFD600;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.stat-label {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.8rem;
+}
+
+.approval-tabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 1.5rem;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-bottom: 2px solid transparent;
+  font-weight: 500;
+}
+
+.tab-btn.active {
+  color: #FFD600;
+  border-bottom-color: #FFD600;
+}
+
+.tab-btn:hover {
+  color: white;
+}
+
+.approval-content {
+  min-height: 400px;
+}
+
+.approval-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 1.5rem;
+}
+
+.approval-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 1.5rem;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.approval-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.approval-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.approval-info {
+  display: flex;
+  gap: 1rem;
+  flex: 1;
+}
+
+.approval-icon {
+  background: rgba(255, 214, 0, 0.1);
+  border: 1px solid rgba(255, 214, 0, 0.3);
+  border-radius: 8px;
+  padding: 0.5rem;
+  color: #FFD600;
+}
+
+.approval-title {
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 0.25rem 0;
+}
+
+.approval-company {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  margin: 0 0 0.5rem 0;
+}
+
+.approval-meta {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.8rem;
+  margin: 0;
+}
+
+.approval-status .status-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: white;
+}
+
+.status-badge.pending {
+  background: rgba(255, 152, 0, 0.2);
+  border: 1px solid rgba(255, 152, 0, 0.3);
+  color: #FF9800;
+}
+
+.approval-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.detail-label {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.detail-value {
+  color: white;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* Detail Modal Specific Styles */
+.detail-section {
+  margin-bottom: 1.5rem;
+}
+
+.detail-section h4 {
+  color: #FFD600;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 214, 0, 0.2);
+  padding-bottom: 0.5rem;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.detail-item.full-width {
+  grid-column: 1 / -1;
+}
+
+.description-text {
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.6;
+  font-size: 0.9rem;
+}
+
+.content-preview {
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.6;
+  font-size: 0.85rem;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 3px solid #FFD600;
+}
+
+.status-badge.pending {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: rgba(255, 165, 0, 0.15);
+  color: #FFA500;
+  border: 1px solid rgba(255, 165, 0, 0.3);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.approval-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.view-btn:hover {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: #3B82F6;
+  color: #3B82F6;
+}
+
+.approve-btn:hover {
+  background: rgba(34, 197, 94, 0.2);
+  border-color: #22C55E;
+  color: #22C55E;
+}
+
+.reject-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: #EF4444;
+  color: #EF4444;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: rgba(26, 26, 26, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-header h3 {
+  color: white;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  line-height: 1;
+}
+
+.close-btn:hover {
+  color: white;
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+.modal-body p {
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 1rem;
+}
+
+.rejection-textarea {
+  width: 100%;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: white;
+  font-size: 0.9rem;
+  resize: vertical;
+  min-height: 100px;
+}
+
+.rejection-textarea:focus {
+  outline: none;
+  border-color: #FFD600;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.rejection-textarea::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.modal-footer {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  padding: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-cancel, .btn-reject {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-cancel {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.btn-cancel:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.btn-reject {
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid #EF4444;
+  color: #EF4444;
+}
+
+.btn-reject:hover {
+  background: rgba(239, 68, 68, 0.3);
+}
+
+/* Empty State */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  color: rgba(255, 255, 255, 0.6);
+  text-align: center;
+}
+
+.empty-state h3 {
+  color: white;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+/* Loading State */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top: 3px solid #FFD600;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+/* Enhanced Responsive Design for Pending Approvals Tab */
+
+/* Large Desktop (1400px+) */
+@media (min-width: 1400px) {
+  .pending-approvals-header {
+    gap: 3rem;
+  }
+
+  .pending-approvals-header h2 {
+    font-size: 1.7rem;
+  }
+
+  .approval-stats {
+    gap: 2.5rem;
+  }
+
+  .stat-item {
+    min-width: 120px;
+    padding: 1.25rem;
+  }
+
+  .stat-value {
+    font-size: 1.8rem;
+  }
+
+  .approval-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+
+  .approval-card {
+    padding: 2rem;
+  }
+
+  .approval-title {
+    font-size: 1.2rem;
+  }
+}
+
+/* Desktop (1200px - 1399px) */
+@media (max-width: 1399px) and (min-width: 1200px) {
+  .pending-approvals-header {
+    gap: 2.5rem;
+  }
+
+  .approval-stats {
+    gap: 2rem;
+  }
+
+  .approval-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.75rem;
+  }
+
+  .approval-card {
+    padding: 1.75rem;
+  }
+}
+
+/* Laptop/Tablet Landscape (1024px - 1199px) */
+@media (max-width: 1199px) and (min-width: 1024px) {
+  .pending-approvals-header {
+    gap: 2rem;
+  }
+
+  .pending-approvals-header h2 {
+    font-size: 1.4rem;
+  }
+
+  .approval-stats {
+    gap: 1.75rem;
+  }
+
+  .stat-item {
+    min-width: 100px;
+    padding: 1rem;
+  }
+
+  .stat-value {
+    font-size: 1.4rem;
+  }
+
+  .approval-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+
+  .approval-card {
+    padding: 1.5rem;
+  }
+
+  .approval-title {
+    font-size: 1.05rem;
+  }
+
+  .tab-btn {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* Tablet Portrait (768px - 1023px) */
+@media (max-width: 1023px) and (min-width: 768px) {
+  .pending-approvals-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+
+  .pending-approvals-header h2 {
+    font-size: 1.3rem;
+  }
+
+  .approval-stats {
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .stat-item {
+    min-width: 90px;
+    padding: 0.9rem;
+  }
+
+  .stat-value {
+    font-size: 1.3rem;
+  }
+
+  .approval-tabs {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .tab-btn {
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+  }
+
+  .approval-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .approval-card {
+    padding: 1.25rem;
+  }
+
+  .approval-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .approval-info {
+    gap: 0.75rem;
+  }
+
+  .approval-title {
+    font-size: 1rem;
+  }
+
+  .approval-actions {
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+
+  .action-btn {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* Mobile Landscape (640px - 767px) */
+@media (max-width: 767px) and (min-width: 640px) {
+  .pending-approvals-header {
+    gap: 1.25rem;
+  }
+
+  .pending-approvals-header h2 {
+    font-size: 1.2rem;
+  }
+
+  .pending-approvals-header p {
+    font-size: 0.85rem;
+  }
+
+  .approval-stats {
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .stat-item {
+    min-width: 80px;
+    padding: 0.75rem;
+  }
+
+  .stat-value {
+    font-size: 1.2rem;
+  }
+
+  .stat-label {
+    font-size: 0.8rem;
+  }
+
+  .approval-tabs {
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .tab-btn {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8rem;
+    flex: 1;
+    text-align: center;
+  }
+
+  .approval-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .approval-card {
+    padding: 1rem;
+  }
+
+  .approval-card-header {
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .approval-info {
+    gap: 0.6rem;
+  }
+
+  .approval-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .approval-title {
+    font-size: 0.95rem;
+  }
+
+  .approval-company {
+    font-size: 0.8rem;
+  }
+
+  .approval-meta {
+    font-size: 0.75rem;
+  }
+
+  .approval-details {
+    gap: 0.5rem;
+  }
+
+  .detail-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  .detail-label {
+    font-size: 0.75rem;
+  }
+
+  .detail-value {
+    font-size: 0.8rem;
+  }
+
+  .approval-actions {
+    gap: 0.5rem;
+  }
+
+  .action-btn {
+    padding: 0.45rem 0.65rem;
+    font-size: 0.75rem;
+  }
+}
+
+/* Mobile Portrait (480px - 639px) */
+@media (max-width: 639px) and (min-width: 480px) {
+  .admin-tab-content {
+    padding: 0.75rem;
+  }
+
+  .pending-approvals-header {
+    margin-bottom: 1.5rem;
+    gap: 1rem;
+  }
+
+  .pending-approvals-header h2 {
+    font-size: 1.1rem;
+  }
+
+  .pending-approvals-header p {
+    font-size: 0.8rem;
+  }
+
+  .approval-stats {
+    gap: 0.75rem;
+    justify-content: space-between;
+  }
+
+  .stat-item {
+    min-width: 70px;
+    padding: 0.6rem;
+  }
+
+  .stat-value {
+    font-size: 1.1rem;
+  }
+
+  .stat-label {
+    font-size: 0.75rem;
+  }
+
+  .approval-tabs {
+    margin-bottom: 1.25rem;
+    gap: 0.4rem;
+  }
+
+  .tab-btn {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.75rem;
+  }
+
+  .approval-grid {
+    gap: 0.75rem;
+  }
+
+  .approval-card {
+    padding: 0.75rem;
+  }
+
+  .approval-info {
+    gap: 0.5rem;
+  }
+
+  .approval-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .approval-title {
+    font-size: 0.9rem;
+  }
+
+  .approval-company {
+    font-size: 0.75rem;
+  }
+
+  .approval-meta {
+    font-size: 0.7rem;
+  }
+
+  .approval-details {
+    gap: 0.4rem;
+  }
+
+  .detail-label {
+    font-size: 0.7rem;
+  }
+
+  .detail-value {
+    font-size: 0.75rem;
+  }
+
+  .approval-actions {
+    gap: 0.4rem;
+  }
+
+  .action-btn {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.7rem;
+  }
+
+  .view-btn {
+    display: none; /* Hide view button on small screens */
+  }
+}
+
+/* Extra Small Mobile (320px - 479px) */
+@media (max-width: 479px) and (min-width: 320px) {
+  .admin-tab-content {
+    padding: 0.5rem;
+  }
+
+  .pending-approvals-header {
+    margin-bottom: 1.25rem;
+    gap: 0.75rem;
+  }
+
+  .pending-approvals-header h2 {
+    font-size: 1rem;
+  }
+
+  .pending-approvals-header p {
+    font-size: 0.75rem;
+  }
+
+  .approval-stats {
+    gap: 0.6rem;
+  }
+
+  .stat-item {
+    min-width: 60px;
+    padding: 0.5rem;
+  }
+
+  .stat-value {
+    font-size: 1rem;
+  }
+
+  .stat-label {
+    font-size: 0.7rem;
+  }
+
+  .approval-tabs {
+    margin-bottom: 1rem;
+    gap: 0.3rem;
+  }
+
+  .tab-btn {
+    padding: 0.35rem 0.5rem;
+    font-size: 0.7rem;
+  }
+
+  .approval-grid {
+    gap: 0.6rem;
+  }
+
+  .approval-card {
+    padding: 0.6rem;
+  }
+
+  .approval-info {
+    gap: 0.4rem;
+  }
+
+  .approval-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .approval-title {
+    font-size: 0.85rem;
+  }
+
+  .approval-company {
+    font-size: 0.7rem;
+  }
+
+  .approval-meta {
+    font-size: 0.65rem;
+  }
+
+  .approval-details {
+    gap: 0.3rem;
+  }
+
+  .detail-label {
+    font-size: 0.65rem;
+  }
+
+  .detail-value {
+    font-size: 0.7rem;
+  }
+
+  .approval-actions {
+    gap: 0.3rem;
+  }
+
+  .action-btn {
+    padding: 0.35rem 0.5rem;
+    font-size: 0.65rem;
+  }
+
+  .view-btn {
+    display: none;
+  }
+
+  .loading-state,
+  .empty-state {
+    padding: 2rem 1rem;
+  }
+
+  .loading-state p,
+  .empty-state h3 {
+    font-size: 0.9rem;
+  }
+
+  .empty-state p {
+    font-size: 0.8rem;
+  }
+}
+
+/* Ultra Small Mobile (280px - 319px) */
+@media (max-width: 319px) {
+  .admin-tab-content {
+    padding: 0.25rem;
+  }
+
+  .pending-approvals-header {
+    margin-bottom: 1rem;
+    gap: 0.5rem;
+  }
+
+  .pending-approvals-header h2 {
+    font-size: 0.9rem;
+  }
+
+  .pending-approvals-header p {
+    font-size: 0.7rem;
+  }
+
+  .approval-stats {
+    gap: 0.5rem;
+  }
+
+  .stat-item {
+    min-width: 50px;
+    padding: 0.4rem;
+  }
+
+  .stat-value {
+    font-size: 0.9rem;
+  }
+
+  .stat-label {
+    font-size: 0.65rem;
+  }
+
+  .tab-btn {
+    padding: 0.3rem 0.4rem;
+    font-size: 0.65rem;
+  }
+
+  .approval-grid {
+    gap: 0.5rem;
+  }
+
+  .approval-card {
+    padding: 0.5rem;
+  }
+
+  .approval-icon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .approval-title {
+    font-size: 0.8rem;
+  }
+
+  .approval-company {
+    font-size: 0.65rem;
+  }
+
+  .approval-meta {
+    font-size: 0.6rem;
+  }
+
+  .detail-label {
+    font-size: 0.6rem;
+  }
+
+  .detail-value {
+    font-size: 0.65rem;
+  }
+
+  .action-btn {
+    padding: 0.3rem 0.4rem;
+    font-size: 0.6rem;
+  }
+}
+
+/* Touch-friendly interactions */
+@media (hover: none) and (pointer: coarse) {
+  .action-btn,
+  .tab-btn {
+    min-height: 44px;
+  }
+
+  .approval-card {
+    min-height: 200px;
+  }
+}
+
+/* Landscape orientation adjustments */
+@media (max-height: 500px) and (orientation: landscape) {
+  .pending-approvals-header {
+    margin-bottom: 1rem;
+  }
+
+  .approval-stats {
+    gap: 1rem;
+  }
+
+  .approval-grid {
+    gap: 0.75rem;
+  }
+
+  .approval-card {
+    padding: 0.75rem;
+  }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .approval-card,
+  .stat-item {
+    border-width: 0.5px;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .approval-card,
+  .action-btn,
+  .tab-btn {
+    transition: none;
+  }
+
+  .loading-spinner {
+    animation: none;
+  }
+}
+
+/* Modal Responsiveness */
+@media (max-width: 768px) {
+  .modal-content {
+    margin: 1rem;
+    max-width: calc(100vw - 2rem);
+  }
+
+  .modal-header h3 {
+    font-size: 1.1rem;
+  }
+
+  .rejection-textarea {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-content {
+    margin: 0.5rem;
+    max-width: calc(100vw - 1rem);
+  }
+
+  .modal-header {
+    padding: 1rem;
+  }
+
+  .modal-body {
+    padding: 1rem;
+  }
+
+  .modal-footer {
+    padding: 1rem;
+    gap: 0.5rem;
+  }
+
+  .btn-cancel,
+  .btn-reject {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+  }
+}

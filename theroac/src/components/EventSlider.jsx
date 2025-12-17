@@ -98,7 +98,12 @@ const EventSlider = ({ eventsData }) => {
             ref={(el) => (scrollRefs.current[sectionIndex] = el)}
           >
             {(section.events || []).map((event, index) => (
-              <div className="prime-card" key={index}>
+              <div 
+                className="prime-card" 
+                key={index}
+                onClick={() => handleApplyNow(event, section.title)}
+                style={{ cursor: 'pointer' }}
+              >
                 <div className="image-anime prime-img-wrapper">
                   <img src={event.img} alt={event.title} className="prime-img" />
                 </div>
@@ -122,7 +127,10 @@ const EventSlider = ({ eventsData }) => {
                   </p>
                   <button 
                     className="buy-btn"
-                    onClick={() => handleApplyNow(event, section.title)}
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent card click when button is clicked
+                      handleApplyNow(event, section.title);
+                    }}
                   >
                     Apply Now →
                   </button>

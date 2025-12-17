@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, Filter, Eye, CheckCircle, XCircle, Clock, User, Mail, Phone, FileText, MessageSquare } from 'lucide-react';
+import { Search, Eye, CheckCircle, XCircle, Clock, User } from 'lucide-react';
 import LoadingSpinner from './LoadingSpinner';
 import CandidateDetailsModal from './CandidateDetailsModal';
 import { toast } from 'react-toastify';
@@ -91,30 +91,7 @@ const EvaluateCandidatesTab = ({ authUser }) => {
     setShowDetailsModal(true);
   };
 
-  const handleSaveNotes = async () => {
-    if (!selectedApplication) return;
 
-    try {
-      const response = await fetch(`${API_URL}/jobs/applications/${selectedApplication.id}/notes`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify({ notes }),
-      });
-
-      if (response.ok) {
-        toast.success('Notes saved successfully');
-        fetchApplications();
-      } else {
-        toast.error('Failed to save notes');
-      }
-    } catch (error) {
-      console.error('Error saving notes:', error);
-      toast.error('Failed to save notes');
-    }
-  };
 
   const filteredApplications = applications.filter(app => {
     const matchesSearch = 

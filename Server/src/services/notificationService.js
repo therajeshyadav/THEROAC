@@ -95,6 +95,114 @@ class NotificationService {
       `/jobs/${jobId}`
     );
   }
+
+  // Job approval notification (for recruiter)
+  async notifyJobApproval(recruiterId, jobTitle, action, rejectionReason = null, jobId) {
+    const title = action === 'approve' ? 'Job Approved' : 'Job Rejected';
+    let message;
+    
+    if (action === 'approve') {
+      message = `Great news! Your job posting "${jobTitle}" has been approved and is now live on the platform.`;
+    } else {
+      message = `Your job posting "${jobTitle}" was not approved. ${rejectionReason ? `Reason: ${rejectionReason}` : ''}`;
+    }
+
+    return this.createNotification(
+      recruiterId,
+      'job_approval',
+      title,
+      message,
+      { jobId, jobTitle, action, rejectionReason },
+      action === 'approve' ? `/jobs/${jobId}` : `/recruiter-dashboard?tab=jobs`
+    );
+  }
+
+  // Event approval notification (for organizer)
+  async notifyEventApproval(organizerId, eventTitle, action, rejectionReason = null, eventId) {
+    const title = action === 'approve' ? 'Event Approved' : 'Event Rejected';
+    let message;
+    
+    if (action === 'approve') {
+      message = `Excellent! Your event "${eventTitle}" has been approved and is now visible to participants.`;
+    } else {
+      message = `Your event "${eventTitle}" was not approved. ${rejectionReason ? `Reason: ${rejectionReason}` : ''}`;
+    }
+
+    return this.createNotification(
+      organizerId,
+      'event_approval',
+      title,
+      message,
+      { eventId, eventTitle, action, rejectionReason },
+      action === 'approve' ? `/events/${eventId}` : `/recruiter-dashboard?tab=events`
+    );
+  }
+
+  // Interview scheduled notification
+  async notifyInterviewScheduled(candidateId, jobTitle, interviewDate, interviewId) {
+    return this.createNotification(
+      candidateId,
+      'interview_scheduled',
+      'Interview Scheduled',
+      `You have an interview scheduled for "${jobTitle}" on ${new Date(interviewDate).toLocaleDateString()}`,
+      { interviewId, jobTitle, interviewDate },
+      `/candidate-dashboard?tab=interviews`
+    );
+  }
+
+  // Interview rescheduled notification
+  async notifyInterviewRescheduled(userId, jobTitle, newDate, interviewId) {
+    return this.createNotification(
+      userId,
+      'interview_rescheduled',
+      'Interview Rescheduled',
+      `Your interview for "${jobTitle}" has been rescheduled to ${new Date(newDate).toLocaleDateString()}`,
+      { interviewId, jobTitle, newDate },
+      `/candidate-dashboard?tab=interviews`
+    );
+  }
+
+  // Internship approval notification (for creator)
+  async notifyInternshipApproval(creatorId, internshipTitle, action, rejectionReason = null, internshipId) {
+    const title = action === 'approve' ? 'Internship Approved' : 'Internship Rejected';
+    let message;
+    
+    if (action === 'approve') {
+      message = `Great news! Your internship posting "${internshipTitle}" has been approved and is now live on the platform.`;
+    } else {
+      message = `Your internship posting "${internshipTitle}" was not approved. ${rejectionReason ? `Reason: ${rejectionReason}` : ''}`;
+    }
+
+    return this.createNotification(
+      creatorId,
+      'internship_approval',
+      title,
+      message,
+      { internshipId, internshipTitle, action, rejectionReason },
+      action === 'approve' ? `/event-detail/internships/${internshipId}` : `/recruiter-dashboard?tab=internships`
+    );
+  }
+
+  // ROAC Prime content approval notification (for creator)
+  async notifyROACPrimeApproval(creatorId, contentTitle, action, rejectionReason = null, contentId) {
+    const title = action === 'approve' ? 'ROAC Prime Content Approved' : 'ROAC Prime Content Rejected';
+    let message;
+    
+    if (action === 'approve') {
+      message = `Excellent! Your ROAC Prime content "${contentTitle}" has been approved and is now visible to users.`;
+    } else {
+      message = `Your ROAC Prime content "${contentTitle}" was not approved. ${rejectionReason ? `Reason: ${rejectionReason}` : ''}`;
+    }
+
+    return this.createNotification(
+      creatorId,
+      'roac_prime_approval',
+      title,
+      message,
+      { contentId, contentTitle, action, rejectionReason },
+      action === 'approve' ? `/event-detail/internships/${contentId}` : `/recruiter-dashboard?tab=roac-prime`
+    );
+  }
 }
 
 module.exports = NotificationService;

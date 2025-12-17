@@ -1,0 +1,141 @@
+/* src/components/admin/AdminDashboard/tabs/AnalyticsTab.css */
+
+.analytics-placeholder {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.analytics-placeholder h3 {
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.analytics-placeholder p {
+  font-size: 1rem;
+  line-height: 1.6;
+}
+/* Responsive Design */
+/* Large Desktop (1400px+) */
+@media (min-width: 1400px) {
+  .analytics-placeholder {
+    padding: 5rem 3rem;
+  }
+  
+  .analytics-placeholder h3 {
+    font-size: 1.75rem;
+  }
+  
+  .analytics-placeholder p {
+    font-size: 1.1rem;
+  }
+}
+
+/* Desktop (1200px-1399px) */
+@media (max-width: 1399px) {
+  .analytics-placeholder {
+    padding: 4.5rem 2.5rem;
+  }
+}
+
+/* Laptop/Tablet Landscape (1024px-1199px) */
+@media (max-width: 1199px) {
+  .analytics-placeholder {
+    padding: 4rem 2rem;
+  }
+  
+  .analytics-placeholder h3 {
+    font-size: 1.4rem;
+  }
+  
+  .analytics-placeholder p {
+    font-size: 0.95rem;
+  }
+}
+
+/* Tablet Portrait (768px-1023px) */
+@media (max-width: 1023px) {
+  .analytics-placeholder {
+    padding: 3.5rem 1.5rem;
+  }
+  
+  .analytics-placeholder h3 {
+    font-size: 1.3rem;
+  }
+}
+
+/* Mobile Landscape (640px-767px) */
+@media (max-width: 767px) {
+  .analytics-placeholder {
+    padding: 3rem 1.25rem;
+  }
+  
+  .analytics-placeholder h3 {
+    font-size: 1.25rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .analytics-placeholder p {
+    font-size: 0.9rem;
+  }
+}
+
+/* Mobile Portrait (480px-639px) */
+@media (max-width: 639px) {
+  .analytics-placeholder {
+    padding: 2.5rem 1rem;
+  }
+  
+  .analytics-placeholder h3 {
+    font-size: 1.2rem;
+  }
+  
+  .analytics-placeholder p {
+    font-size: 0.85rem;
+  }
+}
+
+/* iPhone SE (375x667) Optimization */
+@media (max-width: 375px) {
+  .analytics-placeholder {
+    padding: 2rem 0.75rem;
+  }
+  
+  .analytics-placeholder h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .analytics-placeholder p {
+    font-size: 0.8rem;
+    line-height: 1.5;
+  }
+  
+  .analytics-placeholder svg {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 1rem;
+  }
+}
+
+/* Extra Small Mobile (320px-374px) */
+@media (max-width: 320px) {
+  .analytics-placeholder {
+    padding: 1.5rem 0.5rem;
+  }
+  
+  .analytics-placeholder h3 {
+    font-size: 1rem;
+  }
+  
+  .analytics-placeholder p {
+    font-size: 0.75rem;
+  }
+  
+  .analytics-placeholder svg {
+    width: 40px;
+    height: 40px;
+  }
+}

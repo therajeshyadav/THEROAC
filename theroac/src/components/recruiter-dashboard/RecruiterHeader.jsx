@@ -3,7 +3,7 @@ import {
   TrendingUp,
   MessageSquare
 } from "lucide-react";
-import NotificationBell from "../notifications/NotificationBell";
+import UniversalNotifications from "../common/UniversalNotifications";
 
 const RecruiterHeader = ({
   authUser,
@@ -43,7 +43,7 @@ const RecruiterHeader = ({
             <MessageSquare className="w-5 h-5" />
           </button>
 
-          <NotificationBell />
+          <UniversalNotifications />
 
           <div className="user-profile">
             <div

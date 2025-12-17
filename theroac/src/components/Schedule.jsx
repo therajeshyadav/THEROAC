@@ -74,6 +74,7 @@ const Schedule = () => {
 
 			// Separate internships from other hub content
 			const allHubContent = Array.isArray(hubContentData) ? hubContentData : [];
+			
 			const internships = allHubContent
 				.filter(content => content.contentType === 'internship')
 				.map(content => ({

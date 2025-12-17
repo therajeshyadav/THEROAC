@@ -1,0 +1,151 @@
+/* src/components/admin/AdminDashboard/AdminRightPanel.css */
+
+.admin-organizer-right-panel {
+  position: fixed;
+  right: 0;
+  top: 70px;
+  width: 380px;
+  height: calc(100vh - 70px);
+  background: rgba(26, 26, 26, 0.95);
+  backdrop-filter: blur(20px);
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 2rem;
+  overflow-y: auto;
+  z-index: 900;
+}
+
+.admin-organizer-right-panel::-webkit-scrollbar {
+  width: 6px;
+}
+.admin-organizer-right-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+.admin-organizer-right-panel::-webkit-scrollbar-thumb {
+  background: rgba(255, 214, 0, 0.3);
+  border-radius: 3px;
+}
+
+.admin-right-panel-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Customize card */
+.customize-card {
+  background: linear-gradient(135deg, #ffc107, #ffd600);
+  border-radius: 16px;
+  padding: 2rem;
+}
+
+.customize-header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.customize-text h3 {
+  color: #1a1719;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.customize-text p {
+  color: rgba(26, 23, 25, 0.8);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.customize-logo {
+  width: 60px;
+  height: 60px;
+  background: #1a1719;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.customize-logo span {
+  color: #ffd600;
+  font-weight: 700;
+  font-size: 1.5rem;
+}
+
+/* Right panel sections */
+
+.right-panel-section {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 1.5rem;
+}
+
+.right-panel-section h4 {
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.quick-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.quick-stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+}
+
+.quick-stat-label {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.85rem;
+}
+
+.quick-stat-value {
+  color: #ffd600;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.system-status {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.85rem;
+}
+
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 6px #10b981;
+}
+
+.status-indicator.active {
+  background: #10b981;
+  box-shadow: 0 0 6px #10b981;
+}
+
+@media (max-width: 1400px) {
+  .admin-organizer-right-panel {
+    display: none;
+  }
+}

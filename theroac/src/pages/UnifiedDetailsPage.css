@@ -39,20 +39,24 @@
   color: #FFD600;
 }
 
-/* Top Navigation */
+/* Import Standardized Header Styles */
+@import '../styles/standardized-header.css';
+
+/* Top Navigation - Using Standardized Header */
 .details-page .top-nav {
-  background: rgba(42, 42, 42, 0.95);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 0.5rem 0;
+  /* Inherit from .standardized-header */
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  z-index: 100;
+  width: 100%;
+  height: 85px;
+  background: rgba(26, 26, 26, 0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 1000;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  min-height: 50px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
   transform: translateY(-100%);
   opacity: 0;
   pointer-events: none;
@@ -69,37 +73,54 @@
   transform: translateY(0);
   opacity: 1;
   pointer-events: all;
-  background: rgba(42, 42, 42, 1);
+  background: rgba(26, 26, 26, 1);
   backdrop-filter: blur(20px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .details-page .nav-container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 0 2rem;
+  /* Inherit from .standardized-header-container */
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: 50px;
+  height: 100%;
+  padding: 0 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+  position: relative;
 }
 
 .details-page .nav-left {
   display: flex;
   align-items: center;
   gap: 2rem;
+  flex-shrink: 0;
+}
+
+.details-page .site-logo {
+  /* Inherit from .standardized-logo */
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .details-page .site-logo img {
-  width: 100px;
-  height: 30px;
+  /* Inherit from .standardized-logo img */
+  height: 45px;
+  width: auto;
   object-fit: contain;
 }
 
 .details-page .site-logo a {
   display: block;
   text-decoration: none;
+}
+
+.details-page .site-logo:hover {
+  transform: scale(1.05);
 }
 
 .details-page .nav-tabs {
@@ -147,7 +168,24 @@
 .details-page .nav-right {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  justify-content: flex-end;
+  flex-shrink: 0;
+  margin-left: auto;
+  min-width: fit-content;
+}
+
+.details-page .nav-right-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  height: 100%;
+}
+
+.details-page .notification-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
 }
 
 .details-page .nav-icon {
@@ -210,6 +248,31 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 40px;
+  height: 40px;
+}
+
+/* Universal Notifications Component Alignment */
+.details-page .notification-section .universal-notifications {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.details-page .notification-section .notification-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
 }
 
 .details-page .notification-btn:hover {
@@ -235,7 +298,9 @@
 .details-page .auth-buttons {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 0.75rem;
+  height: 100%;
 }
 
 .details-page .login-btn,
@@ -254,8 +319,12 @@
   cursor: pointer;
   border: none;
   text-decoration: none;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   transition: all 0.3s ease;
+  white-space: nowrap;
+  height: 40px;
 }
 
 .details-page .login-btn:hover,
@@ -291,7 +360,8 @@
   width: 100%;
   margin-bottom: 0;
   flex-shrink: 0;
-  padding-top: 50px;
+  padding-top: 85px;
+  /* Account for standardized fixed header */
 }
 
 .details-page .hero-section {
@@ -1163,6 +1233,7 @@
 
   .details-page .nav-container {
     padding: 0 1rem;
+    justify-content: space-between;
   }
 
   .details-page .nav-tabs {
@@ -1336,6 +1407,7 @@
 
   .details-page .nav-container {
     padding: 0 0.75rem;
+    justify-content: space-between;
   }
 
   .details-page .site-logo img {
@@ -1343,14 +1415,26 @@
     height: 30px;
   }
 
+  .details-page .nav-right-content {
+    gap: 0.75rem;
+  }
+
   .details-page .auth-buttons {
     gap: 0.5rem;
   }
 
   .details-page .login-btn,
-  .details-page .signup-btn {
+  .details-page .signup-btn,
+  .details-page .dashboard-btn,
+  .details-page .logout-btn {
     padding: 8px 12px;
     font-size: 14px;
+    height: 36px;
+  }
+
+  .details-page .notification-section .notification-button {
+    width: 36px;
+    height: 36px;
   }
 }
 
@@ -1459,6 +1543,7 @@
 
   .details-page .nav-container {
     padding: 0 0.5rem;
+    justify-content: space-between;
   }
 
   .details-page .site-logo img {
@@ -1630,6 +1715,7 @@
   .details-page .nav-container {
     padding: 0 0.5rem;
     min-height: 50px;
+    justify-content: space-between;
   }
 
   .details-page .site-logo img {
@@ -1657,16 +1743,28 @@
     min-width: 16px;
   }
 
+  .details-page .nav-right-content {
+    gap: 0.5rem;
+  }
+
   .details-page .auth-buttons {
-    flex-direction: column;
+    flex-direction: row;
     gap: 0.375rem;
   }
 
   .details-page .login-btn,
-  .details-page .signup-btn {
+  .details-page .signup-btn,
+  .details-page .dashboard-btn,
+  .details-page .logout-btn {
     padding: 6px 10px;
     font-size: 12px;
-    width: 100%;
+    height: 32px;
+    min-width: 60px;
+  }
+
+  .details-page .notification-section .notification-button {
+    width: 32px;
+    height: 32px;
   }
 
   .details-page .share-dropdown {
@@ -1991,4 +2089,359 @@ plied Button States */
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+/* ===================================================== */
+/* 🧠 ADDITIONAL ULTRA SMALL MOBILE RESPONSIVE DESIGN */
+/* ===================================================== */
+
+/* Ultra Small Mobile (280px - 319px) */
+@media (max-width: 319px) {
+  .details-page .main-container {
+    padding: 0.5rem;
+  }
+
+  .details-page .hero-section {
+    height: 150px;
+  }
+
+  .details-page .header-card {
+    padding: 0.75rem;
+    border-radius: 12px;
+    min-height: 100px;
+  }
+
+  .details-page .header-left {
+    gap: 1rem;
+  }
+
+  .details-page .logo {
+    width: 45px;
+    height: 45px;
+    font-size: 1.2rem;
+  }
+
+  .details-page .title {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .details-page .meta-row {
+    font-size: 0.75rem;
+  }
+
+  .details-page .days-left {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .details-page .days-number {
+    font-size: 1.5rem;
+  }
+
+  .details-page .days-text {
+    font-size: 0.7rem;
+  }
+
+  .details-page .content-tabs {
+    padding: 0 0.25rem;
+    gap: 0.125rem;
+  }
+
+  .details-page .content-tab {
+    padding: 0.5rem 0.625rem;
+    font-size: 0.75rem;
+  }
+
+  .details-page .content-area {
+    padding: 0.875rem;
+    border-radius: 10px;
+  }
+
+  .details-page .section-title {
+    font-size: 1.1rem;
+  }
+
+  .details-page .subsection-title {
+    font-size: 0.9rem;
+  }
+
+  .details-page .content-list li {
+    font-size: 0.8rem;
+    padding: 0.3rem 0;
+    padding-left: 1rem;
+    line-height: 1.4;
+  }
+
+  .details-page .stage-item {
+    padding: 0.875rem;
+    border-radius: 8px;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .details-page .stage-date {
+    padding: 0.375rem 0.625rem;
+    font-size: 0.75rem;
+  }
+
+  .details-page .stage-title {
+    font-size: 1rem;
+  }
+
+  .details-page .stage-description {
+    font-size: 0.8rem;
+  }
+
+  .details-page .prize-card {
+    padding: 1rem;
+  }
+
+  .details-page .prize-amount {
+    font-size: 1.5rem;
+  }
+
+  .details-page .action-card,
+  .details-page .info-card {
+    padding: 0.75rem;
+    border-radius: 10px;
+  }
+
+  .details-page .card-title {
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .details-page .price {
+    font-size: 1.3rem;
+  }
+
+  .details-page .apply-button {
+    padding: 0.625rem;
+    font-size: 0.8rem;
+    border-radius: 8px;
+  }
+
+  .details-page .stat-item-individual {
+    padding: 0.5rem;
+  }
+
+  .details-page .stat-icon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .details-page .stat-content .stat-label {
+    font-size: 0.65rem;
+  }
+
+  .details-page .stat-content .stat-number {
+    font-size: 0.8rem;
+  }
+
+  .details-page .info-label,
+  .details-page .info-value {
+    font-size: 0.75rem;
+  }
+
+  .details-page .eligibility-item {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.4rem;
+  }
+
+  .details-page .refer-btn {
+    font-size: 0.75rem;
+    padding: 0.4rem 0.6rem;
+  }
+
+  .details-page .card-description {
+    font-size: 0.75rem;
+  }
+
+  .details-page .nav-container {
+    padding: 0 0.375rem;
+    min-height: 45px;
+    justify-content: space-between;
+  }
+
+  .details-page .site-logo img {
+    width: 75px;
+    height: 22px;
+  }
+
+  .details-page .profile-avatar {
+    width: 30px;
+    height: 30px;
+  }
+
+  .details-page .profile-initials {
+    font-size: 0.8rem;
+  }
+
+  .details-page .nav-icon {
+    font-size: 1rem;
+    padding: 0.375rem;
+  }
+
+  .details-page .notification-badge {
+    font-size: 0.55rem;
+    padding: 0.1rem 0.25rem;
+    min-width: 14px;
+  }
+
+  .details-page .nav-right-content {
+    gap: 0.375rem;
+  }
+
+  .details-page .auth-buttons {
+    flex-direction: row;
+    gap: 0.25rem;
+  }
+
+  .details-page .login-btn,
+  .details-page .signup-btn,
+  .details-page .dashboard-btn,
+  .details-page .logout-btn {
+    padding: 5px 8px;
+    font-size: 11px;
+    height: 30px;
+    min-width: 50px;
+  }
+
+  .details-page .notification-section .notification-button {
+    width: 30px;
+    height: 30px;
+  }
+
+  .details-page .share-dropdown {
+    min-width: 120px;
+    right: -15px;
+  }
+
+  .details-page .share-dropdown button {
+    font-size: 11px;
+    padding: 0.375rem 0.625rem;
+  }
+
+  .details-page .deadline-item {
+    padding: 0.75rem;
+    gap: 0.75rem;
+  }
+
+  .details-page .deadline-label {
+    font-size: 0.75rem;
+  }
+
+  .details-page .deadline-date {
+    font-size: 0.85rem;
+  }
+
+  .details-page .warning-box {
+    padding: 0.75rem;
+    gap: 0.5rem;
+  }
+
+  .details-page .warning-box p {
+    font-size: 0.75rem;
+  }
+
+  .details-page .tags-container {
+    gap: 0.375rem;
+  }
+
+  .details-page .tag {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.7rem;
+  }
+}
+
+/* Landscape Orientation Adjustments */
+@media (max-height: 500px) and (orientation: landscape) {
+  .details-page .hero-section {
+    height: 200px;
+  }
+
+  .details-page .header-card {
+    min-height: 80px;
+    padding: 1rem;
+  }
+
+  .details-page .days-left {
+    padding: 0.5rem;
+  }
+
+  .details-page .days-number {
+    font-size: 1.5rem;
+  }
+
+  .details-page .nav-container {
+    min-height: 40px;
+  }
+
+  .details-page .profile-avatar {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+/* High DPI / Retina Display Optimizations */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .details-page .site-logo img,
+  .details-page .company-logo img,
+  .details-page .profile-image {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* Reduced Motion Preferences */
+@media (prefers-reduced-motion: reduce) {
+  .details-page * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .details-page .loading-spinner {
+    animation: none;
+  }
+}
+
+/* Dark Mode Support (if system preference) */
+@media (prefers-color-scheme: dark) {
+  .details-page {
+    background: #0a0a0a;
+  }
+
+  .details-page .header-card,
+  .details-page .content-area,
+  .details-page .action-card,
+  .details-page .info-card {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+}
+
+/* Print Styles */
+@media print {
+  .details-page .top-nav,
+  .details-page .nav-container,
+  .details-page .action-card,
+  .details-page .apply-button,
+  .details-page .share-dropdown,
+  .details-page .auth-buttons {
+    display: none !important;
+  }
+
+  .details-page .main-container {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .details-page .header-card,
+  .details-page .content-area,
+  .details-page .info-card {
+    background: white;
+    color: black;
+    border: 1px solid #ccc;
+  }
 }

@@ -12,6 +12,7 @@ router.get('/slug/:slug', eventController.getEventBySlug);
 router.get('/:id', eventController.getEvent);
 
 // Protected routes (authentication required)
+router.get('/my-events', authenticate, attachOrganizationContext, requireRole(['recruiter', 'organizer', 'admin', 'superadmin']), eventController.getMyEvents);
 router.get('/:id/registration-status', authenticate, attachOrganizationContext, eventController.checkEventRegistrationStatus);
 
 router.post('/', authenticate, attachOrganizationContext, requireRole(['recruiter', 'organizer', 'admin', 'superadmin']), eventController.createEvent);

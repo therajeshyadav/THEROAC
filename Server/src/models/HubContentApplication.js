@@ -26,12 +26,16 @@ HubContentApplication.init({
     }
   },
   status: {
-    type: DataTypes.ENUM('pending', 'accepted', 'rejected'),
+    type: DataTypes.ENUM('pending', 'accepted', 'rejected', 'cancelled'),
     defaultValue: 'pending'
   },
   appliedAt: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW
+  },
+  notes: {
+    type: DataTypes.TEXT,
+    allowNull: true
   }
 }, {
   sequelize,

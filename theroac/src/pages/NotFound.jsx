@@ -85,7 +85,7 @@ const NotFound = () => {
                             Welcome back, {user.role.charAt(0).toUpperCase() + user.role.slice(1)}!
                         </p>
                     )}
-                    <p>The page <code>{location.pathname}</code> doesn't exist or has been moved.</p>
+                    <p>The page you're looking for doesn't exist or has been moved.</p>
                     <p>Don't worry, let's get you back on track!</p>
                     {autoRedirect && (
                         <p className="countdown-text">

@@ -65,7 +65,7 @@ const HeroSlider = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       handleNext();
-    }, 4000);
+    }, 5500);
     return () => clearInterval(interval);
   }, []);
 
@@ -81,14 +81,19 @@ const HeroSlider = () => {
                 index <= 1 ? slide.fullImage : slide.thumbnail
               })`,
             }}
-          > 
+          >
             <div>
               <div className="overlay"></div>
             </div>
             <div className="content">
               <div className="name">{slide.name}</div>
               <div className="des">{slide.desc}</div>
-              <a className="seeMore" target="_blank" rel="noopener noreferrer" href="#">
+              <a
+                className="seeMore"
+                target="_blank"
+                rel="noopener noreferrer"
+                href="#"
+              >
                 <button>See More</button>
               </a>
             </div>
@@ -101,7 +106,7 @@ const HeroSlider = () => {
           <img src={arrowLeft} alt="" />
         </button>
         <button className="next" onClick={handleNext}>
-          <img src={arrowLeft} alt="" style={{ transform: 'rotate(180deg)' }} />
+          <img src={arrowLeft} alt="" style={{ transform: "rotate(180deg)" }} />
         </button>
       </div>
     </div>

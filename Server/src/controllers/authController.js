@@ -87,6 +87,16 @@ exports.login = async (req, res, next) => {
     const user = await User.findOne({ where: { email } });
     if (!user) return res.status(404).json({ message: 'User not found' });
 
+    // Check if user is banned
+    if (user.status === 'banned') {
+      return res.status(403).json({
+        message: 'Your account has been banned. Please contact admin for further assistance.',
+        isBanned: true,
+        supportEmail: 'support@theroac.com',
+        supportPhone: '+91-0000000000'
+      });
+    }
+
     const valid = await bcrypt.compare(password, user.passwordHash);
     if(!valid){
       user.failedLoginAttempts = (user.failedLoginAttempts || 0) + 1;

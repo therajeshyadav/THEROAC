@@ -3,12 +3,45 @@ const { Op } = require('sequelize');
 
 exports.createEvent = async (req, res, next) => {
   try {
-    const { title, description, date, time, venue, capacity, registrationDeadline } = req.body;
+    const { 
+      title, 
+      description, 
+      startDate, 
+      endDate, 
+      locationType, 
+      location, 
+      venue, 
+      city, 
+      state, 
+      country, 
+      venueAddress, 
+      mapLink, 
+      registrationDeadline, 
+      maxParticipants, 
+      registrationFee, 
+      registrationLink, 
+      tags, 
+      categories, 
+      requirements, 
+      whatToBring, 
+      bannerImage, 
+      thumbnailImage, 
+      media, 
+      contactInfo, 
+      socials, 
+      agenda, 
+      speakers, 
+      sponsors, 
+      prizes, 
+      eligibility, 
+      featured, 
+      status 
+    } = req.body;
 
     // Validate required fields
-    if (!title || !date || !time) {
+    if (!title || !startDate) {
       return res.status(400).json({
-        error: 'Missing required fields: title, date, and time are required'
+        error: 'Missing required fields: title and startDate are required'
       });
     }
 
@@ -38,40 +71,109 @@ exports.createEvent = async (req, res, next) => {
       counter++;
     }
 
-    // Create startDate from date and time
-    const startDate = new Date(`${date}T${time}`);
+    // Parse dates
+    const parsedStartDate = new Date(startDate);
+    let parsedEndDate;
+    
+    if (endDate) {
+      parsedEndDate = new Date(endDate);
+    } else {
+      // Set endDate to 2 hours after startDate by default
+      parsedEndDate = new Date(parsedStartDate.getTime() + (2 * 60 * 60 * 1000));
+    }
 
-    // Validate date
-    if (isNaN(startDate.getTime())) {
+    // Validate dates
+    if (isNaN(parsedStartDate.getTime())) {
       return res.status(400).json({
-        error: 'Invalid date or time format'
+        error: 'Invalid startDate format'
       });
     }
 
-    // Set endDate to 2 hours after startDate by default (can be customized)
-    const endDate = new Date(startDate.getTime() + (2 * 60 * 60 * 1000));
+    if (isNaN(parsedEndDate.getTime())) {
+      return res.status(400).json({
+        error: 'Invalid endDate format'
+      });
+    }
 
     const payload = {
       title,
       slug,
-      description,
-      startDate,
-      endDate,
-      location: venue || null,
+      description: description || null,
+      startDate: parsedStartDate,
+      endDate: parsedEndDate,
+      locationType: locationType || 'online',
+      location: location || null,
+      venue: venue || null,
+      city: city || null,
+      state: state || null,
+      country: country || null,
+      venueAddress: venueAddress || null,
+      mapLink: mapLink || null,
       registrationDeadline: registrationDeadline ? new Date(registrationDeadline) : null,
-      locationType: venue ? 'offline' : 'online',
-      tags: [],
+      maxParticipants: maxParticipants ? parseInt(maxParticipants) : null,
+      registrationFee: registrationFee || null,
+      registrationLink: registrationLink || null,
+      tags: tags || [],
+      categories: categories || [],
+      requirements: requirements || null,
+      whatToBring: whatToBring || [],
+      bannerImage: bannerImage || null,
+      thumbnailImage: thumbnailImage || null,
+      media: media || [],
+      contactInfo: contactInfo || null,
+      socials: socials || null,
+      agenda: agenda || [],
+      speakers: speakers || [],
+      sponsors: sponsors || [],
+      prizes: prizes || [],
+      eligibility: eligibility || null,
+      featured: featured || false,
+      status: status || 'upcoming',
       createdBy: req.user.id,
-      organizationId
+      organizationId,
+      approvalStatus: 'pending' // Set to pending for admin approval
     };
 
-    // Auto-populate company social links from recruiter profile
-    if (req.user.role === 'recruiter' && req.user.companySocialLinks) {
-      payload.sociallinks = req.user.companySocialLinks;
-    }
-
     const event = await Event.create(payload);
-    res.status(201).json(event);
+    
+    // Create notification for admin about new event pending approval
+    try {
+      const { getNotificationService } = require('../socket');
+      const notificationService = getNotificationService();
+      const { User } = require('../models');
+      
+      // Get all admin users
+      const adminUsers = await User.findAll({
+        where: { role: ['admin', 'superadmin'] }
+      });
+      
+      // Create notification for each admin
+      for (const admin of adminUsers) {
+        await notificationService.createNotification(
+          admin.id,
+          'event_pending_approval',
+          'New Event Pending Approval',
+          `${req.user.fullName || req.user.email} created a new event "${event.title}" that requires approval.`,
+          { 
+            eventId: event.id, 
+            eventTitle: event.title, 
+            organizerName: req.user.fullName || req.user.email,
+            organizerId: req.user.id
+          },
+          `/admin-dashboard?tab=approvals`
+        );
+      }
+    } catch (notifError) {
+      console.error('Failed to create admin notification:', notifError);
+      // Don't fail event creation if notification fails
+    }
+    
+    // Send success response with approval info
+    res.status(201).json({
+      ...event.toJSON(),
+      message: 'Event created successfully! It will be visible after admin approval.',
+      requiresApproval: true
+    });
   } catch (err) {
     console.error('Event creation error:', err);
     
@@ -90,7 +192,7 @@ exports.createEvent = async (req, res, next) => {
 exports.listEvents = async (req, res, next) => {
   try {
     const { q, tag, status, page = 1, perPage = 20 } = req.query;
-    const where = {};
+    const where = { approvalStatus: 'approved' }; // Only show approved events
     if (status) where.status = status;
     if (q) where.title = { [Op.iLike]: `%${q}%` };
     if (tag) where.tags = { [Op.contains]: [tag] };
@@ -202,6 +304,42 @@ exports.getEventBySlug = async (req, res, next) => {
     console.error('Error fetching event by slug:', err);
     return res.status(500).json({
       error: 'Failed to fetch event. Please try again.'
+    });
+  }
+};
+
+// Get organizer's own events
+exports.getMyEvents = async (req, res, next) => {
+  try {
+    const { page = 1, limit = 20, status, approvalStatus, showAll = false } = req.query;
+    const where = { createdBy: req.user.id };
+
+    if (status) where.status = status;
+    
+    // By default, only show approved events unless explicitly requested otherwise
+    if (approvalStatus) {
+      where.approvalStatus = approvalStatus;
+    } else if (showAll !== 'true') {
+      where.approvalStatus = 'approved';
+    }
+
+    const events = await Event.findAndCountAll({
+      where,
+      limit: parseInt(limit),
+      offset: (parseInt(page) - 1) * parseInt(limit),
+      order: [['createdAt', 'DESC']]
+    });
+
+    res.json({
+      events: events.rows,
+      total: events.count,
+      totalPages: Math.ceil(events.count / parseInt(limit)),
+      currentPage: parseInt(page)
+    });
+  } catch (err) {
+    console.error('Error in getMyEvents:', err);
+    return res.status(500).json({
+      error: 'Failed to fetch your events. Please try again.'
     });
   }
 };

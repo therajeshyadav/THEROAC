@@ -5,6 +5,7 @@ import JobsTab from "./JobsTab";
 import EventsTab from "./EventsTab";
 import PrimeHubTab from "./PrimeHubTab";
 import ApplicationsTab from "./ApplicationsTab";
+import SavedItemsTab from "./SavedItemsTab";
 import ProfileTab from "./CandidateProfilePage";
 
 const DashboardTabs = ({
@@ -96,6 +97,10 @@ const DashboardTabs = ({
         onViewJobDetails={onViewJobDetails}
       />
     );
+  }
+
+  if (activeTab === "saved-items") {
+    return <SavedItemsTab />;
   }
 
   if (activeTab === "profile") {

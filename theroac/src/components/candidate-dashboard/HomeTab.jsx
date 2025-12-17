@@ -246,7 +246,7 @@ const HomeTab = ({
                         </span>
                         <span>
                           <i className="fas fa-rupee-sign" /> {
-                            typeof job.salary === 'object' 
+                            typeof job.salary === 'object' && job.salary !== null
                               ? (job.salary.min && job.salary.max 
                                   ? `₹${job.salary.min} - ₹${job.salary.max}` 
                                   : job.salary.min 

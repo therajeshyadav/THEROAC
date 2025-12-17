@@ -9,7 +9,7 @@ JobApplication.init({
   jobId: { type: DataTypes.UUID, allowNull: false },
   resumeLink: { type: DataTypes.TEXT, allowNull: true },
   coverLetter: { type: DataTypes.TEXT, allowNull: true },
-  status: { type: DataTypes.ENUM('applied','pending','reviewing','shortlisted','interview','offered','hired','accepted','rejected'), defaultValue: 'pending' },
+  status: { type: DataTypes.ENUM('applied','pending','reviewing','shortlisted','interview','offered','hired','accepted','rejected','cancelled'), defaultValue: 'pending' },
   notes: { type: DataTypes.TEXT, allowNull: true },
   metadata: { type: DataTypes.JSON, allowNull: true }
 }, {

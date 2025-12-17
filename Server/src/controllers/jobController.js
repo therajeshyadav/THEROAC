@@ -6,6 +6,7 @@ exports.createJob = async (req, res, next) => {
   try {
     const payload = { ...req.body };
     payload.createdBy = req.user.id;
+    payload.approvalStatus = 'pending'; // Set to pending for admin approval
     
     // Add organization context if available
     if (req.currentOrganization) {
@@ -105,7 +106,44 @@ exports.createJob = async (req, res, next) => {
     }
     
     const job = await Job.create(payload);
-    res.status(201).json(job);
+    
+    // Create notification for admin about new job pending approval
+    try {
+      const notificationService = getNotificationService();
+      const { User } = require('../models');
+      
+      // Get all admin users
+      const adminUsers = await User.findAll({
+        where: { role: ['admin', 'superadmin'] }
+      });
+      
+      // Create notification for each admin
+      for (const admin of adminUsers) {
+        await notificationService.createNotification(
+          admin.id,
+          'job_pending_approval',
+          'New Job Pending Approval',
+          `${req.user.fullName || req.user.email} posted a new job "${job.title}" that requires approval.`,
+          { 
+            jobId: job.id, 
+            jobTitle: job.title, 
+            recruiterName: req.user.fullName || req.user.email,
+            recruiterId: req.user.id
+          },
+          `/admin-dashboard?tab=approvals`
+        );
+      }
+    } catch (notifError) {
+      console.error('Failed to create admin notification:', notifError);
+      // Don't fail job creation if notification fails
+    }
+    
+    // Send success response with approval info
+    res.status(201).json({
+      ...job.toJSON(),
+      message: 'Job posted successfully! It will be visible after admin approval.',
+      requiresApproval: true
+    });
   } catch (err) {
     console.error('Error in createJob:', err);
     
@@ -130,7 +168,10 @@ exports.createJob = async (req, res, next) => {
 exports.listJobs = async (req, res, next) => {
   try {
     const { page = 1, limit = 20, search, jobType, experienceLevel, locationType } = req.query;
-    const where = { status: 'open' };
+    const where = { 
+      status: 'open',
+      approvalStatus: 'approved' // Only show approved jobs
+    };
 
     if (search) {
       where[Op.or] = [
@@ -624,6 +665,42 @@ exports.deleteJob = async (req, res, next) => {
     console.error('Error in deleteJob:', err);
     return res.status(500).json({
       error: 'Failed to delete job. Please try again.'
+    });
+  }
+};
+
+// Get recruiter's own jobs
+exports.getMyJobs = async (req, res, next) => {
+  try {
+    const { page = 1, limit = 20, status, approvalStatus, showAll = false } = req.query;
+    const where = { createdBy: req.user.id };
+
+    if (status) where.status = status;
+    
+    // By default, only show approved jobs unless explicitly requested otherwise
+    if (approvalStatus) {
+      where.approvalStatus = approvalStatus;
+    } else if (showAll !== 'true') {
+      where.approvalStatus = 'approved';
+    }
+
+    const jobs = await Job.findAndCountAll({
+      where,
+      limit: parseInt(limit),
+      offset: (parseInt(page) - 1) * parseInt(limit),
+      order: [['createdAt', 'DESC']]
+    });
+
+    res.json({
+      jobs: jobs.rows,
+      total: jobs.count,
+      totalPages: Math.ceil(jobs.count / parseInt(limit)),
+      currentPage: parseInt(page)
+    });
+  } catch (err) {
+    console.error('Error in getMyJobs:', err);
+    return res.status(500).json({
+      error: 'Failed to fetch your jobs. Please try again.'
     });
   }
 };

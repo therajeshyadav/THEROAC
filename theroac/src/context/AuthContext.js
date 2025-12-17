@@ -102,6 +102,17 @@ export const AuthProvider = ({ children }) => {
           needsVerification: true 
         };
       }
+
+      // Check if user is banned
+      if (response.isBanned) {
+        return {
+          success: false,
+          error: response.message,
+          isBanned: true,
+          supportEmail: response.supportEmail,
+          supportPhone: response.supportPhone
+        };
+      }
       
       const { token, user: userData } = response;
       
@@ -113,6 +124,17 @@ export const AuthProvider = ({ children }) => {
       
       return { success: true, user: userData };
     } catch (error) {
+      // Check if the error response contains ban information
+      if (error.response?.data?.isBanned) {
+        return {
+          success: false,
+          error: error.response.data.message,
+          isBanned: true,
+          supportEmail: error.response.data.supportEmail,
+          supportPhone: error.response.data.supportPhone
+        };
+      }
+      
       return { success: false, error: error.message };
     }
   };

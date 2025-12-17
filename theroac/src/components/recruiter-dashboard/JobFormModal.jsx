@@ -216,7 +216,23 @@ const JobFormModal = ({ job, authUser, onClose, onSuccess }) => {
       const data = await response.json();
 
       if (response.ok) {
-        toast.success(job ? 'Job updated successfully!' : 'Job created successfully!');
+        if (job) {
+          toast.success('Job updated successfully!');
+        } else {
+          // Show approval message for new jobs
+          if (data.requiresApproval) {
+            toast.success('Job posted successfully! It will be visible after admin approval.', {
+              autoClose: 5000,
+              style: {
+                background: '#fff8e1',
+                color: '#d97706',
+                border: '1px solid #ffd600'
+              }
+            });
+          } else {
+            toast.success('Job created successfully!');
+          }
+        }
         onSuccess();
       } else {
         // Handle specific error messages from backend

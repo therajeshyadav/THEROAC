@@ -1,24 +1,18 @@
 const { google } = require('googleapis');
 const { getAccessToken } = require('./gmailAuth');
 require('dotenv').config();
+
+const OAuth2 = google.auth.OAuth2;
+
 class EmailService {
   constructor() {
-    this.initialized = false;
     this.init();
   }
 
   async init() {
     this.oauth2Client = await getAccessToken();
-
-    if (!this.oauth2Client) {
-      console.error("Gmail OAuth client unavailable.");
-      return;
-    }
-
     this.gmail = google.gmail({ version: 'v1', auth: this.oauth2Client });
-
-    console.log('Gmail API EmailService initialized.');
-    this.initialized = true;
+    console.log('✅ Gmail API EmailService initialized successfully.');
   }
 
   // --- Generic Gmail API Sender ---
@@ -46,10 +40,10 @@ class EmailService {
         requestBody: { raw: encodedMessage },
       });
 
-      console.log(`Email sent successfully to ${to}. Gmail ID: ${response.data.id}`);
+      console.log(`📧 Email sent successfully to ${to}. Gmail ID: ${response.data.id}`);
       return { success: true, messageId: response.data.id };
     } catch (error) {
-      console.error('Error sending email via Gmail API:', error.message);
+      console.error('❌ Error sending email via Gmail API:', error.message);
       throw new Error('Failed to send email');
     }
   }

@@ -67,6 +67,10 @@ Job.init({
   companySocials: { type: DataTypes.JSON, allowNull: true }, // {linkedin, twitter, etc}
   contactPerson: { type: DataTypes.JSON, allowNull: true }, // {name, email, phone}
   status: { type: DataTypes.ENUM('open','closed','paused'), defaultValue: 'open' },
+  approvalStatus: { type: DataTypes.ENUM('pending','approved','rejected','draft'), defaultValue: 'pending' },
+  approvedBy: { type: DataTypes.UUID, allowNull: true },
+  approvedAt: { type: DataTypes.DATE, allowNull: true },
+  rejectionReason: { type: DataTypes.TEXT, allowNull: true },
   featured: { type: DataTypes.BOOLEAN, defaultValue: false },
   urgent: { type: DataTypes.BOOLEAN, defaultValue: false },
   views: { type: DataTypes.INTEGER, defaultValue: 0 },

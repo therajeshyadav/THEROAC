@@ -2,6 +2,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import UniversalNotifications from './common/UniversalNotifications';
 
 const Header = () => {
   const navigate = useNavigate();
@@ -96,6 +97,12 @@ const Header = () => {
 
                 {/* Right Buttons - Show different buttons based on authentication */}
                 <div className="d-flex justify-content-end align-items-center">
+                  {isAuthenticated && (
+                    <div className="me-3">
+                      <UniversalNotifications />
+                    </div>
+                  )}
+                  
                   {isAuthenticated ? (
                     // Show Dashboard and Logout buttons when authenticated
                     <>

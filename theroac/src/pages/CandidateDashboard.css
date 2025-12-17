@@ -170,31 +170,39 @@
     background: rgba(26, 23, 25, 0.1);
 }
 
+/* Import Standardized Header Styles */
+@import '../styles/standardized-header.css';
+
 /* Candidate Header */
 .candidate-header {
+    /* Inherit from .standardized-header */
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     width: 100%;
-    height: 80px;
-    background: #2a2a2a;
+    height: 85px;
+    background: rgba(26, 26, 26, 0.95);
+    backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    z-index: 10001;
+    z-index: 1000;
     transition: all 0.3s ease;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
 .candidate-header.scrolled {
-    background: rgba(42, 42, 42, 1);
+    /* Inherit from .standardized-header.scrolled */
+    background: rgba(26, 26, 26, 1);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .header-content {
+    /* Inherit from .standardized-header-container */
     display: flex;
     align-items: center;
     height: 100%;
-    padding: 0 1rem;
+    padding: 0 2rem;
     max-width: 1400px;
     margin: 0 auto;
     width: 100%;
@@ -220,8 +228,10 @@
 }
 
 .dashboard-logo {
-    height: 40px;
+    /* Inherit from .standardized-logo img */
+    height: 45px;
     width: auto;
+    object-fit: contain;
 }
 
 .header-nav {
@@ -380,8 +390,8 @@
 .dashboard-content {
     padding: 2rem 0;
     min-height: 100vh;
-    margin-top: 80px;
-    /* Account for fixed header */
+    margin-top: 85px;
+    /* Account for standardized fixed header */
 }
 
 .dashboard-container .container {

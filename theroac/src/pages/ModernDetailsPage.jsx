@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Calendar, MapPin, Clock, Share2, Facebook, Twitter, Linkedin, Instagram, Link as LinkIcon, Building } from 'lucide-react';
+import { Calendar, MapPin, Clock, Facebook, Twitter, Linkedin, Instagram, Link as LinkIcon, Building } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import apiService from '../services/api';
 import { parseSlugForLookup, createSEOSlug } from '../utils/urlUtils';
@@ -128,7 +128,7 @@ const ModernDetailsPage = () => {
         } else if (type === 'events') {
             setActiveTab('stages');
         } else if (type === 'internships') {
-            setActiveTab('details');
+            setActiveTab('description');
         }
     }, [type]);
 
@@ -255,7 +255,7 @@ const ModernDetailsPage = () => {
         },
         internships: {
             tabs: [
-                { id: 'details', label: 'Internship Details' },
+                { id: 'description', label: 'Internship Details' },
                 { id: 'reviews', label: 'Reviews' },
                 { id: 'faqs', label: 'FAQs & Discussions' }
             ]
@@ -263,7 +263,11 @@ const ModernDetailsPage = () => {
     };
 
     const getOrganizationName = () => {
-        return data?.company || data?.companyName || data?.organization || data?.organizer || 'Organization';
+        const name = data?.company || data?.companyName || data?.organization || data?.organizer;
+        // Ensure we return a string, not an object
+        if (typeof name === 'string') return name;
+        if (typeof name === 'object' && name !== null) return JSON.stringify(name);
+        return 'Organization';
     };
 
     const handleApply = async () => {
@@ -318,26 +322,6 @@ const ModernDetailsPage = () => {
             } else {
                 alert(`Failed to apply: ${errorMessage}`);
             }
-        }
-    };
-
-    // Share function for left section
-    const handleShare = (platform) => {
-        const url = encodeURIComponent(window.location.href);
-        const title = encodeURIComponent(data?.title || 'Check this out');
-        
-        const shareUrls = {
-            facebook: `https://www.facebook.com/sharer/sharer.php?u=${url}`,
-            twitter: `https://twitter.com/intent/tweet?url=${url}&text=${title}`,
-            linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${url}`,
-            copy: null
-        };
-
-        if (platform === 'copy') {
-            navigator.clipboard.writeText(window.location.href);
-            alert('Link copied to clipboard!');
-        } else {
-            window.open(shareUrls[platform], '_blank', 'width=600,height=400');
         }
     };
 
@@ -419,7 +403,7 @@ const ModernDetailsPage = () => {
                                                 {getOrganizationName()}
                                             </a>
                                         ) : (
-                                            <span className="info-text">{getOrganizationName()}</span>
+                                            <span className="info-text">{getOrganizationName() || 'Organization'}</span>
                                         )}
                                     </div>
 
@@ -439,7 +423,7 @@ const ModernDetailsPage = () => {
                                 </div>
 
                                 {/* Social Links - Show only if company has provided links */}
-                                {data.sociallinks && Object.keys(data.sociallinks).length > 0 && (
+                                {data.sociallinks && typeof data.sociallinks === 'object' && Object.keys(data.sociallinks).length > 0 && (
                                     <div className="share-section">
                                         <span className="share-label">Follow Us</span>
                                         <div className="share-buttons">
@@ -506,6 +490,15 @@ const ModernDetailsPage = () => {
                             {/* Right Column - Subscribe Card */}
                             <div className="top-right-column">
                                 <div className="subscribe-card">
+                                    <div className="qr-code-container">
+                                        <img 
+                                            src={`https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(window.location.href)}`}
+                                            alt="QR Code"
+                                            className="qr-code-image"
+                                        />
+                                    </div>
+                                    <p className="qr-text">Scan QR with your phone to open this page</p>
+                                    <span className="or-text">or</span>
                                     {hasApplied ? (
                                         <button 
                                             className="subscribe-btn whatsapp"
@@ -521,15 +514,6 @@ const ModernDetailsPage = () => {
                                             Apply Now
                                         </button>
                                     )}
-                                    <span className="or-text">or</span>
-                                    <div className="qr-code-container">
-                                        <img 
-                                            src={`https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(window.location.href)}`}
-                                            alt="QR Code"
-                                            className="qr-code-image"
-                                        />
-                                    </div>
-                                    <p className="qr-text">Scan QR with your phone to open this page</p>
                                 </div>
                             </div>
                         </div>
@@ -554,16 +538,22 @@ const ModernDetailsPage = () => {
                     {/* Details Section - Job/Internship */}
                     {(type === 'jobs' || type === 'internships') && (
                         <div id="description" className="details-section">
-                            <h2 className="section-title">Details</h2>
+                            <h2 className="section-title">
+                                {type === 'jobs' ? 'Job Details' : 'Internship Details'}
+                            </h2>
                             <div className="details-content">
                                 {/* Description */}
                                 <div className="details-subsection">
                                     <h3 className="subsection-title">Description:</h3>
-                                    {data.description && data.description.trim() ? (
+                                    {data.description && typeof data.description === 'string' && data.description.trim() ? (
                                         <div className="details-text">
                                             {data.description.split('\n').map((line, index) => (
                                                 line.trim() && <p key={index}>{line.trim()}</p>
                                             ))}
+                                        </div>
+                                    ) : data.description && typeof data.description === 'object' ? (
+                                        <div className="details-text">
+                                            <p>{JSON.stringify(data.description)}</p>
                                         </div>
                                     ) : (
                                         <p className="no-details-message">No data</p>
@@ -586,6 +576,10 @@ const ModernDetailsPage = () => {
                                                     line.trim() && <li key={index}>{line.trim()}</li>
                                                 ))}
                                             </ul>
+                                        ) : typeof data.responsibilities === 'object' && data.responsibilities !== null ? (
+                                            <div className="details-text">
+                                                <p>{JSON.stringify(data.responsibilities)}</p>
+                                            </div>
                                         ) : (
                                             <p className="no-details-message">No data</p>
                                         )
@@ -611,6 +605,10 @@ const ModernDetailsPage = () => {
                                                     line.trim() && <li key={index}>{line.trim()}</li>
                                                 ))}
                                             </ul>
+                                        ) : typeof data.requirements === 'object' && data.requirements !== null ? (
+                                            <div className="details-text">
+                                                <p>{JSON.stringify(data.requirements)}</p>
+                                            </div>
                                         ) : (
                                             <p className="no-details-message">No data</p>
                                         )
@@ -632,10 +630,22 @@ const ModernDetailsPage = () => {
                                     <div className="details-subsection">
                                         {data.stages.map((stage, index) => (
                                             <div key={index} className="timeline-item">
-                                                <div className="timeline-date">{stage.date}</div>
+                                                <div className="timeline-date">
+                                                    {typeof stage.date === 'string' ? stage.date : 
+                                                     typeof stage.date === 'object' ? JSON.stringify(stage.date) : 
+                                                     stage.date || 'TBD'}
+                                                </div>
                                                 <div className="timeline-content">
-                                                    <h4>{stage.title}</h4>
-                                                    <p>{stage.description}</p>
+                                                    <h4>
+                                                        {typeof stage.title === 'string' ? stage.title : 
+                                                         typeof stage.title === 'object' ? JSON.stringify(stage.title) : 
+                                                         stage.title || 'Stage'}
+                                                    </h4>
+                                                    <p>
+                                                        {typeof stage.description === 'string' ? stage.description : 
+                                                         typeof stage.description === 'object' ? JSON.stringify(stage.description) : 
+                                                         stage.description || 'No description'}
+                                                    </p>
                                                 </div>
                                             </div>
                                         ))}
@@ -645,53 +655,25 @@ const ModernDetailsPage = () => {
                         </div>
                     )}
 
-                    {/* Event/Internship Details Section */}
-                    <div id="details" className="details-section">
-                        <h2 className="section-title">
-                            {type === 'jobs' ? 'Additional Details' : type === 'events' ? 'Event Details' : 'Internship Details'}
-                        </h2>
-                        
-                        <div className="details-content">
-                            {type === 'events' && data.guidelines && Array.isArray(data.guidelines) && data.guidelines.length > 0 && (
-                                <div className="details-subsection">
-                                    <h3 className="subsection-title">Guidelines</h3>
-                                    <ul className="details-list">
-                                        {data.guidelines.map((item, index) => (
-                                            <li key={index}>{item}</li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            )}
-
-                            {type === 'internships' && (
-                                <>
-                                    <p className="details-description">{data.description}</p>
-                                    
-                                    {data.responsibilities && Array.isArray(data.responsibilities) && data.responsibilities.length > 0 && (
-                                        <div className="details-subsection">
-                                            <h3 className="subsection-title">Responsibilities</h3>
-                                            <ul className="details-list">
-                                                {data.responsibilities.map((item, index) => (
-                                                    <li key={index}>{item}</li>
-                                                ))}
-                                            </ul>
-                                        </div>
-                                    )}
-
-                                    {data.requirements && Array.isArray(data.requirements) && data.requirements.length > 0 && (
-                                        <div className="details-subsection">
-                                            <h3 className="subsection-title">Requirements</h3>
-                                            <ul className="details-list">
-                                                {data.requirements.map((item, index) => (
-                                                    <li key={index}>{item}</li>
-                                                ))}
-                                            </ul>
-                                        </div>
-                                    )}
-                                </>
-                            )}
+                    {/* Event Details Section - Only for Events */}
+                    {type === 'events' && (
+                        <div id="details" className="details-section">
+                            <h2 className="section-title">Event Details</h2>
+                            
+                            <div className="details-content">
+                                {data.guidelines && Array.isArray(data.guidelines) && data.guidelines.length > 0 && (
+                                    <div className="details-subsection">
+                                        <h3 className="subsection-title">Guidelines</h3>
+                                        <ul className="details-list">
+                                            {data.guidelines.map((item, index) => (
+                                                <li key={index}>{item}</li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+                            </div>
                         </div>
-                    </div>
+                    )}
 
                     {/* Important Dates & Deadlines Section */}
                     {/* <div id="dates" className="details-section">
@@ -712,156 +694,7 @@ const ModernDetailsPage = () => {
                         </div>
                     </div> */}
 
-                    {/* Additional Information Section - Job/Internship specific */}
-                    {(type === 'jobs' || type === 'internships') && (
-                        <div id="additional-info" className="details-section">
-                            <h2 className="section-title">Additional Information</h2>
-                            {/* Check if any additional info exists */}
-                            {type === 'internships' && !data.duration && !data.stipend && !data.workDays && !data.type && !data.timing ? (
-                                <p className="no-details-message">No additional information available</p>
-                            ) : type === 'jobs' && !data.type && !data.experience && !data.salary && !data.workMode ? (
-                                <p className="no-details-message">No additional information available</p>
-                            ) : (
-                            <div className="info-grid">
-                                {type === 'internships' && (
-                                    <>
-                                        {/* Internship Duration */}
-                                        {data.duration && (
-                                            <div className="info-card-item">
-                                                <div className="info-card-content">
-                                                    <h4 className="info-card-title">Internship Duration</h4>
-                                                    <p className="info-card-value">{data.duration}</p>
-                                                </div>
-                                                <div className="info-card-icon">
-                                                    <Calendar size={40} />
-                                                </div>
-                                            </div>
-                                        )}
 
-                                        {/* Stipend */}
-                                        {data.stipend && (
-                                            <div className="info-card-item">
-                                                <div className="info-card-content">
-                                                    <h4 className="info-card-title">Stipend</h4>
-                                                    <p className="info-card-value">
-                                                        {typeof data.stipend === 'object' 
-                                                            ? (data.stipend.min && data.stipend.max 
-                                                                ? `₹ ${data.stipend.min.toLocaleString()} - ₹ ${data.stipend.max.toLocaleString()} /Month`
-                                                                : data.stipend.amount 
-                                                                    ? `₹ ${data.stipend.amount.toLocaleString()} /Month`
-                                                                    : 'Unpaid'
-                                                              )
-                                                            : data.stipend
-                                                        }
-                                                    </p>
-                                                </div>
-                                                <div className="info-card-icon">
-                                                    💰
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {/* Work Detail */}
-                                        {data.workDays && (
-                                            <div className="info-card-item">
-                                                <div className="info-card-content">
-                                                    <h4 className="info-card-title">Work Detail</h4>
-                                                    <p className="info-card-value">Working Days: {data.workDays}</p>
-                                                </div>
-                                                <div className="info-card-icon">
-                                                    📋
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {/* Internship Type/Timing */}
-                                        {(data.type || data.timing) && (
-                                            <div className="info-card-item">
-                                                <div className="info-card-content">
-                                                    <h4 className="info-card-title">Internship Type/Timing</h4>
-                                                    <p className="info-card-value">
-                                                        {data.type && `Internship Type: ${data.type}`}
-                                                        {data.type && data.timing && <br />}
-                                                        {data.timing && `Internship Timing: ${data.timing}`}
-                                                    </p>
-                                                </div>
-                                                <div className="info-card-icon">
-                                                    <Clock size={40} />
-                                                </div>
-                                            </div>
-                                        )}
-                                    </>
-                                )}
-
-                                {type === 'jobs' && (
-                                    <>
-                                        {/* Job Type */}
-                                        {data.type && (
-                                            <div className="info-card-item">
-                                                <div className="info-card-content">
-                                                    <h4 className="info-card-title">Job Type</h4>
-                                                    <p className="info-card-value">{data.type}</p>
-                                                </div>
-                                                <div className="info-card-icon">
-                                                    💼
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {/* Experience Required */}
-                                        {data.experience && (
-                                            <div className="info-card-item">
-                                                <div className="info-card-content">
-                                                    <h4 className="info-card-title">Experience Required</h4>
-                                                    <p className="info-card-value">{data.experience}</p>
-                                                </div>
-                                                <div className="info-card-icon">
-                                                    📊
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {/* Salary */}
-                                        {data.salary && (
-                                            <div className="info-card-item">
-                                                <div className="info-card-content">
-                                                    <h4 className="info-card-title">Salary</h4>
-                                                    <p className="info-card-value">
-                                                        {typeof data.salary === 'object'
-                                                            ? (data.salary.min && data.salary.max
-                                                                ? `₹ ${data.salary.min.toLocaleString()} - ₹ ${data.salary.max.toLocaleString()} /Year`
-                                                                : data.salary.min
-                                                                    ? `₹ ${data.salary.min.toLocaleString()}+ /Year`
-                                                                    : 'Competitive'
-                                                              )
-                                                            : data.salary
-                                                        }
-                                                    </p>
-                                                </div>
-                                                <div className="info-card-icon">
-                                                    💰
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {/* Work Mode */}
-                                        {data.workMode && (
-                                            <div className="info-card-item">
-                                                <div className="info-card-content">
-                                                    <h4 className="info-card-title">Work Mode</h4>
-                                                    <p className="info-card-value">{data.workMode}</p>
-                                                </div>
-                                                <div className="info-card-icon">
-                                                    🏢
-                                                </div>
-                                            </div>
-                                        )}
-                                    </>
-                                )}
-                            </div>
-                            )}
-                        </div>
-                    )}
 
                     {/* Prizes Section (Events only) */}
                     {type === 'events' && data.prizes && (
@@ -870,6 +703,38 @@ const ModernDetailsPage = () => {
                             <div className="details-content">
                                 <p className="details-description">{data.prizes.winner || 'No data'}</p>
                             </div>
+                        </div>
+                    )}
+
+                    {/* Photos and Videos Section */}
+                    {(type === 'events' || type === 'internships') && (
+                        <div className="media-section">
+                            <h2 className="section-title">
+                                {type === 'events' ? 'Event Photos And Videos' : 'Media Gallery'}
+                            </h2>
+                            {data.media && Array.isArray(data.media) && data.media.length > 0 ? (
+                                <div className="media-grid">
+                                    {data.media.map((item, index) => (
+                                        <div 
+                                            key={index} 
+                                            className="media-item"
+                                            onClick={() => setSelectedMedia(item)}
+                                            style={{ cursor: 'pointer' }}
+                                        >
+                                            {item.type === 'video' ? (
+                                                <div className="video-wrapper">
+                                                    <img src={item.thumbnail} alt="Video thumbnail" />
+                                                    <div className="play-button">▶</div>
+                                                </div>
+                                            ) : (
+                                                <img src={item.url} alt="Media" />
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="no-details-message">No data</p>
+                            )}
                         </div>
                     )}
 
@@ -916,37 +781,7 @@ const ModernDetailsPage = () => {
                         </div>
                     </div>
 
-                    {/* Photos and Videos Section */}
-                    {(type === 'events' || type === 'internships') && (
-                        <div className="media-section">
-                            <h2 className="section-title">
-                                {type === 'events' ? 'Event Photos And Videos' : 'Media Gallery'}
-                            </h2>
-                            {data.media && Array.isArray(data.media) && data.media.length > 0 ? (
-                                <div className="media-grid">
-                                    {data.media.map((item, index) => (
-                                        <div 
-                                            key={index} 
-                                            className="media-item"
-                                            onClick={() => setSelectedMedia(item)}
-                                            style={{ cursor: 'pointer' }}
-                                        >
-                                            {item.type === 'video' ? (
-                                                <div className="video-wrapper">
-                                                    <img src={item.thumbnail} alt="Video thumbnail" />
-                                                    <div className="play-button">▶</div>
-                                                </div>
-                                            ) : (
-                                                <img src={item.url} alt="Media" />
-                                            )}
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <p className="no-details-message">No data</p>
-                            )}
-                        </div>
-                    )}
+
 
                     {/* Media Modal */}
                     {selectedMedia && (
@@ -975,7 +810,7 @@ const ModernDetailsPage = () => {
                     )}
 
                     {/* Host/Company Info */}
-                    <div className="host-card">
+                    {/* <div className="host-card">
                         <div className="host-avatar">
                             {getOrganizationName().charAt(0)}
                         </div>
@@ -1005,7 +840,7 @@ const ModernDetailsPage = () => {
                                 </div>
                             )}
                         </div>
-                    </div>
+                    </div> */}
                     </div>
                 </div>
             </div>

@@ -79,7 +79,24 @@ HubContent.init({
   views: { type: DataTypes.INTEGER, defaultValue: 0 },
   applications: { type: DataTypes.INTEGER, defaultValue: 0 },
   createdBy: { type: DataTypes.UUID, allowNull: false },
-  organizationId: { type: DataTypes.UUID, allowNull: true }
+  organizationId: { type: DataTypes.UUID, allowNull: true },
+  
+  // Approval system fields
+  approvalStatus: { 
+    type: DataTypes.ENUM('pending', 'approved', 'rejected', 'draft'), 
+    defaultValue: 'pending',
+    allowNull: false 
+  },
+  approvedBy: { 
+    type: DataTypes.UUID, 
+    allowNull: true,
+    references: {
+      model: 'users',
+      key: 'id'
+    }
+  },
+  approvedAt: { type: DataTypes.DATE, allowNull: true },
+  rejectionReason: { type: DataTypes.TEXT, allowNull: true }
 }, {
   sequelize,
   modelName: 'HubContent',

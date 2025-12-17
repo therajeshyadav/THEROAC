@@ -4,6 +4,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { NotificationProvider } from "./contexts/NotificationContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
+import GlobalBanHandler from "./components/GlobalBanHandler";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { ToastContainer } from 'react-toastify';
@@ -75,8 +76,9 @@ function App() {
   return (
     <AuthProvider>
       <NotificationProvider>
-        <ToastContainer />
-        <ScrollToHashElement />
+        <GlobalBanHandler>
+          <ToastContainer />
+          <ScrollToHashElement />
 
       {showHeaderFooter && <Header />}
 
@@ -143,7 +145,8 @@ function App() {
         </Routes>
       </main>
 
-      {showHeaderFooter && <Footer />}
+          {showHeaderFooter && <Footer />}
+        </GlobalBanHandler>
       </NotificationProvider>
     </AuthProvider>
   );

@@ -1,6 +1,6 @@
 // src/components/candidate-dashboard/DashboardHeader.jsx
 import React from 'react';
-import NotificationBell from '../notifications/NotificationBell';
+import UniversalNotifications from '../common/UniversalNotifications';
 
 const DashboardHeader = ({ activeTab, setActiveTab, authUser, logout }) => {
   return (
@@ -60,6 +60,13 @@ const DashboardHeader = ({ activeTab, setActiveTab, authUser, logout }) => {
             <span>ROAC Prime</span>
           </button>
           <button
+            className={`nav-btn ${activeTab === 'saved-items' ? 'active' : ''}`}
+            onClick={() => setActiveTab('saved-items')}
+          >
+            <i className="fas fa-heart" />
+            <span>Saved Items</span>
+          </button>
+          <button
             className={`nav-btn ${activeTab === 'profile' ? 'active' : ''}`}
             onClick={() => setActiveTab('profile')}
           >
@@ -70,7 +77,7 @@ const DashboardHeader = ({ activeTab, setActiveTab, authUser, logout }) => {
 
         <div className="header-right">
           <div className="header-actions">
-            <NotificationBell />
+            <UniversalNotifications />
             <div className="user-menu">
               <div
                 className="user-avatar"

@@ -1,0 +1,957 @@
+/* src/components/admin/AdminDashboard/tabs/DashboardTab.css */
+
+.admin-welcome-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 214, 0, 0.2);
+  padding: 1.5rem 2rem;
+  border-radius: 15px;
+  margin-bottom: 2rem;
+}
+
+.admin-welcome-text h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #fff;
+  margin: 0 0 0.5rem 0;
+}
+
+.admin-welcome-text p {
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.admin-welcome-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.admin-btn-help {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 0.75rem;
+  border-radius: 50%;
+  cursor: pointer;
+  width: 45px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+/* .admin-btn-help:hover {
+  background: rgba(255, 255, 255, 0.2);
+} */
+
+/* Stat cards */
+
+.admin-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.admin-stat-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.admin-stat-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100px;
+  height: 100%;
+  background: linear-gradient(45deg, transparent, rgba(255, 214, 0, 0.1));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* .admin-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 214, 0, 0.2);
+  border-color: rgba(255, 214, 0, 0.3);
+} */
+
+/* .admin-stat-card:hover::after {
+  opacity: 1;
+} */
+
+.admin-stat-icon-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.admin-stat-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1a1719;
+  flex-shrink: 0;
+  background: #ffd600;
+}
+
+.admin-stat-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.admin-stat-number {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.admin-stat-label {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+.admin-stat-details {
+  display: flex;
+  justify-content: space-between;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}
+
+/* Analytics grid */
+
+.admin-dashboard-analytics-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.admin-analytics-chart-section,
+.admin-activity-calendar-section {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  padding: 2rem;
+}
+
+.admin-chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+}
+
+.admin-chart-title-section h3 {
+  color: #fff;
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+}
+
+.admin-chart-title-section p {
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.admin-chart-tabs {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.admin-chart-tab {
+  background: transparent;
+  border: 1px solid rgba(255, 214, 0, 0.3);
+  color: rgba(255, 255, 255, 0.8);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* .admin-chart-tab:hover {
+  background: rgba(255, 214, 0, 0.1);
+} */
+
+.admin-chart-tab.admin-active {
+  background: #ffd600;
+  color: #1a1719;
+  border-color: #ffd600;
+}
+
+.admin-analytics-chart-container {
+  position: relative;
+  height: 320px;
+  margin-top: 2rem;
+}
+
+.admin-chart-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: rgba(255, 255, 255, 0.6);
+  text-align: center;
+}
+
+.admin-chart-placeholder h4 {
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+/* Activity */
+
+.admin-calendar-header h3 {
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+}
+
+.admin-calendar-header p {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.admin-activity-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.admin-activity-item {
+  text-align: center;
+  padding: 1rem;
+  background: rgba(255, 214, 0, 0.1);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 214, 0, 0.2);
+}
+
+.admin-activity-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #ffd600;
+  margin-bottom: 0.5rem;
+}
+
+.admin-activity-label {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+}
+
+/* Enhanced Responsive Design for Dashboard Tab */
+
+/* Large Desktop (1400px+) */
+@media (min-width: 1400px) {
+  .admin-welcome-section {
+    padding: 2rem 2.5rem;
+  }
+
+  .admin-welcome-text h2 {
+    font-size: 1.7rem;
+  }
+
+  .admin-stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+  }
+
+  .admin-stat-card {
+    padding: 2rem;
+  }
+
+  .admin-stat-number {
+    font-size: 1.8rem;
+  }
+
+  .admin-dashboard-analytics-grid {
+    gap: 2rem;
+  }
+
+  .admin-analytics-chart-section,
+  .admin-activity-calendar-section {
+    padding: 2.5rem;
+  }
+}
+
+/* Desktop (1200px - 1399px) */
+@media (max-width: 1399px) and (min-width: 1200px) {
+  .admin-stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.75rem;
+  }
+
+  .admin-stat-card {
+    padding: 1.75rem;
+  }
+}
+
+/* Laptop/Tablet Landscape (1024px - 1199px) */
+@media (max-width: 1199px) and (min-width: 1024px) {
+  .admin-welcome-section {
+    padding: 1.5rem 2rem;
+  }
+
+  .admin-welcome-text h2 {
+    font-size: 1.4rem;
+  }
+
+  .admin-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+
+  .admin-stat-card {
+    padding: 1.5rem;
+  }
+
+  .admin-dashboard-analytics-grid {
+    grid-template-columns: 1.2fr 1fr;
+    gap: 1.5rem;
+  }
+
+  .admin-analytics-chart-section,
+  .admin-activity-calendar-section {
+    padding: 1.75rem;
+  }
+}
+
+/* Tablet Portrait (768px - 1023px) */
+@media (max-width: 1023px) and (min-width: 768px) {
+  .admin-welcome-section {
+    flex-direction: column;
+    gap: 1.25rem;
+    text-align: center;
+    padding: 1.25rem 1.5rem;
+  }
+
+  .admin-welcome-text h2 {
+    font-size: 1.3rem;
+  }
+
+  .admin-welcome-text p {
+    font-size: 0.85rem;
+  }
+
+  .admin-welcome-actions {
+    justify-content: center;
+    gap: 0.75rem;
+  }
+
+  .admin-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+  }
+
+  .admin-stat-card {
+    padding: 1.25rem;
+  }
+
+  .admin-stat-number {
+    font-size: 1.4rem;
+  }
+
+  .admin-dashboard-analytics-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .admin-analytics-chart-section,
+  .admin-activity-calendar-section {
+    padding: 1.5rem;
+  }
+
+  .admin-chart-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .admin-chart-tabs {
+    gap: 0.4rem;
+  }
+
+  .admin-chart-tab {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* Mobile Landscape (640px - 767px) */
+@media (max-width: 767px) and (min-width: 640px) {
+  .admin-welcome-section {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+    padding: 1rem 1.25rem;
+  }
+
+  .admin-welcome-text h2 {
+    font-size: 1.2rem;
+  }
+
+  .admin-welcome-text p {
+    font-size: 0.8rem;
+  }
+
+  .admin-welcome-actions {
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .admin-btn-host {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.85rem;
+  }
+
+  .admin-btn-help {
+    width: 40px;
+    height: 40px;
+  }
+
+  .admin-stats-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .admin-stat-card {
+    padding: 1rem;
+  }
+
+  .admin-stat-icon-row {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .admin-stat-icon {
+    width: 45px;
+    height: 45px;
+  }
+
+  .admin-stat-number {
+    font-size: 1.3rem;
+  }
+
+  .admin-stat-label {
+    font-size: 0.85rem;
+  }
+
+  .admin-dashboard-analytics-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .admin-analytics-chart-section,
+  .admin-activity-calendar-section {
+    padding: 1.25rem;
+  }
+
+  .admin-chart-title-section h3 {
+    font-size: 1.1rem;
+  }
+
+  .admin-chart-title-section p {
+    font-size: 0.8rem;
+  }
+
+  .admin-chart-header {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+
+  .admin-chart-tabs {
+    gap: 0.3rem;
+    flex-wrap: wrap;
+  }
+
+  .admin-chart-tab {
+    padding: 0.35rem 0.7rem;
+    font-size: 0.75rem;
+  }
+
+  .admin-analytics-chart-container {
+    height: 280px;
+  }
+
+  .admin-activity-summary {
+    gap: 1rem;
+  }
+
+  .admin-activity-item {
+    padding: 0.75rem;
+  }
+
+  .admin-activity-number {
+    font-size: 1.5rem;
+  }
+
+  .admin-activity-label {
+    font-size: 0.8rem;
+  }
+}
+
+/* Mobile Portrait (480px - 639px) */
+@media (max-width: 639px) and (min-width: 480px) {
+  .admin-welcome-section {
+    padding: 0.75rem 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .admin-welcome-text h2 {
+    font-size: 1.1rem;
+  }
+
+  .admin-welcome-text p {
+    font-size: 0.75rem;
+  }
+
+  .admin-welcome-actions {
+    gap: 0.4rem;
+  }
+
+  .admin-btn-host {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+  }
+
+  .admin-btn-help {
+    width: 36px;
+    height: 36px;
+  }
+
+  .admin-stats-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .admin-stat-card {
+    padding: 0.75rem;
+  }
+
+  .admin-stat-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .admin-stat-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .admin-stat-number {
+    font-size: 1.2rem;
+  }
+
+  .admin-stat-label {
+    font-size: 0.8rem;
+  }
+
+  .admin-stat-details {
+    font-size: 0.75rem;
+  }
+
+  .admin-dashboard-analytics-grid {
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .admin-analytics-chart-section,
+  .admin-activity-calendar-section {
+    padding: 1rem;
+  }
+
+  .admin-chart-title-section h3 {
+    font-size: 1rem;
+  }
+
+  .admin-chart-title-section p {
+    font-size: 0.75rem;
+  }
+
+  .admin-chart-tabs {
+    gap: 0.25rem;
+  }
+
+  .admin-chart-tab {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.7rem;
+  }
+
+  .admin-analytics-chart-container {
+    height: 250px;
+  }
+
+  .admin-chart-placeholder h4 {
+    font-size: 1rem;
+  }
+
+  .admin-chart-placeholder p {
+    font-size: 0.8rem;
+  }
+
+  .admin-calendar-header h3 {
+    font-size: 1rem;
+  }
+
+  .admin-calendar-header p {
+    font-size: 0.75rem;
+  }
+
+  .admin-activity-summary {
+    gap: 0.75rem;
+  }
+
+  .admin-activity-item {
+    padding: 0.6rem;
+  }
+
+  .admin-activity-number {
+    font-size: 1.3rem;
+  }
+
+  .admin-activity-label {
+    font-size: 0.75rem;
+  }
+}
+
+/* Extra Small Mobile (320px - 479px) */
+@media (max-width: 479px) and (min-width: 320px) {
+  .admin-welcome-section {
+    padding: 0.5rem 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .admin-welcome-text h2 {
+    font-size: 1rem;
+  }
+
+  .admin-welcome-text p {
+    font-size: 0.7rem;
+  }
+
+  .admin-welcome-actions {
+    gap: 0.3rem;
+  }
+
+  .admin-btn-host {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.75rem;
+  }
+
+  .admin-btn-help {
+    width: 32px;
+    height: 32px;
+  }
+
+  .admin-stats-grid {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .admin-stat-card {
+    padding: 0.6rem;
+  }
+
+  .admin-stat-icon-row {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+  }
+
+  .admin-stat-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .admin-stat-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .admin-stat-number {
+    font-size: 1.1rem;
+  }
+
+  .admin-stat-label {
+    font-size: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .admin-stat-details {
+    font-size: 0.7rem;
+    margin-top: 0.25rem;
+  }
+
+  .admin-dashboard-analytics-grid {
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .admin-analytics-chart-section,
+  .admin-activity-calendar-section {
+    padding: 0.75rem;
+  }
+
+  .admin-chart-title-section h3 {
+    font-size: 0.9rem;
+  }
+
+  .admin-chart-title-section p {
+    font-size: 0.7rem;
+  }
+
+  .admin-chart-header {
+    margin-bottom: 1rem;
+  }
+
+  .admin-chart-tabs {
+    gap: 0.2rem;
+  }
+
+  .admin-chart-tab {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.65rem;
+  }
+
+  .admin-analytics-chart-container {
+    height: 200px;
+  }
+
+  .admin-chart-placeholder h4 {
+    font-size: 0.9rem;
+  }
+
+  .admin-chart-placeholder p {
+    font-size: 0.7rem;
+  }
+
+  .admin-calendar-header h3 {
+    font-size: 0.9rem;
+  }
+
+  .admin-calendar-header p {
+    font-size: 0.7rem;
+  }
+
+  .admin-activity-summary {
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+  }
+
+  .admin-activity-item {
+    padding: 0.5rem;
+  }
+
+  .admin-activity-number {
+    font-size: 1.2rem;
+  }
+
+  .admin-activity-label {
+    font-size: 0.7rem;
+  }
+}
+
+/* Ultra Small Mobile (280px - 319px) */
+@media (max-width: 319px) {
+  .admin-welcome-section {
+    padding: 0.4rem 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .admin-welcome-text h2 {
+    font-size: 0.9rem;
+  }
+
+  .admin-welcome-text p {
+    font-size: 0.65rem;
+  }
+
+  .admin-welcome-actions {
+    gap: 0.25rem;
+  }
+
+  .admin-btn-host {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.7rem;
+  }
+
+  .admin-btn-help {
+    width: 28px;
+    height: 28px;
+  }
+
+  .admin-stats-grid {
+    gap: 0.4rem;
+    margin-bottom: 1rem;
+  }
+
+  .admin-stat-card {
+    padding: 0.5rem;
+  }
+
+  .admin-stat-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .admin-stat-icon svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .admin-stat-number {
+    font-size: 1rem;
+  }
+
+  .admin-stat-label {
+    font-size: 0.7rem;
+  }
+
+  .admin-stat-details {
+    font-size: 0.65rem;
+  }
+
+  .admin-dashboard-analytics-grid {
+    gap: 0.4rem;
+    margin-bottom: 1rem;
+  }
+
+  .admin-analytics-chart-section,
+  .admin-activity-calendar-section {
+    padding: 0.6rem;
+  }
+
+  .admin-chart-title-section h3 {
+    font-size: 0.8rem;
+  }
+
+  .admin-chart-title-section p {
+    font-size: 0.65rem;
+  }
+
+  .admin-chart-tab {
+    padding: 0.2rem 0.4rem;
+    font-size: 0.6rem;
+  }
+
+  .admin-analytics-chart-container {
+    height: 180px;
+  }
+
+  .admin-chart-placeholder h4 {
+    font-size: 0.8rem;
+  }
+
+  .admin-chart-placeholder p {
+    font-size: 0.65rem;
+  }
+
+  .admin-activity-item {
+    padding: 0.4rem;
+  }
+
+  .admin-activity-number {
+    font-size: 1.1rem;
+  }
+
+  .admin-activity-label {
+    font-size: 0.65rem;
+  }
+}
+
+/* Touch-friendly interactions */
+@media (hover: none) and (pointer: coarse) {
+  .admin-btn-host,
+  .admin-btn-help,
+  .admin-chart-tab {
+    min-height: 44px;
+  }
+
+  .admin-stat-card.clickable {
+    min-height: 120px;
+  }
+}
+
+/* Landscape orientation adjustments */
+@media (max-height: 500px) and (orientation: landscape) {
+  .admin-welcome-section {
+    padding: 0.5rem 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .admin-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .admin-stat-card {
+    padding: 0.75rem;
+  }
+
+  .admin-dashboard-analytics-grid {
+    grid-template-columns: 1.5fr 1fr;
+    gap: 1rem;
+  }
+
+  .admin-analytics-chart-container {
+    height: 200px;
+  }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .admin-welcome-section,
+  .admin-stat-card,
+  .admin-analytics-chart-section,
+  .admin-activity-calendar-section {
+    border-width: 0.5px;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .admin-stat-card,
+  .admin-btn-host,
+  .admin-btn-help,
+  .admin-chart-tab {
+    transition: none;
+  }
+
+  .admin-stat-card::after {
+    display: none;
+  }
+}

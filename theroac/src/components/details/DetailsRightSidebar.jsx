@@ -173,7 +173,7 @@ const DetailsRightSidebar = ({
                 </div>
                 <div className="stat-content">
                   <span className="stat-label">Team Size</span>
-                  <span className="stat-number">{data.teamSize}</span>
+                  <span className="stat-number">{data.teamSize || 'N/A'}</span>
                 </div>
               </div>
 
@@ -209,7 +209,7 @@ const DetailsRightSidebar = ({
                 </div>
                 <div className="stat-content">
                   <span className="stat-label">Experience</span>
-                  <span className="stat-number">{data.experience}</span>
+                  <span className="stat-number">{data.experience || data.experienceLevel || 'N/A'}</span>
                 </div>
               </div>
 
@@ -245,7 +245,7 @@ const DetailsRightSidebar = ({
                 </div>
                 <div className="stat-content">
                   <span className="stat-label">Duration</span>
-                  <span className="stat-number">{data.duration}</span>
+                  <span className="stat-number">{data.duration || 'N/A'}</span>
                 </div>
               </div>
 
@@ -275,9 +275,13 @@ const DetailsRightSidebar = ({
           {Array.isArray(data.eligibility) ? (
             data.eligibility.map((item, index) => (
               <span key={index} className="eligibility-item">
-                {item}
+                {typeof item === 'string' ? item : JSON.stringify(item)}
               </span>
             ))
+          ) : data.eligibility && typeof data.eligibility === 'object' ? (
+            <span className="eligibility-item">
+              {JSON.stringify(data.eligibility)}
+            </span>
           ) : (
             <span className="eligibility-item">
               {data.eligibility || "Not specified"}
@@ -297,9 +301,13 @@ const DetailsRightSidebar = ({
             {Array.isArray(data.gender) ? (
               data.gender.map((item, index) => (
                 <span key={index} className="eligibility-item">
-                  {item}
+                  {typeof item === 'string' ? item : JSON.stringify(item)}
                 </span>
               ))
+            ) : data.gender && typeof data.gender === 'object' ? (
+              <span className="eligibility-item">
+                {JSON.stringify(data.gender)}
+              </span>
             ) : (
               <span className="eligibility-item">
                 {data.gender || "Not specified"}

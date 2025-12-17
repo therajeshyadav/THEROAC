@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { usePreloader } from "../hooks/usePreloader";
+import { toast } from "react-toastify";
 import dashboardService from "../services/dashboardService";
 import AddContentModal from "../components/AddContentModal";
 import {
@@ -32,7 +33,14 @@ const RecruiterDashboard = () => {
     useAuth();
 
   const [activeTab, setActiveTab] = useState(() => {
-    // Check sessionStorage first (for page reloads)
+    // Check URL parameters first
+    const urlParams = new URLSearchParams(location.search);
+    const tabFromUrl = urlParams.get('tab');
+    if (tabFromUrl) {
+      return tabFromUrl;
+    }
+    
+    // Check sessionStorage next (for page reloads)
     const savedTab = sessionStorage.getItem('activeTab');
     if (savedTab) {
       sessionStorage.removeItem('activeTab'); // Clear after reading
@@ -74,6 +82,15 @@ const RecruiterDashboard = () => {
   });
 
   const preloaderVisible = usePreloader(300);
+
+  // Handle URL parameter changes (only on location change, not activeTab change)
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.search);
+    const tabFromUrl = urlParams.get('tab');
+    if (tabFromUrl && tabFromUrl !== activeTab) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [location.search]); // Removed activeTab dependency to prevent loop
 
   const handleLogout = () => {
     logout();
@@ -268,9 +285,34 @@ const RecruiterDashboard = () => {
     if (modalType) {
       setPendingModalType(modalType);
     }
+    
+    // Clear URL parameters when manually switching tabs
+    const currentUrl = new URL(window.location);
+    if (currentUrl.searchParams.has('tab') || currentUrl.searchParams.has('showPending') || currentUrl.searchParams.has('showRejected')) {
+      currentUrl.searchParams.delete('tab');
+      currentUrl.searchParams.delete('showPending');
+      currentUrl.searchParams.delete('showRejected');
+      window.history.replaceState({}, '', currentUrl.pathname + (currentUrl.searchParams.toString() ? '?' + currentUrl.searchParams.toString() : ''));
+    }
   };
 
-  const handleModalSuccess = () => {
+  const handleModalSuccess = (response) => {
+    // Show appropriate success message based on response
+    if (response && response.requiresApproval) {
+      const contentType = modalType === 'job' ? 'Job' : modalType === 'event' ? 'Event' : 'Content';
+      toast.success(`${contentType} posted successfully! It will be visible after admin approval.`, {
+        autoClose: 5000,
+        style: {
+          background: '#fff8e1',
+          color: '#d97706',
+          border: '1px solid #ffd600'
+        }
+      });
+    } else {
+      const contentType = modalType === 'job' ? 'Job' : modalType === 'event' ? 'Event' : 'Content';
+      toast.success(`${contentType} created successfully!`);
+    }
+    
     fetchDashboardData();
   };
 
@@ -324,14 +366,14 @@ const RecruiterDashboard = () => {
           authUser={authUser}
           notifications={notifications}
           onLogout={handleLogout}
-          onOpenSettings={() => setActiveTab("settings")}
+          onOpenSettings={() => handleTabChange("settings")}
           getUserInitials={getUserInitials}
         />
 
         <div className="organizer-content">
           <RecruiterSidebar
             activeTab={activeTab}
-            setActiveTab={setActiveTab}
+            setActiveTab={handleTabChange}
             sidebarExpanded={sidebarExpanded}
             setSidebarExpanded={setSidebarExpanded}
           />
@@ -370,7 +412,7 @@ const RecruiterDashboard = () => {
               )}
 
               {activeTab === "team" && (
-                <TeamManagementTab authUser={authUser} onTabChange={setActiveTab} />
+                <TeamManagementTab authUser={authUser} onTabChange={handleTabChange} />
               )}
 
               {activeTab === "evaluate" && (

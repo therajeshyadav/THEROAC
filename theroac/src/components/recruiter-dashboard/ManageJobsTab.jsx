@@ -36,6 +36,23 @@ const ManageJobsTab = ({ authUser, setJobsTabLoading, pendingModalType, onModalT
 
   useEffect(() => {
     fetchData();
+    
+    // Check if user came from a notification
+    const urlParams = new URLSearchParams(window.location.search);
+    const showRejected = urlParams.get('showRejected');
+    const showPending = urlParams.get('showPending');
+    
+    if (showRejected === 'true') {
+      setFilterStatus('rejected');
+      // Clear the URL parameter
+      const newUrl = window.location.pathname + window.location.search.replace(/[?&]showRejected=true/, '');
+      window.history.replaceState({}, '', newUrl);
+    } else if (showPending === 'true') {
+      setFilterStatus('pending');
+      // Clear the URL parameter
+      const newUrl = window.location.pathname + window.location.search.replace(/[?&]showPending=true/, '');
+      window.history.replaceState({}, '', newUrl);
+    }
   }, []);
 
   const fetchData = async () => {
@@ -49,13 +66,13 @@ const ManageJobsTab = ({ authUser, setJobsTabLoading, pendingModalType, onModalT
 
   const fetchJobs = async () => {
     try {
-      const response = await fetch(`${API_URL}/jobs`, {
+      const response = await fetch(`${API_URL}/jobs/my-jobs?showAll=true`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       });
       const data = await response.json();
-      const userJobs = data.jobs?.filter(job => job.createdBy === authUser?.id) || [];
+      const userJobs = data.jobs || [];
       setJobs(userJobs);
     } catch (error) {
       console.error('Error fetching jobs:', error);
@@ -65,15 +82,13 @@ const ManageJobsTab = ({ authUser, setJobsTabLoading, pendingModalType, onModalT
 
   const fetchInternships = async () => {
     try {
-      const response = await fetch(`${API_URL}/hub-content?contentType=internship`, {
+      const response = await fetch(`${API_URL}/hub-content/my-content?contentType=internship`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       });
       const data = await response.json();
-      // API returns array directly, not wrapped in object
-      const allContent = Array.isArray(data) ? data : (data.hubContent || []);
-      const userInternships = allContent.filter(item => item.createdBy === authUser?.id && item.contentType === 'internship');
+      const userInternships = data.hubContent || [];
       console.log('Fetched internships:', userInternships);
       setInternships(userInternships);
     } catch (error) {
@@ -164,14 +179,36 @@ const ManageJobsTab = ({ authUser, setJobsTabLoading, pendingModalType, onModalT
   const filteredJobs = jobs.filter(job => {
     const matchesSearch = job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          job.companyName.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesFilter = filterStatus === 'all' || job.status === filterStatus;
+    let matchesFilter = false;
+    
+    if (filterStatus === 'all') {
+      matchesFilter = true;
+    } else if (filterStatus === 'rejected') {
+      matchesFilter = job.approvalStatus === 'rejected';
+    } else if (filterStatus === 'pending') {
+      matchesFilter = job.approvalStatus === 'pending';
+    } else {
+      matchesFilter = job.status === filterStatus;
+    }
+    
     return matchesSearch && matchesFilter;
   });
 
   const filteredInternships = internships.filter(internship => {
     const matchesSearch = internship.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          (internship.companyName && internship.companyName.toLowerCase().includes(searchQuery.toLowerCase()));
-    const matchesFilter = filterStatus === 'all' || internship.status === filterStatus;
+    let matchesFilter = false;
+    
+    if (filterStatus === 'all') {
+      matchesFilter = true;
+    } else if (filterStatus === 'rejected') {
+      matchesFilter = internship.approvalStatus === 'rejected';
+    } else if (filterStatus === 'pending') {
+      matchesFilter = internship.approvalStatus === 'pending';
+    } else {
+      matchesFilter = internship.status === filterStatus;
+    }
+    
     return matchesSearch && matchesFilter;
   });
 
@@ -233,6 +270,18 @@ const ManageJobsTab = ({ authUser, setJobsTabLoading, pendingModalType, onModalT
           >
             Closed ({activeView === 'jobs' ? jobs.filter(j => j.status === 'closed').length : internships.filter(i => i.status === 'archived').length})
           </button>
+          <button
+            className={filterStatus === 'pending' ? 'active' : ''}
+            onClick={() => setFilterStatus('pending')}
+          >
+            Pending Approval ({activeView === 'jobs' ? jobs.filter(j => j.approvalStatus === 'pending').length : internships.filter(i => i.approvalStatus === 'pending').length})
+          </button>
+          <button
+            className={filterStatus === 'rejected' ? 'active' : ''}
+            onClick={() => setFilterStatus('rejected')}
+          >
+            Rejected ({activeView === 'jobs' ? jobs.filter(j => j.approvalStatus === 'rejected').length : internships.filter(i => i.approvalStatus === 'rejected').length})
+          </button>
           {activeView === 'jobs' && (
             <button
               className={filterStatus === 'paused' ? 'active' : ''}
@@ -256,6 +305,7 @@ const ManageJobsTab = ({ authUser, setJobsTabLoading, pendingModalType, onModalT
                 <th>Views</th>
                 <th>Applications</th>
                 <th>Status</th>
+                <th>Approval</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -271,6 +321,9 @@ const ManageJobsTab = ({ authUser, setJobsTabLoading, pendingModalType, onModalT
                         <div className="job-title">{job.title}</div>
                         {job.featured && <span className="badge-featured">Featured</span>}
                         {job.urgent && <span className="badge-urgent">Urgent</span>}
+                        {job.approvalStatus === 'pending' && job.rejectionReason && (
+                          <span className="badge-resubmission">Resubmission</span>
+                        )}
                       </div>
                     </div>
                   </td>
@@ -297,14 +350,54 @@ const ManageJobsTab = ({ authUser, setJobsTabLoading, pendingModalType, onModalT
                     </span>
                   </td>
                   <td>
+                    <div className="approval-status-cell">
+                      <span className={`approval-badge approval-${job.approvalStatus || 'pending'}`}>
+                        {job.approvalStatus || 'pending'}
+                      </span>
+                      {job.approvalStatus === 'rejected' && job.rejectionReason && (
+                        <div className="rejection-reason-tooltip" title={job.rejectionReason}>
+                          ⚠️
+                        </div>
+                      )}
+                    </div>
+                  </td>
+                  <td>
                     <div className="action-buttons">
-                      <button
-                        className="btn-icon"
-                        onClick={() => handleEditJob(job)}
-                        title="Edit"
-                      >
-                        <Edit size={18} />
-                      </button>
+                      {job.approvalStatus === 'rejected' ? (
+                        <button
+                          className="btn-icon btn-resubmit"
+                          onClick={() => handleEditJob(job)}
+                          title="Edit & Resubmit"
+                        >
+                          <Edit size={18} />
+                          <span className="btn-text">Resubmit</span>
+                        </button>
+                      ) : job.approvalStatus === 'approved' ? (
+                        <>
+                          <button
+                            className="btn-icon"
+                            onClick={() => handleEditJob(job)}
+                            title="Edit"
+                          >
+                            <Edit size={18} />
+                          </button>
+                          <button
+                            className="btn-icon btn-view"
+                            onClick={() => window.open(`/event-detail/jobs/${job.slug}`, '_blank')}
+                            title="View Live"
+                          >
+                            <Eye size={18} />
+                          </button>
+                        </>
+                      ) : (
+                        <button
+                          className="btn-icon"
+                          onClick={() => handleEditJob(job)}
+                          title="Edit"
+                        >
+                          <Edit size={18} />
+                        </button>
+                      )}
                       <button
                         className="btn-icon btn-danger"
                         onClick={() => setShowDeleteConfirm(job.id)}
@@ -331,6 +424,7 @@ const ManageJobsTab = ({ authUser, setJobsTabLoading, pendingModalType, onModalT
                 <th>Views</th>
                 <th>Applications</th>
                 <th>Status</th>
+                <th>Approval</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -345,6 +439,9 @@ const ManageJobsTab = ({ authUser, setJobsTabLoading, pendingModalType, onModalT
                       <div>
                         <div className="job-title">{internship.title}</div>
                         {internship.featured && <span className="badge-featured">Featured</span>}
+                        {internship.approvalStatus === 'pending' && internship.rejectionReason && (
+                          <span className="badge-resubmission">Resubmission</span>
+                        )}
                       </div>
                     </div>
                   </td>
@@ -371,14 +468,54 @@ const ManageJobsTab = ({ authUser, setJobsTabLoading, pendingModalType, onModalT
                     </span>
                   </td>
                   <td>
+                    <div className="approval-status-cell">
+                      <span className={`approval-badge approval-${internship.approvalStatus || 'pending'}`}>
+                        {internship.approvalStatus || 'pending'}
+                      </span>
+                      {internship.approvalStatus === 'rejected' && internship.rejectionReason && (
+                        <div className="rejection-reason-tooltip" title={internship.rejectionReason}>
+                          ⚠️
+                        </div>
+                      )}
+                    </div>
+                  </td>
+                  <td>
                     <div className="action-buttons">
-                      <button
-                        className="btn-icon"
-                        onClick={() => handleEditInternship(internship)}
-                        title="Edit"
-                      >
-                        <Edit size={18} />
-                      </button>
+                      {internship.approvalStatus === 'rejected' ? (
+                        <button
+                          className="btn-icon btn-resubmit"
+                          onClick={() => handleEditInternship(internship)}
+                          title="Edit & Resubmit"
+                        >
+                          <Edit size={18} />
+                          <span className="btn-text">Resubmit</span>
+                        </button>
+                      ) : internship.approvalStatus === 'approved' ? (
+                        <>
+                          <button
+                            className="btn-icon"
+                            onClick={() => handleEditInternship(internship)}
+                            title="Edit"
+                          >
+                            <Edit size={18} />
+                          </button>
+                          <button
+                            className="btn-icon btn-view"
+                            onClick={() => window.open(`/event-detail/internships/${internship.slug}`, '_blank')}
+                            title="View Live"
+                          >
+                            <Eye size={18} />
+                          </button>
+                        </>
+                      ) : (
+                        <button
+                          className="btn-icon"
+                          onClick={() => handleEditInternship(internship)}
+                          title="Edit"
+                        >
+                          <Edit size={18} />
+                        </button>
+                      )}
                       <button
                         className="btn-icon btn-danger"
                         onClick={() => setShowDeleteConfirm(internship.id)}

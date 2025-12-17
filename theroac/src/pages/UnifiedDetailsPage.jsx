@@ -9,7 +9,7 @@ import ModernDetailsPage from "./ModernDetailsPage";
 import DetailsTopNav from "../../src/components/details/DetailsTopNav";
 import DetailsHeroSection from "../../src/components/details/DetailsHeroSection";
 import DetailsRightSidebar from "../../src/components/details/DetailsRightSidebar";
-import QuickApplyModal from "../components/QuickApplyModal";
+
 import "./UnifiedDetailsPage.css";
 
 const UnifiedDetailsPage = () => {
@@ -32,7 +32,7 @@ const UnifiedDetailsPage = () => {
   const [hasApplied, setHasApplied] = useState(false);
   const [checkingStatus, setCheckingStatus] = useState(true);
   const [preloaderVisible, setPreloaderVisible] = useState(true);
-  const [showQuickApply, setShowQuickApply] = useState(false);
+
 
   // config per type
   const typeConfig = {
@@ -257,8 +257,8 @@ const UnifiedDetailsPage = () => {
             apiService.checkLikeStatus(data.id, type),
           ]);
 
-          setIsBookmarked(!!bookmarkStatus.bookmarked);
-          setIsLiked(!!likeStatus.liked);
+          setIsBookmarked(!!bookmarkStatus.bookmarked || !!bookmarkStatus.isBookmarked);
+          setIsLiked(!!likeStatus.liked || !!likeStatus.isLiked);
         } catch (error) {
           console.error("Error checking bookmark/like status:", error);
           setIsBookmarked(false);
@@ -319,7 +319,7 @@ const UnifiedDetailsPage = () => {
     if (!salary) return "Competitive";
     
     // Handle object format (new format from backend)
-    if (typeof salary === 'object') {
+    if (typeof salary === 'object' && salary !== null) {
       if (salary.min && salary.max) {
         return `${formatCurrency(salary.min)} - ${formatCurrency(salary.max)}`;
       }
@@ -329,6 +329,7 @@ const UnifiedDetailsPage = () => {
       if (salary.amount) {
         return formatCurrency(salary.amount);
       }
+      // If object has no valid properties, return competitive
       return "Competitive";
     }
     
@@ -351,6 +352,11 @@ const UnifiedDetailsPage = () => {
       return salary;
     }
     
+    // Handle number format
+    if (typeof salary === 'number') {
+      return formatCurrency(salary);
+    }
+    
     return "Competitive";
   };
 
@@ -361,20 +367,38 @@ const UnifiedDetailsPage = () => {
       case "jobs":
         return formatSalaryRange(data.salary) || "Competitive";
       case "events": {
-        const eventPrice = data.price || data.fee;
-        if (!eventPrice || eventPrice === "0" || eventPrice === 0)
+        const eventPrice = data.price || data.fee || data.registrationFee;
+        
+        // Handle object format for registration fee
+        if (eventPrice && typeof eventPrice === 'object') {
+          if (eventPrice.amount) {
+            if (!eventPrice.amount || eventPrice.amount === "0" || eventPrice.amount === 0) {
+              return "Free";
+            }
+            return formatCurrency(eventPrice.amount);
+          }
           return "Free";
+        }
+        
+        // Handle string/number format
+        if (!eventPrice || eventPrice === "0" || eventPrice === 0) {
+          return "Free";
+        }
         return formatCurrency(eventPrice);
       }
       case "internships":
         // Handle object format for stipend
-        if (data.stipend && typeof data.stipend === 'object') {
+        if (data.stipend && typeof data.stipend === 'object' && data.stipend !== null) {
           if (data.stipend.min && data.stipend.max) {
             return `${formatCurrency(data.stipend.min)} - ${formatCurrency(data.stipend.max)}`;
           }
           if (data.stipend.amount) {
+            if (!data.stipend.amount || data.stipend.amount === "0" || data.stipend.amount === 0) {
+              return "Unpaid";
+            }
             return formatCurrency(data.stipend.amount);
           }
+          return "Unpaid";
         }
         if (data.stipend) return formatSalaryRange(data.stipend);
         return "Unpaid";
@@ -410,11 +434,14 @@ const UnifiedDetailsPage = () => {
   const handleShare = (platform) => {
     const url = encodeURIComponent(window.location.href);
     const title = encodeURIComponent(data?.title || "Check this out");
+    const description = encodeURIComponent(
+      `Check out this amazing ${data?.contentType || 'opportunity'}: ${data?.title || 'opportunity'} at ${data?.companyName || 'company'}. ${data?.description ? data.description.substring(0, 100) + '...' : 'Don\'t miss this opportunity!'}`
+    );
 
     const shareUrls = {
       facebook: `https://www.facebook.com/sharer/sharer.php?u=${url}`,
       twitter: `https://twitter.com/intent/tweet?url=${url}&text=${title}`,
-      linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${url}`,
+      linkedin: `https://www.linkedin.com/feed/?shareActive=true&text=${description}%20${url}`,
       copy: null,
     };
 
@@ -434,8 +461,10 @@ const UnifiedDetailsPage = () => {
     }
 
     try {
+      console.log('Toggling bookmark for:', data?.id, type);
       const result = await apiService.toggleBookmark(data?.id, type);
-      setIsBookmarked(result.bookmarked);
+      console.log('Bookmark toggle result:', result);
+      setIsBookmarked(result.bookmarked || result.isBookmarked);
     } catch (error) {
       console.error("Error toggling bookmark:", error);
       alert("Failed to update bookmark");
@@ -449,8 +478,10 @@ const UnifiedDetailsPage = () => {
     }
 
     try {
+      console.log('Toggling like for:', data?.id, type);
       const result = await apiService.toggleLike(data?.id, type);
-      setIsLiked(result.liked);
+      console.log('Like toggle result:', result);
+      setIsLiked(result.liked || result.isLiked);
     } catch (error) {
       console.error("Error toggling like:", error);
       alert("Failed to update like");
@@ -471,52 +502,16 @@ const UnifiedDetailsPage = () => {
 
     if (hasApplied) return;
 
-    // Open Quick Apply Modal
-    setShowQuickApply(true);
-  };
-
-  const handleQuickApplySubmit = async (formData) => {
+    // Direct application without form - send existing candidate data from database
     setIsApplying(true);
     try {
-      // First, update user profile with new data
-      const profileUpdates = {
-        fullName: formData.fullName,
-        phone: formData.phone,
-        gender: formData.gender,
-        location: formData.location,
-        education: [{
-          institute: formData.instituteName,
-          domain: formData.domain,
-          degree: formData.course,
-          specialization: formData.courseSpecialization,
-          graduationYear: formData.graduationYear,
-          duration: formData.courseDuration,
-        }],
-      };
-
-      // Update profile
-      await apiService.updateProfile(profileUpdates);
-
-      // Handle resume upload if provided
-      let resumeLink = "";
-      if (formData.resumeFile) {
-        const resumeFormData = new FormData();
-        resumeFormData.append('resume', formData.resumeFile);
-        const uploadResult = await apiService.uploadResume(resumeFormData);
-        resumeLink = uploadResult.resumePath || uploadResult.url;
-      }
-
-      // Submit application
       let result = null;
+
       switch (type) {
         case "jobs":
           result = await apiService.applyToJob(data.id, {
-            resumeLink: resumeLink,
-            coverLetter: formData.coverLetter,
-            metadata: {
-              userType: formData.userType,
-              differentlyAbled: formData.differentlyAbled,
-            }
+            resumeLink: '',
+            coverLetter: ''
           });
           break;
         case "events":
@@ -526,24 +521,22 @@ const UnifiedDetailsPage = () => {
           result = await apiService.applyToHubContent(data.id);
           break;
         default:
-          throw new Error("Unknown application type");
+          throw new Error('Unknown application type');
       }
 
       if (result) {
         setHasApplied(true);
-        setShowQuickApply(false);
         alert(`Successfully applied for ${data.title}!`);
       }
     } catch (error) {
-      const errorMessage = error.message || "Please try again later.";
-      console.error("Application error:", error);
-
-      if (errorMessage.includes("Already applied")) {
-        alert("You have already applied to this position.");
+      const errorMessage = error.message || 'Please try again later.';
+      console.error('Application error:', error);
+      
+      if (errorMessage.includes('Already applied')) {
+        alert('You have already applied to this position.');
         setHasApplied(true);
-        setShowQuickApply(false);
-      } else if (errorMessage.includes("not found")) {
-        alert("This position is no longer available.");
+      } else if (errorMessage.includes('not found')) {
+        alert('This position is no longer available.');
       } else {
         alert(`Failed to apply: ${errorMessage}`);
       }
@@ -551,6 +544,8 @@ const UnifiedDetailsPage = () => {
       setIsApplying(false);
     }
   };
+
+
 
   if (!data || !typeConfig[type]) {
     return (
@@ -594,14 +589,7 @@ const UnifiedDetailsPage = () => {
       </div>
 
       <div className="details-page unified-details-page">
-        {/* Quick Apply Modal */}
-        <QuickApplyModal
-          isOpen={showQuickApply}
-          onClose={() => setShowQuickApply(false)}
-          jobData={data}
-          userData={user}
-          onSubmit={handleQuickApplySubmit}
-        />
+
 
         {/* 🔹 TOP NAV AS COMPONENT */}
         <DetailsTopNav

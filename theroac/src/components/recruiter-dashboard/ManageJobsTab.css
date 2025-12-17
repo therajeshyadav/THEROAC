@@ -126,6 +126,44 @@
   font-weight: 600;
 }
 
+/* Special styling for pending approval filter button */
+.manage-jobs-container .filter-buttons button:nth-child(4) {
+  /* This targets the "Pending Approval" button specifically */
+  border-color: rgba(255, 165, 0, 0.3);
+}
+
+.manage-jobs-container .filter-buttons button:nth-child(4):hover {
+  background: rgba(255, 165, 0, 0.08);
+  border-color: rgba(255, 165, 0, 0.4);
+  color: #FFA500;
+}
+
+.manage-jobs-container .filter-buttons button:nth-child(4).active {
+  background: rgba(255, 165, 0, 0.15);
+  border-color: rgba(255, 165, 0, 0.5);
+  color: #FFA500;
+  font-weight: 600;
+}
+
+/* Special styling for rejected filter button */
+.manage-jobs-container .filter-buttons button:nth-child(5) {
+  /* This targets the "Rejected" button specifically */
+  border-color: rgba(255, 68, 68, 0.3);
+}
+
+.manage-jobs-container .filter-buttons button:nth-child(5):hover {
+  background: rgba(255, 68, 68, 0.08);
+  border-color: rgba(255, 68, 68, 0.4);
+  color: #FF4444;
+}
+
+.manage-jobs-container .filter-buttons button:nth-child(5).active {
+  background: rgba(255, 68, 68, 0.15);
+  border-color: rgba(255, 68, 68, 0.5);
+  color: #FF4444;
+  font-weight: 600;
+}
+
 .manage-jobs-container .loading-state {
   text-align: center;
   padding: 4rem 2rem;
@@ -230,6 +268,19 @@
   color: #FF4444;
 }
 
+.manage-jobs-container .badge-resubmission {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-left: 0.5rem;
+  background: rgba(59, 130, 246, 0.2);
+  color: #3B82F6;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
 .manage-jobs-container .badge-type {
   display: inline-block;
   padding: 0.3rem 0.75rem;
@@ -316,6 +367,86 @@
   background: #FF4444;
   color: #fff;
   border-color: #FF4444;
+  transform: translateY(-2px);
+}
+
+/* Approval Status Styles */
+.manage-jobs-container .approval-status-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.manage-jobs-container .approval-badge {
+  display: inline-block;
+  padding: 0.35rem 0.85rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  border: 1px solid;
+}
+
+.manage-jobs-container .approval-badge.approval-pending {
+  background: rgba(255, 165, 0, 0.15);
+  color: #FFA500;
+  border-color: rgba(255, 165, 0, 0.3);
+}
+
+.manage-jobs-container .approval-badge.approval-approved {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10B981;
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.manage-jobs-container .approval-badge.approval-rejected {
+  background: rgba(255, 68, 68, 0.15);
+  color: #FF4444;
+  border-color: rgba(255, 68, 68, 0.3);
+}
+
+.manage-jobs-container .rejection-reason-tooltip {
+  cursor: help;
+  font-size: 1rem;
+  color: #FFA500;
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}
+
+.manage-jobs-container .rejection-reason-tooltip:hover {
+  opacity: 1;
+}
+
+/* Resubmit Button Styles */
+.manage-jobs-container .btn-icon.btn-resubmit {
+  background: rgba(255, 165, 0, 0.1);
+  color: #FFA500;
+  border-color: rgba(255, 165, 0, 0.3);
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  min-width: auto;
+}
+
+.manage-jobs-container .btn-icon.btn-resubmit:hover {
+  background: rgba(255, 165, 0, 0.2);
+  border-color: rgba(255, 165, 0, 0.5);
+  transform: translateY(-2px);
+}
+
+.manage-jobs-container .btn-icon.btn-resubmit .btn-text {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.manage-jobs-container .btn-icon.btn-view {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3B82F6;
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.manage-jobs-container .btn-icon.btn-view:hover {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: rgba(59, 130, 246, 0.5);
   transform: translateY(-2px);
 }
 

@@ -8,7 +8,8 @@ EventRegistration.init({
   userId: { type: DataTypes.UUID, allowNull: false },
   eventId: { type: DataTypes.UUID, allowNull: false },
   status: { type: DataTypes.ENUM('registered','attended','cancelled'), defaultValue: 'registered' },
-  metadata: { type: DataTypes.JSON, allowNull: true }
+  metadata: { type: DataTypes.JSON, allowNull: true },
+  notes: { type: DataTypes.TEXT, allowNull: true }
 }, {
   sequelize,
   modelName: 'EventRegistration',

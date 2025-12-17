@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import UniversalNotifications from './common/UniversalNotifications';
 import './DashboardHeader.css';
 
 const DashboardHeader = ({ user, activeTab, setActiveTab, isAdmin = false, onTabChange }) => {
@@ -53,10 +54,7 @@ const DashboardHeader = ({ user, activeTab, setActiveTab, isAdmin = false, onTab
 
                 <div className="header-right">
                     <div className="header-actions">
-                        <button className="notification-btn">
-                            <i className="fas fa-bell"></i>
-                            <span className="notification-badge">3</span>
-                        </button>
+                        <UniversalNotifications />
 
                         <div className="user-info">
                             <div className="user-avatar">

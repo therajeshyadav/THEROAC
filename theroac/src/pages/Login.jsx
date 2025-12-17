@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useAuth } from '../context/AuthContext';
 import { usePreloader } from '../hooks/usePreloader';
+import BannedUserScreen from '../components/BannedUserScreen';
 import './Auth.css';
 
 const Login = () => {
@@ -16,6 +17,7 @@ const Login = () => {
   });
   const [submitLoading, setSubmitLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [bannedUserInfo, setBannedUserInfo] = useState(null);
   const preloaderVisible = usePreloader(300);
 
 
@@ -57,6 +59,15 @@ const Login = () => {
         }
         return;
       } else {
+        // Check if user is banned
+        if (result.isBanned) {
+          setBannedUserInfo({
+            supportEmail: result.supportEmail,
+            supportPhone: result.supportPhone
+          });
+          return;
+        }
+
         // Check if error message contains verification-related keywords
         const errorMsg = result.error || '';
         const isVerificationError = 
@@ -107,6 +118,17 @@ const Login = () => {
       setSubmitLoading(false);
     }
   };
+
+  // Show banned user screen if user is banned
+  if (bannedUserInfo) {
+    return (
+      <BannedUserScreen
+        supportEmail={bannedUserInfo.supportEmail}
+        supportPhone={bannedUserInfo.supportPhone}
+        onBackToLogin={() => setBannedUserInfo(null)}
+      />
+    );
+  }
 
   return (
     <div className="auth-container">

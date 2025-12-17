@@ -1,14 +1,31 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./AboutSlider.css";
 import arrowLeft from "../img/arrow-left.svg";
 import { useNavigate } from 'react-router-dom';
+import apiService from '../services/api';
 
 const AboutSlider = () => {
   const navigate = useNavigate();
   const trackRef = useRef(null);
   const prevRef = useRef(null);
   const nextRef = useRef(null);
+  const [isROACHubApproved, setIsROACHubApproved] = useState(false);
   // const dotsBoxRef = useRef(null);
+
+  // Check ROAC Prime Hub approval status
+  useEffect(() => {
+    const checkROACHubStatus = async () => {
+      try {
+        const response = await apiService.getROACPrimeHubStatus();
+        setIsROACHubApproved(response.isApproved);
+      } catch (error) {
+        console.error('Error checking ROAC Hub status:', error);
+        setIsROACHubApproved(false);
+      }
+    };
+
+    checkROACHubStatus();
+  }, []);
 
   useEffect(() => {
     const track = trackRef.current;
@@ -161,24 +178,26 @@ const AboutSlider = () => {
             </div>
           </article>
 
-          {/* Jobs */}
-          <article className="project-card">
-            <img
-              className="project-card__bg"
-              src='assets/img/discover/Jobs.png'
-              alt="Jobs"
-            />
-            <div className="overlay"></div>
-            <div className="project-card__content">
-              <div>
-                <h3 className="project-card__title">Jobs</h3>
-                <p className="project-card__desc">
-                  Find career opportunities that match your skills and passion.
-                </p>
-                <button className="project-card__btn" onClick={() => navigate('/#Jobs')}>View Jobs</button>
+          {/* ROAC Talent Prime Hub - Only show if approved */}
+          {isROACHubApproved && (
+            <article className="project-card">
+              <img
+                className="project-card__bg"
+                src="assets/img/discover/ROACPrimeTalentHub.png"
+                alt="ROAC Talent Prime Hub"
+              />
+              <div className="overlay"></div>
+              <div className="project-card__content">
+                <div>
+                  <h3 className="project-card__title">ROAC Talent Prime Hub</h3>
+                  <p className="project-card__desc">
+                    Your central platform to connect, grow, and unlock exclusive Roac experiences.
+                  </p>
+                  <button className="project-card__btn">Discover</button>
+                </div>
               </div>
-            </div>
-          </article>
+            </article>
+          )}
 
           {/* Workshops */}
           <article className="project-card">
@@ -218,21 +237,21 @@ const AboutSlider = () => {
             </div>
           </article>
 
-          {/* ROAC Talent Prime Hub */}
+          {/* Jobs */}
           <article className="project-card">
             <img
               className="project-card__bg"
-              src="assets/img/discover/ROACPrimeTalentHub.png"
-              alt="ROAC Talent Prime Hub"
+              src='assets/img/discover/Jobs.png'
+              alt="Jobs"
             />
             <div className="overlay"></div>
             <div className="project-card__content">
               <div>
-                <h3 className="project-card__title">ROAC Talent Prime Hub</h3>
+                <h3 className="project-card__title">Jobs</h3>
                 <p className="project-card__desc">
-                  Your central platform to connect, grow, and unlock exclusive Roac experiences.
+                  Find career opportunities that match your skills and passion.
                 </p>
-                <button className="project-card__btn">Discover</button>
+                <button className="project-card__btn" onClick={() => navigate('/#Jobs')}>View Jobs</button>
               </div>
             </div>
           </article>

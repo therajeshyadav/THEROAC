@@ -171,7 +171,24 @@ const EventFormModal = ({ event, onClose, onSuccess }) => {
       });
 
       if (response.ok) {
-        toast.success(event ? 'Event updated successfully!' : 'Event created successfully!');
+        const data = await response.json();
+        if (event) {
+          toast.success('Event updated successfully!');
+        } else {
+          // Show approval message for new events
+          if (data.requiresApproval) {
+            toast.success('Event created successfully! It will be visible after admin approval.', {
+              autoClose: 5000,
+              style: {
+                background: '#fff8e1',
+                color: '#d97706',
+                border: '1px solid #ffd600'
+              }
+            });
+          } else {
+            toast.success('Event created successfully!');
+          }
+        }
         onSuccess();
         onClose();
       } else {

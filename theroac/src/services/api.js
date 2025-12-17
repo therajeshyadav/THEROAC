@@ -1,13 +1,15 @@
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000/api';
 
-// Base request function
-const request = async (endpoint, options = {}) => {
+// Base request function with retry logic
+const request = async (endpoint, options = {}, retryCount = 0) => {
     const url = `${API_BASE_URL}${endpoint}`;
     const token = localStorage.getItem('token');
 
-    // Create timeout controller
+    // Create timeout controller - longer timeout for admin endpoints
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+    const isAdminEndpoint = endpoint.startsWith('/admin');
+    const timeoutDuration = isAdminEndpoint ? 45000 : 20000; // 45s for admin, 20s for others
+    const timeoutId = setTimeout(() => controller.abort(), timeoutDuration);
 
     const config = {
         headers: {
@@ -26,6 +28,23 @@ const request = async (endpoint, options = {}) => {
         const data = await response.json();
 
         if (!response.ok) {
+            // Check if user is banned
+            if (response.status === 403 && data.isBanned) {
+                // Clear user data and redirect to banned screen
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                
+                // Trigger a custom event to notify the app about ban
+                window.dispatchEvent(new CustomEvent('userBanned', {
+                    detail: {
+                        supportEmail: data.supportEmail,
+                        supportPhone: data.supportPhone
+                    }
+                }));
+                
+                throw new Error(data.error || 'Account banned');
+            }
+            
             throw new Error(data.message || 'API request failed');
         }
 
@@ -35,8 +54,22 @@ const request = async (endpoint, options = {}) => {
         
         // Handle timeout and network errors gracefully
         if (error.name === 'AbortError') {
-            throw new Error('Request timeout - please check your connection');
+            // Retry logic for admin endpoints on timeout
+            if (isAdminEndpoint && retryCount < 2) {
+                console.log(`Retrying admin request (attempt ${retryCount + 1}):`, endpoint);
+                await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1))); // Progressive delay
+                return request(endpoint, options, retryCount + 1);
+            }
+            throw new Error('Request timeout - the server is taking longer than expected. Please try again.');
         }
+        
+        // Retry on network errors for admin endpoints
+        if (isAdminEndpoint && retryCount < 1 && (error.message.includes('fetch') || error.message.includes('network'))) {
+            console.log(`Retrying admin request due to network error (attempt ${retryCount + 1}):`, endpoint);
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            return request(endpoint, options, retryCount + 1);
+        }
+        
         throw error;
     }
 };
@@ -389,6 +422,128 @@ const getAdminAnalytics = async () => {
     return request('/admin/analytics');
 };
 
+const getAdminSettings = async () => {
+    return request('/admin/settings');
+};
+
+const updateAdminSettings = async (settings) => {
+    return request('/admin/settings', {
+        method: 'PUT',
+        body: JSON.stringify(settings),
+    });
+};
+
+// Pending Approvals endpoints
+const getPendingApprovals = async () => {
+    return request('/admin/pending-approvals');
+};
+
+// Rejected Items endpoints
+const getRejectedItems = async (type = null, userId = null) => {
+    const params = new URLSearchParams();
+    if (type) params.append('type', type);
+    if (userId) params.append('userId', userId);
+    
+    const queryString = params.toString();
+    return request(`/admin/rejected-items${queryString ? `?${queryString}` : ''}`);
+};
+
+const allowResubmission = async (type, itemId, clearRejectionReason = true) => {
+    return request(`/admin/rejected-items/${type}/${itemId}/allow-resubmission`, {
+        method: 'PUT',
+        body: JSON.stringify({ clearRejectionReason })
+    });
+};
+
+const approveJob = async (jobId, data = {}) => {
+    return request(`/admin/jobs/${jobId}/approve`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+    });
+};
+
+const approveEvent = async (eventId, data = {}) => {
+    return request(`/admin/events/${eventId}/approve`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+    });
+};
+
+const rejectJob = async (jobId, data = {}) => {
+    return request(`/admin/jobs/${jobId}/reject`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+    });
+};
+
+const rejectEvent = async (eventId, data = {}) => {
+    return request(`/admin/events/${eventId}/reject`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+    });
+};
+
+const getAdminNotifications = async (params = {}) => {
+    const queryParams = new URLSearchParams(params).toString();
+    return request(`/admin/notifications${queryParams ? `?${queryParams}` : ''}`);
+};
+
+const markNotificationAsRead = async (notificationId) => {
+    return request(`/admin/notifications/${notificationId}/read`, {
+        method: 'PUT',
+    });
+};
+
+// Regular user notifications
+const getNotifications = async (params = {}) => {
+    const queryParams = new URLSearchParams(params).toString();
+    return request(`/notifications${queryParams ? `?${queryParams}` : ''}`);
+};
+
+const markUserNotificationAsRead = async (notificationId) => {
+    return request(`/notifications/${notificationId}/read`, {
+        method: 'PUT',
+    });
+};
+
+const markAllNotificationsAsRead = async () => {
+    return request('/notifications/mark-all-read', {
+        method: 'PUT',
+    });
+};
+
+const markAllAdminNotificationsAsRead = async () => {
+    return request('/admin/notifications/mark-all-read', {
+        method: 'PUT',
+    });
+};
+
+const updateJobStatus = async (jobId, status) => {
+    return request(`/admin/jobs/${jobId}/status`, {
+        method: 'PUT',
+        body: JSON.stringify({ status }),
+    });
+};
+
+const deleteJobAdmin = async (jobId) => {
+    return request(`/admin/jobs/${jobId}`, {
+        method: 'DELETE',
+    });
+};
+
+const updateEventStatus = async (eventId, status) => {
+    return request(`/admin/events/${eventId}/status`, {
+        method: 'PUT',
+        body: JSON.stringify({ status }),
+    });
+};
+
+const deleteEventAdmin = async (eventId) => {
+    return request(`/admin/events/${eventId}`, {
+        method: 'DELETE',
+    });
+};
+
 // Hub Content endpoints
 const createHubContent = async (contentData) => {
     return request('/hub-content', {
@@ -409,6 +564,12 @@ const getHubContentById = async (id) => {
 const getHubContentBySlug = async (slug) => {
     return request(`/hub-content/slug/${slug}`);
 };
+
+const getROACPrimeHubStatus = async () => {
+    return request('/hub-content/roac-prime-hub/status');
+};
+
+
 
 // Application status check endpoints
 const checkJobApplicationStatus = async (jobId) => {
@@ -467,10 +628,16 @@ const apiService = {
     getAdminJobs,
     getAdminEvents,
     getAdminAnalytics,
+    getAdminNotifications,
+    markNotificationAsRead,
+    getNotifications,
+    markUserNotificationAsRead,
+    markAllNotificationsAsRead,
     createHubContent,
     getHubContent,
     getHubContentById,
     getHubContentBySlug,
+    getROACPrimeHubStatus,
     checkJobApplicationStatus,
     checkEventRegistrationStatus,
     checkHubContentApplicationStatus,
@@ -494,7 +661,21 @@ const apiService = {
     getResumes,
     setDefaultResume,
     updateResumeTitle,
-    deleteResume
+    deleteResume,
+    updateJobStatus,
+    deleteJobAdmin,
+    updateEventStatus,
+    getRejectedItems,
+    allowResubmission,
+    deleteEventAdmin,
+    getAdminSettings,
+    updateAdminSettings,
+    getPendingApprovals,
+    approveJob,
+    approveEvent,
+    rejectJob,
+    rejectEvent,
+    markAllAdminNotificationsAsRead
 };
 
 export default apiService;

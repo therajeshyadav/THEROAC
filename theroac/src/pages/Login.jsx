@@ -30,24 +30,37 @@ const Login = () => {
     }));
   };
 
+
+
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
+  };
+
+  const handleGoogleLogin = () => {
+    // Redirect to backend Google auth endpoint
+    // Standard OAuth flow usually starts with a redirect to backend which then redirects to Google
+    window.location.href = 'http://localhost:4000/api/auth/google';
+  };
+
+  const handleLinkedInLogin = () => {
+    // Redirect to backend LinkedIn auth endpoint
+    window.location.href = 'http://localhost:4000/api/auth/linkedin';
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitLoading(true);
-    
+
     try {
       const result = await login({
         email: formData.email,
         password: formData.password
       });
-      
+
       if (result.success) {
         // Check if there's a redirect URL stored (from Quick Apply or other pages)
         const redirectUrl = sessionStorage.getItem('redirectAfterLogin');
-        
+
         if (redirectUrl) {
           // Clear the stored redirect URL
           sessionStorage.removeItem('redirectAfterLogin');
@@ -70,12 +83,12 @@ const Login = () => {
 
         // Check if error message contains verification-related keywords
         const errorMsg = result.error || '';
-        const isVerificationError = 
-          result.needsVerification || 
-          errorMsg.toLowerCase().includes('verify') || 
+        const isVerificationError =
+          result.needsVerification ||
+          errorMsg.toLowerCase().includes('verify') ||
           errorMsg.toLowerCase().includes('verification') ||
           errorMsg.toLowerCase().includes('not verified');
-        
+
         if (isVerificationError) {
           // Show warning toast for unverified email
           toast.warning(
@@ -89,7 +102,7 @@ const Login = () => {
               draggable: true,
             }
           );
-          
+
           // Don't set error state, just redirect with email as query parameter
           setTimeout(() => {
             navigate(`/resend-verification?email=${encodeURIComponent(formData.email)}`);
@@ -148,14 +161,28 @@ const Login = () => {
             <path d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98" />
           </svg>
         </div>
-      </div>  
+      </div>
       <div className="container row justify-content-between auth-card">
         <div className="col-5 align-content-center">
           <img src="assets/img/login/Login-pana.svg" alt="" />
         </div>
         <div className="col-6">
           <div className="auth-header">
-            <h2>Login</h2>
+            <h2>Hello Again</h2>
+            <p className="auth-subtitle">Welcome back, you've been missed</p>
+          </div>
+
+          <div className="social-login-container">
+            <button type="button" className="social-btn google" onClick={handleGoogleLogin}>
+              <i className="fab fa-google"></i>
+            </button>
+            <button type="button" className="social-btn linkedin" onClick={handleLinkedInLogin}>
+              <i className="fab fa-linkedin-in"></i>
+            </button>
+          </div>
+
+          <div className="auth-divider">
+            <span>Or</span>
           </div>
 
           <form onSubmit={handleSubmit} className="auth-form">
@@ -205,8 +232,8 @@ const Login = () => {
                 <span className="checkmark"></span>
                 Remember me
               </label>
-              <Link 
-                to={formData.email ? `/forgot-password?email=${encodeURIComponent(formData.email)}` : "/forgot-password"} 
+              <Link
+                to={formData.email ? `/forgot-password?email=${encodeURIComponent(formData.email)}` : "/forgot-password"}
                 className="forgot-link"
               >
                 Forgot Password?

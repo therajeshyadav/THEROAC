@@ -1,17 +1,49 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export default function OAuth2Callback() {
   const [status, setStatus] = useState("loading");
-  const [message, setMessage] = useState("Connecting Gmail... Please wait.");
+  const [message, setMessage] = useState("Processing authorization...");
+  const navigate = useNavigate();
+  const { updateUser } = useAuth(); // Assuming useAuth exposes a way to update state or we just rely on localStorage
 
   useEffect(() => {
     const handleAuth = async () => {
       const params = new URLSearchParams(window.location.search);
+      const token = params.get("token");
       const code = params.get("code");
 
+      // Handle Social Login Token
+      if (token) {
+        try {
+          localStorage.setItem('token', token);
+          // Fetch user data to update context immediately
+          // Note: using direct fetch here to avoid circular dependency or context issues, 
+          // or ideally use a method from context if available.
+          // For now, simpler to reload or let AuthProvider check localStorage on mount/update.
+
+          // Force a small delay or reload to ensure AuthContext picks it up?
+          // AuthContext listens to nothing but on mount it checks.
+          // We can call window.location.href = '/' to force full reload and auth check.
+
+          setStatus("success");
+          setMessage("Login successful! Redirecting...");
+          setTimeout(() => {
+            window.location.href = '/dashboard';
+          }, 1000);
+          return;
+        } catch (e) {
+          setStatus("error");
+          setMessage("Login failed. Please try again.");
+          return;
+        }
+      }
+
+      // Handle Gmail Code (Previous Logic)
       if (!code) {
         setStatus("error");
-        setMessage("❌ Authorization failed: Missing code.");
+        setMessage("❌ Authorization failed: Missing code or token.");
         return;
       }
 

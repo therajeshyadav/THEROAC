@@ -38,6 +38,12 @@ const path = require('path');
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // routes (auth routes should come first, before authentication middleware)
+// Passport Config
+require('./config/passport');
+const passport = require('passport');
+
+// routes (auth routes should come first, before authentication middleware)
+app.use(passport.initialize());
 app.use('/api/auth', authRoutes);
 
 // Attach organization context to authenticated requests (after auth routes)

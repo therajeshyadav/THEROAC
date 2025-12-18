@@ -56,7 +56,7 @@ exports.register = async (req, res, next) => {
     });
   } catch (err) {
     console.error('Error in register:', err);
-    
+
     // Handle Sequelize unique constraint errors
     if (err.name === 'SequelizeUniqueConstraintError') {
       const field = err.errors[0]?.path || 'field';
@@ -98,7 +98,7 @@ exports.login = async (req, res, next) => {
     }
 
     const valid = await bcrypt.compare(password, user.passwordHash);
-    if(!valid){
+    if (!valid) {
       user.failedLoginAttempts = (user.failedLoginAttempts || 0) + 1;
       await user.save();
       return res.status(401).json({ message: 'Invalid credentials' });
@@ -243,7 +243,7 @@ exports.resendVerification = async (req, res, next) => {
     } catch (emailError) {
       console.error('Failed to send verification email:', emailError.message);
       // Still return success since token is saved, but inform about email issue
-      return res.status(200).json({ 
+      return res.status(200).json({
         message: 'Verification token generated. Email service temporarily unavailable.',
         warning: 'Please try again in a few moments or contact support.'
       });
@@ -317,5 +317,32 @@ exports.resetPassword = async (req, res, next) => {
     return res.status(500).json({
       message: 'Password reset failed. Please try again.'
     });
+  }
+};
+
+exports.socialCallback = async (req, res) => {
+  try {
+    const user = req.user;
+    // Check if user is banned
+    if (user.status === 'banned') {
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+      return res.redirect(`${frontendUrl}/login?error=banned&supportEmail=support@theroac.com`);
+    }
+
+    const token = jwt.sign(
+      { id: user.id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    user.lastLogin = new Date();
+    await user.save();
+
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    res.redirect(`${frontendUrl}/oauth2callback?token=${token}`);
+  } catch (error) {
+    console.error('Social callback error:', error);
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    res.redirect(`${frontendUrl}/login?error=auth_failed`);
   }
 };

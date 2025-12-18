@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import { useAuth } from '../context/AuthContext';
 import { usePreloader } from '../hooks/usePreloader';
 import BannedUserScreen from '../components/BannedUserScreen';
+import { redirectToDashboard } from '../utils/roleRedirect';
 import './Auth.css';
 
 const Login = () => {
@@ -67,8 +68,8 @@ const Login = () => {
           // Redirect to the stored page
           window.location.href = redirectUrl;
         } else {
-          // Normal login - redirect to home page
-          window.location.href = '/';
+          // Normal login - redirect based on user role
+          redirectToDashboard(result.user?.role);
         }
         return;
       } else {

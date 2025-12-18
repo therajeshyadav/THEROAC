@@ -20,7 +20,6 @@ import EventsTab from "../components/candidate-dashboard/EventsTab";
 import PrimeHubTab from "../components/candidate-dashboard/PrimeHubTab";
 import ApplicationsTab from "../components/candidate-dashboard/ApplicationsTab";
 import ProfileTab from "../components/candidate-dashboard/CandidateProfilePage";
-import QuickApplyModal from "../components/QuickApplyModal";
 
 import "./CandidateDashboard.css";
 
@@ -655,18 +654,6 @@ const CandidateDashboard = () => {
 
   return (
     <div className="dashboard-container">
-      {/* Quick Apply Modal */}
-      <QuickApplyModal
-        isOpen={showQuickApply}
-        onClose={() => {
-          setShowQuickApply(false);
-          setSelectedJob(null);
-        }}
-        jobData={selectedJob}
-        userData={authUser}
-        onSubmit={handleQuickApplySubmit}
-      />
-
       {preloaderVisible && (
         <div className="preloader">
           <div className="loading-container">

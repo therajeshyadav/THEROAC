@@ -116,6 +116,7 @@
   border-radius: 8px;
   padding: 0.5rem;
   color: #FFD600;
+  height: fit-content;
 }
 
 .approval-title {
@@ -238,7 +239,8 @@
 .approval-actions {
   display: flex;
   gap: 0.75rem;
-  justify-content: flex-end;
+  justify-content: space-between;
+
 }
 
 .action-btn {
@@ -254,6 +256,7 @@
   cursor: pointer;
   transition: all 0.3s ease;
   font-weight: 500;
+  width: fit-content;
 }
 
 .view-btn:hover {

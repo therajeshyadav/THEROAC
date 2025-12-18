@@ -31,17 +31,22 @@ const ManageEventsTab = ({ authUser, setEventsTabLoading, pendingModalType, onMo
   const fetchEvents = async () => {
     try {
       setEventsTabLoading(true);
-      const response = await fetch(`${API_URL}/events`, {
+      const response = await fetch(`${API_URL}/events/my-events?showAll=true`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `HTTP ${response.status}`);
+      }
+      
       const data = await response.json();
-      const userEvents = data.events?.filter(event => event.createdBy === authUser?.id) || [];
-      setEvents(userEvents);
+      setEvents(data.events || []);
     } catch (error) {
       console.error('Error fetching events:', error);
-      toast.error('Failed to load events');
+      toast.error(`Failed to load events: ${error.message}`);
     } finally {
       setEventsTabLoading(false);
     }
@@ -88,7 +93,21 @@ const ManageEventsTab = ({ authUser, setEventsTabLoading, pendingModalType, onMo
   const filteredEvents = events.filter(event => {
     const matchesSearch = event.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          event.location?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesFilter = filterStatus === 'all' || event.status === filterStatus;
+    
+    let matchesFilter = false;
+    if (filterStatus === 'all') {
+      matchesFilter = true;
+    } else if (filterStatus === 'pending') {
+      matchesFilter = event.approvalStatus === 'pending';
+    } else if (filterStatus === 'approved') {
+      matchesFilter = event.approvalStatus === 'approved';
+    } else if (filterStatus === 'rejected') {
+      matchesFilter = event.approvalStatus === 'rejected';
+    } else {
+      // For status filters like upcoming, completed, cancelled
+      matchesFilter = event.status === filterStatus;
+    }
+    
     return matchesSearch && matchesFilter;
   });
 
@@ -137,6 +156,24 @@ const ManageEventsTab = ({ authUser, setEventsTabLoading, pendingModalType, onMo
             All ({events.length})
           </button>
           <button
+            className={filterStatus === 'approved' ? 'active' : ''}
+            onClick={() => setFilterStatus('approved')}
+          >
+            Approved ({events.filter(e => e.approvalStatus === 'approved').length})
+          </button>
+          <button
+            className={filterStatus === 'pending' ? 'active' : ''}
+            onClick={() => setFilterStatus('pending')}
+          >
+            Pending ({events.filter(e => e.approvalStatus === 'pending').length})
+          </button>
+          <button
+            className={filterStatus === 'rejected' ? 'active' : ''}
+            onClick={() => setFilterStatus('rejected')}
+          >
+            Rejected ({events.filter(e => e.approvalStatus === 'rejected').length})
+          </button>
+          <button
             className={filterStatus === 'upcoming' ? 'active' : ''}
             onClick={() => setFilterStatus('upcoming')}
           >
@@ -147,12 +184,6 @@ const ManageEventsTab = ({ authUser, setEventsTabLoading, pendingModalType, onMo
             onClick={() => setFilterStatus('completed')}
           >
             Completed ({events.filter(e => e.status === 'completed').length})
-          </button>
-          <button
-            className={filterStatus === 'cancelled' ? 'active' : ''}
-            onClick={() => setFilterStatus('cancelled')}
-          >
-            Cancelled ({events.filter(e => e.status === 'cancelled').length})
           </button>
         </div>
       </div>
@@ -182,7 +213,7 @@ const ManageEventsTab = ({ authUser, setEventsTabLoading, pendingModalType, onMo
                       </div>
                     </div>
                   </td>
-                  <td>{formatDate(event.date)}</td>
+                  <td>{formatDate(event.startDate)}</td>
                   <td>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                       <MapPin size={14} style={{ color: '#FFD600' }} />
@@ -202,9 +233,16 @@ const ManageEventsTab = ({ authUser, setEventsTabLoading, pendingModalType, onMo
                     </div>
                   </td>
                   <td>
-                    <span className={`status-badge status-${event.status || 'upcoming'}`}>
-                      {event.status || 'upcoming'}
-                    </span>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                      <span className={`status-badge status-${event.approvalStatus || 'pending'}`}>
+                        {event.approvalStatus || 'pending'}
+                      </span>
+                      {event.approvalStatus === 'approved' && (
+                        <span className={`status-badge status-${event.status || 'upcoming'}`} style={{ fontSize: '0.75rem' }}>
+                          {event.status || 'upcoming'}
+                        </span>
+                      )}
+                    </div>
                   </td>
                   <td>
                     <div className="action-buttons">

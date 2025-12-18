@@ -497,7 +497,7 @@ const ModernDetailsPage = () => {
                                             className="qr-code-image"
                                         />
                                     </div>
-                                    <p className="qr-text">Scan QR with your phone to open this page</p>
+                                    <p className="qr-text">Scan the QR code to invite others.</p>
                                     <span className="or-text">or</span>
                                     {hasApplied ? (
                                         <button 

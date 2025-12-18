@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { redirectToDashboard } from "../utils/roleRedirect";
 
 export default function OAuth2Callback() {
   const [status, setStatus] = useState("loading");
@@ -18,20 +19,28 @@ export default function OAuth2Callback() {
       if (token) {
         try {
           localStorage.setItem('token', token);
-          // Fetch user data to update context immediately
-          // Note: using direct fetch here to avoid circular dependency or context issues, 
-          // or ideally use a method from context if available.
-          // For now, simpler to reload or let AuthProvider check localStorage on mount/update.
-
-          // Force a small delay or reload to ensure AuthContext picks it up?
-          // AuthContext listens to nothing but on mount it checks.
-          // We can call window.location.href = '/' to force full reload and auth check.
-
-          setStatus("success");
-          setMessage("Login successful! Redirecting...");
-          setTimeout(() => {
-            window.location.href = '/dashboard';
-          }, 1000);
+          
+          // Fetch user data to determine role for redirection
+          const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:4000'}/api/auth/me`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          
+          if (response.ok) {
+            const userData = await response.json();
+            localStorage.setItem('user', JSON.stringify(userData));
+            
+            setStatus("success");
+            setMessage("Login successful! Redirecting...");
+            
+            setTimeout(() => {
+              // Redirect based on user role
+              redirectToDashboard(userData.role);
+            }, 1000);
+          } else {
+            throw new Error('Failed to fetch user data');
+          }
           return;
         } catch (e) {
           setStatus("error");

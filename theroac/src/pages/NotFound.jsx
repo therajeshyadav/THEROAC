@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { getDashboardPath } from '../utils/roleRedirect';
 import './NotFound.css';
 
 const NotFound = () => {
@@ -13,7 +14,7 @@ const NotFound = () => {
     const handleGoHome = () => {
         setAutoRedirect(false);
         if (isAuthenticated) {
-            navigate(getDashboardUrl(user));
+            navigate(getDashboardPath(user?.role));
         } else {
             navigate('/');
         }
@@ -28,20 +29,7 @@ const NotFound = () => {
         setAutoRedirect(false);
     };
 
-    const getDashboardUrl = (user) => {
-        if (!user) return '/candidate-dashboard';
-        
-        switch (user.role) {
-            case 'admin':
-            case 'superadmin':
-                return '/admin-dashboard';
-            case 'recruiter':
-                return '/recruiter-dashboard';
-            case 'candidate':
-            default:
-                return '/candidate-dashboard';
-        }
-    };
+
 
     // Auto-redirect countdown (optional)
     useEffect(() => {
@@ -52,7 +40,7 @@ const NotFound = () => {
                 if (prev <= 1) {
                     clearInterval(timer);
                     if (isAuthenticated) {
-                        navigate(getDashboardUrl(user));
+                        navigate(getDashboardPath(user?.role));
                     } else {
                         navigate('/');
                     }
@@ -119,7 +107,7 @@ const NotFound = () => {
                         {isAuthenticated ? (
                             // Show dashboard links for authenticated users
                             <>
-                                <a href={getDashboardUrl(user)} className="suggestion-link">
+                                <a href={getDashboardPath(user?.role)} className="suggestion-link">
                                     <i className="fas fa-tachometer-alt"></i>
                                     <span>My Dashboard</span>
                                 </a>

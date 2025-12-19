@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { X, Plus, Trash2 } from 'lucide-react';
+import { X, Plus } from 'lucide-react';
 import { toast } from 'react-toastify';
 import './JobFormModal.css'; // Reuse same CSS
 import ImageUpload from './ImageUpload';
+import MediaUpload from './MediaUpload';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000/api';
 
@@ -13,6 +14,7 @@ const EventFormModal = ({ event, onClose, onSuccess }) => {
     // Basic Info
     title: '',
     description: '',
+    eventType: 'workshop', // Default event type
     locationType: 'online',
     location: '',
     venue: '',
@@ -50,6 +52,7 @@ const EventFormModal = ({ event, onClose, onSuccess }) => {
     speakers: [],
     sponsors: [],
     prizes: [],
+    faqs: [],
     eligibility: {},
     featured: false,
     status: 'upcoming'
@@ -57,14 +60,17 @@ const EventFormModal = ({ event, onClose, onSuccess }) => {
 
   const [newTag, setNewTag] = useState('');
   const [newItem, setNewItem] = useState('');
-  const [newMediaUrl, setNewMediaUrl] = useState('');
-  const [newMediaType, setNewMediaType] = useState('image');
+
 
   useEffect(() => {
     if (event) {
+      // Extract eventType from categories array (first category is the event type)
+      const eventType = event.categories && event.categories.length > 0 ? event.categories[0] : 'workshop';
+      
       setFormData({
         ...formData,
         ...event,
+        eventType, // Set eventType from categories
         registrationFee: event.registrationFee || { amount: '', currency: 'USD', type: 'free' },
         contactInfo: event.contactInfo || { email: '', phone: '', website: '' },
         socials: event.socials || { facebook: '', twitter: '', linkedin: '', instagram: '' },
@@ -75,7 +81,8 @@ const EventFormModal = ({ event, onClose, onSuccess }) => {
         agenda: event.agenda || [],
         speakers: event.speakers || [],
         sponsors: event.sponsors || [],
-        prizes: event.prizes || []
+        prizes: event.prizes || [],
+        faqs: event.faqs || []
       });
     }
   }, [event]);
@@ -132,22 +139,132 @@ const EventFormModal = ({ event, onClose, onSuccess }) => {
     }));
   };
 
-  const addMedia = () => {
-    if (newMediaUrl.trim()) {
-      setFormData(prev => ({
-        ...prev,
-        media: [...prev.media, { type: newMediaType, url: newMediaUrl.trim() }]
-      }));
-      setNewMediaUrl('');
-    }
-  };
-
-  const removeMedia = (index) => {
+  // Agenda helper functions
+  const addAgendaItem = () => {
+    const newItem = { time: '', title: '', description: '', speaker: '' };
     setFormData(prev => ({
       ...prev,
-      media: prev.media.filter((_, i) => i !== index)
+      agenda: [...prev.agenda, newItem]
     }));
   };
+
+  const updateAgendaItem = (index, field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      agenda: prev.agenda.map((item, i) => 
+        i === index ? { ...item, [field]: value } : item
+      )
+    }));
+  };
+
+  const removeAgendaItem = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      agenda: prev.agenda.filter((_, i) => i !== index)
+    }));
+  };
+
+  // Speaker helper functions
+  const addSpeaker = () => {
+    const newSpeaker = { name: '', title: '', bio: '', image: '', socials: {} };
+    setFormData(prev => ({
+      ...prev,
+      speakers: [...prev.speakers, newSpeaker]
+    }));
+  };
+
+  const updateSpeaker = (index, field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      speakers: prev.speakers.map((speaker, i) => 
+        i === index ? { ...speaker, [field]: value } : speaker
+      )
+    }));
+  };
+
+  const removeSpeaker = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      speakers: prev.speakers.filter((_, i) => i !== index)
+    }));
+  };
+
+  // Sponsor helper functions
+  const addSponsor = () => {
+    const newSponsor = { name: '', logo: '', tier: 'Bronze', website: '' };
+    setFormData(prev => ({
+      ...prev,
+      sponsors: [...prev.sponsors, newSponsor]
+    }));
+  };
+
+  const updateSponsor = (index, field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      sponsors: prev.sponsors.map((sponsor, i) => 
+        i === index ? { ...sponsor, [field]: value } : sponsor
+      )
+    }));
+  };
+
+  const removeSponsor = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      sponsors: prev.sponsors.filter((_, i) => i !== index)
+    }));
+  };
+
+  // Prize helper functions
+  const addPrize = () => {
+    const newPrize = { position: '', prize: '', description: '' };
+    setFormData(prev => ({
+      ...prev,
+      prizes: [...prev.prizes, newPrize]
+    }));
+  };
+
+  const updatePrize = (index, field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      prizes: prev.prizes.map((prize, i) => 
+        i === index ? { ...prize, [field]: value } : prize
+      )
+    }));
+  };
+
+  const removePrize = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      prizes: prev.prizes.filter((_, i) => i !== index)
+    }));
+  };
+
+  // FAQ helper functions
+  const addFAQ = () => {
+    const newFAQ = { question: '', answer: '' };
+    setFormData(prev => ({
+      ...prev,
+      faqs: [...prev.faqs, newFAQ]
+    }));
+  };
+
+  const updateFAQ = (index, field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      faqs: prev.faqs.map((faq, i) => 
+        i === index ? { ...faq, [field]: value } : faq
+      )
+    }));
+  };
+
+  const removeFAQ = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      faqs: prev.faqs.filter((_, i) => i !== index)
+    }));
+  };
+
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -161,13 +278,19 @@ const EventFormModal = ({ event, onClose, onSuccess }) => {
       
       const method = event ? 'PUT' : 'POST';
 
+      // Map eventType to categories array (eventType becomes the first category)
+      const submitData = {
+        ...formData,
+        categories: [formData.eventType, ...formData.categories.filter(cat => cat !== formData.eventType)]
+      };
+
       const response = await fetch(url, {
         method,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(submitData)
       });
 
       if (response.ok) {
@@ -207,12 +330,16 @@ const EventFormModal = ({ event, onClose, onSuccess }) => {
     { id: 'basic', label: 'Basic Info' },
     { id: 'details', label: 'Event Details' },
     { id: 'location', label: 'Location' },
+    { id: 'agenda', label: 'Agenda & Timeline' },
+    { id: 'speakers', label: 'Speakers' },
+    { id: 'sponsors', label: 'Sponsors & Prizes' },
+    { id: 'faq', label: 'FAQ' },
     { id: 'media', label: 'Media & Images' },
     { id: 'contact', label: 'Contact & Apply' }
   ];
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay job-form-modal-overlay" onClick={onClose} style={{ zIndex: 9999 }}>
       <div className="job-form-modal modal-container" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2>{event ? 'Edit Event' : 'Create New Event'}</h2>
@@ -263,6 +390,28 @@ const EventFormModal = ({ event, onClose, onSuccess }) => {
                   />
                 </div>
 
+                <div className="form-group">
+                  <label>Event Type *</label>
+                  <select 
+                    name="eventType" 
+                    value={formData.eventType} 
+                    onChange={handleInputChange}
+                    required
+                  >
+                    <option value="workshop">Workshop</option>
+                    <option value="seminar">Seminar</option>
+                    <option value="conference">Conference</option>
+                    <option value="webinar">Webinar</option>
+                    <option value="hackathon">Hackathon</option>
+                    <option value="competition">Competition</option>
+                    <option value="networking">Networking Event</option>
+                    <option value="career-fair">Career Fair</option>
+                    <option value="training">Training Session</option>
+                    <option value="meetup">Meetup</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+
                 <div className="form-row">
                   <div className="form-group">
                     <label>Start Date *</label>
@@ -304,7 +453,7 @@ const EventFormModal = ({ event, onClose, onSuccess }) => {
                         type="text"
                         value={newTag}
                         onChange={(e) => setNewTag(e.target.value)}
-                        onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
+                        onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
                         placeholder="Add tag..."
                       />
                       <button type="button" className="btn-add" onClick={addTag}>
@@ -434,7 +583,7 @@ const EventFormModal = ({ event, onClose, onSuccess }) => {
                         type="text"
                         value={newItem}
                         onChange={(e) => setNewItem(e.target.value)}
-                        onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addWhatToBring())}
+                        onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addWhatToBring())}
                         placeholder="Add item..."
                       />
                       <button type="button" className="btn-add" onClick={addWhatToBring}>
@@ -551,7 +700,7 @@ const EventFormModal = ({ event, onClose, onSuccess }) => {
                   value={formData.bannerImage}
                   onChange={(url) => setFormData(prev => ({ ...prev, bannerImage: url }))}
                   type="events"
-                  fieldName="bannerImage"
+                  fieldName="image"
                   previewClass="banner"
                 />
 
@@ -560,39 +709,346 @@ const EventFormModal = ({ event, onClose, onSuccess }) => {
                   value={formData.thumbnailImage}
                   onChange={(url) => setFormData(prev => ({ ...prev, thumbnailImage: url }))}
                   type="events"
-                  fieldName="thumbnailImage"
+                  fieldName="image"
                 />
 
-                <div className="form-group">
-                  <label>Additional Media</label>
-                  {formData.media.length > 0 && (
-                    <div className="media-list">
-                      {formData.media.map((item, index) => (
-                        <div key={index} className="media-item">
-                          <span className="media-type">{item.type}</span>
-                          <span className="media-url">{item.url}</span>
-                          <button type="button" className="btn-remove" onClick={() => removeMedia(index)}>
-                            <Trash2 size={16} />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  <div className="media-input-group">
-                    <select value={newMediaType} onChange={(e) => setNewMediaType(e.target.value)}>
-                      <option value="image">Image</option>
-                      <option value="video">Video</option>
-                    </select>
-                    <input
-                      type="url"
-                      value={newMediaUrl}
-                      onChange={(e) => setNewMediaUrl(e.target.value)}
-                      placeholder="Media URL..."
-                    />
-                    <button type="button" className="btn-add" onClick={addMedia}>
-                      <Plus size={16} />
+                <MediaUpload
+                  label="Event Photos & Videos"
+                  value={formData.media}
+                  onChange={(media) => setFormData(prev => ({ ...prev, media }))}
+                  type="events"
+                  maxItems={15}
+                />
+              </div>
+            )}
+
+            {activeTab === 'agenda' && (
+              <div className="form-section">
+                <h3>Event Agenda & Timeline</h3>
+
+                <div className="agenda-section">
+                  <div className="section-header">
+                    <h4>Schedule</h4>
+                    <button type="button" className="btn-add" onClick={addAgendaItem}>
+                      <Plus size={16} /> Add Item
                     </button>
                   </div>
+
+                  {formData.agenda.map((item, index) => (
+                    <div key={index} className="agenda-item">
+                      <div className="form-row">
+                        <div className="form-group">
+                          <label>Time</label>
+                          <input
+                            type="text"
+                            value={item.time}
+                            onChange={(e) => updateAgendaItem(index, 'time', e.target.value)}
+                            placeholder="e.g. 10:00 AM"
+                          />
+                        </div>
+                        <div className="form-group" style={{ flex: 2 }}>
+                          <label>Title</label>
+                          <input
+                            type="text"
+                            value={item.title}
+                            onChange={(e) => updateAgendaItem(index, 'title', e.target.value)}
+                            placeholder="Session title"
+                          />
+                        </div>
+                        <button 
+                          type="button" 
+                          className="btn-remove"
+                          onClick={() => removeAgendaItem(index)}
+                        >
+                          <X size={16} />
+                        </button>
+                      </div>
+                      <div className="form-group">
+                        <label>Description</label>
+                        <textarea
+                          value={item.description}
+                          onChange={(e) => updateAgendaItem(index, 'description', e.target.value)}
+                          placeholder="Session description"
+                          rows="2"
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label>Speaker (Optional)</label>
+                        <input
+                          type="text"
+                          value={item.speaker}
+                          onChange={(e) => updateAgendaItem(index, 'speaker', e.target.value)}
+                          placeholder="Speaker name"
+                        />
+                      </div>
+                    </div>
+                  ))}
+
+                  {formData.agenda.length === 0 && (
+                    <div className="empty-state">
+                      <p>No agenda items added yet. Click "Add Item" to create your event schedule.</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'speakers' && (
+              <div className="form-section">
+                <h3>Event Speakers</h3>
+
+                <div className="speakers-section">
+                  <div className="section-header">
+                    <h4>Speaker List</h4>
+                    <button type="button" className="btn-add" onClick={addSpeaker}>
+                      <Plus size={16} /> Add Speaker
+                    </button>
+                  </div>
+
+                  {formData.speakers.map((speaker, index) => (
+                    <div key={index} className="speaker-item">
+                      <div className="form-row">
+                        <div className="form-group">
+                          <label>Name</label>
+                          <input
+                            type="text"
+                            value={speaker.name}
+                            onChange={(e) => updateSpeaker(index, 'name', e.target.value)}
+                            placeholder="Speaker name"
+                          />
+                        </div>
+                        <div className="form-group">
+                          <label>Title/Position</label>
+                          <input
+                            type="text"
+                            value={speaker.title}
+                            onChange={(e) => updateSpeaker(index, 'title', e.target.value)}
+                            placeholder="e.g. Senior Developer"
+                          />
+                        </div>
+                        <button 
+                          type="button" 
+                          className="btn-remove"
+                          onClick={() => removeSpeaker(index)}
+                        >
+                          <X size={16} />
+                        </button>
+                      </div>
+                      <div className="form-group">
+                        <label>Bio</label>
+                        <textarea
+                          value={speaker.bio}
+                          onChange={(e) => updateSpeaker(index, 'bio', e.target.value)}
+                          placeholder="Speaker biography"
+                          rows="3"
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label>Profile Image URL</label>
+                        <input
+                          type="url"
+                          value={speaker.image}
+                          onChange={(e) => updateSpeaker(index, 'image', e.target.value)}
+                          placeholder="https://..."
+                        />
+                      </div>
+                    </div>
+                  ))}
+
+                  {formData.speakers.length === 0 && (
+                    <div className="empty-state">
+                      <p>No speakers added yet. Click "Add Speaker" to add event speakers.</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'sponsors' && (
+              <div className="form-section">
+                <h3>Sponsors & Prizes</h3>
+
+                {/* Sponsors Section */}
+                <div className="sponsors-section">
+                  <div className="section-header">
+                    <h4>Event Sponsors</h4>
+                    <button type="button" className="btn-add" onClick={addSponsor}>
+                      <Plus size={16} /> Add Sponsor
+                    </button>
+                  </div>
+
+                  {formData.sponsors.map((sponsor, index) => (
+                    <div key={index} className="sponsor-item">
+                      <div className="form-row">
+                        <div className="form-group">
+                          <label>Company Name</label>
+                          <input
+                            type="text"
+                            value={sponsor.name}
+                            onChange={(e) => updateSponsor(index, 'name', e.target.value)}
+                            placeholder="Company name"
+                          />
+                        </div>
+                        <div className="form-group">
+                          <label>Tier</label>
+                          <select
+                            value={sponsor.tier}
+                            onChange={(e) => updateSponsor(index, 'tier', e.target.value)}
+                          >
+                            <option value="Bronze">Bronze</option>
+                            <option value="Silver">Silver</option>
+                            <option value="Gold">Gold</option>
+                            <option value="Platinum">Platinum</option>
+                            <option value="Title">Title Sponsor</option>
+                          </select>
+                        </div>
+                        <button 
+                          type="button" 
+                          className="btn-remove"
+                          onClick={() => removeSponsor(index)}
+                        >
+                          <X size={16} />
+                        </button>
+                      </div>
+                      <div className="form-row">
+                        <div className="form-group">
+                          <label>Logo URL</label>
+                          <input
+                            type="url"
+                            value={sponsor.logo}
+                            onChange={(e) => updateSponsor(index, 'logo', e.target.value)}
+                            placeholder="https://..."
+                          />
+                        </div>
+                        <div className="form-group">
+                          <label>Website</label>
+                          <input
+                            type="url"
+                            value={sponsor.website}
+                            onChange={(e) => updateSponsor(index, 'website', e.target.value)}
+                            placeholder="https://..."
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+
+                  {formData.sponsors.length === 0 && (
+                    <div className="empty-state">
+                      <p>No sponsors added yet. Click "Add Sponsor" to add event sponsors.</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Prizes Section */}
+                <div className="prizes-section" style={{ marginTop: '2rem' }}>
+                  <div className="section-header">
+                    <h4>Prizes & Awards</h4>
+                    <button type="button" className="btn-add" onClick={addPrize}>
+                      <Plus size={16} /> Add Prize
+                    </button>
+                  </div>
+
+                  {formData.prizes.map((prize, index) => (
+                    <div key={index} className="prize-item">
+                      <div className="form-row">
+                        <div className="form-group">
+                          <label>Position</label>
+                          <input
+                            type="text"
+                            value={prize.position}
+                            onChange={(e) => updatePrize(index, 'position', e.target.value)}
+                            placeholder="e.g. 1st Place, Winner"
+                          />
+                        </div>
+                        <div className="form-group">
+                          <label>Prize</label>
+                          <input
+                            type="text"
+                            value={prize.prize}
+                            onChange={(e) => updatePrize(index, 'prize', e.target.value)}
+                            placeholder="e.g. $10,000, Trophy"
+                          />
+                        </div>
+                        <button 
+                          type="button" 
+                          className="btn-remove"
+                          onClick={() => removePrize(index)}
+                        >
+                          <X size={16} />
+                        </button>
+                      </div>
+                      <div className="form-group">
+                        <label>Description</label>
+                        <textarea
+                          value={prize.description}
+                          onChange={(e) => updatePrize(index, 'description', e.target.value)}
+                          placeholder="Prize description"
+                          rows="2"
+                        />
+                      </div>
+                    </div>
+                  ))}
+
+                  {formData.prizes.length === 0 && (
+                    <div className="empty-state">
+                      <p>No prizes added yet. Click "Add Prize" to add event prizes.</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'faq' && (
+              <div className="form-section">
+                <h3>Frequently Asked Questions</h3>
+
+                <div className="faq-section">
+                  <div className="section-header">
+                    <h4>FAQ List</h4>
+                    <button type="button" className="btn-add" onClick={addFAQ}>
+                      <Plus size={16} /> Add FAQ
+                    </button>
+                  </div>
+
+                  {formData.faqs.map((faq, index) => (
+                    <div key={index} className="faq-item">
+                      <div className="faq-header">
+                        <h5>FAQ #{index + 1}</h5>
+                        <button 
+                          type="button" 
+                          className="btn-remove"
+                          onClick={() => removeFAQ(index)}
+                        >
+                          <X size={16} />
+                        </button>
+                      </div>
+                      <div className="form-group">
+                        <label>Question</label>
+                        <input
+                          type="text"
+                          value={faq.question}
+                          onChange={(e) => updateFAQ(index, 'question', e.target.value)}
+                          placeholder="Enter the question..."
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label>Answer</label>
+                        <textarea
+                          value={faq.answer}
+                          onChange={(e) => updateFAQ(index, 'answer', e.target.value)}
+                          placeholder="Enter the answer..."
+                          rows="4"
+                        />
+                      </div>
+                    </div>
+                  ))}
+
+                  {formData.faqs.length === 0 && (
+                    <div className="empty-state">
+                      <p>No FAQs added yet. Click "Add FAQ" to add frequently asked questions.</p>
+                    </div>
+                  )}
                 </div>
               </div>
             )}

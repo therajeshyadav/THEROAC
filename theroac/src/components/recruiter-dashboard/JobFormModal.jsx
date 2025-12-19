@@ -42,6 +42,8 @@ const JobFormModal = ({ job, authUser, onClose, onSuccess }) => {
     status: 'open',
     featured: false,
     urgent: false,
+    eligibility: [],
+    faqs: [],
   });
 
   useEffect(() => {
@@ -87,6 +89,8 @@ const JobFormModal = ({ job, authUser, onClose, onSuccess }) => {
         status: job.status || 'open',
         featured: job.featured || false,
         urgent: job.urgent || false,
+        eligibility: job.eligibility || [],
+        faqs: job.faqs || [],
       });
     }
   }, [job]);
@@ -96,6 +100,8 @@ const JobFormModal = ({ job, authUser, onClose, onSuccess }) => {
   const [newSkill, setNewSkill] = useState('');
   const [newCategory, setNewCategory] = useState('');
   const [newPerk, setNewPerk] = useState('');
+  const [newEligibility, setNewEligibility] = useState('');
+  const [newFAQ, setNewFAQ] = useState({ question: '', answer: '' });
   const [newMedia, setNewMedia] = useState({ type: 'image', url: '', caption: '' });
 
 
@@ -169,6 +175,40 @@ const JobFormModal = ({ job, authUser, onClose, onSuccess }) => {
     }));
   };
 
+  const addEligibility = () => {
+    if (newEligibility.trim()) {
+      setFormData(prev => ({
+        ...prev,
+        eligibility: [...prev.eligibility, newEligibility.trim()]
+      }));
+      setNewEligibility('');
+    }
+  };
+
+  const removeEligibility = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      eligibility: prev.eligibility.filter((_, i) => i !== index)
+    }));
+  };
+
+  const addFAQ = () => {
+    if (newFAQ.question.trim() && newFAQ.answer.trim()) {
+      setFormData(prev => ({
+        ...prev,
+        faqs: [...prev.faqs, { ...newFAQ }]
+      }));
+      setNewFAQ({ question: '', answer: '' });
+    }
+  };
+
+  const removeFAQ = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      faqs: prev.faqs.filter((_, i) => i !== index)
+    }));
+  };
+
   const addMedia = () => {
     if (newMedia.url.trim()) {
       setFormData(prev => ({
@@ -194,6 +234,8 @@ const JobFormModal = ({ job, authUser, onClose, onSuccess }) => {
       toast.error('Please fill in all required fields (Title, Company Name, Description)');
       return;
     }
+    
+
     
     setLoading(true);
 
@@ -254,6 +296,7 @@ const JobFormModal = ({ job, authUser, onClose, onSuccess }) => {
     { id: 'company', label: 'Company Info' },
     { id: 'media', label: 'Media & Images' },
     { id: 'contact', label: 'Contact & Apply' },
+    { id: 'faqs', label: 'FAQs' },
   ];
 
   return (
@@ -464,6 +507,34 @@ const JobFormModal = ({ job, authUser, onClose, onSuccess }) => {
                   rows="4"
                   placeholder="List benefits..."
                 />
+              </div>
+
+              <div className="form-group">
+                <label>Eligibility Criteria</label>
+                <div className="tags-input">
+                  <div className="tags-list">
+                    {formData.eligibility.map((criteria, index) => (
+                      <span key={index} className="tag">
+                        {criteria}
+                        <button type="button" onClick={() => removeEligibility(index)}>
+                          <X size={14} />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                  <div className="tag-input-row">
+                    <input
+                      type="text"
+                      value={newEligibility}
+                      onChange={(e) => setNewEligibility(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addEligibility())}
+                      placeholder="Add eligibility criteria (e.g. Bachelor's degree required)"
+                    />
+                    <button type="button" onClick={addEligibility} className="btn-add">
+                      <Plus size={18} />
+                    </button>
+                  </div>
+                </div>
               </div>
 
               <div className="form-group">
@@ -847,6 +918,65 @@ const JobFormModal = ({ job, authUser, onClose, onSuccess }) => {
             </div>
             <div className="modal-actions modal-footer">
               <button type="button" className="cancel-button" onClick={() => setCurrentTab('media')}>
+                Back
+              </button>
+              <button type="button" className="submit-button" onClick={() => setCurrentTab('faqs')}>
+                Next: FAQs
+              </button>
+            </div>
+            </>
+          )}
+
+          {currentTab === 'faqs' && (
+            <>
+            <div className="form-section">
+              <h3>Frequently Asked Questions</h3>
+              <p className="section-description">Add common questions and answers to help candidates understand the role better.</p>
+
+              {/* Existing FAQs */}
+              {formData.faqs.length > 0 && (
+                <div className="faqs-list">
+                  {formData.faqs.map((faq, index) => (
+                    <div key={index} className="faq-item">
+                      <div className="faq-header">
+                        <h4>Q: {faq.question}</h4>
+                        <button type="button" onClick={() => removeFAQ(index)} className="remove-btn">
+                          <X size={16} />
+                        </button>
+                      </div>
+                      <p className="faq-answer">A: {faq.answer}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Add New FAQ */}
+              <div className="form-group">
+                <label>Add New FAQ</label>
+                <div className="faq-input-group">
+                  <input
+                    type="text"
+                    value={newFAQ.question}
+                    onChange={(e) => setNewFAQ(prev => ({ ...prev, question: e.target.value }))}
+                    placeholder="Enter question (e.g., What are the working hours?)"
+                    className="faq-question-input"
+                  />
+                  <textarea
+                    value={newFAQ.answer}
+                    onChange={(e) => setNewFAQ(prev => ({ ...prev, answer: e.target.value }))}
+                    placeholder="Enter answer..."
+                    rows="3"
+                    className="faq-answer-input"
+                  />
+                  <button type="button" onClick={addFAQ} className="btn-add">
+                    <Plus size={18} />
+                    Add FAQ
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div className="modal-actions modal-footer">
+              <button type="button" className="cancel-button" onClick={() => setCurrentTab('contact')}>
                 Back
               </button>
               <button type="submit" className="submit-button" disabled={loading}>

@@ -268,7 +268,7 @@
   color: rgba(255, 255, 255, 0.7);
   font-size: 14px;
   margin-top: 15px;
-  font-style: italic;
+  font-family: var(--ztc-family-font1);
 }
 
 .verification-actions {

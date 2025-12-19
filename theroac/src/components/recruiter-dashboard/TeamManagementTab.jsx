@@ -311,17 +311,14 @@ const TeamManagementTab = ({ authUser, onTabChange }) => {
               <div className="member-avatar">
                 {member.user?.fullName?.charAt(0) || 'U'}
               </div>
-              <div className="member-info">
+              <div className="member-details">
                 <h4 className="member-name">{member.user?.fullName || 'Unknown'}</h4>
                 <p className="member-email">{member.user?.email}</p>
-                {member.user?.headline && <p>{member.user.headline}</p>}
+                {member.user?.headline && (
+                  <p className="member-headline">{member.user.headline}</p>
+                )}
                 {member.status === 'pending' && (
-                  <p style={{ 
-                    color: '#F59E0B', 
-                    fontSize: '0.85rem', 
-                    marginTop: '0.25rem',
-                    fontStyle: 'italic'
-                  }}>
+                  <p className="member-status-pending">
                     ⏳ Invitation sent - waiting for acceptance
                   </p>
                 )}
@@ -331,7 +328,17 @@ const TeamManagementTab = ({ authUser, onTabChange }) => {
               <span className={`role-badge ${member.role}`}>
                 {member.role}
               </span>
-              {member.role !== 'owner' && (
+              {/* Show delete button only if:
+                  1. Current user is owner/admin
+                  2. Member is not owner
+                  3. Current user has permission to manage team
+                  4. Not trying to delete themselves
+              */}
+              {member.role !== 'owner' && 
+               member.user?.id !== authUser?.id &&
+               (authUser?.role === 'owner' || 
+                authUser?.role === 'admin' || 
+                authUser?.permissions?.canManageTeam) && (
                 <button
                   className="btn-remove"
                   onClick={() => handleRemoveMember(member.id)}

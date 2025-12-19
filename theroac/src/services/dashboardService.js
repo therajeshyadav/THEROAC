@@ -27,7 +27,9 @@ class DashboardService {
   }
 
   async getOrganizerStats() {
-    return this.fetchWithAuth('/dashboard/stats');
+    // Add cache-busting parameter to ensure fresh data
+    const timestamp = new Date().getTime();
+    return this.fetchWithAuth(`/dashboard/stats?_t=${timestamp}`);
   }
 
   async getCandidates(params = {}) {

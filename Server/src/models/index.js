@@ -21,6 +21,8 @@ const Interview = require('./Interview');
 const SavedJob = require('./SavedJob');
 const Resume = require('./Resume');
 const TalentPipeline = require('./TalentPipeline');
+const Review = require('./Review');
+const FAQ = require('./FAQ');
 
 // Associations
 User.hasMany(Event, { foreignKey: 'createdBy', as: 'createdEvents' });
@@ -150,6 +152,18 @@ TalentPipeline.belongsTo(Organization, { foreignKey: 'organizationId', as: 'orga
 User.hasMany(TalentPipeline, { foreignKey: 'candidateId', as: 'pipelineEntries' });
 Organization.hasMany(TalentPipeline, { foreignKey: 'organizationId', as: 'talentPipeline' });
 
+// Review associations
+Review.belongsTo(User, { foreignKey: 'createdBy', as: 'author' });
+Review.belongsTo(User, { foreignKey: 'moderatedBy', as: 'moderator' });
+User.hasMany(Review, { foreignKey: 'createdBy', as: 'reviews' });
+User.hasMany(Review, { foreignKey: 'moderatedBy', as: 'moderatedReviews' });
+
+// FAQ associations
+FAQ.belongsTo(User, { foreignKey: 'createdBy', as: 'author' });
+FAQ.belongsTo(User, { foreignKey: 'answeredBy', as: 'answerer' });
+User.hasMany(FAQ, { foreignKey: 'createdBy', as: 'faqs' });
+User.hasMany(FAQ, { foreignKey: 'answeredBy', as: 'answeredFaqs' });
+
 module.exports = {
   sequelize,
   User,
@@ -173,5 +187,7 @@ module.exports = {
   Interview,
   SavedJob,
   Resume,
-  TalentPipeline
+  TalentPipeline,
+  Review,
+  FAQ
 };

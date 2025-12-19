@@ -21,6 +21,9 @@ const DashboardTab = ({ authUser, dashboardStats, getStatsData, onTabChange }) =
       case "Applications":
         onTabChange("applications");
         break;
+      case "Pending Approvals":
+        onTabChange("approvals");
+        break;
       default:
         break;
     }

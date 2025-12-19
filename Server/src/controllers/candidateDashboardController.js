@@ -1,4 +1,4 @@
-const { User, Job, JobApplication, Interview, SavedJob, ProfileView, HubContent, HubContentApplication } = require('../models');
+const { User, Job, JobApplication, Interview, SavedJob, ProfileView, HubContent, HubContentApplication, Event, EventRegistration } = require('../models');
 const { Op } = require('sequelize');
 const sequelize = require('../config/database');
 
@@ -73,6 +73,20 @@ exports.getCandidateStats = async (req, res) => {
       where: { userId }
     });
 
+    // Get upcoming events count
+    const upcomingEvents = await Event.count({
+      where: {
+        status: { [Op.in]: ['upcoming', 'ongoing'] },
+        approvalStatus: 'approved',
+        startDate: { [Op.gte]: now }
+      }
+    });
+
+    // Get events the candidate is registered for
+    const candidateEventRegistrations = await EventRegistration.count({
+      where: { userId }
+    });
+
     // Recent applications with details
     const recentApplications = jobApplications
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
@@ -111,6 +125,8 @@ exports.getCandidateStats = async (req, res) => {
       profileViews,
       profileViewsThisWeek,
       upcomingInterviews,
+      upcomingEvents,
+      candidateEventRegistrations,
       savedJobsCount,
       statusCounts,
       recentApplications,

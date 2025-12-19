@@ -15,40 +15,54 @@ const JobsTab = ({ jobs, internships = [], dashboardStats, appliedItems, onApply
   const [selectedExperience, setSelectedExperience] = useState('all');
   const [salaryRange, setSalaryRange] = useState('all');
   const [sortBy, setSortBy] = useState('recent');
-  const [savedJobs, setSavedJobs] = useState(new Set());
-  const [showSavedOnly, setShowSavedOnly] = useState(false);
+  const [bookmarkedJobs, setBookmarkedJobs] = useState(new Set());
+  const [showBookmarkedOnly, setShowBookmarkedOnly] = useState(false);
 
-  // Load saved jobs
+  // Load bookmarked jobs
   useEffect(() => {
-    loadSavedJobs();
+    loadBookmarkedJobs();
   }, []);
 
-  const loadSavedJobs = async () => {
+  const loadBookmarkedJobs = async () => {
     try {
-      const response = await apiService.getSavedJobs();
-      const savedIds = new Set(response.savedJobs.map(s => s.jobId));
-      setSavedJobs(savedIds);
+      const response = await apiService.getMyBookmarks();
+      const bookmarks = response.bookmarks || response || [];
+      const jobIds = new Set(
+        bookmarks
+          .filter(b => b.itemType === 'jobs' || b.itemType === 'internships')
+          .map(b => b.itemId)
+      );
+      setBookmarkedJobs(jobIds);
     } catch (error) {
-      console.error('Failed to load saved jobs:', error);
+      console.error('Failed to load bookmarked jobs:', error);
     }
   };
 
-  const handleSaveJob = async (jobId, jobType = 'job') => {
+  const handleBookmarkJob = async (jobId, isInternship = false) => {
     try {
-      const response = await apiService.toggleSaveJob(jobId, jobType);
-      if (response.isSaved) {
-        setSavedJobs(prev => new Set([...prev, jobId]));
-        toast.success('Job saved!');
-      } else {
-        setSavedJobs(prev => {
+      const itemType = isInternship ? 'internships' : 'jobs';
+      const wasBookmarked = bookmarkedJobs.has(jobId);
+      
+      const response = await apiService.toggleBookmark(jobId, itemType);
+      console.log('Bookmark response:', response);
+      
+      // Toggle the bookmark state based on previous state
+      if (wasBookmarked) {
+        // Was bookmarked, now removing
+        setBookmarkedJobs(prev => {
           const newSet = new Set(prev);
           newSet.delete(jobId);
           return newSet;
         });
-        toast.info('Job removed from saved');
+        toast.info('Bookmark removed');
+      } else {
+        // Was not bookmarked, now adding
+        setBookmarkedJobs(prev => new Set([...prev, jobId]));
+        toast.success(`${isInternship ? 'Internship' : 'Job'} bookmarked!`);
       }
     } catch (error) {
-      toast.error('Failed to save job');
+      console.error('Bookmark error:', error);
+      toast.error('Failed to bookmark item');
     }
   };
 
@@ -95,8 +109,8 @@ const JobsTab = ({ jobs, internships = [], dashboardStats, appliedItems, onApply
       }
     }
 
-    // Saved only filter
-    if (showSavedOnly && !savedJobs.has(job.id)) {
+    // Bookmarked only filter
+    if (showBookmarkedOnly && !bookmarkedJobs.has(job.id)) {
       return false;
     }
 
@@ -205,10 +219,10 @@ const JobsTab = ({ jobs, internships = [], dashboardStats, appliedItems, onApply
               <div className="col-md-12">
                 <div className="filter-chips">
                   <button 
-                    className={`chip ${showSavedOnly ? 'active' : ''}`}
-                    onClick={() => setShowSavedOnly(!showSavedOnly)}
+                    className={`chip ${showBookmarkedOnly ? 'active' : ''}`}
+                    onClick={() => setShowBookmarkedOnly(!showBookmarkedOnly)}
                   >
-                    <i className="fas fa-bookmark" /> Saved Only ({savedJobs.size})
+                    <i className="fas fa-bookmark" /> Bookmarked Only ({bookmarkedJobs.size})
                   </button>
                   {searchTerm && (
                     <button className="chip" onClick={() => setSearchTerm('')}>
@@ -238,40 +252,92 @@ const JobsTab = ({ jobs, internships = [], dashboardStats, appliedItems, onApply
           <h4>Available Opportunities</h4>
           <span className="job-count">{sortedJobs.length} found</span>
         </div>
-        <div className="jobs-grid">
+        <div className="jobs-grid" style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
+          gap: '1rem',
+          width: '100%',
+          minHeight: '200px'
+        }}>
           {sortedJobs.map((job) => {
             // Check if this is an internship (from hub_content) or regular job
             const isInternship = job.contentType === 'internship';
             const companyName = job.companyName || job.company;
             const displayLocation = job.location || 'Remote';
             
-            // Format salary properly
+            // Format salary/stipend properly with labels and comma formatting
             let displaySalary = 'Competitive';
+            let salaryLabel = 'Salary';
+            
+            // Helper function to format numbers with commas
+            const formatNumber = (num) => {
+              return num ? parseInt(num).toLocaleString() : '';
+            };
+            
             if (isInternship) {
-              if (job.stipend?.amount) {
-                displaySalary = `${job.stipend.currency} ${job.stipend.amount}/${job.stipend.period}`;
-              } else {
-                displaySalary = 'Stipend Available';
-              }
-            } else if (job.salary) {
-              if (typeof job.salary === 'object') {
-                const { min, max, currency = '₹' } = job.salary;
-                if (min && max) {
-                  displaySalary = `${currency}${min} - ${currency}${max}`;
-                } else if (min) {
-                  displaySalary = `${currency}${min}+`;
+              salaryLabel = 'Stipend';
+              if (job.stipend) {
+                if (typeof job.stipend === 'object') {
+                  const currency = job.stipend.currency === 'INR' ? '₹' : job.stipend.currency || '₹';
+                  const period = job.stipend.period || 'month';
+                  
+                  if (job.stipend.min && job.stipend.max) {
+                    const minFormatted = formatNumber(job.stipend.min);
+                    const maxFormatted = formatNumber(job.stipend.max);
+                    displaySalary = `${currency}${minFormatted} - ${currency}${maxFormatted}/${period}`;
+                  } else if (job.stipend.min) {
+                    const minFormatted = formatNumber(job.stipend.min);
+                    displaySalary = `${currency}${minFormatted}+/${period}`;
+                  } else if (job.stipend.amount) {
+                    // Backward compatibility for old single amount format
+                    const amountFormatted = formatNumber(job.stipend.amount);
+                    displaySalary = `${currency}${amountFormatted}/${period}`;
+                  } else {
+                    displaySalary = 'Available';
+                  }
+                } else if (typeof job.stipend === 'string') {
+                  displaySalary = job.stipend;
                 } else {
-                  displaySalary = 'Competitive';
+                  displaySalary = 'Available';
                 }
               } else {
-                displaySalary = job.salary;
+                displaySalary = 'Available';
+              }
+            } else {
+              salaryLabel = 'Salary';
+              if (job.salary) {
+                if (typeof job.salary === 'object') {
+                  const currency = job.salary.currency === 'INR' ? '₹' : job.salary.currency || '₹';
+                  if (job.salary.min && job.salary.max) {
+                    const minFormatted = formatNumber(job.salary.min);
+                    const maxFormatted = formatNumber(job.salary.max);
+                    displaySalary = `${currency}${minFormatted} - ${currency}${maxFormatted}`;
+                  } else if (job.salary.min) {
+                    const minFormatted = formatNumber(job.salary.min);
+                    displaySalary = `${currency}${minFormatted}+`;
+                  } else {
+                    displaySalary = 'Competitive';
+                  }
+                } else {
+                  displaySalary = job.salary;
+                }
               }
             }
             
-            const displayType = isInternship ? job.duration || 'Internship' : (job.type || 'Full-time');
+            const displayType = isInternship ? job.duration || 'Internship' : (job.jobType || 'Full-time');
             
             return (
-              <div key={job.id} className="job-card-detailed">
+              <div key={job.id} className="job-card-detailed" style={{
+                display: 'block',
+                visibility: 'visible',
+                opacity: 1,
+                width: '100%',
+                minHeight: '180px',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                borderRadius: '12px',
+                padding: '1rem',
+                background: 'rgba(255, 255, 255, 0.05)'
+              }}>
                 <div className="job-card-header">
                   <div className="company-logo">
                     {job.companyLogo ? (
@@ -287,10 +353,10 @@ const JobsTab = ({ jobs, internships = [], dashboardStats, appliedItems, onApply
                   </div>
                   <button 
                     className="save-job-btn"
-                    onClick={() => handleSaveJob(job.id, isInternship ? 'internship' : 'job')}
-                    style={{ color: savedJobs.has(job.id) ? '#FFD600' : '#666' }}
+                    onClick={() => handleBookmarkJob(job.id, isInternship)}
+                    style={{ color: bookmarkedJobs.has(job.id) ? '#FFD600' : '#666' }}
                   >
-                    <i className={savedJobs.has(job.id) ? "fas fa-bookmark" : "far fa-bookmark"} />
+                    <i className={bookmarkedJobs.has(job.id) ? "fas fa-bookmark" : "far fa-bookmark"} />
                   </button>
                 </div>
 
@@ -301,11 +367,11 @@ const JobsTab = ({ jobs, internships = [], dashboardStats, appliedItems, onApply
                   </div>
                   <div className="detail-item">
                     <i className="fas fa-rupee-sign" />
-                    <span>{displaySalary}</span>
+                    <span><strong>{salaryLabel}:</strong> {displaySalary}</span>
                   </div>
                   <div className="detail-item">
                     <i className="fas fa-briefcase" />
-                    <span>{job.experience || job.experienceLevel || 'All levels'}</span>
+                    <span>{job.experience || job.experienceLevel || 'fresher'}</span>
                   </div>
                   <div className="detail-item">
                     <i className="fas fa-calendar" />
@@ -313,24 +379,7 @@ const JobsTab = ({ jobs, internships = [], dashboardStats, appliedItems, onApply
                   </div>
                 </div>
 
-                <div className="job-skills">
-                  {job.skills && Array.isArray(job.skills) ? (
-                    job.skills.slice(0, 3).map((skill, index) => (
-                      <span key={index} className="skill-tag">
-                        {skill}
-                      </span>
-                    ))
-                  ) : job.requirements ? (
-                    job.requirements
-                      .split(',')
-                      .slice(0, 3)
-                      .map((skill, index) => (
-                        <span key={index} className="skill-tag">
-                          {skill.trim()}
-                        </span>
-                      ))
-                  ) : null}
-                </div>
+                {/* Skills section hidden as requested */}
 
                 <div className="job-card-footer">
                   <span className="posted-time">
@@ -375,7 +424,7 @@ const JobsTab = ({ jobs, internships = [], dashboardStats, appliedItems, onApply
           {sortedJobs.length === 0 && (
             <div className="no-data">
               <i className="fas fa-briefcase" style={{ fontSize: '48px', color: '#ccc', marginBottom: '16px' }} />
-              <p>{showSavedOnly ? 'No saved jobs yet' : 'No jobs match your filters'}</p>
+              <p>{showBookmarkedOnly ? 'No bookmarked jobs yet' : 'No jobs match your filters'}</p>
               {(searchTerm || selectedType !== 'all' || selectedLocation !== 'all') && (
                 <button 
                   className="btn btn-secondary"
@@ -384,7 +433,7 @@ const JobsTab = ({ jobs, internships = [], dashboardStats, appliedItems, onApply
                     setSelectedType('all');
                     setSelectedLocation('all');
                     setSelectedExperience('all');
-                    setShowSavedOnly(false);
+                    setShowBookmarkedOnly(false);
                   }}
                 >
                   Clear Filters

@@ -73,6 +73,8 @@ HubContent.init({
   responsibilities: { type: DataTypes.TEXT, allowNull: true },
   skills: { type: DataTypes.ARRAY(DataTypes.STRING), allowNull: true },
   benefits: { type: DataTypes.TEXT, allowNull: true },
+  eligibility: { type: DataTypes.JSON, allowNull: true }, // Array of eligibility criteria
+  faqs: { type: DataTypes.JSON, allowNull: true }, // Array of {question: string, answer: string}
   numberOfPositions: { type: DataTypes.INTEGER, allowNull: true },
   
   featured: { type: DataTypes.BOOLEAN, defaultValue: false },

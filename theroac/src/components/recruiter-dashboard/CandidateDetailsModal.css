@@ -388,23 +388,63 @@
 }
 
 /* Resume */
-.resume-link {
+.resume-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.resume-btn {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 24px;
-  background: #FFD600;
-  color: #000;
+  padding: 12px 20px;
   border-radius: 8px;
   text-decoration: none;
   font-weight: 600;
+  font-size: 14px;
   transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
 }
 
-.resume-link:hover {
+.view-btn {
+  background: #FFD600;
+  color: #000;
+  flex: 1;
+  min-width: 140px;
+  justify-content: center;
+}
+
+.view-btn:hover {
   background: #FFC700;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(255, 214, 0, 0.3);
+}
+
+.download-btn {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  flex: 1;
+  min-width: 140px;
+  justify-content: center;
+}
+
+.download-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+@media (max-width: 480px) {
+  .resume-actions {
+    flex-direction: column;
+  }
+  
+  .resume-btn {
+    width: 100%;
+  }
 }
 
 /* Cover Letter */

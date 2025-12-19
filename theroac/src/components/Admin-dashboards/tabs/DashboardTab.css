@@ -53,7 +53,7 @@
 
 .admin-stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 1.5rem;
   margin-bottom: 2rem;
 }
@@ -79,20 +79,24 @@
   right: 0;
   width: 100px;
   height: 100%;
-  background: linear-gradient(45deg, transparent, rgba(255, 214, 0, 0.1));
+  /* background: linear-gradient(45deg, transparent, rgba(255, 214, 0, 0.1)); */
   opacity: 0;
   transition: opacity 0.3s ease;
 }
 
-/* .admin-stat-card:hover {
+.admin-stat-card.clickable {
+  cursor: pointer;
+}
+
+/* .admin-stat-card.clickable:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(255, 214, 0, 0.2);
   border-color: rgba(255, 214, 0, 0.3);
 } */
 
-/* .admin-stat-card:hover::after {
+.admin-stat-card.clickable:hover::after {
   opacity: 1;
-} */
+}
 
 .admin-stat-icon-row {
   display: flex;

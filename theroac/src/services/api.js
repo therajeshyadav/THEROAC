@@ -518,6 +518,18 @@ const markAllAdminNotificationsAsRead = async () => {
     });
 };
 
+// Review endpoints
+const getReviews = async (itemId, itemType) => {
+    return request(`/reviews/${itemType}/${itemId}`);
+};
+
+const createReview = async (itemId, itemType, reviewData) => {
+    return request(`/reviews/${itemType}/${itemId}`, {
+        method: 'POST',
+        body: JSON.stringify(reviewData)
+    });
+};
+
 const updateJobStatus = async (jobId, status) => {
     return request(`/admin/jobs/${jobId}/status`, {
         method: 'PUT',
@@ -675,7 +687,9 @@ const apiService = {
     approveEvent,
     rejectJob,
     rejectEvent,
-    markAllAdminNotificationsAsRead
+    markAllAdminNotificationsAsRead,
+    getReviews,
+    createReview
 };
 
 export default apiService;

@@ -55,9 +55,13 @@ const DashboardTabs = ({
   }
 
   if (activeTab === "jobs") {
+    // Extract internships from hubContent to pass to JobsTab
+    const internships = hubContent ? hubContent.filter(item => item.contentType === 'internship') : [];
+    
     return (
       <JobsTab
         jobs={jobs}
+        internships={internships}
         dashboardStats={dashboardStats}
         appliedItems={appliedItems}
         onApplyJob={onApplyJob}

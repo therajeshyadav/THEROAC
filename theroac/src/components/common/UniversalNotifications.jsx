@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { Bell, Clock, CheckCircle, XCircle, Eye, X, Briefcase, Calendar, User, AlertCircle } from 'lucide-react';
+import { Bell, Clock, CheckCircle, XCircle, X, Briefcase, Calendar, User, AlertCircle } from 'lucide-react';
 import apiService from '../../services/api';
-import { toast } from 'react-toastify';
 import './UniversalNotifications.css';
 
 const UniversalNotifications = ({ onNotificationClick }) => {
@@ -12,9 +11,8 @@ const UniversalNotifications = ({ onNotificationClick }) => {
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [pendingApprovalsCount, setPendingApprovalsCount] = useState(0);
-  const [isOpen, setIsOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const dropdownRef = useRef(null);
+  const [loading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     fetchNotifications();
@@ -25,16 +23,7 @@ const UniversalNotifications = ({ onNotificationClick }) => {
     return () => clearInterval(interval);
   }, [user]);
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsOpen(false);
-      }
-    };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
   const fetchNotifications = async () => {
     if (!user) return;
@@ -44,11 +33,11 @@ const UniversalNotifications = ({ onNotificationClick }) => {
       
       // Use different API endpoints based on user role
       if (user.role === 'admin' || user.role === 'superadmin') {
-        response = await apiService.getAdminNotifications({ limit: 10 });
+        response = await apiService.getAdminNotifications({ limit: 50 });
         setUnreadCount(response.counts?.totalUnread || 0);
         setPendingApprovalsCount(response.counts?.pendingApprovals || 0);
       } else {
-        response = await apiService.getNotifications({ limit: 10 });
+        response = await apiService.getNotifications({ limit: 50 });
         setUnreadCount(response.unreadCount || 0);
         setPendingApprovalsCount(0); // Regular users don't have pending approvals
       }
@@ -151,12 +140,11 @@ const UniversalNotifications = ({ onNotificationClick }) => {
       navigate(notification.actionUrl);
     }
     
-    setIsOpen(false);
+    setIsModalOpen(false);
   };
 
-  const handleViewAllClick = () => {
-    navigate('/notifications');
-    setIsOpen(false);
+  const handleModalClose = () => {
+    setIsModalOpen(false);
   };
 
   const getNotificationIcon = (type, data) => {
@@ -224,119 +212,144 @@ const UniversalNotifications = ({ onNotificationClick }) => {
   const totalNotifications = unreadCount;
 
   return (
-    <div className="universal-notifications" ref={dropdownRef}>
-      <button 
-        className="notification-btn"
-        onClick={() => setIsOpen(!isOpen)}
-        title="Notifications"
-      >
-        <Bell className="w-5 h-5" />
-        {totalNotifications > 0 && (
-          <span className="notification-badge">
-            {totalNotifications > 99 ? '99+' : totalNotifications}
-          </span>
-        )}
-      </button>
+    <>
+      <div className="universal-notifications">
+        <button 
+          className="notification-btn"
+          onClick={() => setIsModalOpen(true)}
+          title="Notifications"
+        >
+          <Bell className="w-5 h-5" />
+          {totalNotifications > 0 && (
+            <span className="notification-badge">
+              {totalNotifications > 99 ? '99+' : totalNotifications}
+            </span>
+          )}
+        </button>
+      </div>
 
-      {isOpen && (
-        <div className="notifications-dropdown">
-          <div className="notifications-header">
-            <h3>Notifications</h3>
-            <div className="header-actions">
-              {unreadCount > 0 && (
+      {/* Right-to-Left Sliding Modal */}
+      {isModalOpen && (
+        <div className="notification-modal-overlay" onClick={handleModalClose}>
+          <div 
+            className="notification-modal-content" 
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-header">
+              <h2>Notifications</h2>
+              <div className="header-actions">
+                {unreadCount > 0 && (
+                  <button 
+                    className="mark-all-read-btn"
+                    onClick={markAllAsRead}
+                  >
+                    Mark all read ({unreadCount})
+                  </button>
+                )}
                 <button 
-                  className="mark-all-read-btn"
-                  onClick={markAllAsRead}
-                  title="Mark all as read"
+                  className="close-modal-btn"
+                  onClick={handleModalClose}
                 >
-                  Mark all read
+                  <X className="w-5 h-5" />
                 </button>
-              )}
-              <button 
-                className="close-btn"
-                onClick={() => setIsOpen(false)}
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-
-          {/* Show pending approvals alert for admins */}
-          {(user?.role === 'admin' || user?.role === 'superadmin') && pendingApprovalsCount > 0 && (
-            <div className="pending-approvals-alert">
-              <Clock className="w-4 h-4 text-orange-500" />
-              <span>
-                {pendingApprovalsCount} item{pendingApprovalsCount > 1 ? 's' : ''} pending approval
-              </span>
-              <button 
-                className="view-approvals-btn"
-                onClick={() => {
-                  if (onNotificationClick) {
-                    onNotificationClick('approvals');
-                  } else {
-                    navigate('/admin-dashboard?tab=approvals');
-                  }
-                  setIsOpen(false);
-                }}
-              >
-                Review
-              </button>
-            </div>
-          )}
-
-          <div className="notifications-list">
-            {loading ? (
-              <div className="notifications-loading">
-                <div className="loading-spinner"></div>
-                <span>Loading notifications...</span>
               </div>
-            ) : notifications.length === 0 ? (
-              <div className="no-notifications">
-                <Bell className="w-8 h-8 text-gray-400" />
-                <p>No notifications yet</p>
-              </div>
-            ) : (
-              notifications.map((notification) => (
-                <div
-                  key={notification.id}
-                  className={`notification-item ${!notification.read ? 'unread' : ''}`}
-                  onClick={() => handleNotificationClick(notification)}
-                >
-                  <div className="notification-icon">
-                    {getNotificationIcon(notification.type, notification.data)}
-                  </div>
-                  <div className="notification-content">
-                    <div className="notification-title">
-                      {notification.title}
-                    </div>
-                    <div className="notification-message">
-                      {notification.message}
-                    </div>
-                    <div className="notification-time">
-                      {formatTimeAgo(notification.createdAt)}
-                    </div>
-                  </div>
-                  {!notification.read && (
-                    <div className="unread-indicator"></div>
-                  )}
+            </div>
+
+            <div className="modal-body">
+              {/* Show pending approvals alert for admins */}
+              {(user?.role === 'admin' || user?.role === 'superadmin') && pendingApprovalsCount > 0 && (
+                <div className="modal-pending-approvals-alert">
+                  <Clock className="w-4 h-4 text-orange-500" />
+                  <span>
+                    {pendingApprovalsCount} item{pendingApprovalsCount > 1 ? 's' : ''} pending approval
+                  </span>
+                  <button 
+                    className="modal-view-approvals-btn"
+                    onClick={() => {
+                      if (onNotificationClick) {
+                        onNotificationClick('approvals');
+                      } else {
+                        navigate('/admin-dashboard?tab=approvals');
+                      }
+                      setIsModalOpen(false);
+                    }}
+                  >
+                    Review
+                  </button>
                 </div>
-              ))
-            )}
-          </div>
+              )}
 
-          {notifications.length > 0 && (
-            <div className="notifications-footer">
-              <button 
-                className="view-all-btn"
-                onClick={handleViewAllClick}
-              >
-                View All Notifications
-              </button>
+              {loading ? (
+                <div className="modal-loading">
+                  <div className="loading-spinner"></div>
+                  <p>Loading notifications...</p>
+                </div>
+              ) : notifications.length === 0 ? (
+                <div className="modal-empty-state">
+                  <Bell className="w-16 h-16 text-gray-400" />
+                  <h3>No notifications</h3>
+                  <p>You're all caught up! No notifications yet.</p>
+                </div>
+              ) : (
+                <div className="modal-notifications-list">
+                  {notifications.map((notification) => (
+                    <div
+                      key={notification.id}
+                      className={`modal-notification-item ${!notification.read ? 'unread' : ''}`}
+                      onClick={() => handleNotificationClick(notification)}
+                    >
+                      <div className="modal-notification-icon">
+                        {getNotificationIcon(notification.type, notification.data)}
+                      </div>
+                      
+                      <div className="modal-notification-content">
+                        <div className="modal-notification-header">
+                          <h4 className="modal-notification-title">{notification.title}</h4>
+                          <span className="modal-notification-time">
+                            {formatTimeAgo(notification.createdAt)}
+                          </span>
+                        </div>
+                        
+                        <p className="modal-notification-message">
+                          {notification.message}
+                        </p>
+                        
+                        {notification.data?.rejectionReason && (
+                          <div className="modal-rejection-reason">
+                            <strong>Reason:</strong> {notification.data.rejectionReason}
+                          </div>
+                        )}
+                      </div>
+                      
+                      {!notification.read && (
+                        <div className="modal-unread-indicator">
+                          <div className="modal-unread-dot"></div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* View All Notifications Button */}
+              {notifications.length > 0 && (
+                <div className="modal-footer">
+                  <button 
+                    className="view-all-notifications-btn"
+                    onClick={() => {
+                      navigate('/notifications');
+                      setIsModalOpen(false);
+                    }}
+                  >
+                    View All Notifications
+                  </button>
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 

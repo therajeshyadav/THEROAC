@@ -18,6 +18,9 @@ const ModernDetailsPage = () => {
     const [isHeaderSticky, setIsHeaderSticky] = useState(false);
     const [hasApplied, setHasApplied] = useState(false);
     const [selectedMedia, setSelectedMedia] = useState(null);
+    const [reviews, setReviews] = useState([]);
+    const [reviewText, setReviewText] = useState('');
+    const [submittingReview, setSubmittingReview] = useState(false);
     const contentRef = useRef(null);
     const heroRef = useRef(null);
 
@@ -63,7 +66,7 @@ const ModernDetailsPage = () => {
                     const correctSlug = createSEOSlug(title, organization);
                     
                     if (id && currentSlug !== correctSlug) {
-                        navigate(`/modern-detail/${type}/${correctSlug}`, { replace: true });
+                        navigate(`/event-detail/${type}/${correctSlug}`, { replace: true });
                         return;
                     }
                 }
@@ -325,6 +328,71 @@ const ModernDetailsPage = () => {
         }
     };
 
+    // Fetch reviews
+    useEffect(() => {
+        const fetchReviews = async () => {
+            if (!data?.id) return;
+            
+            try {
+                // Map frontend types to backend enum values
+                const itemTypeMapping = {
+                    'jobs': 'job',
+                    'events': 'event', 
+                    'internships': 'internship'
+                };
+                
+                const mappedItemType = itemTypeMapping[type] || type;
+                const response = await apiService.getReviews(data.id, mappedItemType);
+                setReviews(response?.reviews || []);
+            } catch (error) {
+                console.error('Error fetching reviews:', error);
+                setReviews([]);
+            }
+        };
+
+        fetchReviews();
+    }, [data?.id, type]);
+
+    // Submit review
+    const handleSubmitReview = async () => {
+        if (!isAuthenticated) {
+            alert('Please login to submit a review');
+            return;
+        }
+
+        if (!reviewText.trim()) {
+            alert('Please write a review before submitting');
+            return;
+        }
+
+        setSubmittingReview(true);
+        try {
+            // Map frontend types to backend enum values
+            const itemTypeMapping = {
+                'jobs': 'job',
+                'events': 'event', 
+                'internships': 'internship'
+            };
+
+            const mappedItemType = itemTypeMapping[type] || type;
+            const reviewData = {
+                content: reviewText.trim()
+            };
+
+            const newReview = await apiService.createReview(data.id, mappedItemType, reviewData);
+            
+            // Add the new review to the list
+            setReviews(prev => [newReview, ...prev]);
+            setReviewText('');
+            alert('Review submitted successfully!');
+        } catch (error) {
+            console.error('Error submitting review:', error);
+            alert('Failed to submit review. Please try again.');
+        } finally {
+            setSubmittingReview(false);
+        }
+    };
+
     const getDeadlineDisplay = () => {
         if (data?.deadline && typeof data.deadline === 'number') {
             return data.deadline;
@@ -410,7 +478,21 @@ const ModernDetailsPage = () => {
                                     {/* Location */}
                                     <div className="info-row">
                                         <MapPin className="info-icon" size={20} />
-                                        <span className="info-text">{data.location || data.companyLocation || 'Location not specified'}</span>
+                                        <span className="info-text">
+                                            {(() => {
+                                                // For jobs: Try to build location from detailed fields first
+                                                const locationParts = [data.city, data.state, data.country].filter(Boolean);
+                                                if (locationParts.length > 0) {
+                                                    return locationParts.join(', ');
+                                                }
+                                                // For internships and events: Use general location field
+                                                if (data.location && data.location.trim()) {
+                                                    return data.location;
+                                                }
+                                                // Final fallback
+                                                return data.companyLocation || 'Location not specified';
+                                            })()}
+                                        </span>
                                     </div>
 
                                     {/* Updated On - Today's Date */}
@@ -617,6 +699,113 @@ const ModernDetailsPage = () => {
                                         <p className="no-details-message">No data</p>
                                     )}
                                 </div>
+
+                                {/* Qualifications - Jobs only */}
+                                {type === 'jobs' && (
+                                    <div className="details-subsection">
+                                        <h3 className="subsection-title">Qualifications:</h3>
+                                        {data.qualifications && (
+                                            typeof data.qualifications === 'string' && data.qualifications.trim() ? (
+                                                <ul className="details-list">
+                                                    {data.qualifications.split('\n').map((line, index) => (
+                                                        line.trim() && <li key={index}>{line.trim()}</li>
+                                                    ))}
+                                                </ul>
+                                            ) : Array.isArray(data.qualifications) && data.qualifications.length > 0 ? (
+                                                <ul className="details-list">
+                                                    {data.qualifications.map((item, index) => (
+                                                        <li key={index}>{item}</li>
+                                                    ))}
+                                                </ul>
+                                            ) : (
+                                                <p className="no-details-message">No data</p>
+                                            )
+                                        )}
+                                        {!data.qualifications && (
+                                            <p className="no-details-message">No data</p>
+                                        )}
+                                    </div>
+                                )}
+
+                                {/* Benefits */}
+                                <div className="details-subsection">
+                                    <h3 className="subsection-title">Benefits:</h3>
+                                    {data.benefits && (
+                                        typeof data.benefits === 'string' && data.benefits.trim() ? (
+                                            <ul className="details-list">
+                                                {data.benefits.split('\n').map((line, index) => (
+                                                    line.trim() && <li key={index}>{line.trim()}</li>
+                                                ))}
+                                            </ul>
+                                        ) : Array.isArray(data.benefits) && data.benefits.length > 0 ? (
+                                            <ul className="details-list">
+                                                {data.benefits.map((item, index) => (
+                                                    <li key={index}>{item}</li>
+                                                ))}
+                                            </ul>
+                                        ) : (
+                                            <p className="no-details-message">No data</p>
+                                        )
+                                    )}
+                                    {!data.benefits && (
+                                        <p className="no-details-message">No data</p>
+                                    )}
+                                </div>
+
+                                {/* Perks - Jobs only */}
+                                {type === 'jobs' && data.perks && Array.isArray(data.perks) && data.perks.length > 0 && (
+                                    <div className="details-subsection">
+                                        <h3 className="subsection-title">Perks:</h3>
+                                        <div className="tags-display">
+                                            {data.perks.map((perk, index) => (
+                                                <span key={index} className="tag-item">{perk}</span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Skills */}
+                                {data.skills && Array.isArray(data.skills) && data.skills.length > 0 && (
+                                    <div className="details-subsection">
+                                        <h3 className="subsection-title">Required Skills:</h3>
+                                        <div className="tags-display">
+                                            {data.skills.map((skill, index) => (
+                                                <span key={index} className="tag-item skill-tag">{skill}</span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Job Details - Additional Info */}
+                                <div className="details-subsection">
+                                    <h3 className="subsection-title">Job Information:</h3>
+                                    <div className="job-info-grid">
+                                        {data.jobType && (
+                                            <div className="info-item">
+                                                <strong>Job Type:</strong>
+                                                <span>{data.jobType}</span>
+                                            </div>
+                                        )}
+                                        {data.department && (
+                                            <div className="info-item">
+                                                <strong>Department:</strong>
+                                                <span>{data.department}</span>
+                                            </div>
+                                        )}
+                                        {data.numberOfPositions && (
+                                            <div className="info-item">
+                                                <strong>Positions Available:</strong>
+                                                <span>{data.numberOfPositions}</span>
+                                            </div>
+                                        )}
+                                        {data.locationType && (
+                                            <div className="info-item">
+                                                <strong>Work Type:</strong>
+                                                <span>{data.locationType}</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     )}
@@ -626,29 +815,26 @@ const ModernDetailsPage = () => {
                         <div id="stages" className="details-section">
                             <h2 className="section-title">Stages and Timeline</h2>
                             <div className="details-content">
-                                {data.stages && Array.isArray(data.stages) && data.stages.length > 0 && (
+                                {data.agenda && Array.isArray(data.agenda) && data.agenda.length > 0 ? (
                                     <div className="details-subsection">
-                                        {data.stages.map((stage, index) => (
+                                        {data.agenda.map((item, index) => (
                                             <div key={index} className="timeline-item">
                                                 <div className="timeline-date">
-                                                    {typeof stage.date === 'string' ? stage.date : 
-                                                     typeof stage.date === 'object' ? JSON.stringify(stage.date) : 
-                                                     stage.date || 'TBD'}
+                                                    {item.time || 'TBD'}
                                                 </div>
                                                 <div className="timeline-content">
-                                                    <h4>
-                                                        {typeof stage.title === 'string' ? stage.title : 
-                                                         typeof stage.title === 'object' ? JSON.stringify(stage.title) : 
-                                                         stage.title || 'Stage'}
-                                                    </h4>
-                                                    <p>
-                                                        {typeof stage.description === 'string' ? stage.description : 
-                                                         typeof stage.description === 'object' ? JSON.stringify(stage.description) : 
-                                                         stage.description || 'No description'}
-                                                    </p>
+                                                    <h4>{item.title || 'Event Stage'}</h4>
+                                                    <p>{item.description || 'No description available'}</p>
+                                                    {item.speaker && (
+                                                        <span className="speaker-info">Speaker: {item.speaker}</span>
+                                                    )}
                                                 </div>
                                             </div>
                                         ))}
+                                    </div>
+                                ) : (
+                                    <div className="no-data">
+                                        <p>Event agenda will be updated soon.</p>
                                     </div>
                                 )}
                             </div>
@@ -661,14 +847,81 @@ const ModernDetailsPage = () => {
                             <h2 className="section-title">Event Details</h2>
                             
                             <div className="details-content">
-                                {data.guidelines && Array.isArray(data.guidelines) && data.guidelines.length > 0 && (
+                                {/* Event Requirements */}
+                                {data.requirements && (
                                     <div className="details-subsection">
-                                        <h3 className="subsection-title">Guidelines</h3>
+                                        <h3 className="subsection-title">Requirements</h3>
+                                        <p className="details-description">{data.requirements}</p>
+                                    </div>
+                                )}
+
+                                {/* What to Bring */}
+                                {data.whatToBring && Array.isArray(data.whatToBring) && data.whatToBring.length > 0 && (
+                                    <div className="details-subsection">
+                                        <h3 className="subsection-title">What to Bring</h3>
                                         <ul className="details-list">
-                                            {data.guidelines.map((item, index) => (
+                                            {data.whatToBring.map((item, index) => (
                                                 <li key={index}>{item}</li>
                                             ))}
                                         </ul>
+                                    </div>
+                                )}
+
+                                {/* Event Information */}
+                                <div className="details-subsection">
+                                    <h3 className="subsection-title">Event Information</h3>
+                                    <div className="event-info-grid">
+                                        <div className="info-item">
+                                            <strong>Event Type:</strong>
+                                            <span>{data.categories && data.categories[0] ? data.categories[0] : 'Workshop'}</span>
+                                        </div>
+                                        <div className="info-item">
+                                            <strong>Location Type:</strong>
+                                            <span>{data.locationType || 'Online'}</span>
+                                        </div>
+                                        {data.maxParticipants && (
+                                            <div className="info-item">
+                                                <strong>Max Participants:</strong>
+                                                <span>{data.maxParticipants}</span>
+                                            </div>
+                                        )}
+                                        {data.registrationFee && (
+                                            <div className="info-item">
+                                                <strong>Registration Fee:</strong>
+                                                <span>
+                                                    {data.registrationFee.type === 'free' ? 'Free' : 
+                                                     `${data.registrationFee.currency || '₹'}${data.registrationFee.amount}`}
+                                                </span>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Speakers */}
+                                {data.speakers && Array.isArray(data.speakers) && data.speakers.length > 0 && (
+                                    <div className="details-subsection">
+                                        <h3 className="subsection-title">Speakers</h3>
+                                        <div className="speakers-grid">
+                                            {data.speakers.map((speaker, index) => (
+                                                <div key={index} className="speaker-card">
+                                                    {speaker.image && (
+                                                        <img src={speaker.image} alt={speaker.name} className="speaker-image" />
+                                                    )}
+                                                    <div className="speaker-info">
+                                                        <h4>{speaker.name}</h4>
+                                                        <p className="speaker-title">{speaker.title}</p>
+                                                        {speaker.bio && <p className="speaker-bio">{speaker.bio}</p>}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {!data.requirements && (!data.whatToBring || data.whatToBring.length === 0) && 
+                                 (!data.speakers || data.speakers.length === 0) && (
+                                    <div className="no-data">
+                                        <p>Event details will be updated soon.</p>
                                     </div>
                                 )}
                             </div>
@@ -706,11 +959,11 @@ const ModernDetailsPage = () => {
                         </div>
                     )}
 
-                    {/* Photos and Videos Section */}
-                    {(type === 'events' || type === 'internships') && (
-                        <div className="media-section">
+                    {/* Photos and Videos Section - Only for Events */}
+                    {type === 'events' && (
+                        <div id="media" className="media-section">
                             <h2 className="section-title">
-                                {type === 'events' ? 'Event Photos And Videos' : 'Media Gallery'}
+                                Event Photos And Videos
                             </h2>
                             {data.media && Array.isArray(data.media) && data.media.length > 0 ? (
                                 <div className="media-grid">
@@ -743,9 +996,29 @@ const ModernDetailsPage = () => {
                         <h2 className="section-title">Reviews</h2>
                         <div className="details-content">
                             <div className="reviews-container">
-                                {/* Reviews will be loaded from backend when available */}
+                                {/* Display existing reviews */}
                                 <div className="reviews-list">
-                                    <p className="no-details-message">No reviews yet. Be the first to review!</p>
+                                    {reviews.length > 0 ? (
+                                        reviews.map((review, index) => (
+                                            <div key={index} className="review-item">
+                                                <div className="review-header">
+                                                    <div className="reviewer-info">
+                                                        <span className="reviewer-name">
+                                                            {review.author?.fullName || review.author?.email || 'Anonymous'}
+                                                        </span>
+                                                        <span className="review-date">
+                                                            {new Date(review.createdAt).toLocaleDateString()}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div className="review-content">
+                                                    <p>{review.comment || review.content}</p>
+                                                </div>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <p className="no-details-message">No reviews yet. Be the first to review!</p>
+                                    )}
                                 </div>
 
                                 {/* Add Review Form - Only show if user is authenticated */}
@@ -756,16 +1029,17 @@ const ModernDetailsPage = () => {
                                             className="feedback-textarea"
                                             placeholder="Share your experience..."
                                             rows="4"
+                                            value={reviewText}
+                                            onChange={(e) => setReviewText(e.target.value)}
                                         ></textarea>
                                         <div className="feedback-actions">
-                                            <div className="rating-stars">
-                                                {[1, 2, 3, 4, 5].map((star) => (
-                                                    <button key={star} className="star-btn">
-                                                        ⭐
-                                                    </button>
-                                                ))}
-                                            </div>
-                                            <button className="feedback-submit-btn">Submit Review</button>
+                                            <button 
+                                                className="feedback-submit-btn"
+                                                onClick={handleSubmitReview}
+                                                disabled={submittingReview}
+                                            >
+                                                {submittingReview ? 'Submitting...' : 'Submit Review'}
+                                            </button>
                                         </div>
                                     </div>
                                 )}
@@ -777,7 +1051,22 @@ const ModernDetailsPage = () => {
                     <div id="faqs" className="details-section">
                         <h2 className="section-title">FAQs & Discussions</h2>
                         <div className="details-content">
-                            <p className="no-details-message">No data</p>
+                            {data?.faqs && data.faqs.length > 0 ? (
+                                <div className="faqs-list">
+                                    {data.faqs.map((faq, index) => (
+                                        <div key={index} className="faq-item">
+                                            <div className="faq-question">
+                                                <h4>Q: {faq.question}</h4>
+                                            </div>
+                                            <div className="faq-answer">
+                                                <p>A: {faq.answer}</p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="no-details-message">No FAQs available</p>
+                            )}
                         </div>
                     </div>
 
@@ -792,15 +1081,39 @@ const ModernDetailsPage = () => {
                                 </button>
                                 {selectedMedia.type === 'video' ? (
                                     <div className="video-container">
-                                        <iframe
-                                            width="100%"
-                                            height="100%"
-                                            src={selectedMedia.url.replace('watch?v=', 'embed/')}
-                                            title="Video player"
-                                            frameBorder="0"
-                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                            allowFullScreen
-                                        ></iframe>
+                                        {selectedMedia.url.includes('youtube.com') || selectedMedia.url.includes('youtu.be') ? (
+                                            <iframe
+                                                width="100%"
+                                                height="100%"
+                                                src={selectedMedia.url.replace('watch?v=', 'embed/')}
+                                                title="Video player"
+                                                frameBorder="0"
+                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                allowFullScreen
+                                            ></iframe>
+                                        ) : (
+                                            <video
+                                                width="100%"
+                                                height="100%"
+                                                controls
+                                                preload="metadata"
+                                                style={{ maxHeight: '70vh', backgroundColor: '#000' }}
+                                                onError={(e) => {
+                                                    console.error('Video load error:', e);
+                                                    console.log('Video URL:', selectedMedia.url);
+                                                }}
+                                                onLoadStart={() => console.log('Video loading started:', selectedMedia.url)}
+                                            >
+                                                <source src={selectedMedia.url} type="video/mp4" />
+                                                <source src={selectedMedia.url} type="video/webm" />
+                                                <source src={selectedMedia.url} type="video/ogg" />
+                                                Your browser does not support the video tag.
+                                                <p>
+                                                    If you cannot see the video, try downloading it: 
+                                                    <a href={selectedMedia.url} download>Download Video</a>
+                                                </p>
+                                            </video>
+                                        )}
                                     </div>
                                 ) : (
                                     <img src={selectedMedia.url} alt="Full size" className="modal-image" />

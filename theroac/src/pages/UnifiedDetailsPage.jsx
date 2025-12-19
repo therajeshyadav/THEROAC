@@ -55,6 +55,7 @@ const UnifiedDetailsPage = () => {
         { id: "details", label: "Details" },
         { id: "dates", label: "Dates & Deadlines" },
         { id: "prizes", label: "Prizes" },
+        { id: "media", label: "Photos & Videos" },
         { id: "reviews", label: "Reviews" },
         { id: "faqs", label: "FAQs & Discussions" },
       ],
@@ -305,14 +306,9 @@ const UnifiedDetailsPage = () => {
     if (!value || isNaN(value)) return value;
 
     const num = parseInt(value.toString().replace(/[^\d]/g, ""), 10);
-
-    if (num >= 10000000)
-      return `₹${(num / 10000000).toFixed(num % 10000000 === 0 ? 0 : 1)}Cr`;
-    if (num >= 100000)
-      return `₹${(num / 100000).toFixed(num % 100000 === 0 ? 0 : 1)}L`;
-    if (num >= 1000)
-      return `₹${(num / 1000).toFixed(num % 1000 === 0 ? 0 : 1)}K`;
-    return `₹${num}`;
+    
+    // Format with commas instead of K/L/Cr abbreviations
+    return `₹${num.toLocaleString()}`;
   };
 
   const formatSalaryRange = (salary) => {

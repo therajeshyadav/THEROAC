@@ -7,6 +7,7 @@ class NotificationService {
 
   async createNotification(userId, type, title, message, data = {}, actionUrl = null) {
     try {
+      console.log(`Creating notification for specific user: ${userId}, type: ${type}, title: ${title}`);
       const notification = await Notification.create({
         userId,
         type,
@@ -19,6 +20,7 @@ class NotificationService {
 
       // Emit real-time notification via Socket.io
       if (this.io) {
+        console.log(`Emitting notification to specific user room: user_${userId}`);
         this.io.to(`user_${userId}`).emit('new_notification', notification);
       }
 

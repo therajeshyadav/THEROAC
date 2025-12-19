@@ -132,7 +132,7 @@
   color: rgba(255, 255, 255, 0.9);
   line-height: 1.6;
   margin: 0;
-  font-style: italic;
+  font-family: var(--ztc-family-font1);
 }
 
 /* Statistics Grid */

@@ -16,6 +16,8 @@ Job.init({
   qualifications: { type: DataTypes.TEXT, allowNull: true },
   benefits: { type: DataTypes.TEXT, allowNull: true },
   perks: { type: DataTypes.JSON, allowNull: true }, // Array of perks
+  eligibility: { type: DataTypes.JSON, allowNull: true }, // Array of eligibility criteria
+  faqs: { type: DataTypes.JSON, allowNull: true }, // Array of {question: string, answer: string}
   jobType: { type: DataTypes.ENUM('full-time','part-time','internship','contract'), defaultValue: 'full-time' },
   experienceLevel: { type: DataTypes.ENUM('fresher','junior','mid','senior'), defaultValue: 'fresher' },
   locationType: { type: DataTypes.ENUM('remote','onsite','hybrid'), defaultValue: 'remote' },

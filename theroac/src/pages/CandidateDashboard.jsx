@@ -185,7 +185,7 @@ const CandidateDashboard = () => {
       ] = await Promise.allSettled([
         apiService.getJobs().catch(() => ({ jobs: [] })),
         apiService.getEvents().catch(() => ({ events: [] })),
-        apiService.getHubContent().catch(() => ({ hubContent: [] })),
+        apiService.getHubContent({ perPage: 100 }).catch(() => ({ hubContent: [] })),
         apiService.getUserApplications().catch(() => ({ applications: [] })),
         apiService.getCandidateStats().catch(() => ({
           totalApplications: 0,
@@ -201,8 +201,8 @@ const CandidateDashboard = () => {
       // Get jobs from jobs API
       const regularJobs = jobsData.status === "fulfilled" ? jobsData.value.jobs || [] : [];
       
-      // Get all hub content
-      const allHubContent = hubContentData.status === "fulfilled" ? hubContentData.value.hubContent || [] : [];
+      // Get all hub content - API returns array directly, not wrapped in object
+      const allHubContent = hubContentData.status === "fulfilled" ? hubContentData.value || [] : [];
       
       // Separate internships from other hub content
       const internships = allHubContent.filter(item => item.contentType === 'internship');
@@ -211,9 +211,9 @@ const CandidateDashboard = () => {
       // Merge jobs with internships for the Jobs section
       setJobs([...regularJobs, ...internships]);
       
-      setEvents(
-        eventsData.status === "fulfilled" ? eventsData.value.events || [] : []
-      );
+      // The events API returns the array directly, not wrapped in an object
+      const eventsArray = eventsData.status === "fulfilled" ? eventsData.value || [] : [];
+      setEvents(eventsArray);
       
       // Only set non-internship content for Hub section
       setHubContent(nonInternshipHubContent);
@@ -283,18 +283,53 @@ const CandidateDashboard = () => {
   const handleApplyToJob = async (jobId) => {
     if (appliedItems.has(jobId)) return;
 
-    // Find the job data
-    const job = [...jobs, ...hubContent].find(j => j.id === jobId);
-    if (!job) {
-      console.error("Job not found for ID:", jobId);
-      setNotification("Job not found");
+    // Check authentication
+    if (!isAuthenticated) {
+      navigate('/login');
       return;
     }
 
-    console.log("Opening Quick Apply modal for job:", job);
-    // Open Quick Apply modal
-    setSelectedJob(job);
-    setShowQuickApply(true);
+    // Check user role
+    if (authUser?.role === 'recruiter' || authUser?.role === 'admin') {
+      setNotification('Recruiters and admins cannot apply. Only candidates can apply.');
+      return;
+    }
+
+    try {
+      // Find the job data
+      const job = [...jobs, ...hubContent].find(j => j.id === jobId);
+      if (!job) {
+        setNotification("Job not found");
+        return;
+      }
+
+      let result = null;
+      
+      // Determine if it's an internship or regular job
+      if (job.contentType === 'internship') {
+        result = await apiService.applyToHubContent(jobId);
+      } else {
+        result = await apiService.applyToJob(jobId, {
+          resumeLink: '',
+          coverLetter: ''
+        });
+      }
+
+      if (result) {
+        setAppliedItems((prev) => new Set([...prev, jobId]));
+        setNotification(`Successfully applied for ${job.title}!`);
+      }
+    } catch (error) {
+      const errorMessage = error.message || 'Please try again later.';
+      console.error('Application error:', error);
+      
+      if (errorMessage.includes('Already applied')) {
+        setNotification('You have already applied to this position.');
+        setAppliedItems((prev) => new Set([...prev, jobId]));
+      } else {
+        setNotification(errorMessage);
+      }
+    }
   };
 
   const handleQuickApplySubmit = async (formData) => {
@@ -361,29 +396,85 @@ const CandidateDashboard = () => {
   const handleRegisterForEvent = async (eventId) => {
     if (appliedItems.has(eventId)) return;
 
-    try {
-      await apiService.registerForEvent(eventId);
-      setAppliedItems((prev) => new Set([...prev, eventId]));
-      setNotification("Successfully registered for event!");
-    } catch (error) {
-      setAppliedItems((prev) => new Set([...prev, eventId]));
-      setNotification("Successfully registered! (Demo mode)");
-    }
-  };
-
-  const handleApplyToHubContent = (hubContentId) => {
-    if (appliedItems.has(hubContentId)) return;
-
-    // Find the hub content data
-    const content = hubContent.find(c => c.id === hubContentId);
-    if (!content) {
-      setNotification("Content not found");
+    // Check authentication
+    if (!isAuthenticated) {
+      navigate('/login');
       return;
     }
 
-    // Open Quick Apply modal (same as jobs)
-    setSelectedJob(content);
-    setShowQuickApply(true);
+    // Check user role
+    if (authUser?.role === 'recruiter' || authUser?.role === 'admin') {
+      setNotification('Recruiters and admins cannot register. Only candidates can register.');
+      return;
+    }
+
+    try {
+      // Find the event data
+      const event = events.find(e => e.id === eventId);
+      if (!event) {
+        setNotification("Event not found");
+        return;
+      }
+
+      const result = await apiService.registerForEvent(eventId);
+      
+      if (result) {
+        setAppliedItems((prev) => new Set([...prev, eventId]));
+        setNotification(`Successfully registered for ${event.title}!`);
+      }
+    } catch (error) {
+      const errorMessage = error.message || 'Please try again later.';
+      console.error('Registration error:', error);
+      
+      if (errorMessage.includes('Already registered')) {
+        setNotification('You have already registered for this event.');
+        setAppliedItems((prev) => new Set([...prev, eventId]));
+      } else {
+        setNotification(errorMessage);
+      }
+    }
+  };
+
+  const handleApplyToHubContent = async (hubContentId) => {
+    if (appliedItems.has(hubContentId)) return;
+
+    // Check authentication
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+
+    // Check user role
+    if (authUser?.role === 'recruiter' || authUser?.role === 'admin') {
+      setNotification('Recruiters and admins cannot apply. Only candidates can apply.');
+      return;
+    }
+
+    try {
+      // Find the hub content data
+      const content = hubContent.find(c => c.id === hubContentId);
+      if (!content) {
+        setNotification("Content not found");
+        return;
+      }
+
+      const result = await apiService.applyToHubContent(hubContentId);
+      
+      if (result) {
+        setAppliedItems((prev) => new Set([...prev, hubContentId]));
+        setNotification(`Successfully applied for ${content.title}!`);
+      }
+    } catch (error) {
+      const errorMessage = error.message || 'Please try again later.';
+      console.error('Hub content application error:', error);
+      
+      if (errorMessage.includes('Already applied')) {
+        setNotification('You have already applied to this content.');
+        setAppliedItems((prev) => new Set([...prev, hubContentId]));
+      } else {
+        setNotification(errorMessage);
+      }
+    }
   };
 
   const handleViewJobDetails = (job) => {
@@ -667,7 +758,7 @@ const CandidateDashboard = () => {
 
       <div className="paginacontainer">
         <div className="progress-wrap warp2">
-          <svg className="progress-circle svg-content" viewBox="-1 -1 102 102">
+          <svg className="progress-Circle svg-content" viewBox="-1 -1 102 102">
             <path d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98" />
           </svg>
         </div>

@@ -33,6 +33,7 @@ exports.createEvent = async (req, res, next) => {
       speakers, 
       sponsors, 
       prizes, 
+      faqs,
       eligibility, 
       featured, 
       status 
@@ -126,6 +127,7 @@ exports.createEvent = async (req, res, next) => {
       speakers: speakers || [],
       sponsors: sponsors || [],
       prizes: prizes || [],
+      faqs: faqs || [],
       eligibility: eligibility || null,
       featured: featured || false,
       status: status || 'upcoming',
@@ -185,6 +187,137 @@ exports.createEvent = async (req, res, next) => {
     
     return res.status(500).json({
       error: 'Failed to create event. Please try again.'
+    });
+  }
+};
+
+exports.updateEvent = async (req, res, next) => {
+  try {
+    const eventId = req.params.id;
+    const { 
+      title, 
+      description, 
+      startDate, 
+      endDate, 
+      locationType, 
+      location, 
+      venue, 
+      city, 
+      state, 
+      country, 
+      venueAddress, 
+      mapLink, 
+      registrationDeadline, 
+      maxParticipants, 
+      registrationFee, 
+      registrationLink, 
+      tags, 
+      categories, 
+      requirements, 
+      whatToBring, 
+      bannerImage, 
+      thumbnailImage, 
+      media, 
+      contactInfo, 
+      socials, 
+      agenda, 
+      speakers, 
+      sponsors, 
+      prizes, 
+      faqs,
+      eligibility, 
+      featured, 
+      status 
+    } = req.body;
+
+    // Find the event
+    const event = await Event.findByPk(eventId);
+    if (!event) {
+      return res.status(404).json({ error: 'Event not found' });
+    }
+
+    // Check if user is the creator or admin
+    if (event.createdBy !== req.user.id && !['admin', 'superadmin'].includes(req.user.role)) {
+      return res.status(403).json({ error: 'You do not have permission to update this event' });
+    }
+
+    // Prepare update payload
+    const updatePayload = {};
+    
+    if (title !== undefined) {
+      updatePayload.title = title;
+      
+      // Regenerate slug if title changed
+      if (title !== event.title) {
+        let baseSlug = title.toLowerCase()
+          .replace(/[^a-z0-9\s-]/g, '')
+          .replace(/\s+/g, '-')
+          .replace(/-+/g, '-')
+          .replace(/^-+|-+$/g, '');
+        
+        if (!baseSlug) baseSlug = 'event';
+        
+        let slug = baseSlug;
+        let counter = 1;
+        while (await Event.findOne({ where: { slug, id: { [Op.ne]: eventId } } })) {
+          slug = `${baseSlug}-${counter}`;
+          counter++;
+        }
+        updatePayload.slug = slug;
+      }
+    }
+    
+    if (description !== undefined) updatePayload.description = description;
+    if (startDate !== undefined) updatePayload.startDate = new Date(startDate);
+    if (endDate !== undefined) updatePayload.endDate = new Date(endDate);
+    if (locationType !== undefined) updatePayload.locationType = locationType;
+    if (location !== undefined) updatePayload.location = location;
+    if (venue !== undefined) updatePayload.venue = venue;
+    if (city !== undefined) updatePayload.city = city;
+    if (state !== undefined) updatePayload.state = state;
+    if (country !== undefined) updatePayload.country = country;
+    if (venueAddress !== undefined) updatePayload.venueAddress = venueAddress;
+    if (mapLink !== undefined) updatePayload.mapLink = mapLink;
+    if (registrationDeadline !== undefined) updatePayload.registrationDeadline = registrationDeadline ? new Date(registrationDeadline) : null;
+    if (maxParticipants !== undefined) updatePayload.maxParticipants = maxParticipants ? parseInt(maxParticipants) : null;
+    if (registrationFee !== undefined) updatePayload.registrationFee = registrationFee;
+    if (registrationLink !== undefined) updatePayload.registrationLink = registrationLink;
+    if (tags !== undefined) updatePayload.tags = tags;
+    if (categories !== undefined) updatePayload.categories = categories;
+    if (requirements !== undefined) updatePayload.requirements = requirements;
+    if (whatToBring !== undefined) updatePayload.whatToBring = whatToBring;
+    if (bannerImage !== undefined) updatePayload.bannerImage = bannerImage;
+    if (thumbnailImage !== undefined) updatePayload.thumbnailImage = thumbnailImage;
+    if (media !== undefined) updatePayload.media = media;
+    if (contactInfo !== undefined) updatePayload.contactInfo = contactInfo;
+    if (socials !== undefined) updatePayload.socials = socials;
+    if (agenda !== undefined) updatePayload.agenda = agenda;
+    if (speakers !== undefined) updatePayload.speakers = speakers;
+    if (sponsors !== undefined) updatePayload.sponsors = sponsors;
+    if (prizes !== undefined) updatePayload.prizes = prizes;
+    if (faqs !== undefined) updatePayload.faqs = faqs;
+    if (eligibility !== undefined) updatePayload.eligibility = eligibility;
+    if (featured !== undefined) updatePayload.featured = featured;
+    if (status !== undefined) updatePayload.status = status;
+
+    // Update the event
+    await event.update(updatePayload);
+
+    res.json({
+      ...event.toJSON(),
+      message: 'Event updated successfully'
+    });
+  } catch (err) {
+    console.error('Event update error:', err);
+    
+    if (err.name === 'SequelizeValidationError') {
+      return res.status(400).json({
+        error: err.errors[0]?.message || 'Validation error'
+      });
+    }
+    
+    return res.status(500).json({
+      error: 'Failed to update event. Please try again.'
     });
   }
 };
@@ -362,5 +495,44 @@ exports.uploadEventImage = async (req, res, next) => {
   } catch (error) {
     console.error('Error uploading event image:', error);
     res.status(500).json({ message: 'Failed to upload image', error: error.message });
+  }
+};
+
+// Upload media (images/videos) for event
+exports.uploadEventMedia = async (req, res, next) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'No media file provided' });
+    }
+
+    const isVideo = req.file.mimetype.startsWith('video/');
+    const isImage = req.file.mimetype.startsWith('image/');
+
+    if (!isVideo && !isImage) {
+      return res.status(400).json({ message: 'Only image and video files are allowed' });
+    }
+
+    // Generate media URL
+    const mediaType = isVideo ? 'videos' : 'images';
+    const mediaUrl = `${req.protocol}://${req.get('host')}/uploads/${mediaType}/events/${req.file.filename}`;
+
+    // For videos, we might want to generate a thumbnail (simplified approach)
+    let thumbnailUrl = mediaUrl;
+    if (isVideo) {
+      // For now, use a default video thumbnail or the same URL
+      // In production, you might want to generate actual video thumbnails
+      thumbnailUrl = `${req.protocol}://${req.get('host')}/assets/default-video-thumbnail.jpg`;
+    }
+
+    res.status(200).json({
+      message: 'Media uploaded successfully',
+      url: mediaUrl,
+      thumbnail: thumbnailUrl,
+      type: isVideo ? 'video' : 'image',
+      filename: req.file.filename
+    });
+  } catch (error) {
+    console.error('Error uploading event media:', error);
+    res.status(500).json({ message: 'Failed to upload media', error: error.message });
   }
 };

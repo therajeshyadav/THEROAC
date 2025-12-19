@@ -1,5 +1,7 @@
 // src/components/candidate-dashboard/HomeTab.jsx
-import React from 'react';
+import { useState, useEffect } from 'react';
+import apiService from '../../services/api';
+import { toast } from 'react-toastify';
 
 const HomeTab = ({
   quickStats,
@@ -16,6 +18,55 @@ const HomeTab = ({
   onViewEventDetails,
   setActiveTab
 }) => {
+  const [bookmarkedJobs, setBookmarkedJobs] = useState(new Set());
+
+  // Load bookmarked jobs
+  useEffect(() => {
+    loadBookmarkedJobs();
+  }, []);
+
+  const loadBookmarkedJobs = async () => {
+    try {
+      const response = await apiService.getMyBookmarks();
+      const bookmarks = response.bookmarks || response || [];
+      const jobIds = new Set(
+        bookmarks
+          .filter(b => b.itemType === 'jobs' || b.itemType === 'internships')
+          .map(b => b.itemId)
+      );
+      setBookmarkedJobs(jobIds);
+    } catch (error) {
+      console.error('Failed to load bookmarked jobs:', error);
+    }
+  };
+
+  const handleBookmarkJob = async (jobId, isInternship = false) => {
+    try {
+      const itemType = isInternship ? 'internships' : 'jobs';
+      const wasBookmarked = bookmarkedJobs.has(jobId);
+      
+      const response = await apiService.toggleBookmark(jobId, itemType);
+      console.log('HomeTab bookmark response:', response);
+      
+      // Toggle the bookmark state based on previous state
+      if (wasBookmarked) {
+        // Was bookmarked, now removing
+        setBookmarkedJobs(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(jobId);
+          return newSet;
+        });
+        toast.info('Bookmark removed');
+      } else {
+        // Was not bookmarked, now adding
+        setBookmarkedJobs(prev => new Set([...prev, jobId]));
+        toast.success(`${isInternship ? 'Internship' : 'Job'} bookmarked!`);
+      }
+    } catch (error) {
+      console.error('HomeTab bookmark error:', error);
+      toast.error('Failed to bookmark item');
+    }
+  };
   return (
     <div className="tab-content">
       {/* Profile Completion Banner */}
@@ -58,7 +109,7 @@ const HomeTab = ({
       )}
 
       {/* Quick Stats */}
-      <div className="stats-grid mb-4">
+      <div className="candidate-stats-grid mb-4">
         {quickStats.map((stat, index) => {
           // Determine which tab to navigate to based on stat title
           let targetTab = null;
@@ -77,25 +128,26 @@ const HomeTab = ({
           return (
             <div 
               key={index} 
-              className={`stat-card ${stat.color} enhanced-card ${targetTab ? 'clickable' : ''}`}
+              className={`candidate-stat-card candidate-${stat.color} ${targetTab ? 'clickable' : ''}`}
               onClick={() => targetTab && setActiveTab && setActiveTab(targetTab)}
               style={{ cursor: targetTab ? 'pointer' : 'default' }}
             >
-              <div className="stat-icon-row">
-                <div className="stat-icon">
+              <div className="candidate-stat-icon-row">
+                <div className="candidate-stat-icon">
                   <i className={`fas ${stat.icon}`} />
                 </div>
-                <div className="stat-number">{stat.value}</div>
+                <div className="candidate-stat-number">{stat.value}</div>
               </div>
-              <div className="stat-info">
-                <div className="stat-label">
+
+              <div className="candidate-stat-info">
+                <div className="candidate-stat-label">
                   {stat.title}
                   {targetTab && (
                     <i className="fas fa-arrow-right" style={{ marginLeft: '8px', fontSize: '12px', opacity: 0.7 }} />
                   )}
                 </div>
                 {stat.details.map((detail, idx) => (
-                  <div key={idx} className="stat-details">
+                  <div key={idx} className="candidate-stat-details">
                     <div>{detail.label}</div>
                     <div>{detail.value}</div>
                   </div>
@@ -291,8 +343,15 @@ const HomeTab = ({
                             'Apply Now'
                           )}
                         </button>
-                        <button className="btn-save">
-                          <i className="fas fa-bookmark" />
+                        <button 
+                          className="btn-save"
+                          onClick={() => handleBookmarkJob(job.id, job.contentType === 'internship')}
+                          style={{ 
+                            color: bookmarkedJobs.has(job.id) ? '#FFD600' : '#666',
+                            background: bookmarkedJobs.has(job.id) ? 'rgba(255, 214, 0, 0.1)' : 'transparent'
+                          }}
+                        >
+                          <i className={bookmarkedJobs.has(job.id) ? "fas fa-bookmark" : "far fa-bookmark"} />
                         </button>
                       </div>
                     </div>

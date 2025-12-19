@@ -172,11 +172,11 @@
   transition: all 0.3s ease;
 }
 
-.admin-stat-card.clickable:hover {
+/* .admin-stat-card.clickable:hover {
   transform: translateY(-2px);
   border-color: rgba(255, 214, 0, 0.4);
   box-shadow: 0 8px 25px rgba(255, 214, 0, 0.15);
-}
+} */
 
 .card-header {
   display: flex;
@@ -825,11 +825,11 @@
   backdrop-filter: blur(10px);
 }
 
-.admin-stat-card:hover {
+/* .admin-stat-card:hover {
   background: rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 214, 0, 0.3);
   transform: translateY(-2px);
-}
+} */
 
 .admin-stat-value {
   font-size: 2rem;

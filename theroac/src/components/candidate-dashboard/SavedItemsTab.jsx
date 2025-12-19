@@ -71,18 +71,55 @@ const SavedItemsTab = () => {
   };
 
   const handleViewDetails = (item) => {
-    // Create a simple URL based on itemType and itemId
+    console.log('SavedItemsTab - handleViewDetails item:', item);
+    const itemData = item.Job || item.Event || item.HubContent || item;
+    console.log('SavedItemsTab - itemData:', itemData);
     let url;
-    if (item.itemType === 'job' || item.itemType === 'jobs') {
-      url = `/event-detail/jobs/${item.itemId}`;
-    } else if (item.itemType === 'event' || item.itemType === 'events') {
-      url = `/event-detail/events/${item.itemId}`;
-    } else if (item.itemType === 'internship' || item.itemType === 'internships') {
-      url = `/event-detail/internships/${item.itemId}`;
-    } else {
-      url = `/event-detail/${item.itemType}/${item.itemId}`;
+    
+    try {
+      if (item.itemType === 'jobs') {
+        // Use createJobURL for jobs
+        const jobData = {
+          slug: itemData?.slug,
+          title: itemData?.title || 'Job',
+          company: itemData?.companyName || itemData?.company || 'Company'
+        };
+        console.log('SavedItemsTab - jobData for URL:', jobData);
+        url = createJobURL(jobData);
+      } else if (item.itemType === 'events') {
+        // Use createEventURL for events
+        const eventData = {
+          slug: itemData?.slug,
+          title: itemData?.title || 'Event'
+        };
+        console.log('SavedItemsTab - eventData for URL:', eventData);
+        url = createEventURL(eventData);
+      } else if (item.itemType === 'internships') {
+        // Use createHubContentURL for internships/hub content
+        const hubData = {
+          slug: itemData?.slug,
+          title: itemData?.title || 'Internship'
+        };
+        console.log('SavedItemsTab - hubData for URL:', hubData);
+        url = createHubContentURL(hubData);
+      } else {
+        // Fallback for unknown types
+        url = `/event-detail/${item.itemType}/${item.itemId}`;
+      }
+      
+      console.log('SavedItemsTab - Generated URL:', url);
+      navigate(url);
+    } catch (error) {
+      console.error('SavedItemsTab - Error generating URL:', error);
+      // Fallback to ID-based URL like EventSlider does
+      const id = item.itemId || '1';
+      const type = item.itemType === 'jobs' ? 'jobs' : 
+                   item.itemType === 'events' ? 'events' : 
+                   item.itemType === 'internships' ? 'internships' : 'jobs';
+      url = `/event-detail/${type}/${id}`;
+      console.log('SavedItemsTab - Fallback URL:', url);
+      navigate(url);
     }
-    navigate(url);
   };
 
   const handleRemoveBookmark = async (itemId, itemType) => {
@@ -176,12 +213,15 @@ const SavedItemsTab = () => {
 
         <div className="saved-item-content">
           <h3 className="item-title">
-            {itemData?.title || `${item.itemType} - ${item.itemId?.substring(0, 8)}`}
+            {itemData?.title || 
+             (item.itemType === 'jobs' ? 'Job ' : 
+              item.itemType === 'events' ? 'Event' : 
+              item.itemType === 'internships' ? 'Internship ' : 'Opportunity')}
           </h3>
           <div className="item-meta">
             <div className="meta-item">
               <Building size={14} />
-              <span>{itemData?.companyName || itemData?.organizerName || 'Company'}</span>
+              <span>{itemData?.companyName || itemData?.organizerName || itemData?.company || 'Company'}</span>
             </div>
             {itemData?.location && (
               <div className="meta-item">
@@ -189,20 +229,100 @@ const SavedItemsTab = () => {
                 <span>{itemData.location}</span>
               </div>
             )}
+            
+            {/* Show salary for jobs/internships */}
+            {(item.itemType === 'jobs' || item.itemType === 'internships') && (
+              <div className="meta-item">
+                <span style={{ color: '#FFD600', marginRight: '4px' }}>₹</span>
+                <span>
+                  {item.itemType === 'internships' && itemData?.stipend ? (
+                    typeof itemData.stipend === 'object' 
+                      ? `${itemData.stipend.currency || '₹'}${itemData.stipend.amount}/${itemData.stipend.period || 'month'}`
+                      : itemData.stipend
+                  ) : itemData?.salary ? (
+                    typeof itemData.salary === 'object' && itemData.salary !== null
+                      ? (itemData.salary.min && itemData.salary.max 
+                          ? `${itemData.salary.currency || '₹'}${itemData.salary.min} - ${itemData.salary.currency || '₹'}${itemData.salary.max}` 
+                          : itemData.salary.min 
+                            ? `${itemData.salary.currency || '₹'}${itemData.salary.min}+` 
+                            : 'Competitive')
+                      : itemData.salary
+                  ) : 'Competitive'}
+                </span>
+              </div>
+            )}
+            
+            {/* Show event date for events */}
+            {item.itemType === 'events' && itemData?.date && (
+              <div className="meta-item">
+                <span style={{ color: '#FFD600', marginRight: '4px' }}>📅</span>
+                <span>{new Date(itemData.date).toLocaleDateString()}</span>
+              </div>
+            )}
+            
+            {/* Show job type/experience */}
+            {(item.itemType === 'jobs' || item.itemType === 'internships') && (
+              <div className="meta-item">
+                <span style={{ color: '#FFD600', marginRight: '4px' }}>💼</span>
+                <span>
+                  {item.itemType === 'internships' 
+                    ? (itemData?.duration || 'Internship')
+                    : (itemData?.jobType || itemData?.type || 'Full-time')} • {itemData?.experienceLevel || itemData?.experience || 'All levels'}
+                </span>
+              </div>
+            )}
+            
+            {/* Show event type for events */}
+            {item.itemType === 'events' && (
+              <div className="meta-item">
+                <span style={{ color: '#FFD600', marginRight: '4px' }}>🎯</span>
+                <span>{itemData?.type || itemData?.category || 'Event'}</span>
+              </div>
+            )}
+            
             <div className="meta-item">
               <Clock size={14} />
               <span>Saved on {formatDate(item.createdAt)}</span>
             </div>
           </div>
+          
+          {/* Show skills/tags if available */}
+          {itemData?.skills && Array.isArray(itemData.skills) && itemData.skills.length > 0 && (
+            <div className="item-skills" style={{ marginTop: '12px', marginBottom: '8px' }}>
+              {itemData.skills.slice(0, 3).map((skill, index) => (
+                <span key={index} style={{
+                  display: 'inline-block',
+                  background: 'rgba(255, 214, 0, 0.2)',
+                  color: '#FFD600',
+                  padding: '2px 8px',
+                  borderRadius: '12px',
+                  fontSize: '0.75rem',
+                  marginRight: '6px',
+                  marginBottom: '4px'
+                }}>
+                  {skill}
+                </span>
+              ))}
+              {itemData.skills.length > 3 && (
+                <span style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '0.75rem' }}>
+                  +{itemData.skills.length - 3} more
+                </span>
+              )}
+            </div>
+          )}
+          
+          {/* Show description if available, otherwise show key details */}
           {itemData?.description ? (
             <p className="item-description">
-              {itemData.description.length > 150 
-                ? `${itemData.description.substring(0, 150)}...` 
+              {itemData.description.length > 120 
+                ? `${itemData.description.substring(0, 120)}...` 
                 : itemData.description}
             </p>
           ) : (
-            <p className="item-description">
-              {type === 'bookmark' ? 'Bookmarked' : 'Liked'} {item.itemType} - Click to view details
+            <p className="item-description" style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+              {item.itemType === 'jobs' && `${itemData?.jobType || 'Full-time'} position at ${itemData?.companyName || 'Company'}`}
+              {item.itemType === 'events' && `${itemData?.type || 'Event'} organized by ${itemData?.organizerName || itemData?.organizer || 'Organizer'}`}
+              {item.itemType === 'internships' && `${itemData?.duration || 'Internship'} opportunity at ${itemData?.companyName || itemData?.company || 'Company'}`}
             </p>
           )}
         </div>

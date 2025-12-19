@@ -370,7 +370,7 @@
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.btn-cancel, .btn-reject {
+.btn-cancel, .btn-approve, .btn-reject {
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
   font-weight: 500;
@@ -389,6 +389,17 @@
 
 .btn-cancel:hover {
   background: rgba(255, 255, 255, 0.15);
+}
+
+.btn-approve {
+  background: rgba(34, 197, 94, 0.2);
+  border: 1px solid #22C55E;
+  color: #22C55E;
+}
+
+.btn-approve:hover {
+  background: rgba(34, 197, 94, 0.3);
+  color: white;
 }
 
 .btn-reject {
@@ -1108,6 +1119,7 @@
   }
 
   .btn-cancel,
+  .btn-approve,
   .btn-reject {
     padding: 0.5rem 1rem;
     font-size: 0.85rem;

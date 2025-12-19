@@ -39,7 +39,7 @@ const EvaluateCandidatesTab = ({ authUser }) => {
   const fetchApplications = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_URL}/jobs/applications/recruiter`, {
+      const response = await fetch(`${API_URL}/dashboard/candidates?limit=1000`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
       
@@ -48,7 +48,45 @@ const EvaluateCandidatesTab = ({ authUser }) => {
       }
       
       const data = await response.json();
-      setApplications(data.applications || []);
+      console.log('Raw candidates data:', data.candidates);
+      
+      // Transform dashboard candidates format to match expected application format
+      const transformedApplications = (data.candidates || []).map(candidate => {
+        console.log('Processing candidate:', candidate);
+        return {
+        id: candidate.id,
+        originalId: candidate.originalId,
+        type: candidate.type, // 'job', 'internship', or 'event'
+        status: candidate.stage || 'pending',
+        createdAt: candidate.createdAt || candidate.appliedDate,
+        user: {
+          fullName: candidate.name,
+          email: candidate.email,
+          phone: candidate.phone,
+          headline: candidate.headline,
+          about: candidate.about,
+          skills: candidate.skills,
+          experiences: candidate.experiences,
+          education: candidate.education,
+          resumePath: candidate.resumeLink, // Map resumeLink to resumePath for consistency
+          profilePicture: candidate.profilePicture,
+          linkedinUrl: candidate.linkedinUrl,
+          githubUrl: candidate.githubUrl,
+          location: candidate.location
+        },
+        job: {
+          title: candidate.position,
+          companyName: candidate.department
+        },
+        resumeLink: candidate.resumeLink,
+        coverLetter: candidate.coverLetter,
+        notes: candidate.notes,
+        metadata: candidate.metadata || {}
+      };
+      });
+      
+      console.log('Transformed applications:', transformedApplications);
+      setApplications(transformedApplications);
     } catch (error) {
       console.error('Error fetching applications:', error);
       toast.error('Failed to load applications');
@@ -200,7 +238,8 @@ const EvaluateCandidatesTab = ({ authUser }) => {
             <thead>
               <tr>
                 <th>Candidate</th>
-                <th>Job Position</th>
+                <th>Position/Event</th>
+                <th>Type</th>
                 <th>Applied Date</th>
                 <th>Status</th>
                 <th>Actions</th>
@@ -225,6 +264,13 @@ const EvaluateCandidatesTab = ({ authUser }) => {
                       <div className="job-title">{app.job?.title || 'N/A'}</div>
                       <div className="job-company">{app.job?.companyName}</div>
                     </div>
+                  </td>
+                  <td>
+                    <span className={`type-badge type-${app.type || 'job'}`}>
+                      {app.type === 'job' ? 'Job' : 
+                       app.type === 'internship' ? 'Internship' : 
+                       app.type === 'event' ? 'Event' : 'Job'}
+                    </span>
                   </td>
                   <td>{new Date(app.createdAt).toLocaleDateString()}</td>
                   <td>

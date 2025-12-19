@@ -115,7 +115,7 @@ const DashboardTab = ({
         if (onTabChange) onTabChange("evaluate"); // Navigate to Evaluate Candidates tab
         break;
       case "Active Events":
-        if (onTabChange) onTabChange("festivals"); // Festivals tab
+        if (onTabChange) onTabChange("events"); // Events tab
         break;
       case "Active Job & Internships":
         if (onTabChange) onTabChange("jobs"); // Jobs & Internships tab
@@ -360,24 +360,25 @@ const DashboardTab = ({
       </div>
 
       {/* Stats Cards */}
-      <div className="stats-grid">
+      <div className="recruiter-stats-grid">
         {getStatsData().map((stat, index) => (
           <div 
             key={index} 
-            className={`stat-card ${stat.color} enhanced-card ${stat.clickable ? 'clickable' : ''}`}
+            className={`recruiter-stat-card recruiter-${stat.color} ${stat.clickable ? 'clickable' : ''}`}
             onClick={() => stat.clickable && handleStatCardClick(stat.title)}
             style={{ cursor: stat.clickable ? 'pointer' : 'default' }}
           >
-            <div className="stat-icon-row">
-              <div className="stat-icon">
+            <div className="recruiter-stat-icon-row">
+              <div className="recruiter-stat-icon">
                 <stat.icon className="w-6 h-6" />
               </div>
-              <div className="stat-number">{stat.value}</div>
+              <div className="recruiter-stat-number">{stat.value}</div>
             </div>
-            <div className="stat-info">
-              <div className="stat-label">{stat.title}</div>
+
+            <div className="recruiter-stat-info">
+              <div className="recruiter-stat-label">{stat.title}</div>
               {stat.details.map((detail, idx) => (
-                <div key={idx} className="stat-details">
+                <div key={idx} className="recruiter-stat-details">
                   <div>{detail.label}</div>
                   <div>{detail.value}</div>
                 </div>

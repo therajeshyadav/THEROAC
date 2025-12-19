@@ -56,12 +56,12 @@ exports.createJob = async (req, res, next) => {
     }
     
     // Validate and sanitize JSON fields
-    ['perks', 'skills', 'categories', 'media', 'companySocials', 'contactPerson'].forEach(field => {
+    ['perks', 'skills', 'categories', 'eligibility', 'faqs', 'media', 'companySocials', 'contactPerson'].forEach(field => {
       if (payload[field] && typeof payload[field] === 'string') {
         try {
           payload[field] = JSON.parse(payload[field]);
         } catch (e) {
-          payload[field] = field === 'perks' || field === 'skills' || field === 'categories' || field === 'media' ? [] : null;
+          payload[field] = field === 'perks' || field === 'skills' || field === 'categories' || field === 'eligibility' || field === 'faqs' || field === 'media' ? [] : null;
         }
       }
     });
@@ -209,6 +209,8 @@ exports.getJob = async (req, res, next) => {
     const job = await Job.findByPk(req.params.id);
     if (!job) return res.status(404).json({ error: 'Job not found' });
 
+
+
     // Increment view counter
     await job.increment('views');
     res.json(job);
@@ -354,6 +356,10 @@ exports.getRecruiterApplications = async (req, res, next) => {
     // Get all applications for these jobs with full candidate details
     const applications = await JobApplication.findAll({
       where: { jobId: { [Op.in]: jobIds } },
+      attributes: [
+        'id', 'userId', 'jobId', 'resumeLink', 'coverLetter', 
+        'status', 'notes', 'metadata', 'createdAt', 'updatedAt'
+      ],
       include: [
         {
           model: Job,
@@ -389,39 +395,139 @@ exports.updateApplicationStatus = async (req, res, next) => {
     const { status } = req.body;
     const recruiterId = req.user.id;
     
-    // Find the application
-    const application = await JobApplication.findByPk(applicationId, {
-      include: [{
-        model: Job,
-        as: 'job',
-        attributes: ['createdBy']
-      }]
-    });
+    let application = null;
+    let isInternshipApplication = false;
+    let isEventRegistration = false;
     
-    if (!application) {
-      return res.status(404).json({ error: 'Application not found' });
+    // Check if it's an internship application (starts with 'internship_')
+    if (applicationId.startsWith('internship_')) {
+      isInternshipApplication = true;
+      const realApplicationId = applicationId.replace('internship_', '');
+      
+      // Find internship application
+      const { HubContentApplication, HubContent } = require('../models');
+      application = await HubContentApplication.findByPk(realApplicationId, {
+        include: [{
+          model: HubContent,
+          as: 'hubContent',
+          attributes: ['createdBy']
+        }]
+      });
+      
+      if (!application) {
+        return res.status(404).json({ error: 'Internship application not found' });
+      }
+      
+      // Check if the recruiter owns this internship
+      if (application.hubContent.createdBy !== recruiterId) {
+        return res.status(403).json({ error: 'Unauthorized' });
+      }
+    } else if (applicationId.startsWith('event_')) {
+      isEventRegistration = true;
+      const realRegistrationId = applicationId.replace('event_', '');
+      
+      // Find event registration
+      const { EventRegistration, Event } = require('../models');
+      application = await EventRegistration.findByPk(realRegistrationId, {
+        include: [{
+          model: Event,
+          as: 'event',
+          attributes: ['createdBy']
+        }]
+      });
+      
+      if (!application) {
+        return res.status(404).json({ error: 'Event registration not found' });
+      }
+      
+      // Check if the recruiter owns this event
+      if (application.event.createdBy !== recruiterId) {
+        return res.status(403).json({ error: 'Unauthorized' });
+      }
+    } else {
+      // Find job application
+      application = await JobApplication.findByPk(applicationId, {
+        include: [{
+          model: Job,
+          as: 'job',
+          attributes: ['createdBy']
+        }]
+      });
+      
+      if (!application) {
+        return res.status(404).json({ error: 'Job application not found' });
+      }
+      
+      // Check if the recruiter owns this job
+      if (application.job.createdBy !== recruiterId) {
+        return res.status(403).json({ error: 'Unauthorized' });
+      }
     }
     
-    // Check if the recruiter owns this job
-    if (application.job.createdBy !== recruiterId) {
-      return res.status(403).json({ error: 'Unauthorized' });
+    // Update status with mapping for internship applications and event registrations
+    let finalStatus = status;
+    
+    if (isInternshipApplication) {
+      // Map job application statuses to internship application statuses
+      const statusMapping = {
+        'applied': 'pending',
+        'pending': 'pending',
+        'reviewing': 'pending',
+        'shortlisted': 'pending',
+        'interview': 'pending', // Interview stage maps to pending for internships
+        'offered': 'accepted',
+        'hired': 'accepted',
+        'accepted': 'accepted',
+        'rejected': 'rejected',
+        'cancelled': 'cancelled'
+      };
+      
+      finalStatus = statusMapping[status] || 'pending';
+    } else if (isEventRegistration) {
+      // Map job application statuses to event registration statuses
+      // Event registrations typically have: registered, confirmed, cancelled, attended
+      const statusMapping = {
+        'applied': 'registered',
+        'pending': 'registered',
+        'reviewing': 'registered',
+        'shortlisted': 'confirmed',
+        'interview': 'confirmed',
+        'offered': 'confirmed',
+        'hired': 'confirmed',
+        'accepted': 'confirmed',
+        'rejected': 'cancelled',
+        'cancelled': 'cancelled'
+      };
+      
+      finalStatus = statusMapping[status] || 'registered';
     }
     
-    // Update status
-    application.status = status;
+    application.status = finalStatus;
     await application.save();
     
     // Send notification to candidate
     try {
       const notificationService = getNotificationService();
-      const job = await Job.findByPk(application.jobId);
+      let contentItem = null;
       
-      await notificationService.notifyApplicationStatusChange(
-        application.userId,
-        job.title,
-        status,
-        application.id
-      );
+      if (isInternshipApplication) {
+        const { HubContent } = require('../models');
+        contentItem = await HubContent.findByPk(application.hubContentId);
+      } else if (isEventRegistration) {
+        const { Event } = require('../models');
+        contentItem = await Event.findByPk(application.eventId);
+      } else {
+        contentItem = await Job.findByPk(application.jobId);
+      }
+      
+      if (contentItem) {
+        await notificationService.notifyApplicationStatusChange(
+          application.userId,
+          contentItem.title,
+          status,
+          application.id
+        );
+      }
     } catch (notifError) {
       console.error('Failed to send notification:', notifError);
     }
@@ -571,6 +677,8 @@ exports.updateJob = async (req, res, next) => {
     
     const payload = { ...req.body };
     
+
+    
     // Validate and sanitize salary field
     if (payload.salary) {
       if (typeof payload.salary === 'string') {
@@ -592,15 +700,17 @@ exports.updateJob = async (req, res, next) => {
     }
     
     // Validate and sanitize JSON fields
-    ['perks', 'skills', 'categories', 'media', 'companySocials', 'contactPerson'].forEach(field => {
+    ['perks', 'skills', 'categories', 'eligibility', 'faqs', 'media', 'companySocials', 'contactPerson'].forEach(field => {
       if (payload[field] && typeof payload[field] === 'string') {
         try {
           payload[field] = JSON.parse(payload[field]);
         } catch (e) {
-          payload[field] = field === 'perks' || field === 'skills' || field === 'categories' || field === 'media' ? [] : null;
+          payload[field] = field === 'perks' || field === 'skills' || field === 'categories' || field === 'eligibility' || field === 'faqs' || field === 'media' ? [] : null;
         }
       }
     });
+    
+
     
     // Update slug if title or company changed
     if ((payload.title || payload.companyName) && !payload.slug) {
@@ -622,6 +732,7 @@ exports.updateJob = async (req, res, next) => {
     }
     
     await job.update(payload);
+    
     res.json(job);
   } catch (err) {
     console.error('Error in updateJob:', err);

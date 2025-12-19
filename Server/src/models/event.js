@@ -41,6 +41,7 @@ Event.init({
   whatToBring: { type: DataTypes.ARRAY(DataTypes.STRING), allowNull: true },
   contactInfo: { type: DataTypes.JSON, allowNull: true }, // {email, phone, website}
   socials: { type: DataTypes.JSON, allowNull: true }, // {facebook, twitter, linkedin, instagram}
+  faqs: { type: DataTypes.JSON, allowNull: true }, // Array of {question, answer}
   featured: { type: DataTypes.BOOLEAN, defaultValue: false },
   views: { type: DataTypes.INTEGER, defaultValue: 0 },
   registrations: { type: DataTypes.INTEGER, defaultValue: 0 },

@@ -218,16 +218,16 @@ exports.getDashboardStats = async (req, res, next) => {
       pendingROACPrimeApprovals,
       unreadNotifications
     ] = await Promise.all([
-      User.count(),
-      User.count({ where: { role: 'candidate' } }),
-      User.count({ where: { role: 'recruiter' } }),
+      User.count({ where: { id: { [Op.ne]: req.user.id } } }), // Exclude current admin
+      User.count({ where: { role: 'candidate', id: { [Op.ne]: req.user.id } } }), // Exclude current admin
+      User.count({ where: { role: 'recruiter', id: { [Op.ne]: req.user.id } } }), // Exclude current admin
       Job.count(),
       Job.count({ where: { status: 'open' } }),
       Event.count(),
       Event.count({ where: { status: 'upcoming' } }),
       JobApplication.count(),
       JobApplication.count({ where: { status: 'pending' } }),
-      User.count({ where: { status: 'inactive' } }),
+      User.count({ where: { status: 'inactive', id: { [Op.ne]: req.user.id } } }), // Exclude current admin
       Job.count({ where: { approvalStatus: 'pending' } }),
       Event.count({ where: { approvalStatus: 'pending' } }),
       require('../models').HubContent.count({ where: { approvalStatus: 'pending', contentType: 'internship' } }),
@@ -257,7 +257,7 @@ exports.getDashboardStats = async (req, res, next) => {
       newEvents,
       newApplications
     ] = await Promise.all([
-      User.count({ where: { createdAt: { [Op.gte]: thirtyDaysAgo } } }),
+      User.count({ where: { createdAt: { [Op.gte]: thirtyDaysAgo }, id: { [Op.ne]: req.user.id } } }), // Exclude current admin
       Job.count({ where: { createdAt: { [Op.gte]: thirtyDaysAgo } } }),
       Event.count({ where: { createdAt: { [Op.gte]: thirtyDaysAgo } } }),
       JobApplication.count({ where: { createdAt: { [Op.gte]: thirtyDaysAgo } } })
@@ -671,6 +671,7 @@ exports.approveJob = async (req, res, next) => {
     // Send notification to recruiter
     try {
       const notificationService = getNotificationService();
+      console.log(`Sending job approval notification to specific recruiter: ${job.createdBy} for job: ${job.title}`);
       await notificationService.notifyJobApproval(
         job.createdBy,
         job.title,
@@ -961,7 +962,10 @@ exports.getAnalytics = async (req, res, next) => {
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 
     const userGrowth = await User.findAll({
-      where: { createdAt: { [Op.gte]: sixMonthsAgo } },
+      where: { 
+        createdAt: { [Op.gte]: sixMonthsAgo },
+        id: { [Op.ne]: req.user.id } // Exclude current admin
+      },
       attributes: [
         [User.sequelize.fn('DATE_TRUNC', 'month', User.sequelize.col('createdAt')), 'month'],
         [User.sequelize.fn('COUNT', '*'), 'count']

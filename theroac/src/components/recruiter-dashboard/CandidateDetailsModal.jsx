@@ -13,6 +13,11 @@ const CandidateDetailsModal = ({ isOpen, onClose, application, onStatusUpdate })
   const candidate = application.user || {};
   const job = application.job || {};
   const metadata = application.metadata || {};
+  
+  console.log('CandidateDetailsModal - Application:', application);
+  console.log('CandidateDetailsModal - Candidate:', candidate);
+  console.log('CandidateDetailsModal - Resume Link:', application.resumeLink);
+  console.log('CandidateDetailsModal - Resume Path:', candidate.resumePath);
 
   const handleStatusUpdate = async () => {
     setUpdating(true);
@@ -66,6 +71,62 @@ const CandidateDetailsModal = ({ isOpen, onClose, application, onStatusUpdate })
       month: 'long',
       day: 'numeric'
     });
+  };
+
+  const getResumeUrl = (resumePath) => {
+    if (!resumePath) return '';
+    
+    // If it's already a full URL, return as is
+    if (resumePath.startsWith('http://') || resumePath.startsWith('https://')) {
+      return resumePath;
+    }
+    
+    // If it starts with /uploads, prepend the API URL
+    const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000/api';
+    const baseUrl = API_URL.replace('/api', ''); // Remove /api from the end
+    
+    // If path starts with /, use it directly, otherwise add /
+    const path = resumePath.startsWith('/') ? resumePath : `/${resumePath}`;
+    
+    return `${baseUrl}${path}`;
+  };
+
+  const getStatusOptions = (applicationType) => {
+    switch (applicationType) {
+      case 'event':
+        return [
+          { value: 'registered', label: 'Registered' },
+          { value: 'confirmed', label: 'Confirmed' },
+          { value: 'attended', label: 'Attended' },
+          { value: 'no-show', label: 'No Show' },
+          { value: 'cancelled', label: 'Cancelled' }
+        ];
+      
+      case 'internship':
+        return [
+          { value: 'pending', label: 'Pending' },
+          { value: 'reviewing', label: 'Under Review' },
+          { value: 'shortlisted', label: 'Shortlisted' },
+          { value: 'accepted', label: 'Accepted' },
+          { value: 'rejected', label: 'Rejected' },
+          { value: 'cancelled', label: 'Cancelled' }
+        ];
+      
+      case 'job':
+      default:
+        return [
+          { value: 'applied', label: 'Applied' },
+          { value: 'pending', label: 'Pending' },
+          { value: 'reviewing', label: 'Reviewing' },
+          { value: 'shortlisted', label: 'Shortlisted' },
+          { value: 'interview', label: 'Interview' },
+          { value: 'offered', label: 'Offered' },
+          { value: 'hired', label: 'Hired' },
+          { value: 'accepted', label: 'Accepted' },
+          { value: 'rejected', label: 'Rejected' },
+          { value: 'cancelled', label: 'Cancelled' }
+        ];
+    }
   };
 
   return (
@@ -255,14 +316,23 @@ const CandidateDetailsModal = ({ isOpen, onClose, application, onStatusUpdate })
           {(application.resumeLink || candidate.resumePath) && (
             <div className="section resume-section">
               <h4><i className="fas fa-file-pdf"></i> Resume</h4>
-              <a 
-                href={application.resumeLink || candidate.resumePath} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="resume-link"
-              >
-                <i className="fas fa-download"></i> Download Resume
-              </a>
+              <div className="resume-actions">
+                <a 
+                  href={getResumeUrl(application.resumeLink || candidate.resumePath)} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="resume-btn view-btn"
+                >
+                  <i className="fas fa-eye"></i> View Resume
+                </a>
+                <a 
+                  href={getResumeUrl(application.resumeLink || candidate.resumePath)} 
+                  download
+                  className="resume-btn download-btn"
+                >
+                  <i className="fas fa-download"></i> Download
+                </a>
+              </div>
             </div>
           )}
 
@@ -286,14 +356,11 @@ const CandidateDetailsModal = ({ isOpen, onClose, application, onStatusUpdate })
                   onChange={(e) => setStatus(e.target.value)}
                   className="status-select"
                 >
-                  <option value="applied">Applied</option>
-                  <option value="pending">Pending</option>
-                  <option value="reviewing">Reviewing</option>
-                  <option value="shortlisted">Shortlisted</option>
-                  <option value="interview">Interview</option>
-                  <option value="offered">Offered</option>
-                  <option value="hired">Hired</option>
-                  <option value="rejected">Rejected</option>
+                  {getStatusOptions(application.type).map(option => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
                 </select>
                 <button 
                   className="btn-primary"

@@ -39,7 +39,7 @@ exports.createHubContent = async (req, res, next) => {
     }
 
     // Validate and sanitize JSON fields
-    ['tags', 'skills', 'media'].forEach(field => {
+    ['tags', 'skills', 'eligibility', 'media', 'faqs'].forEach(field => {
       if (payload[field] && typeof payload[field] === 'string') {
         try {
           payload[field] = JSON.parse(payload[field]);
@@ -192,30 +192,8 @@ exports.listHubContent = async (req, res, next) => {
     if (!req.user || !['admin', 'superadmin'].includes(req.user.role)) {
       where.status = 'published';
       
-      if (contentType) {
-        // If specific contentType is requested
-        if (contentType === 'internship') {
-          // Internships: just need to be published
-          // No approval requirement
-        } else {
-          // Other content types: need approval
-          where.approvalStatus = 'approved';
-        }
-      } else {
-        // When no contentType specified, show both:
-        // 1. All published internships (any approval status)
-        // 2. All published + approved other content
-        where[Op.or] = [
-          { 
-            contentType: 'internship',
-            status: 'published'
-          },
-          { 
-            approvalStatus: 'approved',
-            status: 'published'
-          }
-        ];
-      }
+      // All content types now require approval for public display
+      where.approvalStatus = 'approved';
     }
     
     if (status) where.status = status;
@@ -313,7 +291,7 @@ exports.updateHubContent = async (req, res, next) => {
     }
 
     // Validate and sanitize JSON fields
-    ['tags', 'skills', 'media'].forEach(field => {
+    ['tags', 'skills', 'eligibility', 'media', 'faqs'].forEach(field => {
       if (payload[field] && typeof payload[field] === 'string') {
         try {
           payload[field] = JSON.parse(payload[field]);
@@ -429,6 +407,9 @@ exports.applyToHubContent = async (req, res, next) => {
       hubContentId,
       status: 'pending'
     });
+
+    // Increment applications count
+    await HubContent.increment('applications', { where: { id: hubContentId } });
 
     res.status(201).json({
       success: true,

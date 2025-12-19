@@ -70,9 +70,9 @@ const DetailsRightSidebar = ({
           )}
         </div>
 
-        <div className="price-section">
+        {/* <div className="price-section">
           <span className="price">{getPriceDisplay()}</span>
-        </div>
+        </div> */}
 
         {/* Apply Button – only candidate or not logged in */}
         {(!user || user.role === "candidate") && (
@@ -162,7 +162,7 @@ const DetailsRightSidebar = ({
                 <div className="stat-content">
                   <span className="stat-label">Registered</span>
                   <span className="stat-number">
-                    {data.registered || data.applied || 0}
+                    {data.registrations || data.registered || 0}
                   </span>
                 </div>
               </div>
@@ -199,7 +199,7 @@ const DetailsRightSidebar = ({
                 </div>
                 <div className="stat-content">
                   <span className="stat-label">Applied</span>
-                  <span className="stat-number">{data.applied || 0}</span>
+                  <span className="stat-number">{data.applications || 0}</span>
                 </div>
               </div>
 
@@ -210,6 +210,16 @@ const DetailsRightSidebar = ({
                 <div className="stat-content">
                   <span className="stat-label">Experience</span>
                   <span className="stat-number">{data.experience || data.experienceLevel || 'N/A'}</span>
+                </div>
+              </div>
+
+              <div className="stat-item-individual">
+                <div className="stat-icon">
+                  <Award size={20} />
+                </div>
+                <div className="stat-content">
+                  <span className="stat-label">Salary</span>
+                  <span className="stat-number">{getPriceDisplay()}</span>
                 </div>
               </div>
 
@@ -235,7 +245,7 @@ const DetailsRightSidebar = ({
                 </div>
                 <div className="stat-content">
                   <span className="stat-label">Applied</span>
-                  <span className="stat-number">{data.applied || 0}</span>
+                  <span className="stat-number">{data.applications || 0}</span>
                 </div>
               </div>
 
@@ -246,6 +256,16 @@ const DetailsRightSidebar = ({
                 <div className="stat-content">
                   <span className="stat-label">Duration</span>
                   <span className="stat-number">{data.duration || 'N/A'}</span>
+                </div>
+              </div>
+
+              <div className="stat-item-individual">
+                <div className="stat-icon">
+                  <Award size={20} />
+                </div>
+                <div className="stat-content">
+                  <span className="stat-label">Stipend</span>
+                  <span className="stat-number">{getPriceDisplay()}</span>
                 </div>
               </div>
 

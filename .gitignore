@@ -75,3 +75,4 @@ Server/uploads/
 Server/.env
 .vscode/
 dist/
+.DS_Store

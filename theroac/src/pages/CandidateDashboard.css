@@ -242,7 +242,7 @@
     justify-content: center;
 }
 
-.dashboard-container .nav-btn {
+.dashboard-container .navBtn {
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -259,18 +259,18 @@
     min-width: fit-content;
 }
 
-.dashboard-container .nav-btn:hover {
+.dashboard-container .navBtn:hover {
     background: rgba(255, 214, 0, 0.1);
     color: #FFD600;
 }
 
-.dashboard-container .nav-btn.active {
+.dashboard-container .navBtn.active {
     background: rgba(255, 214, 0, 0.15);
     color: #FFD600;
     font-weight: 600;
 }
 
-.dashboard-container .nav-btn i {
+.dashboard-container .navBtn i {
     font-size: 1rem;
 }
 
@@ -1920,16 +1920,16 @@ select:focus {
         gap: 0.5rem;
     }
 
-    .nav-btn {
+    .navBtn {
         padding: 0.5rem;
         font-size: 0.8rem;
     }
 
-    .nav-btn span {
+    .navBtn span {
         display: none;
     }
 
-    .nav-btn {
+    .navBtn {
         min-width: 40px;
         justify-content: center;
     }
@@ -1979,7 +1979,7 @@ select:focus {
         gap: 0.25rem;
     }
 
-    .header-nav .nav-btn {
+    .header-nav .navBtn {
         padding: 0.5rem;
         min-width: 40px;
     }

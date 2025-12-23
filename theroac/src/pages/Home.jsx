@@ -9,7 +9,7 @@ import ContactSection from '../components/ContactSection';
 import { usePreloader } from '../hooks/usePreloader';
 
 const Home = () => {
-  const isLoading = usePreloader(500); // Hide preloader after 500ms
+  const isLoading = usePreloader(500);
   return (
     <>
       <div id="popup" className="popup-overlay d-none">

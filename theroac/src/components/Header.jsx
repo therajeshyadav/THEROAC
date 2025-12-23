@@ -51,7 +51,7 @@ const Header = () => {
       <div className="header-area homepage10 header header-sticky d-none d-lg-block" id="header">
         <div className="container">
           <div className="row align-items-center">
-            <div className="col-lg-12">
+            <div className="col-lg-12 p-0">
               <div className="header-elements d-flex justify-content-between align-items-center">
 
                 {/* Logo */}

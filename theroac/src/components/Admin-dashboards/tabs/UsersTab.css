@@ -1268,7 +1268,8 @@ Current Admin Styling */
   font-size: 0.7rem;
   color: rgba(255, 255, 255, 0.5);
 }
-* Improved User Stats Layout */
+
+/* Improved User Stats Layout */
 .user-stat-row {
   display: grid;
   grid-template-columns: 1fr 1fr;

@@ -23,7 +23,7 @@ const request = async (endpoint, options = {}, retryCount = 0) => {
 
     try {
         const response = await fetch(url, config);
-        clearTimeout(timeoutId); // Clear timeout on successful response
+        clearTimeout(timeoutId);
         
         const data = await response.json();
 

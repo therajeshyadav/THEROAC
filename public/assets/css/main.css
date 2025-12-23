@@ -1050,7 +1050,7 @@ img {
 }
 @media (max-width: 767px) {
   .heading13 h2 {
-    font-size: var(--ztc-font-size-font-s32);
+    font-size: var(--ztc-font-size-font-s18);
     line-height: 40px;
   }
 }
@@ -7905,12 +7905,11 @@ img {
 }
 .footer10-sertion-area .footer-logo-area p {
   color: var(--ztc-text-text-1);
-  font-family: var(--ztc-family-font2);
+  font-family: var(--ztc-family-font1);
   font-size: var(--ztc-font-size-font-s18);
   font-style: normal;
   font-weight: var(--ztc-weight-medium);
   line-height: 26px;
-  opacity: 0.8;
 }
 .footer10-sertion-area .footer-logo-area ul li {
   display: inline-block;
@@ -8102,7 +8101,7 @@ img {
 .footer10-sertion-area .copyright p {
   color: var(--ztc-text-text-1);
   text-align: center;
-  font-family: var(--ztc-family-font2);
+  font-family: var(--ztc-family-font1);
   font-size: var(--ztc-font-size-font-s18);
   font-style: normal;
   font-weight: var(--ztc-weight-medium);
@@ -12108,7 +12107,11 @@ img {
   padding: 0;
   border: none;
 }
-
+@media (min-width: 1024px) {
+  .homepage10-body .header-area.homepage10 .header-elements .main-menu ul li a {
+    padding: 0 18px;
+  }
+}
 /*============= HEADER CSS AREA ENDS ===============*/
 /*============= ATTENT CSS AREA ===============*/
 .attent1-section-area {

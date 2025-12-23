@@ -81,7 +81,7 @@ const EventSlider = ({ eventsData }) => {
       {eventsData.map((section, sectionIndex) => (
         <div className="prime-carousel-container" key={sectionIndex} id={section.titleId}>
           {/* Section Heading */}
-          <div className="heading13 h2 pb-3 text-white">{section.title}</div>
+          <div className="heading13 pb-3 text-white">{section.title}</div>
 
           {/* Left Scroll Button */}
           <button

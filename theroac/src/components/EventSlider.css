@@ -4,6 +4,36 @@
   padding: 30px 0px;
 }
 
+/* Section Header with Discover Button */
+.section-header-with-discover {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.discover-section-btn {
+  background: linear-gradient(45deg, #ffd700, #ffed4e);
+  color: #000;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.discover-section-btn:hover {
+  background: linear-gradient(45deg, #ffed4e, #ffd700);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+}
+
 .prime-carousel {
   display: flex;
   overflow-x: auto;
@@ -130,6 +160,17 @@
 @media (max-width: 768px) {
   .prime-carousel-container {
     padding: 10px 30px;
+  }
+
+  .section-header-with-discover {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .discover-section-btn {
+    font-size: 0.8rem;
+    padding: 6px 12px;
   }
 
   .prime-card {

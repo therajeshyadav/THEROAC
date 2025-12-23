@@ -16,6 +16,7 @@ import Speakers from "./pages/Speakers";
 import Schedule from "./pages/Schedule";
 import Blog from "./pages/Blog";
 import Contact from "./pages/Contact";
+import Discover from "./pages/Discover";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Signup from "./pages/Signup";
@@ -65,7 +66,7 @@ function App() {
     "/recruiter-dashboard",
     "/admin-dashboard"
   ];
-  const validPages = ["/", "/speakers", "/schedule", "/blog", "/contact", ...authPages, ...dashboardPages];
+  const validPages = ["/", "/speakers", "/schedule", "/blog", "/contact", "/discover", ...authPages, ...dashboardPages];
 
   const isAuthPage = authPages.includes(location.pathname);
   const isDashboardPage = dashboardPages.includes(location.pathname);
@@ -89,6 +90,7 @@ function App() {
           <Route path="/schedule" element={<Schedule />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/discover" element={<Discover />} />
           <Route path= "/oauth2callback" element={<Callback />} />
           {/* Public routes - redirect to dashboard if already logged in */}
           <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />

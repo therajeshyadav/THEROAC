@@ -1,0 +1,495 @@
+/* ===================================================== */
+/* 🎯 DISCOVER PAGE STYLES - Prime Video Inspired */
+/* ===================================================== */
+
+.discover-page-wrapper {
+  /* Isolate discover page from global styles */
+  isolation: isolate;
+  width: 100%;
+  min-height: 100vh;
+}
+
+.discover-page {
+  background: #0f0f0f;
+  color: #ffffff;
+  min-height: 100vh;
+  font-family: 'Arial', sans-serif;
+  /* Ensure proper spacing from header */
+  padding-top: 0;
+  margin-top: 0;
+  /* Reset any inherited styles */
+  line-height: 1.6;
+  font-size: 16px;
+  width: 100%;
+}
+
+/* Fix header/footer conflicts */
+.discover-page * {
+  box-sizing: border-box;
+}
+
+/* Ensure discover page doesn't interfere with header */
+.discover-page .discover-hero,
+.discover-page .discover-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* Override any global button styles */
+.discover-page button {
+  font-family: inherit;
+}
+
+/* Override any global link styles */
+.discover-page a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ===================================================== */
+/* 🎬 HERO SECTION */
+/* ===================================================== */
+
+.discover-hero {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  padding: 120px 0 60px; /* Increased top padding for header space */
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  margin-top: 0; /* Remove any margin conflicts */
+}
+
+.discover-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="%23333" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+  opacity: 0.1;
+}
+
+.discover-hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.discover-hero h1 {
+  font-size: 3.5rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  background: linear-gradient(45deg, #ffffff, #ffd700);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.discover-hero p {
+  font-size: 1.2rem;
+  color: #cccccc;
+  margin-bottom: 30px;
+}
+
+.discover-view-all-btn {
+  background: linear-gradient(45deg, #ffd700, #ffed4e);
+  color: #000000;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.discover-view-all-btn:hover {
+  background: linear-gradient(45deg, #ffed4e, #ffd700);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+}
+
+/* ===================================================== */
+/* 📱 CONTENT SECTIONS */
+/* ===================================================== */
+
+.discover-content {
+  padding: 40px 0;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.discover-no-content {
+  text-align: center;
+  padding: 60px 20px;
+  color: #cccccc;
+}
+
+.discover-no-content h3 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  color: #ffffff;
+}
+
+.discover-no-content p {
+  font-size: 1rem;
+  color: #999999;
+}
+
+.discover-section {
+  margin-bottom: 50px;
+  padding: 0 60px;
+}
+
+.discover-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 0 20px;
+}
+
+.discover-section-header h2 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0;
+}
+
+.discover-see-more {
+  background: none;
+  border: none;
+  color: #ffd700;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  padding: 8px 16px;
+  border-radius: 4px;
+}
+
+.discover-see-more:hover {
+  color: #ffffff;
+  background: rgba(255, 215, 0, 0.1);
+}
+
+/* ===================================================== */
+/* 🎠 CAROUSEL CONTAINER */
+/* ===================================================== */
+
+.discover-carousel-container {
+  position: relative;
+  width: 100%;
+}
+
+.discover-carousel {
+  display: flex;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  gap: 16px;
+  padding: 10px 0;
+}
+
+.discover-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+/* ===================================================== */
+/* 🎯 SCROLL BUTTONS */
+/* ===================================================== */
+
+.discover-scroll-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.8);
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  color: #ffffff;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.discover-scroll-btn:hover {
+  background: rgba(255, 215, 0, 0.9);
+  color: #000000;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.discover-scroll-btn.left {
+  left: -25px;
+}
+
+.discover-scroll-btn.right {
+  right: -25px;
+}
+
+/* ===================================================== */
+/* 🎴 DISCOVER CARDS */
+/* ===================================================== */
+
+.discover-card {
+  flex: 0 0 280px;
+  background: #1a1a1a;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.discover-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3);
+}
+
+.discover-card-image {
+  position: relative;
+  height: 160px;
+  overflow: hidden;
+}
+
+.discover-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.discover-card:hover .discover-card-image img {
+  transform: scale(1.1);
+}
+
+.discover-card-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.discover-card:hover .discover-card-overlay {
+  opacity: 1;
+}
+
+.discover-card-action {
+  background: rgba(255, 215, 0, 0.95);
+  color: #000000;
+  padding: 12px 20px;
+  border-radius: 25px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-align: center;
+  transition: transform 0.3s ease;
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+}
+
+.discover-card-action:hover {
+  transform: scale(1.05);
+}
+
+.discover-card-content {
+  padding: 16px;
+}
+
+.discover-card-content h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #ffffff;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.discover-card-details {
+  font-size: 0.85rem;
+  color: #cccccc;
+}
+
+.discover-card-details p {
+  margin: 4px 0;
+  line-height: 1.4;
+}
+
+.discover-card-details .company,
+.discover-card-details .amount,
+.discover-card-details .prize,
+.discover-card-details .date {
+  color: #ffd700;
+  font-weight: 500;
+}
+
+.discover-card-details .meta {
+  color: #999999;
+  font-size: 0.8rem;
+}
+
+.discover-card-details .salary {
+  color: #4ade80;
+  font-weight: 500;
+}
+
+/* ===================================================== */
+/* 📱 RESPONSIVE DESIGN */
+/* ===================================================== */
+
+/* Large Tablets */
+@media (max-width: 1024px) {
+  .discover-section {
+    padding: 0 40px;
+  }
+  
+  .discover-card {
+    flex: 0 0 260px;
+  }
+  
+  .discover-hero {
+    font-size: 3rem;
+    padding: 100px 0 50px; /* Adjust for smaller screens */
+  }
+  
+  .discover-hero h1 {
+    font-size: 3rem;
+  }
+  
+  .discover-scroll-btn.left {
+    left: -15px;
+  }
+  
+  .discover-scroll-btn.right {
+    right: -15px;
+  }
+}
+
+/* Tablets */
+@media (max-width: 768px) {
+  .discover-section {
+    padding: 0 20px;
+  }
+  
+  .discover-card {
+    flex: 0 0 240px;
+  }
+  
+  .discover-hero {
+    padding: 80px 0 40px; /* Adjust for mobile header */
+  }
+  
+  .discover-hero h1 {
+    font-size: 2.5rem;
+  }
+  
+  .discover-hero p {
+    font-size: 1.1rem;
+  }
+  
+  .discover-section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .discover-section-header h2 {
+    font-size: 1.5rem;
+  }
+  
+  .discover-scroll-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+  }
+  
+  .discover-scroll-btn.left {
+    left: -10px;
+  }
+  
+  .discover-scroll-btn.right {
+    right: -10px;
+  }
+}
+
+/* Mobile Large */
+@media (max-width: 480px) {
+  .discover-section {
+    padding: 0 15px;
+  }
+  
+  .discover-card {
+    flex: 0 0 220px;
+  }
+  
+  .discover-hero {
+    padding: 60px 0 30px; /* Adjust for mobile */
+  }
+  
+  .discover-hero h1 {
+    font-size: 2rem;
+  }
+  
+  .discover-hero p {
+    font-size: 1rem;
+  }
+  
+  .discover-section-header h2 {
+    font-size: 1.3rem;
+  }
+  
+  .discover-scroll-btn {
+    display: none;
+  }
+  
+  .discover-carousel {
+    gap: 12px;
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+  
+  .discover-card-content {
+    padding: 12px;
+  }
+  
+  .discover-card-content h3 {
+    font-size: 0.9rem;
+  }
+  
+  .discover-card-details {
+    font-size: 0.8rem;
+  }
+}
+
+/* Mobile Small */
+@media (max-width: 360px) {
+  .discover-card {
+    flex: 0 0 200px;
+  }
+  
+  .discover-hero h1 {
+    font-size: 1.8rem;
+  }
+  
+  .discover-section-header h2 {
+    font-size: 1.2rem;
+  }
+}

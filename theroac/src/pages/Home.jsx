@@ -87,6 +87,7 @@ const Home = () => {
             <li>
               <a href="#">Home</a>
             </li>
+            <li><a href="/discover">Discover</a></li>
             <li><a href="/about">About</a></li>
             <li>
               <a href="/speakers">Events</a>

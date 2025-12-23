@@ -80,8 +80,16 @@ const EventSlider = ({ eventsData }) => {
     <div className="event-sections-wrapper">
       {eventsData.map((section, sectionIndex) => (
         <div className="prime-carousel-container" key={sectionIndex} id={section.titleId}>
-          {/* Section Heading */}
-          <div className="heading13 h2 pb-3 text-white">{section.title}</div>
+          {/* Section Heading with Discover Button */}
+          <div className="section-header-with-discover">
+            <div className="heading13 h2 pb-3 text-white">{section.title}</div>
+            <button 
+              className="discover-section-btn"
+              onClick={() => navigate('/discover')}
+            >
+              Discover More →
+            </button>
+          </div>
 
           {/* Left Scroll Button */}
           <button

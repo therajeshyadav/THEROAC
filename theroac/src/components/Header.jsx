@@ -65,6 +65,7 @@ const Header = () => {
                 <div className="main-menu">
                   <ul className="d-flex align-items-center m-0 p-0" style={{ listStyle: "none" }}>
                     <li><a href="/">Home</a></li>
+                    <li><a href="/discover">Discover</a></li>
                     <li>
                       {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
                       <a href="#">

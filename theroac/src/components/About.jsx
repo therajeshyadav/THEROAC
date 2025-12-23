@@ -173,7 +173,7 @@ const AboutSlider = () => {
                 <p className="project-card__desc">
                   Participate. Compete. Showcase your talent on the grand stage.
                 </p>
-                <button className="project-card__btn" onClick={() => navigate('/')}>Explore</button>
+                <button className="project-card__btn" onClick={() => navigate('/discover?filter=competitions')}>Explore</button>
               </div>
             </div>
           </article>
@@ -213,7 +213,7 @@ const AboutSlider = () => {
                 <p className="project-card__desc">
                   Learn from industry experts through live sessions and hands-on activities.
                 </p>
-                <button className="project-card__btn">Join Now</button>
+                <button className="project-card__btn" onClick={() => navigate('/discover?filter=events')}>Join Now</button>
               </div>
             </div>
           </article>
@@ -232,7 +232,7 @@ const AboutSlider = () => {
                 <p className="project-card__desc">
                   Access funding and support to take your academic journey further.
                 </p>
-                <button className="project-card__btn">Apply</button>
+                <button className="project-card__btn" onClick={() => navigate('/discover?filter=scholarships')}>Apply</button>
               </div>
             </div>
           </article>
@@ -251,7 +251,7 @@ const AboutSlider = () => {
                 <p className="project-card__desc">
                   Find career opportunities that match your skills and passion.
                 </p>
-                <button className="project-card__btn" onClick={() => navigate('/#Jobs')}>View Jobs</button>
+                <button className="project-card__btn" onClick={() => navigate('/discover?filter=jobs')}>View Jobs</button>
               </div>
             </div>
           </article>

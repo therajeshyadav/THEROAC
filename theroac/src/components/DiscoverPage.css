@@ -13,7 +13,7 @@
   background: #0f0f0f;
   color: #ffffff;
   min-height: 100vh;
-  font-family: 'Arial', sans-serif;
+  font-family: var(--ztc-family-font1);;
   /* Ensure proper spacing from header */
   padding-top: 0;
   margin-top: 0;
@@ -37,7 +37,7 @@
 
 /* Override any global button styles */
 .discover-page button {
-  font-family: inherit;
+  font-family: var(--ztc-family-font1);;
 }
 
 /* Override any global link styles */
@@ -352,22 +352,76 @@
 }
 
 /* ===================================================== */
-/* 📱 RESPONSIVE DESIGN */
+/* 📱 RESPONSIVE DESIGN - Enhanced Mobile-First */
 /* ===================================================== */
 
-/* Large Tablets */
-@media (max-width: 1024px) {
+/* Mobile Menu Styles */
+.mobile-header {
+  background: #0f0f0f;
+  border-bottom: 1px solid #333;
+  z-index: 1000;
+}
+
+.mobile-sidebar {
+  background: #0f0f0f;
+  z-index: 1001;
+}
+
+.mobile-sidebar.mobile-menu-active {
+  transform: translateX(0);
+}
+
+/* Container System - Following Home page pattern */
+.discover-page .container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+.discover-page .container-fluid {
+  width: 100%;
+  padding: 0 15px;
+}
+
+/* Spacing System - Following Home page pattern */
+.discover-page .sp1 { padding: 100px 0; }
+.discover-page .sp2 { padding: 100px 0 70px; }
+.discover-page .sp3 { padding: 0 0 70px; }
+
+/* Large Desktop (1400px+) */
+@media (min-width: 1400px) {
+  .discover-content {
+    max-width: 1600px;
+  }
+  
+  .discover-section {
+    padding: 0 80px;
+  }
+  
+  .discover-card {
+    flex: 0 0 320px;
+  }
+}
+
+/* Desktop (1200px - 1399px) */
+@media (max-width: 1399px) {
+  .discover-content {
+    max-width: 1200px;
+  }
+  
+  .discover-section {
+    padding: 0 60px;
+  }
+}
+
+/* Large Tablets (1024px - 1199px) */
+@media (max-width: 1199px) {
   .discover-section {
     padding: 0 40px;
   }
   
   .discover-card {
     flex: 0 0 260px;
-  }
-  
-  .discover-hero {
-    font-size: 3rem;
-    padding: 100px 0 50px; /* Adjust for smaller screens */
   }
   
   .discover-hero h1 {
@@ -383,8 +437,31 @@
   }
 }
 
-/* Tablets */
-@media (max-width: 768px) {
+/* Tablet Portrait (768px - 1023px) */
+@media (max-width: 1023px) {
+  .discover-page .sp1 { padding: 50px 0; }
+  .discover-page .sp2 { padding: 50px 0 20px; }
+  .discover-page .sp3 { padding: 0 0 40px; }
+  
+  .discover-section {
+    padding: 0 30px;
+  }
+  
+  .discover-hero {
+    padding: 80px 0 40px;
+  }
+  
+  .discover-hero h1 {
+    font-size: 2.8rem;
+  }
+}
+
+/* Mobile Landscape (640px - 767px) */
+@media (max-width: 767px) {
+  .discover-page .sp1 { padding: 50px 0; }
+  .discover-page .sp2 { padding: 50px 0 20px; }
+  .discover-page .sp3 { padding: 0 0 40px; }
+  
   .discover-section {
     padding: 0 20px;
   }
@@ -394,7 +471,7 @@
   }
   
   .discover-hero {
-    padding: 80px 0 40px; /* Adjust for mobile header */
+    padding: 80px 0 40px;
   }
   
   .discover-hero h1 {
@@ -409,6 +486,7 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
+    padding: 0 10px;
   }
   
   .discover-section-header h2 {
@@ -430,8 +508,12 @@
   }
 }
 
-/* Mobile Large */
-@media (max-width: 480px) {
+/* Mobile Portrait (480px - 639px) */
+@media (max-width: 639px) {
+  .discover-page .container {
+    padding: 0 10px;
+  }
+  
   .discover-section {
     padding: 0 15px;
   }
@@ -441,7 +523,7 @@
   }
   
   .discover-hero {
-    padding: 60px 0 30px; /* Adjust for mobile */
+    padding: 60px 0 30px;
   }
   
   .discover-hero h1 {
@@ -479,17 +561,57 @@
   }
 }
 
-/* Mobile Small */
-@media (max-width: 360px) {
+/* Extra Small Mobile (320px - 479px) */
+@media (max-width: 479px) {
+  .discover-page .container {
+    padding: 0 8px;
+  }
+  
   .discover-card {
     flex: 0 0 200px;
+  }
+  
+  .discover-hero {
+    padding: 50px 0 25px;
   }
   
   .discover-hero h1 {
     font-size: 1.8rem;
   }
   
+  .discover-hero-content {
+    padding: 0 15px;
+  }
+  
   .discover-section-header h2 {
     font-size: 1.2rem;
+  }
+  
+  .discover-view-all-btn {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
+}
+
+/* Ultra Small Mobile (280px - 319px) */
+@media (max-width: 319px) {
+  .discover-page .container {
+    padding: 0 5px;
+  }
+  
+  .discover-card {
+    flex: 0 0 180px;
+  }
+  
+  .discover-hero h1 {
+    font-size: 1.6rem;
+  }
+  
+  .discover-hero-content {
+    padding: 0 10px;
+  }
+  
+  .discover-section-header h2 {
+    font-size: 1.1rem;
   }
 }

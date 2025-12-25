@@ -25,49 +25,49 @@ const DashboardHeader = ({ activeTab, setActiveTab, authUser, logout }) => {
 
         <nav className="header-nav">
           <button
-            className={`nav-btn ${activeTab === 'internships' ? 'active' : ''}`}
+            className={`navBtn ${activeTab === 'internships' ? 'active' : ''}`}
             onClick={() => setActiveTab('internships')}
           >
             <i className="fas fa-briefcase" />
             <span>Dashboard</span>
           </button>
           <button
-            className={`nav-btn ${activeTab === 'jobs' ? 'active' : ''}`}
+            className={`navBtn ${activeTab === 'jobs' ? 'active' : ''}`}
             onClick={() => setActiveTab('jobs')}
           >
             <i className="fas fa-search" />
             <span>Find Jobs</span>
           </button>
           <button
-            className={`nav-btn ${activeTab === 'applications' ? 'active' : ''}`}
+            className={`navBtn ${activeTab === 'applications' ? 'active' : ''}`}
             onClick={() => setActiveTab('applications')}
           >
             <i className="fas fa-file-alt" />
             <span>Applications</span>
           </button>
           <button
-            className={`nav-btn ${activeTab === 'events' ? 'active' : ''}`}
+            className={`navBtn ${activeTab === 'events' ? 'active' : ''}`}
             onClick={() => setActiveTab('events')}
           >
             <i className="fas fa-calendar" />
             <span>Events</span>
           </button>
           <button
-            className={`nav-btn ${activeTab === 'prime-hub' ? 'active' : ''}`}
+            className={`navBtn ${activeTab === 'prime-hub' ? 'active' : ''}`}
             onClick={() => setActiveTab('prime-hub')}
           >
             <i className="fas fa-star" />
             <span>ROAC Prime</span>
           </button>
           <button
-            className={`nav-btn ${activeTab === 'saved-items' ? 'active' : ''}`}
+            className={`navBtn ${activeTab === 'saved-items' ? 'active' : ''}`}
             onClick={() => setActiveTab('saved-items')}
           >
             <i className="fas fa-heart" />
             <span>Saved Items</span>
           </button>
           <button
-            className={`nav-btn ${activeTab === 'profile' ? 'active' : ''}`}
+            className={`navBtn ${activeTab === 'profile' ? 'active' : ''}`}
             onClick={() => setActiveTab('profile')}
           >
             <i className="fas fa-user" />

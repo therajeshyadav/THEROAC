@@ -63,7 +63,7 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.saved-items-nav .nav-btn {
+.saved-items-nav .nav-Btn {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -78,12 +78,12 @@
   transition: all 0.3s ease;
 }
 
-.saved-items-nav .nav-btn:hover {
+.saved-items-nav .nav-Btn:hover {
   color: #FFD600;
   background: rgba(255, 214, 0, 0.1);
 }
 
-.saved-items-nav .nav-btn.active {
+.saved-items-nav .nav-Btn.active {
   color: #FFD600;
   border-bottom-color: #FFD600;
   background: rgba(255, 214, 0, 0.1);
@@ -333,13 +333,13 @@
     gap: 0;
   }
 
-  .saved-items-nav .nav-btn {
+  .saved-items-nav .nav-Btn {
     padding: 0.75rem 1rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 0;
   }
 
-  .saved-items-nav .nav-btn.active {
+  .saved-items-nav .nav-Btn.active {
     border-bottom-color: #FFD600;
   }
 

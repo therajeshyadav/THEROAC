@@ -562,7 +562,7 @@ textarea {
   border-radius: 8px;
   color: #fff;
   font-size: 14px;
-  font-family: inherit;
+  font-family: var(--ztc-family-font1);
   resize: vertical;
   margin-bottom: 12px;
 }

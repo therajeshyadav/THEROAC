@@ -184,7 +184,7 @@
     color: #fff;
     font-size: 1rem;
     transition: all 0.3s;
-    font-family: inherit;
+    font-family: var(--ztc-family-font1); 
 }
 
 .settings-input-field:focus {

@@ -364,14 +364,14 @@ const SavedItemsTab = () => {
 
       <div className="saved-items-nav">
         <button
-          className={`nav-btn ${activeSubTab === 'bookmarks' ? 'active' : ''}`}
+          className={`nav-Btn ${activeSubTab === 'bookmarks' ? 'active' : ''}`}
           onClick={() => setActiveSubTab('bookmarks')}
         >
           <Bookmark size={18} />
           <span>Bookmarks ({bookmarkedItems.length})</span>
         </button>
         <button
-          className={`nav-btn ${activeSubTab === 'likes' ? 'active' : ''}`}
+          className={`nav-Btn ${activeSubTab === 'likes' ? 'active' : ''}`}
           onClick={() => setActiveSubTab('likes')}
         >
           <Heart size={18} />

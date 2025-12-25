@@ -1,8 +1,8 @@
 .page {
   padding: 30px;
   color: #ffffff;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
+  font-family: var(--ztc-family-font1);;
+
 }
 
 /* ---------- COVER ---------- */

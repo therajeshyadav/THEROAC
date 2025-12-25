@@ -178,7 +178,60 @@ const AboutSlider = () => {
               </div>
             </div>
           </article>
-
+          {/* Workshops */}
+          <article className="project-card">
+            <img
+              className="project-card__bg"
+              src="assets/img/discover/Workshop.png"
+              alt="Workshops"
+            />
+            <div className="overlay"></div>
+            <div className="project-card__content">
+              <div>
+                <h3 className="project-card__title">Workshops</h3>
+                <p className="project-card__desc">
+                  Learn from industry experts through live sessions and hands-on activities.
+                </p>
+                <button className="project-card__btn" onClick={() => navigate('/discover?filter=events')}>Join Now</button>
+              </div>
+            </div>
+          </article>
+          {/* Jobs */}
+          <article className="project-card">
+            <img
+              className="project-card__bg"
+              src='assets/img/discover/Jobs.png'
+              alt="Jobs"
+            />
+            <div className="overlay"></div>
+            <div className="project-card__content">
+              <div>
+                <h3 className="project-card__title">Jobs</h3>
+                <p className="project-card__desc">
+                  Find career opportunities that match your skills and passion.
+                </p>
+                <button className="project-card__btn" onClick={() => navigate('/discover?filter=jobs')}>View Jobs</button>
+              </div>
+            </div>
+          </article>
+          {/* Scholarships */}
+          <article className="project-card">
+            <img
+              className="project-card__bg"
+              src="assets/img/discover/Scholarships.jpg"
+              alt="Scholarships"
+            />
+            <div className="overlay"></div>
+            <div className="project-card__content">
+              <div>
+                <h3 className="project-card__title">Scholarships</h3>
+                <p className="project-card__desc">
+                  Access funding and support to take your academic journey further.
+                </p>
+                <button className="project-card__btn" onClick={() => navigate('/discover?filter=scholarships')}>Apply</button>
+              </div>
+            </div>
+          </article>
           {/* ROAC Talent Prime Hub - Only show if approved */}
           {isROACHubApproved && (
             <article className="project-card">
@@ -199,63 +252,6 @@ const AboutSlider = () => {
               </div>
             </article>
           )}
-
-          {/* Workshops */}
-          <article className="project-card">
-            <img
-              className="project-card__bg"
-              src="assets/img/discover/Workshop.png"
-              alt="Workshops"
-            />
-            <div className="overlay"></div>
-            <div className="project-card__content">
-              <div>
-                <h3 className="project-card__title">Workshops</h3>
-                <p className="project-card__desc">
-                  Learn from industry experts through live sessions and hands-on activities.
-                </p>
-                <button className="project-card__btn" onClick={() => navigate('/discover?filter=events')}>Join Now</button>
-              </div>
-            </div>
-          </article>
-
-          {/* Scholarships */}
-          <article className="project-card">
-            <img
-              className="project-card__bg"
-              src="assets/img/discover/Scholarships.jpg"
-              alt="Scholarships"
-            />
-            <div className="overlay"></div>
-            <div className="project-card__content">
-              <div>
-                <h3 className="project-card__title">Scholarships</h3>
-                <p className="project-card__desc">
-                  Access funding and support to take your academic journey further.
-                </p>
-                <button className="project-card__btn" onClick={() => navigate('/discover?filter=scholarships')}>Apply</button>
-              </div>
-            </div>
-          </article>
-
-          {/* Jobs */}
-          <article className="project-card">
-            <img
-              className="project-card__bg"
-              src='assets/img/discover/Jobs.png'
-              alt="Jobs"
-            />
-            <div className="overlay"></div>
-            <div className="project-card__content">
-              <div>
-                <h3 className="project-card__title">Jobs</h3>
-                <p className="project-card__desc">
-                  Find career opportunities that match your skills and passion.
-                </p>
-                <button className="project-card__btn" onClick={() => navigate('/discover?filter=jobs')}>View Jobs</button>
-              </div>
-            </div>
-          </article>
         </div>
       </div>
 

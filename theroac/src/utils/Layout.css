@@ -1,0 +1,100 @@
+.submenu-button {
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.has-sub > .submenu-button::after {
+  content: "+";
+}
+
+.has-sub.open > .submenu-button::after {
+  content: "-";
+}
+
+
+.allmobilesection {
+  padding: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 20px;
+}
+
+.allmobilesection .vl-btn10 {
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: 12px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.dashboard-btn {
+  background: linear-gradient(45deg, #ffd700, #ffed4e);
+  color: #000000 !important;
+}
+
+.dashboard-btn:hover {
+  background: linear-gradient(45deg, #ffed4e, #ffd700);
+  transform: translateY(-2px);
+}
+
+.logout-btn {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.logout-btn:hover {
+  background: rgba(255, 0, 0, 0.2);
+  border-color: rgba(255, 0, 0, 0.4);
+  color: #ff6b6b !important;
+}
+
+.login-btn {
+  background: linear-gradient(45deg, #4CAF50, #45a049);
+  color: #ffffff !important;
+}
+
+.login-btn:hover {
+  background: linear-gradient(45deg, #45a049, #4CAF50);
+  transform: translateY(-2px);
+}
+
+.signup-btn {
+  background: linear-gradient(45deg, #ffd700, #ffed4e);
+  color: #000000 !important;
+}
+
+.signup-btn:hover {
+  background: linear-gradient(45deg, #ffed4e, #ffd700);
+  transform: translateY(-2px);
+}
+
+.space16 {
+  height: 16px;
+}
+
+
+.sub-menu.show {
+  max-height: 300px !important;
+  opacity: 1 !important;
+}
+
+
+.has-sub.open .sub-menu {
+  max-height: 300px !important;
+  opacity: 1 !important;
+  display: block !important;
+}
+
+
+.sub-menu li a {
+  pointer-events: auto !important;
+  z-index: 10 !important;
+}

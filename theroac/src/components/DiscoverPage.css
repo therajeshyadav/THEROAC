@@ -13,7 +13,7 @@
   background: #0f0f0f;
   color: #ffffff;
   min-height: 100vh;
-  font-family: var(--ztc-family-font1);;
+  font-family: var(--ztc-family-font1);
   /* Ensure proper spacing from header */
   padding-top: 0;
   margin-top: 0;
@@ -21,6 +21,7 @@
   line-height: 1.6;
   font-size: 16px;
   width: 100%;
+  overflow-x: hidden; /* Prevent horizontal scroll */
 }
 
 /* Fix header/footer conflicts */
@@ -37,7 +38,7 @@
 
 /* Override any global button styles */
 .discover-page button {
-  font-family: var(--ztc-family-font1);;
+  font-family: var(--ztc-family-font1);
 }
 
 /* Override any global link styles */
@@ -55,8 +56,13 @@
   padding: 120px 0 60px; /* Increased top padding for header space */
   text-align: center;
   position: relative;
-  overflow: hidden;
+  overflow: visible; /* Changed from hidden to visible */
   margin-top: 0; /* Remove any margin conflicts */
+  width: 100%;
+  min-height: 300px; /* Ensure minimum height */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .discover-hero::before {
@@ -86,12 +92,14 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  line-height: 1.2;
 }
 
 .discover-hero p {
   font-size: 1.2rem;
   color: #cccccc;
   margin-bottom: 30px;
+  line-height: 1.5;
 }
 
 .discover-view-all-btn {
@@ -122,6 +130,7 @@
   padding: 40px 0;
   max-width: 1400px;
   margin: 0 auto;
+  width: 100%;
 }
 
 .discover-no-content {
@@ -144,6 +153,7 @@
 .discover-section {
   margin-bottom: 50px;
   padding: 0 60px;
+  width: 100%;
 }
 
 .discover-section-header {
@@ -352,46 +362,78 @@
 }
 
 /* ===================================================== */
-/* 📱 RESPONSIVE DESIGN - Enhanced Mobile-First */
+/* 🔧 UTILITY CLASSES FOR RESPONSIVE DESIGN */
 /* ===================================================== */
 
-/* Mobile Menu Styles */
-.mobile-header {
-  background: #0f0f0f;
-  border-bottom: 1px solid #333;
-  z-index: 1000;
+/* Hide elements on specific screen sizes */
+.hide-mobile {
+  display: block;
 }
 
-.mobile-sidebar {
-  background: #0f0f0f;
-  z-index: 1001;
+.hide-desktop {
+  display: none;
 }
 
-.mobile-sidebar.mobile-menu-active {
-  transform: translateX(0);
+.show-mobile {
+  display: none;
 }
+
+.show-desktop {
+  display: block;
+}
+
+/* Text alignment utilities */
+.text-center-mobile {
+  text-align: left;
+}
+
+.text-left-mobile {
+  text-align: left;
+}
+
+/* Spacing utilities */
+.mb-mobile-small {
+  margin-bottom: 10px;
+}
+
+.mb-mobile-medium {
+  margin-bottom: 20px;
+}
+
+.p-mobile-small {
+  padding: 10px;
+}
+
+.p-mobile-medium {
+  padding: 20px;
+}
+
+/* ===================================================== */
+/* 📱 RESPONSIVE DESIGN - Following Home Page Patterns */
+/* ===================================================== */
 
 /* Container System - Following Home page pattern */
 .discover-page .container {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 0 15px;
+  padding: 0 2rem;
 }
 
 .discover-page .container-fluid {
   width: 100%;
-  padding: 0 15px;
+  padding: 0 2rem;
 }
 
 /* Spacing System - Following Home page pattern */
-.discover-page .sp1 { padding: 100px 0; }
-.discover-page .sp2 { padding: 100px 0 70px; }
-.discover-page .sp3 { padding: 0 0 70px; }
+.discover-page .sp1 { padding: 120px 0; }
+.discover-page .sp2 { padding: 100px 0 80px; }
+.discover-page .sp3 { padding: 0 0 80px; }
 
-/* Large Desktop (1400px+) */
+/* Large Desktop (1400px+) - Default styles already applied */
 @media (min-width: 1400px) {
   .discover-content {
     max-width: 1600px;
+    padding: 0 2rem;
   }
   
   .discover-section {
@@ -401,31 +443,58 @@
   .discover-card {
     flex: 0 0 320px;
   }
+  
+  .discover-hero-content {
+    max-width: 900px;
+  }
 }
 
 /* Desktop (1200px - 1399px) */
 @media (max-width: 1399px) {
+  .discover-page .container {
+    max-width: 1200px;
+    padding: 0 1.5rem;
+  }
+  
   .discover-content {
     max-width: 1200px;
+    padding: 0 1.5rem;
   }
   
   .discover-section {
     padding: 0 60px;
   }
+  
+  .discover-hero-content {
+    max-width: 800px;
+  }
 }
 
-/* Large Tablets (1024px - 1199px) */
+/* Laptop/Tablet Landscape (1024px - 1199px) */
 @media (max-width: 1199px) {
+  .discover-page .container {
+    max-width: 1024px;
+    padding: 0 1rem;
+  }
+  
+  .discover-content {
+    padding: 0 1rem;
+  }
+  
   .discover-section {
     padding: 0 40px;
   }
   
   .discover-card {
-    flex: 0 0 260px;
+    flex: 0 0 280px;
   }
   
   .discover-hero h1 {
     font-size: 3rem;
+  }
+  
+  .discover-hero-content {
+    max-width: 700px;
   }
   
   .discover-scroll-btn.left {
@@ -439,28 +508,61 @@
 
 /* Tablet Portrait (768px - 1023px) */
 @media (max-width: 1023px) {
-  .discover-page .sp1 { padding: 50px 0; }
-  .discover-page .sp2 { padding: 50px 0 20px; }
+  .discover-page .container {
+    padding: 0 1rem;
+  }
+  
+  .discover-page .sp1 { padding: 80px 0; }
+  .discover-page .sp2 { padding: 60px 0 40px; }
   .discover-page .sp3 { padding: 0 0 40px; }
+  
+  .discover-content {
+    padding: 0 1rem;
+  }
   
   .discover-section {
     padding: 0 30px;
   }
   
+  .discover-card {
+    flex: 0 0 260px;
+  }
+  
   .discover-hero {
-    padding: 80px 0 40px;
+    padding: 100px 0 50px;
   }
   
   .discover-hero h1 {
     font-size: 2.8rem;
   }
+  
+  .discover-hero-content {
+    max-width: 600px;
+    padding: 0 1rem;
+  }
+  
+  .discover-section-header {
+    padding: 0 15px;
+  }
+  
+  .discover-section-header h2 {
+    font-size: 1.6rem;
+  }
 }
 
 /* Mobile Landscape (640px - 767px) */
 @media (max-width: 767px) {
-  .discover-page .sp1 { padding: 50px 0; }
-  .discover-page .sp2 { padding: 50px 0 20px; }
-  .discover-page .sp3 { padding: 0 0 40px; }
+  .discover-page .container {
+    padding: 0 0.75rem;
+  }
+  
+  .discover-page .sp1 { padding: 60px 0; }
+  .discover-page .sp2 { padding: 50px 0 30px; }
+  .discover-page .sp3 { padding: 0 0 30px; }
+  
+  .discover-content {
+    padding: 0 0.75rem;
+  }
   
   .discover-section {
     padding: 0 20px;
@@ -482,10 +584,15 @@
     font-size: 1.1rem;
   }
   
+  .discover-hero-content {
+    max-width: 500px;
+    padding: 0 0.75rem;
+  }
+  
   .discover-section-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 10px;
+    gap: 12px;
     padding: 0 10px;
   }
   
@@ -506,12 +613,25 @@
   .discover-scroll-btn.right {
     right: -10px;
   }
+  
+  .discover-view-all-btn {
+    padding: 10px 20px;
+    font-size: 0.95rem;
+  }
 }
 
 /* Mobile Portrait (480px - 639px) */
 @media (max-width: 639px) {
   .discover-page .container {
-    padding: 0 10px;
+    padding: 0 0.5rem;
+  }
+  
+  .discover-page .sp1 { padding: 50px 0; }
+  .discover-page .sp2 { padding: 40px 0 25px; }
+  .discover-page .sp3 { padding: 0 0 25px; }
+  
+  .discover-content {
+    padding: 0 0.5rem;
   }
   
   .discover-section {
@@ -523,19 +643,28 @@
   }
   
   .discover-hero {
-    padding: 60px 0 30px;
+    padding: 70px 0 35px;
   }
   
   .discover-hero h1 {
-    font-size: 2rem;
+    font-size: 2.2rem;
   }
   
   .discover-hero p {
     font-size: 1rem;
   }
   
+  .discover-hero-content {
+    max-width: 400px;
+    padding: 0 0.5rem;
+  }
+  
+  .discover-section-header {
+    padding: 0 8px;
+  }
+  
   .discover-section-header h2 {
-    font-size: 1.3rem;
+    font-size: 1.4rem;
   }
   
   .discover-scroll-btn {
@@ -559,12 +688,29 @@
   .discover-card-details {
     font-size: 0.8rem;
   }
+  
+  .discover-view-all-btn {
+    padding: 10px 18px;
+    font-size: 0.9rem;
+  }
 }
 
 /* Extra Small Mobile (320px - 479px) */
 @media (max-width: 479px) {
   .discover-page .container {
-    padding: 0 8px;
+    padding: 0 0.375rem;
+  }
+  
+  .discover-page .sp1 { padding: 40px 0; }
+  .discover-page .sp2 { padding: 35px 0 20px; }
+  .discover-page .sp3 { padding: 0 0 20px; }
+  
+  .discover-content {
+    padding: 0 0.375rem;
+  }
+  
+  .discover-section {
+    padding: 0 10px;
   }
   
   .discover-card {
@@ -572,46 +718,317 @@
   }
   
   .discover-hero {
-    padding: 50px 0 25px;
+    padding: 60px 0 30px;
   }
   
   .discover-hero h1 {
-    font-size: 1.8rem;
+    font-size: 1.9rem;
+  }
+  
+  .discover-hero p {
+    font-size: 0.95rem;
   }
   
   .discover-hero-content {
-    padding: 0 15px;
+    max-width: 320px;
+    padding: 0 0.375rem;
+  }
+  
+  .discover-section-header {
+    padding: 0 5px;
   }
   
   .discover-section-header h2 {
-    font-size: 1.2rem;
+    font-size: 1.3rem;
+  }
+  
+  .discover-card-content {
+    padding: 10px;
+  }
+  
+  .discover-card-content h3 {
+    font-size: 0.85rem;
+  }
+  
+  .discover-card-details {
+    font-size: 0.75rem;
   }
   
   .discover-view-all-btn {
-    padding: 10px 20px;
-    font-size: 0.9rem;
+    padding: 9px 16px;
+    font-size: 0.85rem;
+  }
+  
+  .discover-carousel {
+    gap: 10px;
   }
 }
 
 /* Ultra Small Mobile (280px - 319px) */
 @media (max-width: 319px) {
   .discover-page .container {
-    padding: 0 5px;
+    padding: 0 0.25rem;
+  }
+  
+  .discover-page .sp1 { padding: 35px 0; }
+  .discover-page .sp2 { padding: 30px 0 15px; }
+  .discover-page .sp3 { padding: 0 0 15px; }
+  
+  .discover-content {
+    padding: 0 0.25rem;
+  }
+  
+  .discover-section {
+    padding: 0 8px;
   }
   
   .discover-card {
     flex: 0 0 180px;
   }
   
+  .discover-hero {
+    padding: 50px 0 25px;
+  }
+  
   .discover-hero h1 {
-    font-size: 1.6rem;
+    font-size: 1.7rem;
+  }
+  
+  .discover-hero p {
+    font-size: 0.9rem;
   }
   
   .discover-hero-content {
-    padding: 0 10px;
+    max-width: 280px;
+    padding: 0 0.25rem;
   }
   
   .discover-section-header h2 {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
+  }
+  
+  .discover-card-content {
+    padding: 8px;
+  }
+  
+  .discover-card-content h3 {
+    font-size: 0.8rem;
+  }
+  
+  .discover-card-details {
+    font-size: 0.7rem;
+  }
+  
+  .discover-view-all-btn {
+    padding: 8px 14px;
+    font-size: 0.8rem;
+  }
+  
+  .discover-carousel {
+    gap: 8px;
+  }
+}
+
+/* ===================================================== */
+/* 🎯 ADDITIONAL RESPONSIVE ENHANCEMENTS */
+/* ===================================================== */
+
+/* High DPI / Retina Display Optimizations */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .discover-card-image img {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* Reduced Motion Preferences */
+@media (prefers-reduced-motion: reduce) {
+  .discover-page * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Landscape Orientation Adjustments for Mobile */
+@media (max-height: 500px) and (orientation: landscape) {
+  .discover-hero {
+    padding: 40px 0 20px;
+  }
+  
+  .discover-hero h1 {
+    font-size: 2rem;
+  }
+  
+  .discover-hero p {
+    font-size: 0.9rem;
+  }
+}
+
+/* ===================================================== */
+/* 📱 RESPONSIVE UTILITY CLASSES - MOBILE OVERRIDES */
+/* ===================================================== */
+
+/* Mobile-specific utility overrides */
+@media (max-width: 1023px) {
+  .hide-mobile {
+    display: none !important;
+  }
+  
+  .show-mobile {
+    display: block !important;
+  }
+  
+  .text-center-mobile {
+    text-align: center !important;
+  }
+  
+  .text-left-mobile {
+    text-align: left !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .mb-mobile-small {
+    margin-bottom: 10px !important;
+  }
+  
+  .mb-mobile-medium {
+    margin-bottom: 20px !important;
+  }
+  
+  .p-mobile-small {
+    padding: 10px !important;
+  }
+  
+  .p-mobile-medium {
+    padding: 20px !important;
+  }
+}
+
+@media (max-width: 639px) {
+  .discover-event-slider-wrapper {
+    padding: 0;
+    margin: 0;
+  }
+  
+  .discover-event-slider-wrapper .prime-carousel-container {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+}
+
+@media (max-width: 479px) {
+  .discover-event-slider-wrapper .prime-carousel-container {
+    padding-left: 0.375rem;
+    padding-right: 0.375rem;
+  }
+}
+
+@media (max-width: 319px) {
+  .discover-event-slider-wrapper .prime-carousel-container {
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+  }
+}
+/* ===================================================== */
+/* 🔧 SPECIFIC FIX FOR 412x915 SCREEN (Galaxy S20/S21) */
+/* ===================================================== */
+
+/* Target 412x915 and similar resolutions */
+@media (max-width: 414px) and (min-width: 410px) and (max-height: 920px) and (min-height: 910px) {
+  .discover-hero {
+    padding: 90px 0 40px !important;
+    min-height: 400px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  
+  .discover-hero-content {
+    padding: 20px 16px !important;
+    max-width: 100% !important;
+    width: calc(100% - 32px) !important;
+    margin: 0 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    position: relative !important;
+    z-index: 10 !important;
+  }
+  
+  .discover-hero h1 {
+    font-size: 2.3rem !important;
+    line-height: 1.2 !important;
+    margin-bottom: 16px !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    white-space: normal !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  
+  .discover-hero p {
+    font-size: 1rem !important;
+    line-height: 1.4 !important;
+    margin-bottom: 20px !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  
+  .discover-view-all-btn {
+    padding: 12px 20px !important;
+    font-size: 0.9rem !important;
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+}
+
+/* Broader fix for similar screen sizes */
+@media (max-width: 414px) and (max-height: 920px) {
+  .discover-hero {
+    overflow: visible !important;
+    position: relative !important;
+  }
+  
+  .discover-hero::before {
+    z-index: 1 !important;
+  }
+  
+  .discover-hero-content {
+    position: relative !important;
+    z-index: 10 !important;
+    transform: none !important;
+  }
+  
+  .discover-hero h1,
+  .discover-hero p,
+  .discover-view-all-btn {
+    transform: none !important;
+    position: relative !important;
+    z-index: 11 !important;
+  }
+}
+
+/* Emergency visibility fix for all mobile devices */
+@media (max-width: 480px) {
+  .discover-hero * {
+    visibility: visible !important;
+    opacity: 1 !important;
+    display: block !important;
+  }
+  
+  .discover-hero-content * {
+    max-width: 100% !important;
+    overflow: visible !important;
+  }
+  
+  .discover-hero {
+    background: #1a1a1a !important; /* Fallback background */
   }
 }

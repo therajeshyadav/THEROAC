@@ -125,14 +125,53 @@
   font-weight: bold;
 }
 /* ===================================================== */
-/* 🧠 RESPONSIVE DESIGN */
+/* 🧠 RESPONSIVE DESIGN - Following Home Page Patterns */
 /* ===================================================== */
 
-/* Tablets (landscape & portrait) */
-@media (max-width: 1024px) {
+/* Large Desktop (1400px+) - Default styles already applied */
+@media (min-width: 1400px) {
   .prime-carousel-container {
-    padding: 30px;
+    padding: 40px 2rem;
   }
+  
+  .prime-card {
+    flex: 0 0 340px;
+  }
+  
+  .prime-img-wrapper {
+    height: 200px;
+  }
+  
+  .heading13.pb-3.text-white {
+    font-size: 2rem;
+  }
+}
+
+/* Desktop (1200px - 1399px) */
+@media (max-width: 1399px) {
+  .prime-carousel-container {
+    padding: 35px 1.5rem;
+  }
+  
+  .prime-card {
+    flex: 0 0 320px;
+  }
+  
+  .prime-img-wrapper {
+    height: 180px;
+  }
+  
+  .heading13.pb-3.text-white {
+    font-size: 1.85rem;
+  }
+}
+
+/* Laptop/Tablet Landscape (1024px - 1199px) */
+@media (max-width: 1199px) {
+  .prime-carousel-container {
+    padding: 30px 1rem;
+  }
+  
   .prime-card {
     flex: 0 0 280px;
   }
@@ -148,18 +187,76 @@
   .Event-btn.left {
     left: -32px;
   }
+  
   .Event-btn.right {
     right: -32px;
   }
+  
   .heading13.pb-3.text-white {
-    font-size: 1.625rem;
+    font-size: 1.7rem;
   }
 }
 
-/* Mobile Large (portrait mode phones) */
-@media (max-width: 768px) {
+/* Tablet Portrait (768px - 1023px) */
+@media (max-width: 1023px) {
   .prime-carousel-container {
-    padding: 10px 30px;
+    padding: 25px 1rem;
+  }
+
+  .section-header-with-discover {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .discover-section-btn {
+    font-size: 0.85rem;
+    padding: 7px 14px;
+  }
+
+  .prime-card {
+    flex: 0 0 260px;
+  }
+
+  .prime-img-wrapper {
+    height: 150px;
+  }
+
+  .prime-card-content {
+    padding: 14px;
+  }
+
+  .prime-card-content h3 {
+    font-size: 0.9rem;
+  }
+
+  .prime-card-content p {
+    font-size: 0.85rem;
+  }
+
+  .Event-btn {
+    width: 45px;
+    height: 45px;
+    font-size: 1.8rem;
+  }
+  
+  .Event-btn.left {
+    left: -25px;
+  }
+  
+  .Event-btn.right {
+    right: -25px;
+  }
+  
+  .heading13.pb-3.text-white {
+    font-size: 1.6rem;
+  }
+}
+
+/* Mobile Landscape (640px - 767px) */
+@media (max-width: 767px) {
+  .prime-carousel-container {
+    padding: 20px 0.75rem;
   }
 
   .section-header-with-discover {
@@ -194,30 +291,36 @@
   }
 
   .Event-btn {
-    width: 30px;
-    height: 30px;
-    font-size: 1.5rem;
+    width: 40px;
+    height: 40px;
+    font-size: 1.6rem;
   }
+  
   .Event-btn.left {
     left: -20px;
   }
+  
   .Event-btn.right {
     right: -20px;
   }
+  
+  .heading13.pb-3.text-white {
+    font-size: 1.5rem;
+  }
 }
 
-/* Mobile Small (under 480px) */
-@media (max-width: 480px) {
+/* Mobile Portrait (480px - 639px) */
+@media (max-width: 639px) {
   .prime-carousel-container {
-    padding: 10px 20px;
+    padding: 15px 0.5rem;
   }
+  
   .prime-carousel {
     gap: 12px;
   }
 
   .prime-card {
-    flex: 0 0 76%;
-    margin: 0px 10px;
+    flex: 0 0 220px;
   }
 
   .prime-img-wrapper {
@@ -235,7 +338,150 @@
   .prime-card-content p {
     font-size: 0.75rem;
   }
+  
+  .Event-btn {
+    width: 35px;
+    height: 35px;
+    font-size: 1.4rem;
+  }
+  
+  .Event-btn.left {
+    left: -15px;
+  }
+  
+  .Event-btn.right {
+    right: -15px;
+  }
+  
+  .heading13.pb-3.text-white {
+    font-size: 1.4rem;
+  }
+  
+  .discover-section-btn {
+    font-size: 0.75rem;
+    padding: 5px 10px;
+  }
+}
+
+/* Extra Small Mobile (320px - 479px) */
+@media (max-width: 479px) {
+  .prime-carousel-container {
+    padding: 10px 0.375rem;
+  }
+  
+  .prime-carousel {
+    gap: 10px;
+  }
+
+  .prime-card {
+    flex: 0 0 200px;
+  }
+
+  .prime-img-wrapper {
+    height: 120px;
+  }
+
+  .prime-card-content {
+    padding: 8px;
+  }
+
+  .prime-card-content h3 {
+    font-size: 0.8rem;
+  }
+
+  .prime-card-content p {
+    font-size: 0.7rem;
+  }
+  
   .Event-btn {
     display: none;
+  }
+  
+  .heading13.pb-3.text-white {
+    font-size: 1.3rem;
+  }
+  
+  .discover-section-btn {
+    font-size: 0.7rem;
+    padding: 4px 8px;
+  }
+}
+
+/* Ultra Small Mobile (280px - 319px) */
+@media (max-width: 319px) {
+  .prime-carousel-container {
+    padding: 8px 0.25rem;
+  }
+  
+  .prime-carousel {
+    gap: 8px;
+  }
+
+  .prime-card {
+    flex: 0 0 180px;
+  }
+
+  .prime-img-wrapper {
+    height: 110px;
+  }
+
+  .prime-card-content {
+    padding: 6px;
+  }
+
+  .prime-card-content h3 {
+    font-size: 0.75rem;
+  }
+
+  .prime-card-content p {
+    font-size: 0.65rem;
+  }
+  
+  .heading13.pb-3.text-white {
+    font-size: 1.2rem;
+  }
+  
+  .discover-section-btn {
+    font-size: 0.65rem;
+    padding: 3px 6px;
+  }
+}
+
+/* ===================================================== */
+/* 🎯 ADDITIONAL RESPONSIVE ENHANCEMENTS */
+/* ===================================================== */
+
+/* High DPI / Retina Display Optimizations */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .prime-img {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* Reduced Motion Preferences */
+@media (prefers-reduced-motion: reduce) {
+  .prime-carousel {
+    scroll-behavior: auto;
+  }
+  
+  .Event-btn,
+  .discover-section-btn {
+    transition: none;
+  }
+}
+
+/* Landscape Orientation Adjustments for Mobile */
+@media (max-height: 500px) and (orientation: landscape) {
+  .prime-carousel-container {
+    padding: 15px 0.5rem;
+  }
+  
+  .prime-img-wrapper {
+    height: 100px;
+  }
+  
+  .heading13.pb-3.text-white {
+    font-size: 1.2rem;
   }
 }

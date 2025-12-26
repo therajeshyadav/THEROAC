@@ -104,92 +104,99 @@ function App() {
           {showHeaderFooter && <Header />}
 
           <main>
-            <Layout>
+            {!isDashboardPage ? (
+              <Layout>
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/speakers" element={<Speakers />} />
+                  <Route path="/schedule" element={<Schedule />} />
+                  <Route path="/blog" element={<Blog />} />
+                  <Route path="/contact" element={<Contact />} />
+                  <Route path="/discover" element={<Discover />} />
+                  <Route path="/oauth2callback" element={<Callback />} />
+                  {/* Public routes - redirect to dashboard if already logged in */}
+                  <Route
+                    path="/login"
+                    element={
+                      <PublicRoute>
+                        <Login />
+                      </PublicRoute>
+                    }
+                  />
+                  <Route
+                    path="/register"
+                    element={
+                      <PublicRoute>
+                        <Register />
+                      </PublicRoute>
+                    }
+                  />
+                  <Route
+                    path="/signup"
+                    element={
+                      <PublicRoute>
+                        <Signup />
+                      </PublicRoute>
+                    }
+                  />
+                  <Route
+                    path="/forgot-password"
+                    element={
+                      <PublicRoute>
+                        <ForgotPassword />
+                      </PublicRoute>
+                    }
+                  />
+                  <Route
+                    path="/reset-password"
+                    element={
+                      <PublicRoute>
+                        <ResetPassword />
+                      </PublicRoute>
+                    }
+                  />
+                  <Route
+                    path="/verify-email"
+                    element={
+                      <PublicRoute>
+                        <VerifyEmail />
+                      </PublicRoute>
+                    }
+                  />
+                  <Route
+                    path="/resend-verification"
+                    element={
+                      <PublicRoute>
+                        <ResendVerification />
+                      </PublicRoute>
+                    }
+                  />
+                  <Route
+                    path="/verification-pending"
+                    element={
+                      <PublicRoute>
+                        <VerificationPending />
+                      </PublicRoute>
+                    }
+                  />
+                  <Route
+                    path="/event-detail/:type/:slug"
+                    element={<UnifiedDetailsPage />}
+                  />
+                  <Route
+                    path="/notifications"
+                    element={
+                      <ProtectedRoute>
+                        <NotificationsPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  {/* Catch-all route for 404 - must be last */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Layout>
+            ) : (
               <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/speakers" element={<Speakers />} />
-                <Route path="/schedule" element={<Schedule />} />
-                <Route path="/blog" element={<Blog />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/discover" element={<Discover />} />
-                <Route path="/oauth2callback" element={<Callback />} />
-                {/* Public routes - redirect to dashboard if already logged in */}
-                <Route
-                  path="/login"
-                  element={
-                    <PublicRoute>
-                      <Login />
-                    </PublicRoute>
-                  }
-                />
-                <Route
-                  path="/register"
-                  element={
-                    <PublicRoute>
-                      <Register />
-                    </PublicRoute>
-                  }
-                />
-                <Route
-                  path="/signup"
-                  element={
-                    <PublicRoute>
-                      <Signup />
-                    </PublicRoute>
-                  }
-                />
-                <Route
-                  path="/forgot-password"
-                  element={
-                    <PublicRoute>
-                      <ForgotPassword />
-                    </PublicRoute>
-                  }
-                />
-                <Route
-                  path="/reset-password"
-                  element={
-                    <PublicRoute>
-                      <ResetPassword />
-                    </PublicRoute>
-                  }
-                />
-                <Route
-                  path="/verify-email"
-                  element={
-                    <PublicRoute>
-                      <VerifyEmail />
-                    </PublicRoute>
-                  }
-                />
-                <Route
-                  path="/resend-verification"
-                  element={
-                    <PublicRoute>
-                      <ResendVerification />
-                    </PublicRoute>
-                  }
-                />
-                <Route
-                  path="/verification-pending"
-                  element={
-                    <PublicRoute>
-                      <VerificationPending />
-                    </PublicRoute>
-                  }
-                />
-                <Route
-                  path="/event-detail/:type/:slug"
-                  element={<UnifiedDetailsPage />}
-                />
-                <Route
-                  path="/notifications"
-                  element={
-                    <ProtectedRoute>
-                      <NotificationsPage />
-                    </ProtectedRoute>
-                  }
-                />
                 <Route
                   path="/dashboard"
                   element={
@@ -225,7 +232,7 @@ function App() {
                 {/* Catch-all route for 404 - must be last */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
-            </Layout>
+            )}
           </main>
 
           {showHeaderFooter && <Footer />}

@@ -45,9 +45,13 @@ const Layout = ({ children }) => {
               </div>
               <div
                 className="mobile-nav-icon dots-menu"
-                onClick={() => setMenuOpen(true)}
+                onClick={() => setMenuOpen(!menuOpen)}
               >
-                <i className="fa-solid fa-bars-staggered"></i>
+                {menuOpen ? (
+                  <i className="fa-solid fa-xmark"></i>
+                ) : (
+                  <i className="fa-solid fa-bars-staggered"></i>
+                )}
               </div>
             </div>
           </div>
@@ -55,6 +59,21 @@ const Layout = ({ children }) => {
       </div>
 
       {/* ===== Mobile Sidebar ===== */}
+      {menuOpen && (
+        <div 
+          className="mobile-overlay"
+          onClick={() => setMenuOpen(false)}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            zIndex: 999
+          }}
+        />
+      )}
       <div
         className={`mobile-sidebar mobile-sidebar10 ${
           menuOpen ? "mobile-menu-active" : ""

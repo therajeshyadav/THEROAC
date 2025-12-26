@@ -50,8 +50,8 @@ const RecruiterDashboard = () => {
     return location.state?.activeTab || "dashboard";
   });
   const [pendingModalType, setPendingModalType] = useState(null);
-  const [sidebarExpanded, setSidebarExpanded] = useState(false);
   const [notifications] = useState(3);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 767);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [stats, setStats] = useState(null);
@@ -82,6 +82,15 @@ const RecruiterDashboard = () => {
   });
 
   const preloaderVisible = usePreloader(300);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 767);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Handle URL parameter changes (only on location change, not activeTab change)
   useEffect(() => {
@@ -371,12 +380,12 @@ const RecruiterDashboard = () => {
         />
 
         <div className="organizer-content">
-          <RecruiterSidebar
-            activeTab={activeTab}
-            setActiveTab={handleTabChange}
-            sidebarExpanded={sidebarExpanded}
-            setSidebarExpanded={setSidebarExpanded}
-          />
+          {!isMobile && (
+            <RecruiterSidebar
+              activeTab={activeTab}
+              setActiveTab={handleTabChange}
+            />
+          )}
 
           <div className="organizer-main">
             <div className="max-w-[1200px]">

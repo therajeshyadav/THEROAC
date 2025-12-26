@@ -24,16 +24,14 @@ const navItems = [
 
 const RecruiterSidebar = ({
   activeTab,
-  setActiveTab,
-  sidebarExpanded,
-  setSidebarExpanded
+  setActiveTab
 }) => {
+  const handleNavClick = (tabId) => {
+    setActiveTab(tabId);
+  };
+
   return (
-    <div
-      className={`organizer-sidebar ${sidebarExpanded ? "expanded" : ""}`}
-      onMouseEnter={() => setSidebarExpanded(true)}
-      onMouseLeave={() => setSidebarExpanded(false)}
-    >
+    <div className="organizer-sidebar">
       <nav className="sidebar-nav">
         {navItems.map((item) => (
           <button
@@ -41,7 +39,7 @@ const RecruiterSidebar = ({
             className={`nav-item ${
               activeTab === item.id ? "active" : ""
             }`}
-            onClick={() => setActiveTab(item.id)}
+            onClick={() => handleNavClick(item.id)}
           >
             <item.icon className="w-5 h-5" />
             <span>{item.label}</span>

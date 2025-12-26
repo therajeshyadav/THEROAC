@@ -50,6 +50,7 @@ const AdminDashboard = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [notifications] = useState(5);
   const [loading, setLoading] = useState(true);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 1023);
 
   const [dashboardStats, setDashboardStats] = useState(null);
   const [users, setUsers] = useState([]);
@@ -68,6 +69,15 @@ const AdminDashboard = () => {
   });
 
   const preloaderVisible = usePreloader(300);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 1023);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const navItems = [
     { id: "dashboard", label: "Dashboard", icon: BarChart3 },
@@ -281,37 +291,29 @@ const AdminDashboard = () => {
           onAvatarClick={() => setActiveTab("settings")}
           onNotificationClick={setActiveTab}
           getUserInitials={getUserInitials}
-          mobileMenuOpen={mobileMenuOpen}
-          setMobileMenuOpen={setMobileMenuOpen}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          navItems={navItems}
         />
 
-        {/* Mobile Menu Overlay */}
-        {mobileMenuOpen && (
-          <div 
-            className="admin-mobile-overlay"
-            onClick={() => setMobileMenuOpen(false)}
-          />
-        )}
-
         <div className="admin-organizer-content">
-          <AdminSidebar
-            navItems={navItems}
-            activeTab={activeTab}
-            setActiveTab={(id) => {
-              setActiveTab(id);
-              setMobileMenuOpen(false); // Close mobile menu when tab is selected
-              if (id === "users") loadUsers();
-              if (id === "jobs") loadJobs();
-              if (id === "events") loadEvents();
-            }}
-            loadUsers={loadUsers}
-            loadJobs={loadJobs}
-            loadEvents={loadEvents}
-            sidebarExpanded={sidebarExpanded}
-            setSidebarExpanded={setSidebarExpanded}
-            mobileMenuOpen={mobileMenuOpen}
-            setMobileMenuOpen={setMobileMenuOpen}
-          />
+          {!isMobile && (
+            <AdminSidebar
+              navItems={navItems}
+              activeTab={activeTab}
+              setActiveTab={(id) => {
+                setActiveTab(id);
+                if (id === "users") loadUsers();
+                if (id === "jobs") loadJobs();
+                if (id === "events") loadEvents();
+              }}
+              loadUsers={loadUsers}
+              loadJobs={loadJobs}
+              loadEvents={loadEvents}
+              sidebarExpanded={sidebarExpanded}
+              setSidebarExpanded={setSidebarExpanded}
+            />
+          )}
 
           <main className="admin-organizer-main">
             <div className="admin-max-w-1200">

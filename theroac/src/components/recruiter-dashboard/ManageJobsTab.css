@@ -554,3 +554,519 @@
     flex-wrap: wrap;
   }
 }
+/* ===================================================== */
+/* 📱 COMPREHENSIVE RESPONSIVE DESIGN FOR MANAGE JOBS TAB */
+/* ===================================================== */
+
+/* Large Desktop (1400px+) - Default styles already applied */
+@media (min-width: 1400px) {
+  .manage-jobs-container {
+    padding: 2.5rem;
+    max-width: 1600px;
+  }
+  
+  .manage-jobs-container .manage-jobs-header h2 {
+    font-size: 2rem;
+  }
+}
+
+/* Desktop (1200px - 1399px) */
+@media (max-width: 1399px) {
+  .manage-jobs-container {
+    padding: 2rem;
+    max-width: 1200px;
+  }
+}
+
+/* Laptop/Tablet Landscape (1024px - 1199px) */
+@media (max-width: 1199px) {
+  .manage-jobs-container {
+    padding: 1.5rem;
+  }
+  
+  .manage-jobs-container .manage-jobs-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .manage-jobs-container .header-buttons {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+  
+  .manage-jobs-container .search-box {
+    max-width: 100%;
+  }
+  
+  .manage-jobs-container .jobs-table {
+    overflow-x: auto;
+  }
+  
+  .manage-jobs-container .jobs-table table {
+    min-width: 1000px;
+  }
+}
+
+/* Tablet Portrait (768px - 1023px) */
+@media (max-width: 1023px) {
+  .manage-jobs-container {
+    padding: 1rem;
+  }
+  
+  .manage-jobs-container .manage-jobs-header h2 {
+    font-size: 1.6rem;
+  }
+  
+  .manage-jobs-container .manage-jobs-filters {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .manage-jobs-container .filter-buttons {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .manage-jobs-container .filter-buttons button {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+  }
+  
+  .manage-jobs-container .btn-primary {
+    padding: 0.5rem 1.25rem;
+    font-size: 0.85rem;
+  }
+  
+  .manage-jobs-container .btn-view-toggle {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+  }
+  
+  .manage-jobs-container .jobs-table th,
+  .manage-jobs-container .jobs-table td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.85rem;
+  }
+  
+  .manage-jobs-container .company-logo-small {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .manage-jobs-container .btn-icon {
+    min-width: 32px;
+    min-height: 32px;
+    padding: 0.375rem;
+  }
+}
+
+/* Mobile Landscape (640px - 767px) */
+@media (max-width: 767px) {
+  .manage-jobs-container {
+    padding: 0.75rem;
+  }
+  
+  .manage-jobs-container .manage-jobs-header {
+    margin-bottom: 1.5rem;
+  }
+  
+  .manage-jobs-container .manage-jobs-header h2 {
+    font-size: 1.4rem;
+  }
+  
+  .manage-jobs-container .manage-jobs-header p {
+    font-size: 0.9rem;
+  }
+  
+  .manage-jobs-container .header-buttons {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.75rem;
+  }
+  
+  .manage-jobs-container .btn-primary,
+  .manage-jobs-container .btn-view-toggle {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .manage-jobs-container .manage-jobs-filters {
+    margin-bottom: 1.5rem;
+  }
+  
+  .manage-jobs-container .search-box {
+    width: 100%;
+    margin-bottom: 0.75rem;
+  }
+  
+  .manage-jobs-container .filter-buttons {
+    justify-content: flex-start;
+  }
+  
+  .manage-jobs-container .filter-buttons button {
+    flex: 1;
+    min-width: 0;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+  }
+  
+  .manage-jobs-container .jobs-table table {
+    min-width: 800px;
+  }
+  
+  .manage-jobs-container .jobs-table th,
+  .manage-jobs-container .jobs-table td {
+    padding: 0.5rem 0.375rem;
+    font-size: 0.8rem;
+  }
+  
+  .manage-jobs-container .job-title-cell {
+    gap: 0.5rem;
+  }
+  
+  .manage-jobs-container .company-logo-small {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .manage-jobs-container .job-title {
+    font-size: 0.85rem;
+  }
+  
+  .manage-jobs-container .badge-featured,
+  .manage-jobs-container .badge-urgent,
+  .manage-jobs-container .badge-resubmission {
+    font-size: 0.6rem;
+    padding: 0.15rem 0.4rem;
+  }
+  
+  .manage-jobs-container .status-badge,
+  .manage-jobs-container .approval-badge {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.6rem;
+  }
+  
+  .manage-jobs-container .action-buttons {
+    gap: 0.25rem;
+  }
+  
+  .manage-jobs-container .btn-icon {
+    min-width: 28px;
+    min-height: 28px;
+    padding: 0.25rem;
+  }
+  
+  .manage-jobs-container .empty-state {
+    padding: 3rem 1rem;
+  }
+  
+  .manage-jobs-container .empty-icon {
+    font-size: 3rem;
+  }
+  
+  .manage-jobs-container .empty-state h3 {
+    font-size: 1.3rem;
+  }
+}
+
+/* Mobile Portrait (480px - 639px) */
+@media (max-width: 639px) {
+  .manage-jobs-container {
+    padding: 0.5rem;
+  }
+  
+  .manage-jobs-container .manage-jobs-header h2 {
+    font-size: 1.2rem;
+  }
+  
+  .manage-jobs-container .manage-jobs-header p {
+    font-size: 0.85rem;
+  }
+  
+  .manage-jobs-container .btn-primary {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+  }
+  
+  .manage-jobs-container .filter-buttons {
+    flex-direction: column;
+  }
+  
+  .manage-jobs-container .filter-buttons button {
+    width: 100%;
+    text-align: center;
+  }
+  
+  .manage-jobs-container .jobs-table table {
+    min-width: 700px;
+  }
+  
+  .manage-jobs-container .jobs-table th,
+  .manage-jobs-container .jobs-table td {
+    padding: 0.375rem 0.25rem;
+    font-size: 0.75rem;
+  }
+  
+  .manage-jobs-container .company-logo-small {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .manage-jobs-container .job-title {
+    font-size: 0.8rem;
+  }
+  
+  .manage-jobs-container .btn-icon {
+    min-width: 24px;
+    min-height: 24px;
+    padding: 0.2rem;
+  }
+  
+  .manage-jobs-container .btn-icon.btn-resubmit {
+    padding: 0.3rem 0.5rem;
+  }
+  
+  .manage-jobs-container .btn-icon.btn-resubmit .btn-text {
+    font-size: 0.7rem;
+  }
+  
+  .manage-jobs-container .delete-confirm-modal {
+    padding: 1.5rem;
+    width: 95%;
+  }
+  
+  .manage-jobs-container .delete-confirm-modal h3 {
+    font-size: 1.1rem;
+  }
+  
+  .manage-jobs-container .modal-actions {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .manage-jobs-container .btn-secondary,
+  .manage-jobs-container .btn-danger {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* Extra Small Mobile (320px - 479px) */
+@media (max-width: 479px) {
+  .manage-jobs-container {
+    padding: 0.375rem;
+  }
+  
+  .manage-jobs-container .manage-jobs-header {
+    margin-bottom: 1rem;
+  }
+  
+  .manage-jobs-container .manage-jobs-header h2 {
+    font-size: 1.1rem;
+  }
+  
+  .manage-jobs-container .manage-jobs-header p {
+    font-size: 0.8rem;
+  }
+  
+  .manage-jobs-container .btn-primary,
+  .manage-jobs-container .btn-view-toggle {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+  }
+  
+  .manage-jobs-container .manage-jobs-filters {
+    margin-bottom: 1rem;
+  }
+  
+  .manage-jobs-container .filter-buttons button {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.7rem;
+  }
+  
+  .manage-jobs-container .jobs-table table {
+    min-width: 600px;
+  }
+  
+  .manage-jobs-container .jobs-table th,
+  .manage-jobs-container .jobs-table td {
+    padding: 0.25rem 0.15rem;
+    font-size: 0.7rem;
+  }
+  
+  .manage-jobs-container .company-logo-small {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .manage-jobs-container .job-title {
+    font-size: 0.75rem;
+  }
+  
+  .manage-jobs-container .badge-featured,
+  .manage-jobs-container .badge-urgent,
+  .manage-jobs-container .badge-resubmission {
+    font-size: 0.55rem;
+    padding: 0.1rem 0.3rem;
+  }
+  
+  .manage-jobs-container .status-badge,
+  .manage-jobs-container .approval-badge {
+    font-size: 0.65rem;
+    padding: 0.2rem 0.5rem;
+  }
+  
+  .manage-jobs-container .btn-icon {
+    min-width: 20px;
+    min-height: 20px;
+    padding: 0.15rem;
+  }
+  
+  .manage-jobs-container .empty-state {
+    padding: 2rem 0.5rem;
+  }
+  
+  .manage-jobs-container .empty-icon {
+    font-size: 2.5rem;
+  }
+  
+  .manage-jobs-container .empty-state h3 {
+    font-size: 1.1rem;
+  }
+  
+  .manage-jobs-container .empty-state p {
+    font-size: 0.85rem;
+  }
+}
+
+/* Ultra Small Mobile (280px - 319px) */
+@media (max-width: 319px) {
+  .manage-jobs-container {
+    padding: 0.25rem;
+  }
+  
+  .manage-jobs-container .manage-jobs-header h2 {
+    font-size: 1rem;
+  }
+  
+  .manage-jobs-container .manage-jobs-header p {
+    font-size: 0.75rem;
+  }
+  
+  .manage-jobs-container .btn-primary,
+  .manage-jobs-container .btn-view-toggle {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.7rem;
+  }
+  
+  .manage-jobs-container .filter-buttons button {
+    padding: 0.35rem 0.5rem;
+    font-size: 0.65rem;
+  }
+  
+  .manage-jobs-container .jobs-table table {
+    min-width: 500px;
+  }
+  
+  .manage-jobs-container .jobs-table th,
+  .manage-jobs-container .jobs-table td {
+    padding: 0.2rem 0.1rem;
+    font-size: 0.65rem;
+  }
+  
+  .manage-jobs-container .company-logo-small {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .manage-jobs-container .job-title {
+    font-size: 0.7rem;
+  }
+}
+
+/* ===================================================== */
+/* 🎯 RESPONSIVE TABLE ENHANCEMENTS */
+/* ===================================================== */
+
+/* Hide less important columns on smaller screens */
+@media (max-width: 1023px) {
+  .manage-jobs-container .jobs-table .hide-tablet {
+    display: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .manage-jobs-container .jobs-table .hide-mobile {
+    display: none;
+  }
+}
+
+/* Responsive table scroll indicators */
+@media (max-width: 1199px) {
+  .manage-jobs-container .jobs-table {
+    position: relative;
+  }
+  
+  .manage-jobs-container .jobs-table::after {
+    content: '← Scroll to see more →';
+    position: absolute;
+    bottom: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+    text-align: center;
+  }
+}
+
+@media (max-width: 479px) {
+  .manage-jobs-container .jobs-table::after {
+    font-size: 0.7rem;
+    bottom: -20px;
+  }
+}
+
+/* ===================================================== */
+/* 🔧 ACCESSIBILITY AND PERFORMANCE */
+/* ===================================================== */
+
+/* Focus states for mobile */
+@media (max-width: 767px) {
+  .manage-jobs-container .btn-primary:focus,
+  .manage-jobs-container .btn-secondary:focus,
+  .manage-jobs-container .btn-icon:focus,
+  .manage-jobs-container .filter-buttons button:focus {
+    outline: 2px solid #ffd600;
+    outline-offset: 2px;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .manage-jobs-container .btn-icon,
+  .manage-jobs-container .btn-primary,
+  .manage-jobs-container .btn-secondary {
+    transition: none;
+  }
+  
+  .manage-jobs-container .btn-icon:hover,
+  .manage-jobs-container .btn-primary:hover,
+  .manage-jobs-container .btn-danger:hover {
+    transform: none;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .manage-jobs-container .jobs-table {
+    border: 2px solid #fff;
+  }
+  
+  .manage-jobs-container .status-badge,
+  .manage-jobs-container .approval-badge {
+    border-width: 2px;
+  }
+}

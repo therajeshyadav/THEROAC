@@ -501,7 +501,7 @@
   
   .rejection-stats {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 1rem;
   }
 
@@ -517,11 +517,12 @@
   }
 
   .rejected-actions {
-    flex-direction: column;
+    flex-direction: row;
   }
 
   .modal-overlay {
     padding: 1rem;
+    margin-top: 60px;
   }
 
   .modal-content {
@@ -570,7 +571,7 @@
 /* Mobile Portrait (480px-639px) */
 @media (max-width: 639px) {
   .rejection-stats {
-    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
     gap: 0.75rem;
   }
 

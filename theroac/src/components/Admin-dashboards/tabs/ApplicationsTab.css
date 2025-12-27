@@ -478,7 +478,7 @@
 /* Mobile Portrait (480px-639px) */
 @media (max-width: 639px) {
   .admin-enhanced-application-management {
-    padding: 0;
+    padding-left: 20px;
   }
   
   .admin-application-management-header {

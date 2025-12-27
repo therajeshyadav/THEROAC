@@ -6,7 +6,12 @@ import { toast } from "react-toastify";
 import UserProfileModal from "../UserProfileModal";
 import "./UsersTab.css";
 
-const UsersTab = ({ users: initialUsers, getUserInitials, updateUserStatus, currentAdminId }) => {
+const UsersTab = ({
+  users: initialUsers,
+  getUserInitials,
+  updateUserStatus,
+  currentAdminId,
+}) => {
   const [users, setUsers] = useState(initialUsers || []);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -29,16 +34,16 @@ const UsersTab = ({ users: initialUsers, getUserInitials, updateUserStatus, curr
         limit: 20,
         ...(search && { search }),
         ...(role && { role }),
-        ...(status && { status })
+        ...(status && { status }),
       };
-      
+
       const response = await apiService.getAdminUsers(params);
       setUsers(response.users || []);
       setTotalPages(response.pagination?.totalPages || 1);
       setCurrentPage(response.pagination?.page || 1);
     } catch (error) {
-      console.error('Error fetching users:', error);
-      toast.error('Failed to load users');
+      console.error("Error fetching users:", error);
+      toast.error("Failed to load users");
     } finally {
       setLoading(false);
     }
@@ -53,22 +58,24 @@ const UsersTab = ({ users: initialUsers, getUserInitials, updateUserStatus, curr
 
   const handleStatusUpdate = async (userId, newStatus, userName) => {
     // Prevent admin from banning themselves (frontend safeguard)
-    if (userId === currentAdminId && newStatus === 'banned') {
-      toast.error('You cannot ban yourself. Please ask another admin to perform this action if needed.');
+    if (userId === currentAdminId && newStatus === "banned") {
+      toast.error(
+        "You cannot ban yourself. Please ask another admin to perform this action if needed."
+      );
       return;
     }
 
     // Show confirmation dialog for banning users
-    if (newStatus === 'banned') {
+    if (newStatus === "banned") {
       const confirmBan = window.confirm(
         `Are you sure you want to ban "${userName}"?\n\n` +
-        `This will:\n` +
-        `• Prevent them from logging into the platform\n` +
-        `• Block access to all features\n` +
-        `• Show them a banned message with admin contact info\n\n` +
-        `This action can be reversed by changing their status back to "Active".`
+          `This will:\n` +
+          `• Prevent them from logging into the platform\n` +
+          `• Block access to all features\n` +
+          `• Show them a banned message with admin contact info\n\n` +
+          `This action can be reversed by changing their status back to "Active".`
       );
-      
+
       if (!confirmBan) {
         return; // User cancelled the ban
       }
@@ -79,8 +86,10 @@ const UsersTab = ({ users: initialUsers, getUserInitials, updateUserStatus, curr
       toast.success(`User status updated to ${newStatus}`);
       fetchUsers(currentPage, searchQuery, roleFilter, statusFilter);
     } catch (error) {
-      console.error('Error updating user status:', error);
-      toast.error(error.response?.data?.message || 'Failed to update user status');
+      console.error("Error updating user status:", error);
+      toast.error(
+        error.response?.data?.message || "Failed to update user status"
+      );
     }
   };
 
@@ -114,26 +123,30 @@ const UsersTab = ({ users: initialUsers, getUserInitials, updateUserStatus, curr
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
-              <select 
-                className="admin-filter-select"
-                value={roleFilter}
-                onChange={(e) => setRoleFilter(e.target.value)}
-              >
-                <option value="">All Roles</option>
-                <option value="admin">Admin</option>
-                <option value="recruiter">Recruiter</option>
-                <option value="candidate">Candidate</option>
-              </select>
-              <select 
-                className="admin-filter-select"
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-              >
-                <option value="">All Status</option>
-                <option value="active">Active</option>
-                <option value="pending">Pending</option>
-                <option value="banned">Banned</option>
-              </select>
+
+              <div className="admin-filter-row">
+                <select
+                  className="admin-filter-select"
+                  value={roleFilter}
+                  onChange={(e) => setRoleFilter(e.target.value)}
+                >
+                  <option value="">All Roles</option>
+                  <option value="admin">Admin</option>
+                  <option value="recruiter">Recruiter</option>
+                  <option value="candidate">Candidate</option>
+                </select>
+
+                <select
+                  className="admin-filter-select"
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                >
+                  <option value="">All Status</option>
+                  <option value="active">Active</option>
+                  <option value="pending">Pending</option>
+                  <option value="banned">Banned</option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
@@ -153,7 +166,12 @@ const UsersTab = ({ users: initialUsers, getUserInitials, updateUserStatus, curr
           ) : (
             <div className="users-grid">
               {users.map((user) => (
-                <div key={user.id} className={`enhanced-user-card ${user.id === currentAdminId ? 'current-admin' : ''}`}>
+                <div
+                  key={user.id}
+                  className={`enhanced-user-card ${
+                    user.id === currentAdminId ? "current-admin" : ""
+                  }`}
+                >
                   <div className="user-card-header">
                     <div className="user-avatar-section">
                       <div className="user-avatar-large">
@@ -172,7 +190,9 @@ const UsersTab = ({ users: initialUsers, getUserInitials, updateUserStatus, curr
                       <div className="user-basic-info">
                         <h4 className="user-name">
                           {user.fullName}
-                          {user.id === currentAdminId && <span className="current-admin-badge">You</span>}
+                          {user.id === currentAdminId && (
+                            <span className="current-admin-badge">You</span>
+                          )}
                         </h4>
                         <p className="user-email">{user.email}</p>
                       </div>
@@ -181,9 +201,7 @@ const UsersTab = ({ users: initialUsers, getUserInitials, updateUserStatus, curr
                       <span className={`enhanced-role-badge ${user.role}`}>
                         {user.role}
                       </span>
-                      <span
-                        className={`enhanced-status-badge ${user.status}`}
-                      >
+                      <span className={`enhanced-status-badge ${user.status}`}>
                         {user.status}
                       </span>
                     </div>
@@ -229,7 +247,9 @@ const UsersTab = ({ users: initialUsers, getUserInitials, updateUserStatus, curr
                         <div className="user-stat-item">
                           <span className="stat-label">Location</span>
                           <span className="stat-value">
-                            {[user.city, user.state, user.country].filter(Boolean).join(', ')}
+                            {[user.city, user.state, user.country]
+                              .filter(Boolean)
+                              .join(", ")}
                           </span>
                         </div>
                       )}
@@ -238,7 +258,7 @@ const UsersTab = ({ users: initialUsers, getUserInitials, updateUserStatus, curr
 
                   <div className="user-card-footer">
                     <div className="user-actions">
-                      <button 
+                      <button
                         className="action-btn view-btn"
                         onClick={() => handleViewProfile(user)}
                       >
@@ -277,20 +297,34 @@ const UsersTab = ({ users: initialUsers, getUserInitials, updateUserStatus, curr
         {/* Pagination */}
         {totalPages > 1 && (
           <div className="admin-pagination">
-            <button 
+            <button
               className="pagination-btn"
               disabled={currentPage === 1}
-              onClick={() => fetchUsers(currentPage - 1, searchQuery, roleFilter, statusFilter)}
+              onClick={() =>
+                fetchUsers(
+                  currentPage - 1,
+                  searchQuery,
+                  roleFilter,
+                  statusFilter
+                )
+              }
             >
               Previous
             </button>
             <span className="pagination-info">
               Page {currentPage} of {totalPages}
             </span>
-            <button 
+            <button
               className="pagination-btn"
               disabled={currentPage === totalPages}
-              onClick={() => fetchUsers(currentPage + 1, searchQuery, roleFilter, statusFilter)}
+              onClick={() =>
+                fetchUsers(
+                  currentPage + 1,
+                  searchQuery,
+                  roleFilter,
+                  statusFilter
+                )
+              }
             >
               Next
             </button>

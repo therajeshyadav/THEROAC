@@ -11,11 +11,8 @@
 
 .admin-user-management-header {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 2rem;
+  flex-direction: column;
   padding-bottom: 1.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .admin-header-title h3 {
@@ -33,9 +30,11 @@
 
 .admin-search-filter-container {
   display: flex;
-  gap: 1rem;
-  align-items: center;
+  flex-direction: column; /* 🔑 search upar */
+  gap: 0.75rem;
+  width: 100%;
 }
+
 
 .admin-search-box {
   position: relative;
@@ -468,16 +467,7 @@
     font-size: 1.3rem;
   }
 
-  .admin-search-filter-container {
-    flex-direction: column;
-    gap: 1rem;
-  }
-
   .admin-search-input {
-    width: 100%;
-  }
-
-  .admin-filter-select {
     width: 100%;
   }
 
@@ -1311,4 +1301,57 @@ Current Admin Styling */
 
 .user-stats {
   margin-bottom: 1rem;
+}
+
+/* =============================== */
+/* USER MANAGEMENT HEADER LAYOUT */
+/* =============================== */
+
+.admin-user-management-header {
+  display: flex;
+  flex-direction: column; /* title always top */
+  gap: 1rem;
+}
+
+/* Search + filters wrapper */
+.admin-search-filter-container {
+  display: flex;
+  flex-direction: column; /* search upar, selects niche */
+  gap: 0.75rem;
+  width: 100%;
+}
+
+/* Search bar full width */
+.admin-search-box {
+  width: 100%;
+}
+
+.admin-search-input {
+  width: 100%;
+}
+
+/* Selects always in one row */
+.admin-filter-row {
+  display: flex;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+/* Equal width selects */
+.admin-filter-select {
+  flex: 1;
+  min-width: 120px;
+}
+
+
+/* User card footer responsive fix */
+@media (max-width: 767px) {
+  .user-actions {
+    flex-direction: column;   /* 🔑 stack buttons */
+  }
+
+  .user-actions .action-btn {
+    width: 100%;              /* 🔑 full width buttons */
+    justify-content: center;
+  }
 }

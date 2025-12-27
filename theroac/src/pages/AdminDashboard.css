@@ -923,7 +923,7 @@
 
 @media (max-width: 639px) {
   .admin-stats-grid {
-    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
     gap: 0.75rem;
   }
 
@@ -1316,6 +1316,7 @@ html, body {
     .admin-organizer-main > * {
         max-width: 100%;
         box-sizing: border-box;
+        margin-top: 40px;
     }
 }
 

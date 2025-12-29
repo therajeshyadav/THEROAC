@@ -266,13 +266,13 @@ const DiscoverPage = () => {
   return (
     <>
       {/* Progress Wrap - Scroll to Top */}
-      <div className="paginacontainer">
+      {/* <div className="paginacontainer">
         <div className="progress-wrap warp2">
           <svg className="progress-circle svg-content" width="100%" height="100%" viewBox="-1 -1 102 102">
             <path d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98" />
           </svg>
         </div>
-      </div>
+      </div> */}
 
       <div className="discover-page-wrapper">
         <div className="discover-page">

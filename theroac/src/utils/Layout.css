@@ -3,6 +3,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  font-size: 18px;
+  color: var(--ztc-bg-bg-1);
+  line-height: 40px;
 }
 
 .has-sub > .submenu-button::after {
@@ -57,12 +60,12 @@
 }
 
 .login-btn {
-  background: linear-gradient(45deg, #4CAF50, #45a049);
-  color: #ffffff !important;
+  background: linear-gradient(45deg, #ffd700, #ffed4e);
+  color: #000000 !important;
 }
 
 .login-btn:hover {
-  background: linear-gradient(45deg, #45a049, #4CAF50);
+   background: linear-gradient(45deg, #ffd700, #ffed4e);
   transform: translateY(-2px);
 }
 

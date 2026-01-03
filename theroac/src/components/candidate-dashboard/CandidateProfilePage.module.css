@@ -215,6 +215,18 @@
   gap: 6px;
 }
 
+/* ---------- quiz section ---------- */
+.quizSection {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.quizSection .primaryBtn {
+  margin-top: 8px;
+}
+
 /* responsive */
 @media (max-width: 768px) {
   .cover {
@@ -224,4 +236,61 @@
   .coverRight {
     align-items: flex-start;
   }
+}
+
+/* ================== MANDATORY PHONE MODAL ================== */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: linear-gradient(135deg, #1a1719, #2a2329);
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 500px;
+  width: 90%;
+  border: 1px solid rgba(255, 214, 0, 0.3);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+}
+
+.modalHeader h3 {
+  color: #ffd600;
+  margin: 0 0 8px 0;
+  font-size: 1.5rem;
+}
+
+.modalHeader p {
+  color: #ffffff;
+  margin: 0 0 24px 0;
+  opacity: 0.9;
+  line-height: 1.5;
+}
+
+.modalBody {
+  margin-bottom: 24px;
+}
+
+.modalNote {
+  color: #888;
+  font-size: 0.85rem;
+  margin: 8px 0 0 0;
+  font-style: italic;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.modalActions .primaryBtn {
+  min-width: 150px;
 }

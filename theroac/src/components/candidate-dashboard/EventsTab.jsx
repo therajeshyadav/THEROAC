@@ -37,7 +37,6 @@ const EventsTab = ({ events, appliedItems, onRegisterEvent, onViewEventDetails }
       const wasBookmarked = bookmarkedEvents.has(eventId);
       
       const response = await apiService.toggleBookmark(eventId, 'events');
-      console.log('Event bookmark response:', response);
       
       // Toggle the bookmark state based on previous state
       if (wasBookmarked) {

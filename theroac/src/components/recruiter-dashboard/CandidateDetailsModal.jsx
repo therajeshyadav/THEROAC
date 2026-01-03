@@ -14,10 +14,6 @@ const CandidateDetailsModal = ({ isOpen, onClose, application, onStatusUpdate })
   const job = application.job || {};
   const metadata = application.metadata || {};
   
-  console.log('CandidateDetailsModal - Application:', application);
-  console.log('CandidateDetailsModal - Candidate:', candidate);
-  console.log('CandidateDetailsModal - Resume Link:', application.resumeLink);
-  console.log('CandidateDetailsModal - Resume Path:', candidate.resumePath);
 
   const handleStatusUpdate = async () => {
     setUpdating(true);

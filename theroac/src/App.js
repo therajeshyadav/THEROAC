@@ -32,6 +32,7 @@ import UnifiedDetailsPage from "./pages/UnifiedDetailsPage";
 import NotificationsPage from "./pages/NotificationsPage";
 import Callback from "./pages/OAuth2Callback";
 import NotFound from "./pages/NotFound";
+import QuizPage from "./pages/QuizPage";
 
 // ✅ Helper component to handle smooth scrolling to hash IDs
 function ScrollToHashElement() {
@@ -76,6 +77,9 @@ function App() {
     "/recruiter-dashboard",
     "/admin-dashboard",
   ];
+  const specialPages = [
+    "/quiz", // Quiz page has its own header
+  ];
   const validPages = [
     "/",
     "/speakers",
@@ -85,14 +89,16 @@ function App() {
     "/discover",
     ...authPages,
     ...dashboardPages,
+    ...specialPages,
   ];
 
   const isAuthPage = authPages.includes(location.pathname);
   const isDashboardPage = dashboardPages.includes(location.pathname);
+  const isSpecialPage = specialPages.includes(location.pathname);
   const isDetailPage = location.pathname.startsWith("/event-detail/");
   const isValidPage = validPages.includes(location.pathname) || isDetailPage;
   const showHeaderFooter =
-    !isAuthPage && !isDashboardPage && !isDetailPage && isValidPage;
+    !isAuthPage && !isDashboardPage && !isSpecialPage && !isDetailPage && isValidPage;
 
   return (
     <AuthProvider>
@@ -104,7 +110,7 @@ function App() {
           {showHeaderFooter && <Header />}
 
           <main>
-            {!isDashboardPage ? (
+            {!isDashboardPage && !isSpecialPage ? (
               <Layout>
                 <Routes>
                   <Route path="/" element={<Home />} />
@@ -195,7 +201,7 @@ function App() {
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </Layout>
-            ) : (
+            ) : isDashboardPage ? (
               <Routes>
                 <Route
                   path="/dashboard"
@@ -228,6 +234,20 @@ function App() {
                       <AdminDashboard />
                     </ProtectedRoute>
                   }
+                />
+                {/* Catch-all route for 404 - must be last */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            ) : (
+              // Special pages (like quiz) without Layout wrapper
+              <Routes>
+                <Route 
+                  path="/quiz" 
+                  element={
+                    <ProtectedRoute requiredRole="candidate">
+                      <QuizPage />
+                    </ProtectedRoute>
+                  } 
                 />
                 {/* Catch-all route for 404 - must be last */}
                 <Route path="*" element={<NotFound />} />

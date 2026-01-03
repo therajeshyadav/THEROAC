@@ -89,7 +89,6 @@ const ManageJobsTab = ({ authUser, setJobsTabLoading, pendingModalType, onModalT
       });
       const data = await response.json();
       const userInternships = data.hubContent || [];
-      console.log('Fetched internships:', userInternships);
       setInternships(userInternships);
     } catch (error) {
       console.error('Error fetching internships:', error);

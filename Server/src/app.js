@@ -24,6 +24,7 @@ const resumeRoutes = require('./routes/resumes');
 const talentPipelineRoutes = require('./routes/talentPipeline');
 const reviewRoutes = require('./routes/reviews');
 const faqRoutes = require('./routes/faqs');
+const quizRoutes = require('./routes/quiz');
 const errorHandler = require('./middlewares/errorHandler');
 const { attachOrganizationContext } = require('./middlewares/organizationMiddleware');
 
@@ -74,6 +75,7 @@ app.use('/api/resumes', authenticate, attachOrganizationContext, resumeRoutes);
 app.use('/api/talent-pipeline', authenticate, attachOrganizationContext, talentPipelineRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/faqs', faqRoutes);
+app.use('/api/quiz', quizRoutes); // Removed authentication for testing
 
 // health check
 app.get('/health', (req, res) => res.json({ ok: true }));

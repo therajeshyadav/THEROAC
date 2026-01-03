@@ -59,10 +59,12 @@
   overflow: visible; /* Changed from hidden to visible */
   margin-top: 0; /* Remove any margin conflicts */
   width: 100%;
-  min-height: 300px; /* Ensure minimum height */
+  min-height: 400px; /* Ensure minimum height */
   display: flex;
   align-items: center;
   justify-content: center;
+  /* Prevent layout shift during loading */
+  flex-shrink: 0;
 }
 
 .discover-hero::before {
@@ -1032,4 +1034,86 @@
   .discover-hero {
     background: #1a1a1a !important; /* Fallback background */
   }
+}
+
+/* ===================================================== */
+/* 🔄 LOADING STATE STYLES */
+/* ===================================================== */
+
+.discover-content .preloader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  padding: 60px 20px;
+}
+
+.discover-content .loading-container {
+  text-align: center;
+}
+
+.discover-content .loading {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(255, 215, 0, 0.3);
+  border-top: 4px solid #ffd700;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+.discover-content #loading-icon img {
+  width: 60px;
+  height: 60px;
+  opacity: 0.8;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Ensure hero section is always visible during loading */
+.discover-page-wrapper .discover-hero {
+  position: relative;
+  z-index: 2;
+}
+
+.discover-page-wrapper .discover-content {
+  position: relative;
+  z-index: 1;
+}
+/* ===================================================== */
+/* 🚀 PERFORMANCE & LAYOUT STABILITY */
+/* ===================================================== */
+
+/* Prevent flash of unstyled content */
+.discover-page-wrapper {
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
+}
+
+/* Ensure consistent layout during data loading */
+.discover-page {
+  contain: layout style;
+}
+
+/* Prevent layout shifts */
+.discover-hero,
+.discover-content {
+  will-change: auto;
+}
+
+/* Optimize rendering */
+.discover-card {
+  contain: layout style paint;
+}
+
+/* Ensure hero section is always rendered first */
+.discover-hero {
+  order: -1;
+}
+
+.discover-content {
+  order: 1;
 }

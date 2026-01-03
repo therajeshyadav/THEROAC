@@ -56,7 +56,6 @@ const request = async (endpoint, options = {}, retryCount = 0) => {
         if (error.name === 'AbortError') {
             // Retry logic for admin endpoints on timeout
             if (isAdminEndpoint && retryCount < 2) {
-                console.log(`Retrying admin request (attempt ${retryCount + 1}):`, endpoint);
                 await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1))); // Progressive delay
                 return request(endpoint, options, retryCount + 1);
             }
@@ -65,7 +64,6 @@ const request = async (endpoint, options = {}, retryCount = 0) => {
         
         // Retry on network errors for admin endpoints
         if (isAdminEndpoint && retryCount < 1 && (error.message.includes('fetch') || error.message.includes('network'))) {
-            console.log(`Retrying admin request due to network error (attempt ${retryCount + 1}):`, endpoint);
             await new Promise(resolve => setTimeout(resolve, 2000));
             return request(endpoint, options, retryCount + 1);
         }
@@ -601,6 +599,144 @@ const getUserApplicationStatuses = async (itemIds = []) => {
     return request(`/applications/status${queryParams ? `?${queryParams}` : ''}`);
 };
 
+// Quiz endpoints
+const getQuizTypes = async () => {
+    // Return predefined quiz types that will be used to call your Gemini backend
+    return {
+        quizTypes: [
+            {
+                id: 'javascript',
+                name: 'JavaScript',
+                description: 'Test your JavaScript programming skills',
+                icon: '💻',
+                timeLimit: 30,
+                questionCount: 5,
+                topic: 'JavaScript',
+                difficulty: 'medium'
+            },
+            {
+                id: 'react',
+                name: 'React.js',
+                description: 'Assess your React framework knowledge',
+                icon: '⚛️',
+                timeLimit: 25,
+                questionCount: 5,
+                topic: 'React.js',
+                difficulty: 'medium'
+            },
+            {
+                id: 'nodejs',
+                name: 'Node.js',
+                description: 'Evaluate your backend development skills',
+                icon: '🟢',
+                timeLimit: 30,
+                questionCount: 5,
+                topic: 'Node.js',
+                difficulty: 'medium'
+            },
+            {
+                id: 'python',
+                name: 'Python',
+                description: 'Test your Python programming abilities',
+                icon: '🐍',
+                timeLimit: 30,
+                questionCount: 5,
+                topic: 'Python',
+                difficulty: 'medium'
+            },
+            {
+                id: 'java',
+                name: 'Java',
+                description: 'Assess your Java programming knowledge',
+                icon: '☕',
+                timeLimit: 35,
+                questionCount: 5,
+                topic: 'Java',
+                difficulty: 'medium'
+            },
+            {
+                id: 'database',
+                name: 'Database & SQL',
+                description: 'Test your database management skills',
+                icon: '🗄️',
+                timeLimit: 25,
+                questionCount: 5,
+                topic: 'SQL and Database Management',
+                difficulty: 'medium'
+            }
+        ]
+    };
+};
+
+const generateQuiz = async (quizType) => {
+    // Call your actual Gemini backend
+    const response = await request('/quiz/generate', {
+        method: 'POST',
+        body: JSON.stringify({
+            topic: quizType.topic,
+            difficulty: quizType.difficulty
+        }),
+    });
+
+    // Transform the Gemini response to match expected format
+    return {
+        quiz: {
+            id: `quiz_${Date.now()}`,
+            questions: response.map((q, index) => ({
+                id: `q_${index + 1}`,
+                question: q.question,
+                options: q.options,
+                correctAnswer: q.correctAnswer,
+                explanation: q.explanation
+            })),
+            timeLimit: quizType.timeLimit
+        }
+    };
+};
+
+const submitQuiz = async (quizData) => {
+    // Since your backend doesn't have submit endpoint yet, calculate score locally
+    // But the quiz questions came from Gemini AI
+    const { answers, correctAnswersMap, timeSpent, quizTypeId } = quizData;
+    
+    let correctCount = 0;
+    const totalQuestions = Object.keys(answers).length;
+    
+    Object.keys(answers).forEach(questionId => {
+        const userAnswer = answers[questionId];
+        const correctAnswer = correctAnswersMap[questionId];
+        if (userAnswer === correctAnswer) {
+            correctCount++;
+        }
+    });
+    
+    const score = Math.round((correctCount / totalQuestions) * 100);
+    const passed = score >= 70;
+    
+    return {
+        result: {
+            score,
+            correctAnswers: correctCount,
+            totalQuestions,
+            timeSpent,
+            passed,
+            badge: passed ? {
+                id: `badge_${quizTypeId}`,
+                name: `${quizTypeId.charAt(0).toUpperCase() + quizTypeId.slice(1)} Expert`,
+                icon: '🏆'
+            } : null
+        }
+    };
+};
+
+const getUserQuizHistory = async () => {
+    return { history: [] };
+};
+
+const getUserBadges = async () => {
+    return { badges: [] };
+};
+
 // Export all functions as apiService object
 const apiService = {
     request,
@@ -689,7 +825,12 @@ const apiService = {
     rejectEvent,
     markAllAdminNotificationsAsRead,
     getReviews,
-    createReview
+    createReview,
+    getQuizTypes,
+    generateQuiz,
+    submitQuiz,
+    getUserQuizHistory,
+    getUserBadges
 };
 
 export default apiService;

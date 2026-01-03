@@ -48,11 +48,9 @@ const EvaluateCandidatesTab = ({ authUser }) => {
       }
       
       const data = await response.json();
-      console.log('Raw candidates data:', data.candidates);
       
       // Transform dashboard candidates format to match expected application format
       const transformedApplications = (data.candidates || []).map(candidate => {
-        console.log('Processing candidate:', candidate);
         return {
         id: candidate.id,
         originalId: candidate.originalId,
@@ -85,7 +83,6 @@ const EvaluateCandidatesTab = ({ authUser }) => {
       };
       });
       
-      console.log('Transformed applications:', transformedApplications);
       setApplications(transformedApplications);
     } catch (error) {
       console.error('Error fetching applications:', error);

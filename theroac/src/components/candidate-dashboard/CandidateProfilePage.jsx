@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { User } from "lucide-react";
 import styles from "./CandidateProfilePage.module.css";
 
@@ -8,6 +9,7 @@ function getEmptyProfile() {
     fullName: "",
     headline: "",
     email: "",
+    phone: "",
     location: "",
     about: "",
     // backend se aane wala stored resume path/url
@@ -26,20 +28,24 @@ function getEmptyProfile() {
  *  - onSaveProfile: async (profile) => {...}  // yaha API call karoge
  */
 const CandidateProfilePage = ({ initialProfile, onSaveProfile }) => {
+  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [profile, setProfile] = useState(getEmptyProfile());
   const [newSkill, setNewSkill] = useState("");
+  const [showPhoneModal, setShowPhoneModal] = useState(false);
+  const [tempPhone, setTempPhone] = useState("");
+  const [isPhoneMandatory, setIsPhoneMandatory] = useState(false);
 
   // Jab initialProfile aaye (backend se), state update karo
   useEffect(() => {
-    console.log('CandidateProfilePage - initialProfile:', initialProfile);
     if (initialProfile) {
       const updatedProfile = {
         ...getEmptyProfile(),
         fullName: initialProfile.fullName || initialProfile.name || "",
         headline: initialProfile.headline || "",
         email: initialProfile.email || "",
+        phone: initialProfile.phone || "",
         location: initialProfile.location || "",
         about: initialProfile.about || initialProfile.bio || "",
         resumePath: initialProfile.resumePath || initialProfile.resumeUrl || "",
@@ -48,8 +54,13 @@ const CandidateProfilePage = ({ initialProfile, onSaveProfile }) => {
         experiences: Array.isArray(initialProfile.experiences) ? initialProfile.experiences : [],
         education: Array.isArray(initialProfile.education) ? initialProfile.education : [],
       };
-      console.log('CandidateProfilePage - updatedProfile:', updatedProfile);
       setProfile(updatedProfile);
+
+      // Check if phone number is missing and show modal
+      if (!initialProfile.phone || initialProfile.phone.trim() === "") {
+        setShowPhoneModal(true);
+        setIsPhoneMandatory(true);
+      }
     }
   }, [initialProfile]);
 
@@ -140,8 +151,70 @@ const CandidateProfilePage = ({ initialProfile, onSaveProfile }) => {
     }));
   };
 
+  // -------- PHONE VALIDATION HELPER --------
+  const validatePhoneNumber = (phone) => {
+    if (!phone || phone.trim() === "") {
+      return { isValid: false, message: "Phone number is mandatory." };
+    }
+
+    // Remove all spaces and special characters except +
+    const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
+    
+    // Check for Indian phone number patterns
+    const patterns = [
+      /^\+91[6-9]\d{9}$/, // +91XXXXXXXXXX
+      /^91[6-9]\d{9}$/,   // 91XXXXXXXXXX
+      /^[6-9]\d{9}$/      // XXXXXXXXXX
+    ];
+
+    const isValid = patterns.some(pattern => pattern.test(cleanPhone));
+    
+    if (!isValid) {
+      return { 
+        isValid: false, 
+        message: "Please enter a valid Indian phone number (10 digits starting with 6-9)" 
+      };
+    }
+
+    return { isValid: true, message: "" };
+  };
+
+  // -------- SAVE PHONE FROM MODAL --------
+  const handleSavePhoneFromModal = async () => {
+    const validation = validatePhoneNumber(tempPhone);
+    if (!validation.isValid) {
+      alert(validation.message);
+      return;
+    }
+
+    try {
+      setSaving(true);
+      const updatedProfile = { ...profile, phone: tempPhone };
+      setProfile(updatedProfile);
+      
+      if (onSaveProfile) {
+        await onSaveProfile(updatedProfile);
+      }
+      
+      setShowPhoneModal(false);
+      setTempPhone("");
+      setIsPhoneMandatory(false);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to save phone number");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   // -------- SAVE PROFILE --------
   const handleSave = async () => {
+    const validation = validatePhoneNumber(profile.phone);
+    if (!validation.isValid) {
+      alert(validation.message);
+      return;
+    }
+
     try {
       setSaving(true);
       if (onSaveProfile) {
@@ -176,6 +249,13 @@ const CandidateProfilePage = ({ initialProfile, onSaveProfile }) => {
                 />
                 <input
                   className={styles.input}
+                  placeholder="Phone Number"
+                  type="tel"
+                  value={profile.phone}
+                  onChange={(e) => handleChange("phone", e.target.value)}
+                />
+                <input
+                  className={styles.input}
                   placeholder="Headline (e.g. Full Stack Developer)"
                   value={profile.headline}
                   onChange={(e) => handleChange("headline", e.target.value)}
@@ -190,6 +270,9 @@ const CandidateProfilePage = ({ initialProfile, onSaveProfile }) => {
             ) : (
               <>
                 <h2>{profile.fullName || "Your Name"}</h2>
+                <p style={{ color: profile.phone ? '#ffffff' : '#ff6b6b' }}>
+                  {profile.phone || "⚠️ Phone number required"}
+                </p>
                 <p>{profile.headline || "Add your headline"}</p>
                 <p className={styles.muted}>
                   {profile.location || "Add your location"}
@@ -465,6 +548,60 @@ const CandidateProfilePage = ({ initialProfile, onSaveProfile }) => {
           <p className={styles.text}>No education added yet.</p>
         )}
       </Section>
+
+      {/* ================== QUIZ FOR BADGE ================== */}
+      <Section title="Quiz for Badge">
+        <div className={styles.quizSection}>
+          <p className={styles.text}>
+            Take skill-based quizzes to earn badges and showcase your expertise to recruiters.
+          </p>
+          <button
+            className={styles.primaryBtn}
+            onClick={() => navigate('/quiz')}
+          >
+            Take Quiz
+          </button>
+        </div>
+      </Section>
+
+      {/* ================== MANDATORY PHONE MODAL ================== */}
+      {showPhoneModal && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modal}>
+            <div className={styles.modalHeader}>
+              <h3>Phone Number Required</h3>
+              <p>
+                {isPhoneMandatory 
+                  ? "Please add your phone number to complete your profile. This is mandatory for all users and cannot be skipped."
+                  : "Please add your phone number to complete your profile. This is mandatory for all users."
+                }
+              </p>
+            </div>
+            <div className={styles.modalBody}>
+              <input
+                className={styles.input}
+                type="tel"
+                placeholder="Enter your phone number"
+                value={tempPhone}
+                onChange={(e) => setTempPhone(e.target.value)}
+                maxLength="13"
+              />
+              <p className={styles.modalNote}>
+                Format: +91XXXXXXXXXX or 10-digit number starting with 6-9
+              </p>
+            </div>
+            <div className={styles.modalActions}>
+              <button
+                className={styles.primaryBtn}
+                onClick={handleSavePhoneFromModal}
+                disabled={saving}
+              >
+                {saving ? "Saving..." : "Save Phone Number"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

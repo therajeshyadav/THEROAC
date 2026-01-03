@@ -457,9 +457,7 @@ const UnifiedDetailsPage = () => {
     }
 
     try {
-      console.log('Toggling bookmark for:', data?.id, type);
       const result = await apiService.toggleBookmark(data?.id, type);
-      console.log('Bookmark toggle result:', result);
       setIsBookmarked(result.bookmarked || result.isBookmarked);
     } catch (error) {
       console.error("Error toggling bookmark:", error);
@@ -474,9 +472,7 @@ const UnifiedDetailsPage = () => {
     }
 
     try {
-      console.log('Toggling like for:', data?.id, type);
       const result = await apiService.toggleLike(data?.id, type);
-      console.log('Like toggle result:', result);
       setIsLiked(result.liked || result.isLiked);
     } catch (error) {
       console.error("Error toggling like:", error);

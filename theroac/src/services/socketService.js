@@ -23,21 +23,7 @@ class SocketService {
       reconnectionAttempts: 5
     });
 
-    this.socket.on('connect', () => {
-      console.log('✅ Connected to WebSocket server');
-    });
-
-    this.socket.on('connected', (data) => {
-      console.log('Server confirmation:', data);
-    });
-
-    this.socket.on('disconnect', (reason) => {
-      console.log('❌ Disconnected from WebSocket:', reason);
-    });
-
-    this.socket.on('connect_error', (error) => {
-      console.error('Connection error:', error.message);
-    });
+  
 
     return this.socket;
   }

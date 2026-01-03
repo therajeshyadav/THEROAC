@@ -17,7 +17,6 @@ const AboutSlider = () => {
     const checkROACHubStatus = async () => {
       try {
         const response = await apiService.getROACPrimeHubStatus();
-        console.log('ROAC Hub approval status:', response.isApproved);
         setIsROACHubApproved(response.isApproved);
       } catch (error) {
         console.error('Error checking ROAC Hub status:', error);

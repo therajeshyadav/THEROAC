@@ -32,7 +32,7 @@ const Footer = () => {
 							<h3>Contact Us</h3>
 							<ul>
 								<li>
-									<a href="tel:+917973977956"><img src="assets/img/icons/phn1.svg" alt="" />+91 7973977956</a>
+									<a href="tel:+917973977956"><img src="assets/img/icons/phn1.svg" alt="" />++91 62396 49779</a>
 								</li>
 								<li>
 									<a href="#"><img src="assets/img/icons/location1.svg" alt="" />Chandigarh</a>

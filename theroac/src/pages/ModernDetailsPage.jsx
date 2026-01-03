@@ -195,7 +195,6 @@ const ModernDetailsPage = () => {
 
     // Scroll to section
     const scrollToSection = (sectionId) => {
-        console.log('Scrolling to section:', sectionId); // Debug log
         
         // Update active tab immediately for better UX
         setActiveTab(sectionId);
@@ -217,7 +216,6 @@ const ModernDetailsPage = () => {
             // Calculate target scroll position
             const targetScroll = currentScroll + sectionRect.top - pageWrapperRect.top - 100;
             
-            console.log('Current scroll:', currentScroll, 'Target scroll:', targetScroll); // Debug log
             
             pageWrapper.scrollTo({
                 top: targetScroll,
@@ -1081,17 +1079,18 @@ const ModernDetailsPage = () => {
                                 </button>
                                 {selectedMedia.type === 'video' ? (
                                     <div className="video-container">
-                                        {selectedMedia.url.includes('youtube.com') || selectedMedia.url.includes('youtu.be') ? (
+                                        {selectedMedia.url && (selectedMedia.url.includes('youtube.com') || selectedMedia.url.includes('youtu.be')) ? (
                                             <iframe
                                                 width="100%"
                                                 height="100%"
-                                                src={selectedMedia.url.replace('watch?v=', 'embed/')}
+                                                src={selectedMedia.url.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/')}
                                                 title="Video player"
                                                 frameBorder="0"
                                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                                 allowFullScreen
                                             ></iframe>
-                                        ) : (
+                                        ) : selectedMedia.videoUrl ? (
+                                            // Use videoUrl if available (separate from thumbnail)
                                             <video
                                                 width="100%"
                                                 height="100%"
@@ -1100,20 +1099,67 @@ const ModernDetailsPage = () => {
                                                 style={{ maxHeight: '70vh', backgroundColor: '#000' }}
                                                 onError={(e) => {
                                                     console.error('Video load error:', e);
-                                                    console.log('Video URL:', selectedMedia.url);
+                                                    e.target.style.display = 'none';
+                                                    // Show fallback message
+                                                    const fallback = e.target.nextElementSibling;
+                                                    if (fallback) fallback.style.display = 'block';
                                                 }}
-                                                onLoadStart={() => console.log('Video loading started:', selectedMedia.url)}
+                                               // onLoadStart={() => console.log('Video loading started:', selectedMedia.videoUrl)}
+                                            >
+                                                <source src={selectedMedia.videoUrl} type="video/mp4" />
+                                                <source src={selectedMedia.videoUrl} type="video/webm" />
+                                                <source src={selectedMedia.videoUrl} type="video/ogg" />
+                                                Your browser does not support the video tag.
+                                            </video>
+                                        ) : selectedMedia.url ? (
+                                            // Fallback to url property
+                                            <video
+                                                width="100%"
+                                                height="100%"
+                                                controls
+                                                preload="metadata"
+                                                style={{ maxHeight: '70vh', backgroundColor: '#000' }}
+                                                onError={(e) => {
+                                                    console.error('Video load error:', e);
+                                                  //  console.log('Video URL:', selectedMedia.url);
+                                                    e.target.style.display = 'none';
+                                                    // Show fallback message
+                                                    const fallback = e.target.nextElementSibling;
+                                                    if (fallback) fallback.style.display = 'block';
+                                                }}
+                                              //  onLoadStart={() => console.log('Video loading started:', selectedMedia.url)}
                                             >
                                                 <source src={selectedMedia.url} type="video/mp4" />
                                                 <source src={selectedMedia.url} type="video/webm" />
                                                 <source src={selectedMedia.url} type="video/ogg" />
                                                 Your browser does not support the video tag.
-                                                <p>
-                                                    If you cannot see the video, try downloading it: 
-                                                    <a href={selectedMedia.url} download>Download Video</a>
-                                                </p>
                                             </video>
-                                        )}
+                                        ) : null}
+                                        
+                                        {/* Fallback message for failed videos */}
+                                        <div style={{ 
+                                            display: 'none', 
+                                            color: 'white', 
+                                            textAlign: 'center', 
+                                            padding: '2rem',
+                                            backgroundColor: '#000',
+                                            borderRadius: '8px'
+                                        }}>
+                                            <p>Unable to load video</p>
+                                            <p style={{ fontSize: '14px', opacity: 0.7 }}>
+                                                The video format may not be supported or the file may be unavailable.
+                                            </p>
+                                            {(selectedMedia.videoUrl || selectedMedia.url) && (
+                                                <a 
+                                                    href={selectedMedia.videoUrl || selectedMedia.url} 
+                                                    target="_blank" 
+                                                    rel="noopener noreferrer"
+                                                    style={{ color: '#FFD600', textDecoration: 'underline' }}
+                                                >
+                                                    Try opening video in new tab
+                                                </a>
+                                            )}
+                                        </div>
                                     </div>
                                 ) : (
                                     <img src={selectedMedia.url} alt="Full size" className="modal-image" />

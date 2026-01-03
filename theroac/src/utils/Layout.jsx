@@ -30,7 +30,6 @@ const Layout = ({ children }) => {
     }
   };
 
-  console.log(menuOpen);
   return (
     <>
       {/* ===== Mobile Header ===== */}

@@ -121,10 +121,7 @@ const RecruiterDashboard = () => {
       
       // Get fresh user data from localStorage
       const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
-      console.log('Dashboard - storedUser:', storedUser);
-      console.log('Dashboard - authUser:', authUser);
-      console.log('Dashboard - organizationId:', storedUser?.organizationId || authUser?.organizationId);
-      
+     
       const [statsData, analyticsData] = await Promise.all([
         dashboardService.getOrganizerStats(),
         dashboardService.getAnalytics("year"),
@@ -136,8 +133,7 @@ const RecruiterDashboard = () => {
       const currentUser = authUser || storedUser;
       
       // Fetch organization data for profile
-      console.log('Dashboard - using currentUser:', currentUser);
-      console.log('Dashboard - organizationId:', currentUser?.organizationId);
+
       
       if (currentUser?.organizationId) {
         try {
@@ -146,11 +142,10 @@ const RecruiterDashboard = () => {
           const orgResponse = await fetch(`${API_URL}/organizations/${currentUser.organizationId}`, {
             headers: { 'Authorization': `Bearer ${token}` }
           });
-          console.log('Organization API response status:', orgResponse.status);
+         
           
           if (orgResponse.ok) {
             const orgData = await orgResponse.json();
-            console.log('Organization data received:', orgData);
             
             const updatedProfileData = {
               fullName: currentUser.fullName || '',
@@ -181,7 +176,6 @@ const RecruiterDashboard = () => {
               supportEmail: currentUser?.preferences?.communication?.supportEmail || ''
             };
             
-            console.log('Setting profileData to:', updatedProfileData);
             setProfileData(updatedProfileData);
           }
         } catch (err) {
@@ -189,8 +183,6 @@ const RecruiterDashboard = () => {
         }
       } else {
         // No organization, check if user has company data stored in profile
-        console.log('No organizationId, checking user.company data');
-        console.log('currentUser.company:', currentUser?.company);
         
         setProfileData({
           fullName: currentUser?.fullName || '',

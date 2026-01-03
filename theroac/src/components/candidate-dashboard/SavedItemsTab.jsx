@@ -30,35 +30,28 @@ const SavedItemsTab = () => {
   const loadSavedItems = async () => {
     try {
       setLoading(true);
-      console.log('Loading saved items...');
       
       const [bookmarksResponse, likesResponse] = await Promise.allSettled([
         apiService.getMyBookmarks(),
         apiService.getMyLikes()
       ]);
 
-      console.log('Bookmarks response:', bookmarksResponse);
-      console.log('Likes response:', likesResponse);
 
       if (bookmarksResponse.status === 'fulfilled') {
-        console.log('Full bookmarks response value:', bookmarksResponse.value);
         // Try different possible response formats
         const bookmarks = bookmarksResponse.value.bookmarks || 
                          bookmarksResponse.value || 
                          [];
-        console.log('Setting bookmarked items:', bookmarks);
         setBookmarkedItems(bookmarks);
       } else {
         console.error('Bookmarks request failed:', bookmarksResponse.reason);
       }
 
       if (likesResponse.status === 'fulfilled') {
-        console.log('Full likes response value:', likesResponse.value);
         // Try different possible response formats
         const likes = likesResponse.value.likes || 
                      likesResponse.value || 
                      [];
-        console.log('Setting liked items:', likes);
         setLikedItems(likes);
       } else {
         console.error('Likes request failed:', likesResponse.reason);
@@ -71,9 +64,7 @@ const SavedItemsTab = () => {
   };
 
   const handleViewDetails = (item) => {
-    console.log('SavedItemsTab - handleViewDetails item:', item);
     const itemData = item.Job || item.Event || item.HubContent || item;
-    console.log('SavedItemsTab - itemData:', itemData);
     let url;
     
     try {
@@ -84,7 +75,6 @@ const SavedItemsTab = () => {
           title: itemData?.title || 'Job',
           company: itemData?.companyName || itemData?.company || 'Company'
         };
-        console.log('SavedItemsTab - jobData for URL:', jobData);
         url = createJobURL(jobData);
       } else if (item.itemType === 'events') {
         // Use createEventURL for events
@@ -92,7 +82,6 @@ const SavedItemsTab = () => {
           slug: itemData?.slug,
           title: itemData?.title || 'Event'
         };
-        console.log('SavedItemsTab - eventData for URL:', eventData);
         url = createEventURL(eventData);
       } else if (item.itemType === 'internships') {
         // Use createHubContentURL for internships/hub content
@@ -100,14 +89,12 @@ const SavedItemsTab = () => {
           slug: itemData?.slug,
           title: itemData?.title || 'Internship'
         };
-        console.log('SavedItemsTab - hubData for URL:', hubData);
         url = createHubContentURL(hubData);
       } else {
         // Fallback for unknown types
         url = `/event-detail/${item.itemType}/${item.itemId}`;
       }
       
-      console.log('SavedItemsTab - Generated URL:', url);
       navigate(url);
     } catch (error) {
       console.error('SavedItemsTab - Error generating URL:', error);
@@ -117,7 +104,6 @@ const SavedItemsTab = () => {
                    item.itemType === 'events' ? 'events' : 
                    item.itemType === 'internships' ? 'internships' : 'jobs';
       url = `/event-detail/${type}/${id}`;
-      console.log('SavedItemsTab - Fallback URL:', url);
       navigate(url);
     }
   };
@@ -166,7 +152,6 @@ const SavedItemsTab = () => {
   };
 
   const renderItemCard = (item, type) => {
-    console.log('Rendering item:', item);
     const itemData = item.Job || item.Event || item.HubContent || item;
     
     return (

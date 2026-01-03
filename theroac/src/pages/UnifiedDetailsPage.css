@@ -865,7 +865,7 @@
 
 .action-card {
   border: 2px solid #FFD600;
-  box-shadow: 0 0 20px rgba(255, 214, 0, 0.3);
+  /* box-shadow: 0 0 20px rgba(255, 214, 0, 0.3); */
 }
 
 .action-header {
@@ -2066,7 +2066,7 @@
 
 .details-page .action-card {
   border: 2px solid #FFD600;
-  box-shadow: 0 0 20px rgba(255, 214, 0, 0.3);
+  /* box-shadow: 0 0 20px rgba(255, 214, 0, 0.3); */
 }/* Ap
 plied Button States */
 .details-page .apply-button.applied {

@@ -44,7 +44,6 @@ const JobsTab = ({ jobs, internships = [], dashboardStats, appliedItems, onApply
       const wasBookmarked = bookmarkedJobs.has(jobId);
       
       const response = await apiService.toggleBookmark(jobId, itemType);
-      console.log('Bookmark response:', response);
       
       // Toggle the bookmark state based on previous state
       if (wasBookmarked) {

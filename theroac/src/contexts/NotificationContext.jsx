@@ -129,7 +129,6 @@ export const NotificationProvider = ({ children }) => {
 
     // Handle new notifications
     const handleNewNotification = (notification) => {
-      console.log('📬 New notification:', notification);
       setNotifications(prev => [notification, ...prev]);
       setUnreadCount(prev => prev + 1);
 

@@ -238,22 +238,49 @@ const DiscoverPage = () => {
   if (loading) {
     return (
       <>
-        {/* Progress Wrap - Scroll to Top */}
-        {/* <div className="paginacontainer">
-          <div className="progress-wrap warp2">
-            <svg className="progress-circle svg-content" width="100%" height="100%" viewBox="-1 -1 102 102">
-              <path d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98" />
-            </svg>
-          </div>
-        </div> */}
-
         <div className="discover-page-wrapper">
           <div className="discover-page">
-            <div className="preloader">
-              <div className="loading-container">
-                <div className="loading"></div>
-                <div id="loading-icon">
-                  <img src="assets/img/logo/preloader.png" alt="" />
+            {/* Hero Section - Always show even during loading */}
+            <div className="discover-hero">
+              <div className="discover-hero-content">
+                <h1>
+                  {filter === "jobs" && "Jobs & Internships"}
+                  {filter === "events" && "Events & Workshops"}
+                  {filter === "scholarships" && "Scholarships"}
+                  {filter === "competitions" && "Competitions & Hackathons"}
+                  {!filter && "Discover Opportunities"}
+                </h1>
+                <p>
+                  {filter === "jobs" &&
+                    "Find the perfect job or internship opportunity that matches your skills and career goals"}
+                  {filter === "events" &&
+                    "Join workshops, conferences, and events to enhance your skills and network"}
+                  {filter === "scholarships" &&
+                    "Access funding and financial support for your educational journey"}
+                  {filter === "competitions" &&
+                    "Participate in competitions and hackathons to showcase your talent"}
+                  {!filter &&
+                    "Explore jobs, internships, events, scholarships, and competitions all in one place"}
+                </p>
+                {filter && (
+                  <button
+                    className="discover-view-all-btn"
+                    onClick={() => navigate("/discover")}
+                  >
+                    View All Categories
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Loading Content */}
+            <div className="discover-content">
+              <div className="preloader">
+                <div className="loading-container">
+                  <div className="loading"></div>
+                  <div id="loading-icon">
+                    <img src="assets/img/logo/preloader.png" alt="" />
+                  </div>
                 </div>
               </div>
             </div>

@@ -18,13 +18,7 @@ const SettingsTab = ({
   };
 
   // Debug: Check what data we have
-  console.log('SettingsTab - authUser:', authUser);
-  console.log('SettingsTab - authUser.company:', authUser?.company);
-  console.log('SettingsTab - profileData:', profileData);
-  console.log('SettingsTab - profileData.companyName:', profileData?.companyName);
-  console.log('SettingsTab - displayProfile:', displayProfile);
-  console.log('SettingsTab - displayProfile.companyName:', displayProfile?.companyName);
-  console.log('SettingsTab - displayProfile.company:', displayProfile?.company);
+
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -91,7 +85,6 @@ const SettingsTab = ({
         }
       };
 
-      console.log('Saving profile data:', userFields);
 
       // Update user profile
       const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000/api';
@@ -109,10 +102,8 @@ const SettingsTab = ({
       }
 
       const response = await userResponse.json();
-      console.log('Save response:', response);
       
       const updatedUser = response.user || response;
-      console.log('Updated user data:', updatedUser);
       
       // Fetch fresh user data from server to get company field
       const freshUserResponse = await fetch(`${API_URL}/users/me`, {
@@ -124,7 +115,6 @@ const SettingsTab = ({
       if (freshUserResponse.ok) {
         const freshData = await freshUserResponse.json();
         const freshUser = freshData.user || freshData;
-        console.log('Fresh user data from server:', freshUser);
         
         // Update local storage with fresh data
         localStorage.setItem('user', JSON.stringify(freshUser));
@@ -132,7 +122,6 @@ const SettingsTab = ({
         // Store current tab before reload so we come back to settings
         sessionStorage.setItem('activeTab', 'settings');
         
-        console.log("Profile updated successfully");
         setIsEditingProfile(false);
         
         // Reload page to reflect changes

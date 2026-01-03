@@ -75,9 +75,7 @@ const CandidateDashboard = () => {
   // Calculate profile completion
   useEffect(() => {
     if (authUser) {
-      console.log('CandidateDashboard - authUser:', authUser);
       const completion = calculateProfileCompletion(authUser);
-      console.log('CandidateDashboard - profileCompletion:', completion);
       setProfileCompletion(completion);
     }
   }, [authUser]);
@@ -110,25 +108,26 @@ const CandidateDashboard = () => {
     let totalPoints = 0;
     let earnedPoints = 0;
 
-    // Basic info (40 points total)
+    // Basic info (50 points total)
     if (user.fullName || user.name) earnedPoints += 10;
     if (user.email) earnedPoints += 5;
+    if (user.phone) earnedPoints += 10; // Phone is now mandatory
     if (user.headline) earnedPoints += 10;
     if (user.location) earnedPoints += 5;
     if (user.about) earnedPoints += 10;
-    totalPoints += 40;
+    totalPoints += 50;
 
     // Resume (20 points)
     if (user.resumePath || user.resumeUrl) earnedPoints += 20;
     totalPoints += 20;
 
-    // Skills (15 points)
-    if (user.skills && user.skills.length > 0) earnedPoints += 15;
-    totalPoints += 15;
+    // Skills (10 points)
+    if (user.skills && user.skills.length > 0) earnedPoints += 10;
+    totalPoints += 10;
 
-    // Experience (15 points)
-    if (user.experiences && user.experiences.length > 0) earnedPoints += 15;
-    totalPoints += 15;
+    // Experience (10 points)
+    if (user.experiences && user.experiences.length > 0) earnedPoints += 10;
+    totalPoints += 10;
 
     // Education (10 points)
     if (user.education && user.education.length > 0) earnedPoints += 10;
@@ -546,7 +545,6 @@ const CandidateDashboard = () => {
   const handleSaveProfile = async (profileDataFromComponent) => {
     let loadingToast = null;
     try {
-      console.log('Saving profile data:', profileDataFromComponent);
       loadingToast = toast.loading("Updating profile...");
 
       // Prepare data object
@@ -554,6 +552,7 @@ const CandidateDashboard = () => {
         fullName: profileDataFromComponent.fullName || "",
         headline: profileDataFromComponent.headline || "",
         email: profileDataFromComponent.email || "",
+        phone: profileDataFromComponent.phone || "",
         location: profileDataFromComponent.location || "",
         about: profileDataFromComponent.about || "",
         skills: profileDataFromComponent.skills || [],
@@ -561,11 +560,9 @@ const CandidateDashboard = () => {
         education: profileDataFromComponent.education || [],
       };
 
-      console.log('Data to send:', dataToSend);
 
       // If there's a resume file, upload it first
       if (profileDataFromComponent.resumeFile) {
-        console.log('Uploading resume file...');
         const resumeFormData = new FormData();
         resumeFormData.append('resume', profileDataFromComponent.resumeFile);
         
@@ -578,7 +575,6 @@ const CandidateDashboard = () => {
         });
         
         const resumeData = await resumeResponse.json();
-        console.log('Resume upload response:', resumeData);
         
         if (!resumeResponse.ok) {
           throw new Error(resumeData.message || 'Failed to upload resume');
@@ -586,7 +582,6 @@ const CandidateDashboard = () => {
         
         // Add resume path to profile data
         dataToSend.resumePath = resumeData.resumePath || resumeData.url;
-        console.log('Resume uploaded successfully:', dataToSend.resumePath);
       }
 
       // Now update profile with JSON data
@@ -600,7 +595,6 @@ const CandidateDashboard = () => {
       });
 
       const data = await response.json();
-      console.log('Save response:', data);
 
       if (!response.ok) {
         throw new Error(data.message || 'Failed to update profile');
@@ -608,7 +602,6 @@ const CandidateDashboard = () => {
 
       // Update authUser with new data from response
       const updatedUserData = data.user || data;
-      console.log('Updated user data:', updatedUserData);
       
       // Update localStorage
       localStorage.setItem('user', JSON.stringify(updatedUserData));

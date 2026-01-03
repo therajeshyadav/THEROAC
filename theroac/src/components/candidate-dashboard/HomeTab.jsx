@@ -46,7 +46,6 @@ const HomeTab = ({
       const wasBookmarked = bookmarkedJobs.has(jobId);
       
       const response = await apiService.toggleBookmark(jobId, itemType);
-      console.log('HomeTab bookmark response:', response);
       
       // Toggle the bookmark state based on previous state
       if (wasBookmarked) {

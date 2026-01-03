@@ -52,7 +52,6 @@ const PrimeHubTab = ({
       const wasBookmarked = bookmarkedContent.has(contentId);
       
       const response = await apiService.toggleBookmark(contentId, itemType);
-      console.log('Content bookmark response:', response);
       
       // Toggle the bookmark state based on previous state
       if (wasBookmarked) {

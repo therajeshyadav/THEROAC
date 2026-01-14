@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Upload, X, Image as ImageIcon, Video, Plus, Trash2 } from 'lucide-react';
+import { Upload, Trash2, Video } from 'lucide-react';
 import { toast } from 'react-toastify';
 import './ImageUpload.css';
 import './MediaUpload.css';
@@ -14,8 +14,6 @@ const MediaUpload = ({
   maxItems = 10
 }) => {
   const [uploading, setUploading] = useState(false);
-  const [newMediaType, setNewMediaType] = useState('image');
-  const [newMediaUrl, setNewMediaUrl] = useState('');
 
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
@@ -36,10 +34,10 @@ const MediaUpload = ({
       return;
     }
 
-    // Validate file size (10MB for images, 50MB for videos)
-    const maxSize = isVideo ? 50 * 1024 * 1024 : 10 * 1024 * 1024;
+    // Validate file size (50MB for images, 500MB for videos)
+    const maxSize = isVideo ? 500 * 1024 * 1024 : 50 * 1024 * 1024;
     if (file.size > maxSize) {
-      toast.error(`File size should be less than ${isVideo ? '50MB' : '10MB'}`);
+      toast.error(`File size should be less than ${isVideo ? '500MB' : '50MB'}`);
       return;
     }
 
@@ -81,28 +79,6 @@ const MediaUpload = ({
     }
   };
 
-  const addMediaUrl = () => {
-    if (!newMediaUrl.trim()) {
-      toast.error('Please enter a valid URL');
-      return;
-    }
-
-    if (value.length >= maxItems) {
-      toast.error(`Maximum ${maxItems} media items allowed`);
-      return;
-    }
-
-    const newMediaItem = {
-      type: newMediaType,
-      url: newMediaUrl.trim(),
-      thumbnail: newMediaType === 'video' ? newMediaUrl.replace('watch?v=', 'vi/') + '/maxresdefault.jpg' : newMediaUrl.trim()
-    };
-
-    onChange([...value, newMediaItem]);
-    setNewMediaUrl('');
-    toast.success('Media added successfully!');
-  };
-
   const removeMedia = (index) => {
     const newMedia = value.filter((_, i) => i !== index);
     onChange(newMedia);
@@ -132,7 +108,9 @@ const MediaUpload = ({
               </div>
               <div className="media-info">
                 <span className="media-type">{item.type}</span>
-                <span className="media-url">{item.url.length > 40 ? item.url.substring(0, 40) + '...' : item.url}</span>
+                <span className="media-url">
+                  {item.type === 'video' ? `Video ${index + 1}` : `Image ${index + 1}`}
+                </span>
               </div>
               <button 
                 type="button" 
@@ -167,34 +145,6 @@ const MediaUpload = ({
             />
           </div>
 
-          {/* URL Input */}
-          <div className="url-input-section">
-            <div className="url-input-group">
-              <select 
-                value={newMediaType} 
-                onChange={(e) => setNewMediaType(e.target.value)}
-                className="media-type-select"
-              >
-                <option value="image">Image</option>
-                <option value="video">Video</option>
-              </select>
-              <input
-                type="url"
-                value={newMediaUrl}
-                onChange={(e) => setNewMediaUrl(e.target.value)}
-                placeholder="Enter media URL..."
-                className="url-input"
-              />
-              <button 
-                type="button" 
-                className="btn-add-url" 
-                onClick={addMediaUrl}
-                disabled={!newMediaUrl.trim()}
-              >
-                <Plus size={16} />
-              </button>
-            </div>
-          </div>
         </div>
       )}
 

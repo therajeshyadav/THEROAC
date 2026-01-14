@@ -5,6 +5,7 @@ const helmet = require('helmet');
 const { sequelize } = require('./models');
 const authRoutes = require('./routes/auth');
 const eventRoutes = require('./routes/events');
+const eventStageRoutes = require('./routes/eventStages');
 const hackathonRoutes = require('./routes/hackathons');
 const jobRoutes = require('./routes/jobs');
 const userRoutes = require('./routes/users');
@@ -54,6 +55,7 @@ const { authenticate } = require('./middlewares/auth');
 
 // Public routes (authentication handled per-route inside these routers)
 app.use('/api/events', eventRoutes);
+app.use('/api/events', eventStageRoutes); // Event stages routes
 app.use('/api/hackathons', hackathonRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/hub-content', hubContentRoutes);

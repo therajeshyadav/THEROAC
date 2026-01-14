@@ -213,22 +213,19 @@ exports.uploadResume = async (req, res, next) => {
       return res.status(401).json({ success: false, error: 'Unauthorized: User not found.' });
     }
 
-    if (!req.file) {
-      return res.status(400).json({ success: false, error: 'No file uploaded.' });
+    if (!req.fileUrl) {
+      return res.status(400).json({ success: false, error: 'No file uploaded or upload failed.' });
     }
 
-    // Generate the file URL/path
-    const resumePath = `/uploads/resumes/${req.file.filename}`;
-
-    // Update user's resumePath in database
-    await req.user.update({ resumePath });
+    // Update user's resumePath in database with GCS URL
+    await req.user.update({ resumePath: req.fileUrl });
 
     return res.status(200).json({
       success: true,
-      message: 'Resume uploaded successfully',
-      resumePath,
-      url: resumePath,
-      filename: req.file.filename,
+      message: 'Resume uploaded successfully to Google Cloud Storage',
+      resumePath: req.fileUrl,
+      url: req.fileUrl,
+      uploadedFile: req.uploadedFile,
     });
   } catch (err) {
     console.error('Error in uploadResume:', err);

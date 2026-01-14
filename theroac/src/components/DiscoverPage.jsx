@@ -23,7 +23,7 @@ const DiscoverPage = () => {
       setLoading(true);
       const [jobsData, apiEventsData, hubContentData] = await Promise.all([
         apiService.getJobs({ limit: 15 }).catch(() => ({ jobs: [] })),
-        apiService.getEvents().catch(() => ({ events: [] })),
+        apiService.getEvents({ perPage: 50 }).catch(() => ({ events: [] })),
         apiService.getHubContent({ limit: 15 }).catch(() => []),
       ]);
 

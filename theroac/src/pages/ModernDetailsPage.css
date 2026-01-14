@@ -2271,3 +2271,1802 @@
         height: 50vh;
     }
 }
+/* Sponsors Section */
+.sponsors-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.sponsor-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1rem;
+    transition: all 0.2s;
+}
+
+.sponsor-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 214, 0, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.sponsor-logo {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sponsor-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.sponsor-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #FFD600, #ffd000);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+.sponsor-tier {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.sponsor-tier.bronze {
+    background: linear-gradient(135deg, #CD7F32, #B8860B);
+    color: white;
+}
+
+.sponsor-tier.silver {
+    background: linear-gradient(135deg, #C0C0C0, #A8A8A8);
+    color: #1a1a1a;
+}
+
+.sponsor-tier.gold {
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    color: #1a1a1a;
+}
+
+.sponsor-tier.platinum {
+    background: linear-gradient(135deg, #E5E4E2, #D3D3D3);
+    color: #1a1a1a;
+}
+
+.sponsor-tier.title {
+    background: linear-gradient(135deg, #FF6B6B, #FF4757);
+    color: white;
+}
+
+.sponsor-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.sponsor-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+    line-height: 1.3;
+}
+
+.sponsor-website {
+    font-size: 14px;
+    color: #FFD600;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 6px 12px;
+    border: 1px solid rgba(255, 214, 0, 0.3);
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.sponsor-website:hover {
+    background: rgba(255, 214, 0, 0.1);
+    border-color: #FFD600;
+    color: #ffd000;
+    text-decoration: none;
+}
+
+/* Responsive Sponsors Grid */
+@media (max-width: 1023px) {
+    .sponsors-grid {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 1.25rem;
+    }
+    
+    .sponsor-card {
+        padding: 1.25rem;
+    }
+    
+    .sponsor-logo {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .sponsor-placeholder {
+        font-size: 40px;
+    }
+    
+    .sponsor-name {
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 767px) {
+    .sponsors-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+    
+    .sponsor-card {
+        padding: 1rem;
+    }
+    
+    .sponsor-logo {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .sponsor-placeholder {
+        font-size: 32px;
+    }
+    
+    .sponsor-name {
+        font-size: 15px;
+    }
+    
+    .sponsor-website {
+        font-size: 13px;
+        padding: 5px 10px;
+    }
+}
+
+@media (max-width: 479px) {
+    .sponsors-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.875rem;
+    }
+    
+    .sponsor-card {
+        padding: 0.875rem;
+    }
+    
+    .sponsor-logo {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .sponsor-placeholder {
+        font-size: 28px;
+    }
+    
+    .sponsor-name {
+        font-size: 14px;
+    }
+    
+    .sponsor-website {
+        font-size: 12px;
+        padding: 4px 8px;
+    }
+    
+    .sponsor-tier {
+        font-size: 9px;
+        padding: 3px 6px;
+    }
+}
+
+@media (max-width: 319px) {
+    .sponsors-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .sponsor-card {
+        padding: 0.75rem;
+    }
+    
+    .sponsor-logo {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .sponsor-placeholder {
+        font-size: 24px;
+    }
+    
+    .sponsor-name {
+        font-size: 13px;
+    }
+}
+
+/* ===================================================== */
+/* 🎯 ENHANCED STAGES & TIMELINE SECTION */
+/* ===================================================== */
+
+.stages-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.stage-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 2rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stage-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 214, 0, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.stage-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, #FFD600, #FFA500);
+    opacity: 0.7;
+}
+
+.stage-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.stage-number {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #FFD600, #FFA500);
+    color: #1a1a1a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: 700;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(255, 214, 0, 0.3);
+}
+
+.stage-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.stage-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+    line-height: 1.3;
+}
+
+.stage-dates {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.stage-date,
+.stage-deadline {
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.stage-date {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.stage-deadline {
+    color: #FFD600;
+}
+
+.stage-status {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
+}
+
+.stage-status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: 1px solid;
+    white-space: nowrap;
+}
+
+.stage-status-badge.not-registered {
+    background: rgba(255, 99, 99, 0.1);
+    color: #ff6363;
+    border-color: rgba(255, 99, 99, 0.3);
+}
+
+.stage-status-badge.upcoming {
+    background: rgba(0, 123, 255, 0.1);
+    color: #007bff;
+    border-color: rgba(0, 123, 255, 0.3);
+}
+
+.stage-status-badge.live {
+    background: rgba(40, 167, 69, 0.1);
+    color: #28a745;
+    border-color: rgba(40, 167, 69, 0.3);
+    animation: pulse 2s infinite;
+}
+
+.stage-status-badge.ended {
+    background: rgba(108, 117, 125, 0.1);
+    color: #6c757d;
+    border-color: rgba(108, 117, 125, 0.3);
+}
+
+.stage-status-badge.pending {
+    background: rgba(255, 193, 7, 0.1);
+    color: #ffc107;
+    border-color: rgba(255, 193, 7, 0.3);
+}
+
+.stage-status-badge.locked {
+    background: rgba(255, 99, 99, 0.1);
+    color: #ff6363;
+    border: 1px solid rgba(255, 99, 99, 0.3);
+}
+
+.stage-action-btn.locked {
+    background: rgba(255, 99, 99, 0.2);
+    color: #ff6363;
+    cursor: not-allowed;
+    border: 1px solid rgba(255, 99, 99, 0.3);
+}
+
+/* Timeline Container - ROAC Color Scheme */
+.timeline-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    position: relative;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.timeline-stage {
+    display: flex;
+    align-items: flex-start;
+    position: relative;
+    margin-bottom: 0;
+}
+
+/* Stage Number Circle - ROAC Colors */
+.stage-number-circle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #FFD600; /* ROAC Primary Yellow */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-right: 20px;
+    margin-top: 10px;
+    z-index: 2;
+    position: relative;
+    border: 3px solid #1a1a1a;
+    box-shadow: 0 4px 12px rgba(255, 214, 0, 0.3);
+}
+
+.timeline-stage.live .stage-number-circle {
+    background: #FFD600;
+    border-color: #28a745;
+    animation: pulseGlow 2s infinite;
+}
+
+.timeline-stage.ended .stage-number-circle {
+    background: #FFD600;
+    border-color: #6c757d;
+}
+
+.timeline-stage.locked .stage-number-circle {
+    background: #f8f9fa;
+    border-color: #dc3545;
+    color: #dc3545;
+}
+
+.timeline-stage.upcoming .stage-number-circle {
+    background: #f8f9fa;
+    border-color: #FFD600;
+    color: #FFD600;
+}
+
+.stage-number {
+    color: #1a1a1a;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.timeline-stage.locked .stage-number,
+.timeline-stage.upcoming .stage-number {
+    color: inherit;
+}
+
+@keyframes pulseGlow {
+    0% {
+        box-shadow: 0 4px 12px rgba(255, 214, 0, 0.3);
+    }
+    50% {
+        box-shadow: 0 4px 20px rgba(255, 214, 0, 0.6);
+    }
+    100% {
+        box-shadow: 0 4px 12px rgba(255, 214, 0, 0.3);
+    }
+}
+
+/* Connecting Line with Progression Logic */
+.stage-connecting-line {
+    position: absolute;
+    left: 29px;
+    top: 70px;
+    width: 2px;
+    height: calc(100% + 20px);
+    background: #e9ecef;
+    z-index: 1;
+}
+
+/* Line progression based on stage status */
+.timeline-stage.ended .stage-connecting-line {
+    background: #FFD600; /* Completed stages get yellow line */
+}
+
+.timeline-stage.live .stage-connecting-line {
+    background: linear-gradient(to bottom, #FFD600 0%, #FFD600 50%, #e9ecef 50%, #e9ecef 100%);
+}
+
+/* Hide line for last stage */
+.timeline-stage:last-child .stage-connecting-line {
+    display: none;
+}
+
+/* Stage Content Card - ROAC Theme */
+.stage-content-card {
+    flex: 1;
+    background: #1a1a1a; /* Dark background like ROAC theme */
+    border: 1px solid #333;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    color: #fff;
+}
+
+.timeline-stage.live .stage-content-card {
+    border-color: #FFD600;
+    box-shadow: 0 4px 16px rgba(255, 214, 0, 0.2);
+}
+
+.timeline-stage.locked .stage-content-card {
+    background: #2a2a2a;
+    border-color: #dc3545;
+    opacity: 0.7;
+}
+
+.timeline-stage.ended .stage-content-card {
+    border-color: #FFD600;
+    background: #1f1f1f;
+}
+
+/* Date Header */
+.stage-date-header {
+    margin-bottom: 16px;
+}
+
+.stage-dates {
+    font-size: 14px;
+    color: #FFD600; /* ROAC Yellow for dates */
+    font-weight: 500;
+}
+
+/* Stage Header Row */
+.stage-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+    gap: 16px;
+}
+
+.stage-title-text {
+    font-size: 20px;
+    font-weight: 600;
+    color: #fff;
+    margin: 0;
+    flex: 1;
+}
+
+/* Status Indicators - ROAC Colors */
+.stage-status-indicator {
+    flex-shrink: 0;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-badge.live {
+    background: rgba(255, 214, 0, 0.2);
+    color: #FFD600;
+    border: 1px solid #FFD600;
+}
+
+.status-badge.ended {
+    background: rgba(255, 214, 0, 0.1);
+    color: #FFD600;
+    border: 1px solid rgba(255, 214, 0, 0.3);
+}
+
+.status-badge.locked {
+    background: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+    border: 1px solid rgba(220, 53, 69, 0.3);
+}
+
+.status-badge.upcoming {
+    background: rgba(255, 214, 0, 0.1);
+    color: #FFD600;
+    border: 1px solid rgba(255, 214, 0, 0.3);
+}
+
+.live-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #FFD600;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(255, 214, 0, 0.7);
+    }
+    
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 10px rgba(255, 214, 0, 0);
+    }
+    
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(255, 214, 0, 0);
+    }
+}
+
+/* Stage Description */
+.stage-description-text {
+    margin-bottom: 20px;
+}
+
+.stage-description-text p {
+    color: #ccc;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Requirements Section */
+.stage-requirements {
+    margin-bottom: 24px;
+}
+
+.requirements-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #FFD600;
+    margin-bottom: 12px;
+}
+
+.requirements-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.requirement-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px;
+    background: rgba(255, 214, 0, 0.05);
+    border-radius: 8px;
+    border-left: 4px solid #FFD600;
+}
+
+.requirement-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    color: #FFD600;
+}
+
+.requirement-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.requirement-label {
+    font-weight: 600;
+    color: #fff;
+    font-size: 14px;
+}
+
+.requirement-desc {
+    color: #ccc;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.requirement-required {
+    color: #FFD600;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+/* Action Area */
+.stage-action-area {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+/* Update existing stage action buttons - ROAC Colors */
+.stage-action-btn {
+    padding: 12px 32px;
+    border-radius: 8px;
+    border: none;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 180px;
+}
+
+.stage-action-btn.register {
+    background: linear-gradient(135deg, #FFD600, #FFA500);
+    color: #1a1a1a;
+}
+
+.stage-action-btn.register:hover {
+    background: linear-gradient(135deg, #FFA500, #FFD600);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 214, 0, 0.4);
+}
+
+.stage-action-btn.submit {
+    background: linear-gradient(135deg, #FFD600, #FFA500);
+    color: #1a1a1a;
+}
+
+.stage-action-btn.submit:hover {
+    background: linear-gradient(135deg, #FFA500, #FFD600);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 214, 0, 0.4);
+}
+
+.stage-action-btn.locked {
+    background: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+    cursor: not-allowed;
+    border: 1px solid rgba(220, 53, 69, 0.3);
+}
+
+.stage-action-btn.disabled {
+    background: rgba(108, 117, 125, 0.2);
+    color: rgba(255, 255, 255, 0.5);
+    cursor: not-allowed;
+}
+
+/* Team Status Section - Stage 1 Hackathon */
+.team-status-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+    background: rgba(255, 214, 0, 0.05);
+    border: 1px solid rgba(255, 214, 0, 0.2);
+    border-radius: 8px;
+}
+
+.team-incomplete-indicator,
+.team-complete-indicator {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+    text-align: center;
+}
+
+.team-status-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: #ffc107;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.team-complete-indicator .team-status-text {
+    color: #28a745;
+}
+
+/* Team Building Flow - ROAC Colors */
+.stage-team-flow {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+    background: rgba(255, 214, 0, 0.05);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 214, 0, 0.2);
+}
+
+.team-status-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.team-incomplete-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: rgba(255, 193, 7, 0.1);
+    color: #ffc107;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    width: fit-content;
+}
+
+.team-complete-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: rgba(40, 167, 69, 0.1);
+    color: #28a745;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    width: fit-content;
+}
+
+.team-help-text {
+    color: #ccc;
+    font-size: 13px;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.team-action-buttons {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.stage-action-btn.team-build {
+    background: linear-gradient(135deg, #FFD600, #FFA500);
+    color: #1a1a1a;
+    padding: 12px 24px;
+    border-radius: 8px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.stage-action-btn.team-build:hover {
+    background: linear-gradient(135deg, #FFA500, #FFD600);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 214, 0, 0.4);
+}
+
+.stage-action-btn.team-edit {
+    background: rgba(255, 214, 0, 0.1);
+    color: #FFD600;
+    border: 1px solid rgba(255, 214, 0, 0.3);
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.stage-action-btn.team-edit:hover {
+    background: rgba(255, 214, 0, 0.2);
+    transform: translateY(-1px);
+}
+
+/* Stage Info Only - For evaluation rounds without submission */
+.stage-info-only {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 12px 32px;
+    border-radius: 8px;
+    background: rgba(255, 214, 0, 0.1);
+    border: 1px solid rgba(255, 214, 0, 0.3);
+}
+
+.stage-status-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: #FFD600;
+    text-align: center;
+}
+
+/* Team Info Display */
+.team-info-display {
+    background: rgba(255, 214, 0, 0.05);
+    border: 1px solid rgba(255, 214, 0, 0.2);
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 12px;
+}
+
+.team-members-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.team-member-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+}
+
+.member-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #FFD600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1a1a1a;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.member-info {
+    flex: 1;
+}
+
+.member-name {
+    color: #fff;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.member-role {
+    color: #ccc;
+    font-size: 12px;
+}
+@media (max-width: 768px) {
+    .timeline-container {
+        max-width: 100%;
+        padding: 0 16px;
+    }
+    
+    .stage-number-circle {
+        width: 50px;
+        height: 50px;
+        margin-right: 16px;
+    }
+    
+    .stage-number {
+        font-size: 16px;
+    }
+    
+    .stage-connecting-line {
+        left: 24px;
+        top: 60px;
+    }
+    
+    .stage-content-card {
+        padding: 20px;
+    }
+    
+    .stage-header-row {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .stage-title-text {
+        font-size: 18px;
+    }
+    
+    .stage-action-btn {
+        min-width: 160px;
+        padding: 10px 24px;
+    }
+}
+
+@media (max-width: 480px) {
+    .stage-number-circle {
+        width: 40px;
+        height: 40px;
+        margin-right: 12px;
+    }
+    
+    .stage-number {
+        font-size: 14px;
+    }
+    
+    .stage-connecting-line {
+        left: 19px;
+        top: 50px;
+    }
+    
+    .stage-content-card {
+        padding: 16px;
+    }
+    
+    .stage-title-text {
+        font-size: 16px;
+    }
+    
+    .requirement-item {
+        padding: 10px;
+    }
+    
+    .stage-action-btn {
+        min-width: 140px;
+        padding: 8px 20px;
+        font-size: 13px;
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.05);
+    }
+}
+
+.stage-status-live {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.25rem;
+}
+
+.time-left {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 500;
+}
+
+.stage-description {
+    margin-bottom: 1.5rem;
+}
+
+.stage-description p {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 15px;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.stage-submissions {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 214, 0, 0.2);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.submissions-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #FFD600;
+    margin: 0 0 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.submissions-title::before {
+    content: '📋';
+    font-size: 18px;
+}
+
+.submission-requirements {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.submission-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 1rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    transition: all 0.2s ease;
+}
+
+.submission-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 214, 0, 0.3);
+}
+
+.submission-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 214, 0, 0.1);
+    border-radius: 6px;
+}
+
+.submission-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.submission-type {
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    text-transform: capitalize;
+}
+
+.submission-desc {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.4;
+}
+
+.submission-required {
+    font-size: 10px;
+    color: #ff6363;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: rgba(255, 99, 99, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    align-self: flex-start;
+}
+
+.stage-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.stage-action-btn {
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    min-width: 180px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stage-action-btn.register {
+    background: linear-gradient(135deg, #FFD600, #FFA500);
+    color: #1a1a1a;
+}
+
+.stage-action-btn.register:hover {
+    background: linear-gradient(135deg, #FFA500, #FFD600);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 214, 0, 0.4);
+}
+
+.stage-action-btn.submit {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+}
+
+.stage-action-btn.submit:hover {
+    background: linear-gradient(135deg, #20c997, #28a745);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+}
+
+.stage-action-btn.disabled {
+    background: rgba(108, 117, 125, 0.3);
+    color: rgba(255, 255, 255, 0.5);
+    cursor: not-allowed;
+    border: 1px solid rgba(108, 117, 125, 0.3);
+}
+
+.stage-action-btn.disabled:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+/* ===================================================== */
+/* 📱 RESPONSIVE STAGES SECTION */
+/* ===================================================== */
+
+/* Tablet Portrait / Small Laptop (768px - 1023px) */
+@media (max-width: 1023px) {
+    .stage-item {
+        padding: 1.5rem;
+    }
+    
+    .stage-header {
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .stage-number {
+        width: 45px;
+        height: 45px;
+        font-size: 18px;
+    }
+    
+    .stage-title {
+        font-size: 22px;
+    }
+    
+    .submission-requirements {
+        grid-template-columns: 1fr;
+    }
+    
+    .stage-action-btn {
+        min-width: 160px;
+        padding: 10px 20px;
+    }
+}
+
+/* Mobile Landscape / Large Phone (640px - 767px) */
+@media (max-width: 767px) {
+    .stages-timeline {
+        gap: 1.5rem;
+    }
+    
+    .stage-item {
+        padding: 1.25rem;
+    }
+    
+    .stage-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .stage-number {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+        align-self: flex-start;
+    }
+    
+    .stage-title {
+        font-size: 20px;
+    }
+    
+    .stage-dates {
+        gap: 0.375rem;
+    }
+    
+    .stage-date,
+    .stage-deadline {
+        font-size: 13px;
+    }
+    
+    .stage-status {
+        align-items: flex-start;
+        margin-top: 0.5rem;
+    }
+    
+    .stage-submissions {
+        padding: 1rem;
+    }
+    
+    .submissions-title {
+        font-size: 15px;
+    }
+    
+    .submission-item {
+        padding: 0.875rem;
+    }
+    
+    .submission-icon {
+        font-size: 20px;
+        width: 28px;
+        height: 28px;
+    }
+    
+    .submission-type {
+        font-size: 13px;
+    }
+    
+    .submission-desc {
+        font-size: 11px;
+    }
+    
+    .stage-action-btn {
+        min-width: 140px;
+        padding: 9px 18px;
+        font-size: 13px;
+    }
+}
+
+/* Mobile Portrait / Small Phone (480px - 639px) */
+@media (max-width: 639px) {
+    .stage-item {
+        padding: 1rem;
+    }
+    
+    .stage-number {
+        width: 36px;
+        height: 36px;
+        font-size: 14px;
+    }
+    
+    .stage-title {
+        font-size: 18px;
+    }
+    
+    .stage-date,
+    .stage-deadline {
+        font-size: 12px;
+    }
+    
+    .stage-status-badge {
+        font-size: 11px;
+        padding: 5px 10px;
+    }
+    
+    .time-left {
+        font-size: 10px;
+    }
+    
+    .stage-description p {
+        font-size: 14px;
+    }
+    
+    .stage-submissions {
+        padding: 0.875rem;
+    }
+    
+    .submissions-title {
+        font-size: 14px;
+    }
+    
+    .submission-item {
+        padding: 0.75rem;
+        gap: 0.5rem;
+    }
+    
+    .submission-icon {
+        font-size: 18px;
+        width: 24px;
+        height: 24px;
+    }
+    
+    .submission-type {
+        font-size: 12px;
+    }
+    
+    .submission-desc {
+        font-size: 10px;
+    }
+    
+    .submission-required {
+        font-size: 9px;
+        padding: 1px 4px;
+    }
+    
+    .stage-action-btn {
+        min-width: 120px;
+        padding: 8px 16px;
+        font-size: 12px;
+    }
+}
+
+/* Extra Small Mobile (320px - 479px) */
+@media (max-width: 479px) {
+    .stage-item {
+        padding: 0.875rem;
+    }
+    
+    .stage-number {
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
+    }
+    
+    .stage-title {
+        font-size: 16px;
+        line-height: 1.2;
+    }
+    
+    .stage-dates {
+        gap: 0.25rem;
+    }
+    
+    .stage-date,
+    .stage-deadline {
+        font-size: 11px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+    }
+    
+    .stage-status-badge {
+        font-size: 10px;
+        padding: 4px 8px;
+    }
+    
+    .stage-description p {
+        font-size: 13px;
+    }
+    
+    .stage-submissions {
+        padding: 0.75rem;
+    }
+    
+    .submissions-title {
+        font-size: 13px;
+    }
+    
+    .submissions-title::before {
+        font-size: 16px;
+    }
+    
+    .submission-item {
+        padding: 0.625rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .submission-icon {
+        font-size: 16px;
+        width: 20px;
+        height: 20px;
+        align-self: flex-start;
+    }
+    
+    .submission-type {
+        font-size: 11px;
+    }
+    
+    .submission-desc {
+        font-size: 9px;
+        line-height: 1.3;
+    }
+    
+    .stage-action-btn {
+        min-width: 100px;
+        padding: 7px 14px;
+        font-size: 11px;
+        width: 100%;
+    }
+}
+
+/* Ultra Small Mobile (280px - 319px) */
+@media (max-width: 319px) {
+    .stage-item {
+        padding: 0.75rem;
+    }
+    
+    .stage-item::before {
+        width: 3px;
+    }
+    
+    .stage-number {
+        width: 28px;
+        height: 28px;
+        font-size: 11px;
+    }
+    
+    .stage-title {
+        font-size: 14px;
+    }
+    
+    .stage-date,
+    .stage-deadline {
+        font-size: 10px;
+    }
+    
+    .stage-status-badge {
+        font-size: 9px;
+        padding: 3px 6px;
+    }
+    
+    .time-left {
+        font-size: 8px;
+    }
+    
+    .stage-description p {
+        font-size: 12px;
+    }
+    
+    .stage-submissions {
+        padding: 0.625rem;
+    }
+    
+    .submissions-title {
+        font-size: 12px;
+    }
+    
+    .submissions-title::before {
+        font-size: 14px;
+    }
+    
+    .submission-item {
+        padding: 0.5rem;
+    }
+    
+    .submission-icon {
+        font-size: 14px;
+        width: 18px;
+        height: 18px;
+    }
+    
+    .submission-type {
+        font-size: 10px;
+    }
+    
+    .submission-desc {
+        font-size: 8px;
+    }
+    
+    .submission-required {
+        font-size: 8px;
+        padding: 1px 3px;
+    }
+    
+    .stage-action-btn {
+        min-width: 90px;
+        padding: 6px 12px;
+        font-size: 10px;
+    }
+}
+/* Quiz Modal Styles */
+.quiz-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 1rem;
+}
+
+.quiz-modal-container {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  max-width: 900px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* Quiz Action Button */
+.stage-action-btn.quiz {
+  background: linear-gradient(135deg, #9C27B0, #673AB7);
+  color: white;
+  border: none;
+}
+
+.stage-action-btn.quiz:hover:not(:disabled) {
+  background: linear-gradient(135deg, #8E24AA, #5E35B1);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(156, 39, 176, 0.3);
+}
+
+/* Quiz Completed Indicator */
+.quiz-completed-indicator {
+  background: rgba(76, 175, 80, 0.1);
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  color: #4CAF50;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+/* Submission Completed Indicator */
+.submission-completed-indicator {
+  background: rgba(76, 175, 80, 0.1);
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  color: #4CAF50;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+/* Stage Actions Group */
+.stage-actions-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Quiz Requirements Display */
+.quiz-requirement-item {
+  background: rgba(156, 39, 176, 0.1);
+  border: 1px solid rgba(156, 39, 176, 0.2);
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.quiz-requirement-icon {
+  color: #9C27B0;
+  margin-right: 0.75rem;
+  font-size: 1.2rem;
+}
+
+.quiz-requirement-details {
+  flex: 1;
+}
+
+.quiz-requirement-label {
+  font-weight: 600;
+  color: #9C27B0;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.quiz-requirement-desc {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.quiz-requirement-time {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.8rem;
+  font-style: italic;
+}
+
+/* Quiz Status in Stage Requirements */
+.stage-requirements .quiz-requirement-item {
+  display: flex;
+  align-items: flex-start;
+}
+
+/* Responsive Quiz Modal */
+@media (max-width: 768px) {
+  .quiz-modal-overlay {
+    padding: 0.5rem;
+  }
+  
+  .quiz-modal-container {
+    max-height: 95vh;
+  }
+  
+  .stage-actions-group {
+    gap: 0.75rem;
+  }
+  
+  .quiz-completed-indicator {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
+  }
+}
+/* Prizes Section Styles */
+.prizes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.prize-item {
+  border: 1px solid rgba(255, 214, 0, 0.2);
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+
+
+.prize-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.prize-position {
+  color: #FFD600;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.prize-amount {
+ 
+  color: #FFD600;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  
+}
+
+.prize-description {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Responsive Prizes */
+@media (max-width: 768px) {
+  .prize-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .prize-position {
+    font-size: 1.1rem;
+  }
+  
+  .prize-amount {
+    align-self: flex-start;
+  }
+}
+/* Team Incomplete Warning Styles */
+.team-incomplete-warning {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 16px;
+    background: rgba(220, 53, 69, 0.1);
+    border: 1px solid rgba(220, 53, 69, 0.3);
+    border-radius: 8px;
+    margin: 8px 0;
+}
+
+.team-incomplete-warning .warning-text {
+    color: #dc3545;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-align: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .team-incomplete-warning {
+        padding: 10px 12px;
+    }
+    
+    .team-incomplete-warning .warning-text {
+        font-size: 0.85rem;
+    }
+}
+/* Team Registration Deadline Passed Styles */
+.team-deadline-passed {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 16px;
+    background: rgba(108, 117, 125, 0.1);
+    border: 1px solid rgba(108, 117, 125, 0.3);
+    border-radius: 8px;
+    margin: 8px 0;
+}
+
+.team-deadline-passed .deadline-text {
+    color: #6c757d;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-align: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .team-deadline-passed {
+        padding: 10px 12px;
+    }
+    
+    .team-deadline-passed .deadline-text {
+        font-size: 0.85rem;
+    }
+}

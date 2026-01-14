@@ -19,7 +19,7 @@ const Schedule = () => {
 				apiService.getJobs({ limit: 10 }).catch((error) => {
 					return { jobs: [] };
 				}),
-				apiService.getEvents().catch((error) => {
+				apiService.getEvents({ perPage: 50 }).catch((error) => {
 					return { events: [] };
 				}),
 				apiService.getHubContent({ limit: 10 }).catch((error) => {

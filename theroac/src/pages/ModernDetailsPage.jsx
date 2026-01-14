@@ -4,6 +4,8 @@ import { Calendar, MapPin, Clock, Facebook, Twitter, Linkedin, Instagram, Link a
 import { useAuth } from '../context/AuthContext';
 import apiService from '../services/api';
 import { parseSlugForLookup, createSEOSlug } from '../utils/urlUtils';
+import StageSubmissionModal from '../components/StageSubmissionModal';
+import QuizInterface from '../components/QuizInterface';
 import './ModernDetailsPage.css';
 
 const ModernDetailsPage = () => {
@@ -21,6 +23,17 @@ const ModernDetailsPage = () => {
     const [reviews, setReviews] = useState([]);
     const [reviewText, setReviewText] = useState('');
     const [submittingReview, setSubmittingReview] = useState(false);
+    const [showSubmissionModal, setShowSubmissionModal] = useState(false);
+    const [selectedStage, setSelectedStage] = useState(null);
+    const [selectedStageIndex, setSelectedStageIndex] = useState(null);
+    const [showQuizModal, setShowQuizModal] = useState(false);
+    const [quizStage, setQuizStage] = useState(null);
+    const [quizStageIndex, setQuizStageIndex] = useState(null);
+    const [quizStatuses, setQuizStatuses] = useState({});
+    const [userSubmissions, setUserSubmissions] = useState({}); // Track user submissions by stage
+    const [teamStatus, setTeamStatus] = useState(null); // Track team creation status
+    const [problemStatements, setProblemStatements] = useState(null); // Track problem statements
+    const [submissionStatuses, setSubmissionStatuses] = useState({}); // Track submission status for each stage
     const contentRef = useRef(null);
     const heroRef = useRef(null);
 
@@ -115,6 +128,13 @@ const ModernDetailsPage = () => {
                 }
                 
                 setHasApplied(hasAppliedStatus);
+                
+                // If user has applied for an event, check quiz statuses for all stages
+                if (hasAppliedStatus && type === 'events' && data.stages) {
+                    await checkQuizStatuses();
+                    await checkSubmissionStatuses(); // Check submission statuses
+                    await checkTeamStatus(); // Check team status for hackathons
+                }
             } catch (error) {
                 console.error('Error checking application status:', error);
                 setHasApplied(false);
@@ -123,6 +143,90 @@ const ModernDetailsPage = () => {
 
         checkApplicationStatus();
     }, [data?.id, isAuthenticated, user, type]);
+
+    // Check quiz statuses for all stages
+    const checkQuizStatuses = async () => {
+        if (!data?.id || !data.stages) return;
+        
+        try {
+            const statuses = {};
+            for (let i = 0; i < data.stages.length; i++) {
+                const stage = data.stages[i];
+                if (stage.hasQuiz) {
+                    try {
+                        console.log(`🧠 Checking quiz status for stage ${i}:`, stage.quiz?.title);
+                        const quizStatus = await apiService.getStageQuizStatus(data.id, i);
+                        console.log(`✅ Quiz status for stage ${i}:`, quizStatus);
+                        statuses[i] = quizStatus;
+                    } catch (error) {
+                        console.error(`❌ Error checking quiz status for stage ${i}:`, error);
+                        statuses[i] = { hasQuiz: false, available: false, completed: false };
+                    }
+                }
+            }
+            console.log('🎯 All quiz statuses:', statuses);
+            setQuizStatuses(statuses);
+        } catch (error) {
+            console.error('Error checking quiz statuses:', error);
+        }
+    };
+
+    // Check submission statuses for all stages
+    const checkSubmissionStatuses = async () => {
+        if (!data?.id || !data.stages) return;
+        
+        try {
+            const statuses = {};
+            for (let i = 0; i < data.stages.length; i++) {
+                const stage = data.stages[i];
+                if (stage.submissions && stage.submissions.length > 0) {
+                    try {
+                        console.log(`📝 Checking submission status for stage ${i}:`, stage.title);
+                        const submissionStatus = await apiService.getStageSubmissionStatus(data.id, i);
+                        console.log(`✅ Submission status for stage ${i}:`, submissionStatus);
+                        statuses[i] = submissionStatus;
+                    } catch (error) {
+                        console.error(`❌ Error checking submission status for stage ${i}:`, error);
+                        statuses[i] = { hasSubmitted: false, submission: null };
+                    }
+                }
+            }
+            console.log('🎯 All submission statuses:', statuses);
+            setSubmissionStatuses(statuses);
+        } catch (error) {
+            console.error('Error checking submission statuses:', error);
+        }
+    };
+
+    // Check team status for team-based events
+    const checkTeamStatus = async () => {
+        if (!data?.id || !needsTeamManagement()) return;
+        
+        try {
+            // Check if user has a team for this event
+            const response = await apiService.getEventTeamStatus(data.id);
+            setTeamStatus(response);
+            
+            // Check if problem statements are released
+            const problemStatementsResponse = await apiService.getEventProblemStatements(data.id);
+            setProblemStatements(problemStatementsResponse);
+        } catch (error) {
+            console.error('Error checking team status:', error);
+            setTeamStatus({ hasTeam: false, teamId: null });
+        }
+    };
+
+    // Helper function to check if team can participate (considering deadline)
+    const canTeamParticipate = () => {
+        if (!teamStatus) return false;
+        
+        // If registration deadline passed and team is incomplete, block completely
+        if (teamStatus.isRegistrationDeadlinePassed && !teamStatus.isEligibleForSubmission) {
+            return false;
+        }
+        
+        return true;
+    };
 
     // Set default active tab based on type
     useEffect(() => {
@@ -234,24 +338,23 @@ const ModernDetailsPage = () => {
         };
     }, []);
 
-    // Tab configuration
+    // Tab configuration - SIMPLIFIED
     const typeConfig = {
         jobs: {
             tabs: [
                 { id: 'description', label: 'Job Description' },
-                { id: 'dates', label: 'Dates & Deadlines' },
                 { id: 'reviews', label: 'Reviews' },
                 { id: 'faqs', label: 'FAQs & Discussions' }
             ]
         },
         events: {
             tabs: [
-                { id: 'stages', label: 'Stages & Timeline' },
+                { id: 'stages', label: 'Stages & Timeline' }, // Single tab for all events
                 { id: 'details', label: 'Details' },
-                { id: 'dates', label: 'Dates & Deadlines' },
                 { id: 'prizes', label: 'Prizes' },
                 { id: 'reviews', label: 'Reviews' },
-                { id: 'faqs', label: 'FAQs & Discussions' }
+                { id: 'faqs', label: 'FAQs & Discussions' },
+                { id: 'sponsors', label: 'Sponsors' }
             ]
         },
         internships: {
@@ -308,8 +411,10 @@ const ModernDetailsPage = () => {
             }
 
             if (result) {
+                console.log('🎉 Registration successful! Setting hasApplied to true');
+                console.log('📊 Event stages data:', data.stages);
                 setHasApplied(true);
-                alert(`Successfully applied for ${data.title}!`);
+                alert(`Successfully registered for ${data.title}! You can now submit for active stages.`);
             }
         } catch (error) {
             const errorMessage = error.message || 'Please try again later.';
@@ -417,6 +522,746 @@ const ModernDetailsPage = () => {
         return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
     };
 
+    // Helper function to get submission icon based on type
+    const getSubmissionIcon = (type) => {
+        const icons = {
+            'ppt': '📊',
+            'presentation': '📊',
+            'github': '💻',
+            'github-link': '💻',
+            'demo-video': '🎥',
+            'video': '🎥',
+            'quiz': '📝',
+            'document': '📄',
+            'pdf': '📄',
+            'link': '🔗',
+            'code': '💻',
+            'design': '🎨',
+            'prototype': '🔧'
+        };
+        return icons[type?.toLowerCase()] || '📎';
+    };
+
+    // Helper function to check if event type needs team management
+    const needsTeamManagement = () => {
+        if (!data?.categories || !Array.isArray(data.categories)) return false;
+        const teamBasedTypes = ['hackathon', 'competition', 'contest', 'challenge'];
+        return data.categories.some(category => teamBasedTypes.includes(category.toLowerCase()));
+    };
+
+    // Helper function to check if event type needs submission functionality
+    const needsSubmissionStages = () => {
+        if (!data?.categories || !Array.isArray(data.categories)) return false;
+        const submissionTypes = ['hackathon', 'competition'];
+        return data.categories.some(category => submissionTypes.includes(category.toLowerCase()));
+    };
+
+    // Helper function to determine stage status with sequential logic
+    const getStageStatus = (stage, index) => {
+        const now = new Date();
+        const startDate = stage.startDate ? new Date(stage.startDate) : null;
+        const deadline = stage.deadline ? new Date(stage.deadline) : null;
+        
+        // Check if user has applied/registered for this event
+        const userRegistered = hasApplied;
+        
+        if (!userRegistered) {
+            return <span className="stage-status-badge not-registered">Not Registered</span>;
+        }
+        
+        // Sequential logic: Check if previous stages are completed
+        if (index > 0) {
+            const previousStage = data.stages[index - 1];
+            const prevDeadline = previousStage.deadline ? new Date(previousStage.deadline) : null;
+            
+            // If previous stage hasn't ended yet, this stage should be locked
+            if (prevDeadline && now < prevDeadline) {
+                return <span className="stage-status-badge locked">Locked - Complete Previous Stage</span>;
+            }
+        }
+        
+        // Current stage logic
+        if (startDate && now < startDate) {
+            return <span className="stage-status-badge upcoming">Upcoming</span>;
+        }
+        
+        if (deadline && now > deadline) {
+            return <span className="stage-status-badge ended">Ended</span>;
+        }
+        
+        if (startDate && deadline && now >= startDate && now <= deadline) {
+            const timeLeft = Math.ceil((deadline - now) / (1000 * 60 * 60 * 24));
+            return (
+                <div className="stage-status-live">
+                    <span className="stage-status-badge live">Live</span>
+                    <span className="time-left">{timeLeft} days left</span>
+                </div>
+            );
+        }
+        
+        return <span className="stage-status-badge pending">Pending</span>;
+    };
+
+    // Helper function to get stage action button with proper hackathon flow
+    const getStageActionButton = (stage, index) => {
+        const now = new Date();
+        const startDate = stage.startDate ? new Date(stage.startDate) : null;
+        const deadline = stage.deadline ? new Date(stage.deadline) : null;
+        
+        // If user hasn't registered for the event, show register button
+        if (!hasApplied) {
+            return (
+                <button 
+                    className="stage-action-btn register"
+                    onClick={handleApply}
+                >
+                    Register for Event
+                </button>
+            );
+        }
+        
+        // Check if stage has submissions (only submission stages get submit button)
+        const hasSubmissions = stage.submissions && stage.submissions.length > 0;
+        const hasQuiz = stage.hasQuiz && stage.quiz && stage.quiz.questions && stage.quiz.questions.length > 0;
+        
+        // If no submissions and no quiz, show evaluation round
+        if (!hasSubmissions && !hasQuiz) {
+            if (deadline && now > deadline) {
+                return (
+                    <div className="stage-info-only">
+                        <span className="stage-status-text">✅ Round Completed</span>
+                    </div>
+                );
+            }
+            
+            if (startDate && now < startDate) {
+                return (
+                    <div className="stage-info-only">
+                        <span className="stage-status-text">⏳ Starts {formatDate(startDate)}</span>
+                    </div>
+                );
+            }
+            
+            return (
+                <div className="stage-info-only">
+                    <span className="stage-status-text">📋 Evaluation Round - No Submission Required</span>
+                </div>
+            );
+        }
+        
+        // If stage has quiz but no submissions, handle quiz-only logic
+        if (hasQuiz && !hasSubmissions) {
+            const quizStatus = quizStatuses[index];
+            
+            if (deadline && now > deadline) {
+                return (
+                    <div className="stage-info-only">
+                        <span className="stage-status-text">✅ Quiz Round Completed</span>
+                    </div>
+                );
+            }
+            
+            if (startDate && now < startDate) {
+                return (
+                    <div className="stage-info-only">
+                        <span className="stage-status-text">⏳ Quiz Starts {formatDate(startDate)}</span>
+                    </div>
+                );
+            }
+            
+            if (startDate && deadline && now >= startDate && now <= deadline) {
+                if (quizStatus?.completed) {
+                    return (
+                        <div className="stage-info-only">
+                            <span className="stage-status-text">✅ Quiz Completed ({quizStatus.submission?.score}%)</span>
+                        </div>
+                    );
+                } else if (quizStatus?.available !== false) {
+                    // Show quiz button - check team eligibility and deadline first
+                    if (!canTeamParticipate()) {
+                        return (
+                            <div className="team-deadline-passed">
+                                <span className="deadline-text">
+                                    ⏰ {teamStatus?.isRegistrationDeadlinePassed ? 
+                                        'Registration deadline has passed. Team cannot participate.' : 
+                                        (teamStatus?.eligibilityMessage || 'Team not eligible for quiz')}
+                                </span>
+                            </div>
+                        );
+                    }
+                    
+                    if (!teamStatus?.isEligibleForSubmission) {
+                        return (
+                            <div className="team-incomplete-warning">
+                                <span className="warning-text">
+                                    ⚠️ {teamStatus?.eligibilityMessage || 'Team not eligible for quiz'}
+                                </span>
+                            </div>
+                        );
+                    }
+                    
+                    return (
+                        <button 
+                            className="stage-action-btn quiz"
+                            onClick={() => handleStartQuiz(stage, index)}
+                        >
+                            🧠 Start Quiz - {stage.quiz?.title || 'Team Quiz'}
+                        </button>
+                    );
+                } else {
+                    return (
+                        <button className="stage-action-btn disabled" disabled>
+                            Quiz Not Available
+                        </button>
+                    );
+                }
+            }
+            
+            return (
+                <button className="stage-action-btn disabled" disabled>
+                    Quiz Not Available
+                </button>
+            );
+        }
+        
+        // Special logic for Stage 1 (Multi-phase for Team-based Events)
+        if (index === 0 && needsTeamManagement()) {
+            // Multi-phase Stage 1 for team-based events (hackathons, competitions, etc.)
+            if (startDate && now < startDate) {
+                return (
+                    <button className="stage-action-btn disabled" disabled>
+                        Starts {formatDate(startDate)}
+                    </button>
+                );
+            }
+            
+            if (deadline && now > deadline) {
+                return (
+                    <button className="stage-action-btn disabled" disabled>
+                        Stage 1 Ended
+                    </button>
+                );
+            }
+            
+            if (startDate && deadline && now >= startDate && now <= deadline) {
+                // Phase 1: Team Creation (first priority)
+                if (!teamStatus || !teamStatus.hasTeam) {
+                    return (
+                        <button 
+                            className="stage-action-btn team-build"
+                            onClick={() => handleTeamBuilding(stage, index)}
+                        >
+                            🏗️ Create Team
+                        </button>
+                    );
+                }
+                
+                // Team exists - now check stage requirements based on recruiter's configuration
+                if (teamStatus.hasTeam) {
+                    // Priority 1: Quiz (if configured by recruiter)
+                    if (stage.hasQuiz && stage.quiz && stage.quiz.questions && stage.quiz.questions.length > 0) {
+                        const quizStatus = quizStatuses[index];
+                        
+                        if (quizStatus?.completed) {
+                            // Quiz completed - check if there are submissions too
+                            if (hasSubmissions) {
+                                // Check if already submitted
+                                const submissionStatus = submissionStatuses[index];
+                                if (submissionStatus?.hasSubmitted) {
+                                    return (
+                                        <div className="stage-actions-group">
+                                            <div className="quiz-completed-indicator">
+                                                ✅ Quiz Completed ({quizStatus.submission?.score}%)
+                                            </div>
+                                            <div className="submission-completed-indicator">
+                                                ✅ Project Submitted
+                                            </div>
+                                        </div>
+                                    );
+                                }
+                                
+                                return (
+                                    <div className="stage-actions-group">
+                                        <div className="quiz-completed-indicator">
+                                            ✅ Quiz Completed ({quizStatus.submission?.score}%)
+                                        </div>
+                                        {/* FIRST_SUBMISSION_BUTTON_INSTANCE */}
+                                        {!canTeamParticipate() ? (
+                                            <div className="team-deadline-passed">
+                                                <span className="deadline-text">
+                                                    ⏰ Registration deadline has passed. Team cannot participate.
+                                                </span>
+                                            </div>
+                                        ) : teamStatus?.isEligibleForSubmission ? (
+                                            <button 
+                                                className="stage-action-btn submit"
+                                                onClick={() => handleStageSubmission(stage, index)}
+                                                disabled={!teamStatus?.isLeader}
+                                                title={!teamStatus?.isLeader ? "Only team leader can submit" : ""}
+                                            >
+                                                💡 {teamStatus?.isLeader ? 'Submit Project Idea' : 'Team Leader Submits'}
+                                            </button>
+                                        ) : (
+                                            <div className="team-incomplete-warning">
+                                                <span className="warning-text">
+                                                    ⚠️ {teamStatus?.eligibilityMessage || 'Team not eligible for submissions'}
+                                                </span>
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            } else {
+                                return (
+                                    <div className="stage-info-only">
+                                        <span className="stage-status-text">✅ Quiz Completed ({quizStatus.submission?.score}%)</span>
+                                    </div>
+                                );
+                            }
+                        } else if (quizStatus?.available !== false) {
+                            // Quiz available - check team eligibility and deadline first
+                            if (!canTeamParticipate()) {
+                                return (
+                                    <div className="team-deadline-passed">
+                                        <span className="deadline-text">
+                                            ⏰ Registration deadline has passed. Team cannot participate.
+                                        </span>
+                                    </div>
+                                );
+                            }
+                            
+                            if (!teamStatus?.isEligibleForSubmission) {
+                                return (
+                                    <div className="team-incomplete-warning">
+                                        <span className="warning-text">
+                                            ⚠️ {teamStatus?.eligibilityMessage || 'Team not eligible for quiz'}
+                                        </span>
+                                    </div>
+                                );
+                            }
+                            
+                            return (
+                                <button 
+                                    className="stage-action-btn quiz"
+                                    onClick={() => handleStartQuiz(stage, index)}
+                                >
+                                    🧠 Start Quiz - {stage.quiz?.title || 'Stage Quiz'}
+                                </button>
+                            );
+                        } else {
+                            return (
+                                <button className="stage-action-btn disabled" disabled>
+                                    Quiz Not Available
+                                </button>
+                            );
+                        }
+                    }
+                    
+                    // No quiz, check for submissions
+                    if (hasSubmissions) {
+                        // Check if problem statements are available and released
+                        if (problemStatements?.available && !problemStatements.released) {
+                            return (
+                                <div className="stage-info-only">
+                                    <span className="stage-status-text">
+                                        ✅ Team Created! Waiting for Problem Statements...
+                                    </span>
+                                </div>
+                            );
+                        }
+                        
+                        // Problem statements released or not required - show submission
+                        if (problemStatements?.available && problemStatements.released) {
+                            const submissionStartDate = problemStatements.submissionStartDate ? 
+                                new Date(problemStatements.submissionStartDate) : startDate;
+                            
+                            if (now < submissionStartDate) {
+                                return (
+                                    <div className="stage-actions-group">
+                                        <button 
+                                            className="stage-action-btn info"
+                                            onClick={() => handleViewProblemStatements(problemStatements)}
+                                        >
+                                            📋 View Problem Statements
+                                        </button>
+                                        <div className="stage-info-text">
+                                            Submission opens {formatDate(submissionStartDate)}
+                                        </div>
+                                    </div>
+                                );
+                            } else {
+                                // Check if already submitted
+                                const submissionStatus = submissionStatuses[index];
+                                if (submissionStatus?.hasSubmitted) {
+                                    return (
+                                        <div className="stage-actions-group">
+                                            <button 
+                                                className="stage-action-btn info"
+                                                onClick={() => handleViewProblemStatements(problemStatements)}
+                                            >
+                                                📋 View Problem Statements
+                                            </button>
+                                            <div className="submission-completed-indicator">
+                                                ✅ Project Submitted
+                                            </div>
+                                        </div>
+                                    );
+                                }
+                                
+                                return (
+                                    <div className="stage-actions-group">
+                                        <button 
+                                            className="stage-action-btn info"
+                                            onClick={() => handleViewProblemStatements(problemStatements)}
+                                        >
+                                            📋 View Problem Statements
+                                        </button>
+                                        {/* SECOND_SUBMISSION_BUTTON_INSTANCE */}
+                                        {!canTeamParticipate() ? (
+                                            <div className="team-deadline-passed">
+                                                <span className="deadline-text">
+                                                    ⏰ Registration deadline has passed. Team cannot participate.
+                                                </span>
+                                            </div>
+                                        ) : teamStatus?.isEligibleForSubmission ? (
+                                            <button 
+                                                className="stage-action-btn submit"
+                                                onClick={() => handleStageSubmission(stage, index)}
+                                                disabled={!teamStatus?.isLeader}
+                                                title={!teamStatus?.isLeader ? "Only team leader can submit" : ""}
+                                            >
+                                                💡 {teamStatus?.isLeader ? 'Submit Project Idea' : 'Team Leader Submits'}
+                                            </button>
+                                        ) : (
+                                            <div className="team-incomplete-warning">
+                                                <span className="warning-text">
+                                                    ⚠️ {teamStatus?.eligibilityMessage || 'Team not eligible for submissions'}
+                                                </span>
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            }
+                        } else {
+                            // No problem statements, direct submission
+                            // Check if already submitted
+                            const submissionStatus = submissionStatuses[index];
+                            if (submissionStatus?.hasSubmitted) {
+                                return (
+                                    <div className="submission-completed-indicator">
+                                        ✅ Project Submitted
+                                    </div>
+                                );
+                            }
+                            
+                            // Check team eligibility and registration deadline before showing submit button
+                            if (!canTeamParticipate()) {
+                                return (
+                                    <div className="team-deadline-passed">
+                                        <span className="deadline-text">
+                                            ⏰ Registration deadline has passed. Team cannot participate.
+                                        </span>
+                                    </div>
+                                );
+                            }
+                            
+                            if (!teamStatus?.isEligibleForSubmission) {
+                                return (
+                                    <div className="team-incomplete-warning">
+                                        <span className="warning-text">
+                                            ⚠️ {teamStatus?.eligibilityMessage || 'Team not eligible for submissions'}
+                                        </span>
+                                    </div>
+                                );
+                            }
+                            
+                            return (
+                                <button 
+                                    className="stage-action-btn submit"
+                                    onClick={() => handleStageSubmission(stage, index)}
+                                    disabled={!teamStatus?.isLeader}
+                                    title={!teamStatus?.isLeader ? "Only team leader can submit" : ""}
+                                >
+                                    💡 {teamStatus?.isLeader ? 'Submit Project Idea' : 'Team Leader Submits'}
+                                </button>
+                            );
+                        }
+                    }
+                    
+                    // No quiz, no submissions - team created but nothing to show
+                    // Don't show any button, team creation phase is complete
+                    return null;
+                }
+            }
+            
+            return (
+                <button className="stage-action-btn disabled" disabled>
+                    Not Available
+                </button>
+            );
+        }
+        
+        // Regular Stage 1 logic for non-team events
+        if (index === 0 && hasSubmissions && !needsTeamManagement()) {
+            // Current submission stage logic for Stage 1
+            if (startDate && now < startDate) {
+                return (
+                    <button className="stage-action-btn disabled" disabled>
+                        Starts {formatDate(startDate)}
+                    </button>
+                );
+            }
+            
+            if (deadline && now > deadline) {
+                return (
+                    <button className="stage-action-btn disabled" disabled>
+                        Submission Ended
+                    </button>
+                );
+            }
+            
+            if (startDate && deadline && now >= startDate && now <= deadline) {
+                // Check if already submitted
+                const submissionStatus = submissionStatuses[index];
+                if (submissionStatus?.hasSubmitted) {
+                    return (
+                        <div className="submission-completed-indicator">
+                            ✅ Submitted
+                        </div>
+                    );
+                }
+                
+                return (
+                    <button 
+                        className="stage-action-btn submit"
+                        onClick={() => handleStageSubmission(stage, index)}
+                    >
+                        Submit for {stage.title || `Round ${index + 1}`}
+                    </button>
+                );
+            }
+            
+            return (
+                <button className="stage-action-btn disabled" disabled>
+                    Not Available
+                </button>
+            );
+        }
+        
+        // For submission stages (Stage 2+) - check if previous stages are complete
+        if (index > 0) {
+            const previousStage = data.stages[index - 1];
+            const prevDeadline = previousStage.deadline ? new Date(previousStage.deadline) : null;
+            
+            // If previous stage hasn't ended yet, this stage should be locked
+            if (prevDeadline && now < prevDeadline) {
+                const daysLeft = Math.ceil((prevDeadline - now) / (1000 * 60 * 60 * 24));
+                return (
+                    <button className="stage-action-btn locked" disabled>
+                        🔒 Unlocks in {daysLeft} days
+                    </button>
+                );
+            }
+        }
+        
+        // Current submission stage logic
+        if (startDate && now < startDate) {
+            return (
+                <button className="stage-action-btn disabled" disabled>
+                    Starts {formatDate(startDate)}
+                </button>
+            );
+        }
+        
+        if (deadline && now > deadline) {
+            return (
+                <button className="stage-action-btn disabled" disabled>
+                    Submission Ended
+                </button>
+            );
+        }
+        
+        if (startDate && deadline && now >= startDate && now <= deadline) {
+            // Check if stage has a quiz
+            const quizStatus = quizStatuses[index];
+            if (stage.hasQuiz && quizStatus) {
+                if (quizStatus.completed) {
+                    // Quiz completed, show submission button if there are submissions
+                    if (hasSubmissions) {
+                        // Check if already submitted
+                        const submissionStatus = submissionStatuses[index];
+                        if (submissionStatus?.hasSubmitted) {
+                            return (
+                                <div className="stage-actions-group">
+                                    <div className="quiz-completed-indicator">
+                                        ✅ Quiz Completed ({quizStatus.submission?.score}%)
+                                    </div>
+                                    <div className="submission-completed-indicator">
+                                        ✅ Submitted
+                                    </div>
+                                </div>
+                            );
+                        }
+                        
+                        return (
+                            <div className="stage-actions-group">
+                                <div className="quiz-completed-indicator">
+                                    ✅ Quiz Completed ({quizStatus.submission?.score}%)
+                                </div>
+                                <button 
+                                    className="stage-action-btn submit"
+                                    onClick={() => handleStageSubmission(stage, index)}
+                                >
+                                    Submit for {stage.title || `Round ${index + 1}`}
+                                </button>
+                            </div>
+                        );
+                    } else {
+                        return (
+                            <div className="stage-info-only">
+                                <span className="stage-status-text">✅ Quiz Completed ({quizStatus.submission?.score}%)</span>
+                            </div>
+                        );
+                    }
+                } else if (quizStatus.available) {
+                    // Quiz available - check team eligibility and deadline first
+                    if (!canTeamParticipate()) {
+                        return (
+                            <div className="team-deadline-passed">
+                                <span className="deadline-text">
+                                    ⏰ Registration deadline has passed. Team cannot participate.
+                                </span>
+                            </div>
+                        );
+                    }
+                    
+                    if (!teamStatus?.isEligibleForSubmission) {
+                        return (
+                            <div className="team-incomplete-warning">
+                                <span className="warning-text">
+                                    ⚠️ {teamStatus?.eligibilityMessage || 'Team not eligible for quiz'}
+                                </span>
+                            </div>
+                        );
+                    }
+                    
+                    return (
+                        <button 
+                            className="stage-action-btn quiz"
+                            onClick={() => handleStartQuiz(stage, index)}
+                        >
+                            🧠 Take Quiz - {stage.quiz?.title || 'Stage Quiz'}
+                        </button>
+                    );
+                } else {
+                    // Quiz not yet available
+                    return (
+                        <button className="stage-action-btn disabled" disabled>
+                            Quiz Available Soon
+                        </button>
+                    );
+                }
+            }
+            
+            // No quiz, regular submission button
+            // Check if already submitted
+            const submissionStatus = submissionStatuses[index];
+            if (submissionStatus?.hasSubmitted) {
+                return (
+                    <div className="submission-completed-indicator">
+                        ✅ Submitted
+                    </div>
+                );
+            }
+            
+            return (
+                <button 
+                    className="stage-action-btn submit"
+                    onClick={() => handleStageSubmission(stage, index)}
+                >
+                    Submit for {stage.title || `Round ${index + 1}`}
+                </button>
+            );
+        }
+        
+        return (
+            <button className="stage-action-btn disabled" disabled>
+                Not Available
+            </button>
+        );
+    };
+
+    // Handler for viewing problem statements
+    const handleViewProblemStatements = (problemStatements) => {
+        console.log('📋 Problem statements clicked:', problemStatements);
+        // You can implement a modal or navigate to a dedicated page
+        // For now, let's show an alert with the problem statements
+        if (problemStatements.statements && problemStatements.statements.length > 0) {
+            const statementsText = problemStatements.statements
+                .map((stmt, index) => `${index + 1}. ${stmt.title}\n   ${stmt.description}`)
+                .join('\n\n');
+            alert(`Problem Statements:\n\n${statementsText}`);
+        } else {
+            alert('Problem statements will be available soon!');
+        }
+    };
+
+    // Handler for team building (Stage 1)
+    const handleTeamBuilding = (stage, index) => {
+        console.log('🏗️ Team building clicked:', { stage, index });
+        // Navigate to team building page
+        navigate(`/event/${data.id}/team-building`, { 
+            state: { 
+                event: data, 
+                stage: stage, 
+                stageIndex: index 
+            } 
+        });
+    };
+
+    // Handler for stage submission
+    const handleStageSubmission = (stage, index) => {
+        console.log('🎯 Stage submission clicked:', { stage, index });
+        console.log('📝 Stage data:', stage);
+        console.log('🔢 Stage index:', index);
+        
+        setSelectedStage(stage);
+        setSelectedStageIndex(index);
+        setShowSubmissionModal(true);
+        
+        console.log('✅ Modal should open now');
+    };
+
+    // Handler for successful submission
+    const handleSubmissionSuccess = async (stageIndex) => {
+        // You can update the UI to show submission status
+        console.log(`Successfully submitted for stage ${stageIndex}`);
+        // Refresh submission statuses to update UI
+        await checkSubmissionStatuses();
+    };
+
+    // Quiz handlers
+    const handleStartQuiz = (stage, index) => {
+        console.log('🧠 Quiz clicked:', { stage, index });
+        console.log('🎯 Quiz data:', stage.quiz);
+        console.log('📊 Quiz status:', quizStatuses[index]);
+        setQuizStage(stage);
+        setQuizStageIndex(index);
+        setShowQuizModal(true);
+    };
+
+    const handleQuizComplete = async (results) => {
+        console.log('✅ Quiz completed:', results);
+        // Refresh quiz statuses
+        await checkQuizStatuses();
+        setShowQuizModal(false);
+    };
+
+    const handleQuizClose = () => {
+        setShowQuizModal(false);
+        setQuizStage(null);
+        setQuizStageIndex(null);
+    };
+
     if (loading) {
         return (
             <div className="modern-loading">
@@ -445,7 +1290,7 @@ const ModernDetailsPage = () => {
                                 {/* Company Logo */}
                                 <div className="company-logo">
                                     <img 
-                                        src={data.companyLogo || data.logo || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(getOrganizationName()) + '&size=120&background=FFD600&color=1a1a1a&bold=true'} 
+                                        src={data.thumbnailImage || data.companyLogo || data.logo || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(getOrganizationName()) + '&size=120&background=FFD600&color=1a1a1a&bold=true'} 
                                         alt={getOrganizationName()}
                                         onError={(e) => {
                                             e.target.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(getOrganizationName()) + '&size=120&background=FFD600&color=1a1a1a&bold=true';
@@ -725,9 +1570,9 @@ const ModernDetailsPage = () => {
                                     </div>
                                 )}
 
-                                {/* Benefits */}
+                                {/* Perks & Benefits */}
                                 <div className="details-subsection">
-                                    <h3 className="subsection-title">Benefits:</h3>
+                                    <h3 className="subsection-title">Perks & Benefits:</h3>
                                     {data.benefits && (
                                         typeof data.benefits === 'string' && data.benefits.trim() ? (
                                             <ul className="details-list">
@@ -813,7 +1658,138 @@ const ModernDetailsPage = () => {
                         <div id="stages" className="details-section">
                             <h2 className="section-title">Stages and Timeline</h2>
                             <div className="details-content">
-                                {data.agenda && Array.isArray(data.agenda) && data.agenda.length > 0 ? (
+                                {data.stages && Array.isArray(data.stages) && data.stages.length > 0 ? (
+                                    <div className="timeline-container">
+                                        {data.stages.map((stage, index) => {
+                                            const now = new Date();
+                                            const startDate = stage.startDate ? new Date(stage.startDate) : null;
+                                            const deadline = stage.deadline ? new Date(stage.deadline) : null;
+                                            
+                                            // Determine if stage is locked (previous stage not ended)
+                                            let isLocked = false;
+                                            if (index > 0) {
+                                                const previousStage = data.stages[index - 1];
+                                                const prevDeadline = previousStage.deadline ? new Date(previousStage.deadline) : null;
+                                                isLocked = prevDeadline && now < prevDeadline;
+                                            }
+                                            
+                                            // Determine stage status
+                                            let stageStatus = 'upcoming';
+                                            if (!hasApplied) {
+                                                stageStatus = 'not-registered';
+                                            } else if (isLocked) {
+                                                stageStatus = 'locked';
+                                            } else if (startDate && now < startDate) {
+                                                stageStatus = 'upcoming';
+                                            } else if (deadline && now > deadline) {
+                                                stageStatus = 'ended';
+                                            } else if (startDate && deadline && now >= startDate && now <= deadline) {
+                                                stageStatus = 'live';
+                                            } else {
+                                                stageStatus = 'pending';
+                                            }
+                                            
+                                            return (
+                                                <div key={index} className={`timeline-stage ${stageStatus}`}>
+                                                    {/* Stage Number Circle */}
+                                                    <div className="stage-number-circle">
+                                                        <span className="stage-number">{index + 1}</span>
+                                                    </div>
+                                                    
+                                                    {/* Connecting Line */}
+                                                    {index < data.stages.length - 1 && (
+                                                        <div className="stage-connecting-line"></div>
+                                                    )}
+                                                    
+                                                    {/* Stage Content Card */}
+                                                    <div className="stage-content-card">
+                                                        {/* Date Range Header */}
+                                                        <div className="stage-date-header">
+                                                            <span className="stage-dates">
+                                                                {startDate && formatDate(startDate)} 
+                                                                {startDate && formatTime(startDate)} IST
+                                                                {deadline && (
+                                                                    <> → {formatDate(deadline)} {formatTime(deadline)} IST</>
+                                                                )}
+                                                            </span>
+                                                        </div>
+                                                        
+                                                        {/* Stage Title and Status */}
+                                                        <div className="stage-header-row">
+                                                            <h3 className="stage-title-text">
+                                                                {stage.title || `Round ${index + 1}`}
+                                                            </h3>
+                                                            <div className="stage-status-indicator">
+                                                                {stageStatus === 'live' && (
+                                                                    <span className="status-badge live">
+                                                                        <span className="live-dot"></span>
+                                                                        Live
+                                                                    </span>
+                                                                )}
+                                                                {stageStatus === 'ended' && (
+                                                                    <span className="status-badge ended">Ended</span>
+                                                                )}
+                                                                {stageStatus === 'locked' && (
+                                                                    <span className="status-badge locked">🔒 Locked</span>
+                                                                )}
+                                                                {stageStatus === 'upcoming' && (
+                                                                    <span className="status-badge upcoming">Upcoming</span>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        {/* Stage Description */}
+                                                        <div className="stage-description-text">
+                                                            <p>{stage.description}</p>
+                                                        </div>
+                                                        
+                                                       
+                                                        
+                                                        {/* Quiz Requirements */}
+                                                        {stage.hasQuiz && stage.quiz && (
+                                                            <div className="stage-requirements">
+                                                                <h4 className="requirements-title">Stage Quiz:</h4>
+                                                                <div className="requirements-list">
+                                                                    <div className="quiz-requirement-item">
+                                                                        <div className="quiz-requirement-icon">
+                                                                            🧠
+                                                                        </div>
+                                                                        <div className="quiz-requirement-details">
+                                                                            <span className="quiz-requirement-label">
+                                                                                {stage.quiz.title || 'Stage Assessment Quiz'}
+                                                                            </span>
+                                                                            {stage.quiz.description && (
+                                                                                <span className="quiz-requirement-desc">
+                                                                                    {stage.quiz.description}
+                                                                                </span>
+                                                                            )}
+                                                                            <span className="quiz-requirement-time">
+                                                                                Time Limit: {stage.quiz.timeLimit || 30} minutes • 
+                                                                                Questions: {stage.quiz.questions?.length || 0} • 
+                                                                                Passing Score: 70%
+                                                                            </span>
+                                                                            {quizStatuses[index]?.completed && (
+                                                                                <span className="quiz-requirement-desc" style={{ color: '#4CAF50', fontWeight: '500' }}>
+                                                                                    ✅ Completed with {quizStatuses[index].submission?.score}% score
+                                                                                </span>
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                        
+                                                        {/* Action Button */}
+                                                        <div className="stage-action-area">
+                                                            {getStageActionButton(stage, index)}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                ) : data.agenda && Array.isArray(data.agenda) && data.agenda.length > 0 ? (
+                                    // Fallback to old agenda format
                                     <div className="details-subsection">
                                         {data.agenda.map((item, index) => (
                                             <div key={index} className="timeline-item">
@@ -832,7 +1808,7 @@ const ModernDetailsPage = () => {
                                     </div>
                                 ) : (
                                     <div className="no-data">
-                                        <p>Event agenda will be updated soon.</p>
+                                        <p>Event stages will be updated soon.</p>
                                     </div>
                                 )}
                             </div>
@@ -845,25 +1821,25 @@ const ModernDetailsPage = () => {
                             <h2 className="section-title">Event Details</h2>
                             
                             <div className="details-content">
-                                {/* Event Requirements */}
-                                {data.requirements && (
+                                
+                                <div>
+                                    {/* Description */}
                                     <div className="details-subsection">
-                                        <h3 className="subsection-title">Requirements</h3>
-                                        <p className="details-description">{data.requirements}</p>
-                                    </div>
-                                )}
+                                        <h3 className="subsection-title">Description:</h3>
+                                        <div className="details-text">
+                                            {data.description && typeof data.description === 'string' && data.description.trim() ? (
+                                                data.description.split('\n').map((line, index) => ( 
+                                                    line.trim() && <p key={index}>{line.trim()}</p>
+                                                ))
+                                            ) : data.description && typeof data.description === 'object' ? (
+                                                <p>{JSON.stringify(data.description)}</p>
+                                            ) : (
+                                                <p className="no-details-message">No data</p>
+                                            )}
+                                        </div>
+                                   </div>
+                                </div>
 
-                                {/* What to Bring */}
-                                {data.whatToBring && Array.isArray(data.whatToBring) && data.whatToBring.length > 0 && (
-                                    <div className="details-subsection">
-                                        <h3 className="subsection-title">What to Bring</h3>
-                                        <ul className="details-list">
-                                            {data.whatToBring.map((item, index) => (
-                                                <li key={index}>{item}</li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                )}
 
                                 {/* Event Information */}
                                 <div className="details-subsection">
@@ -916,43 +1892,30 @@ const ModernDetailsPage = () => {
                                     </div>
                                 )}
 
-                                {!data.requirements && (!data.whatToBring || data.whatToBring.length === 0) && 
-                                 (!data.speakers || data.speakers.length === 0) && (
-                                    <div className="no-data">
-                                        <p>Event details will be updated soon.</p>
-                                    </div>
-                                )}
                             </div>
                         </div>
                     )}
 
-                    {/* Important Dates & Deadlines Section */}
-                    {/* <div id="dates" className="details-section">
-                        <h2 className="section-title">Important dates & deadlines</h2>
-                        <div className="deadline-list">
-                            <div className="deadline-item">
-                                <Calendar className="deadline-icon" size={24} />
-                                <div className="deadline-info">
-                                    <span className="deadline-label">Application Deadline</span>
-                                    <span className="deadline-date">
-                                        {data.applicationDeadline 
-                                            ? new Date(data.applicationDeadline).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: '2-digit', hour: '2-digit', minute: '2-digit', hour12: true }) + ' IST'
-                                            : `${getDeadlineDisplay()} days left`
-                                        }
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div> */}
-
 
 
                     {/* Prizes Section (Events only) */}
-                    {type === 'events' && data.prizes && (
+                    {type === 'events' && data.prizes && Array.isArray(data.prizes) && data.prizes.length > 0 && (
                         <div id="prizes" className="details-section">
                             <h2 className="section-title">Rewards and Prizes</h2>
                             <div className="details-content">
-                                <p className="details-description">{data.prizes.winner || 'No data'}</p>
+                                <div className="prizes-list">
+                                    {data.prizes.map((prize, index) => (
+                                        <div key={index} className="prize-item">
+                                            <div className="prize-header">
+                                                <h3 className="prize-position">{prize.position}</h3>
+                                                <span className="prize-amount">{prize.prize}</span>
+                                            </div>
+                                            {prize.description && (
+                                                <p className="prize-description">{prize.description}</p>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     )}
@@ -1068,7 +2031,55 @@ const ModernDetailsPage = () => {
                         </div>
                     </div>
 
-
+                    {/* Sponsors Section - Only for Events */}
+                    {type === 'events' && (
+                        <div id="sponsors" className="details-section">
+                            <h2 className="section-title">Event Sponsors</h2>
+                            <div className="details-content">
+                                {data?.sponsors && data.sponsors.length > 0 ? (
+                                    <div className="sponsors-grid">
+                                        {data.sponsors.map((sponsor, index) => (
+                                            <div key={index} className="sponsor-card">
+                                                <div className="sponsor-logo">
+                                                    {sponsor.logo ? (
+                                                        <img 
+                                                            src={sponsor.logo} 
+                                                            alt={sponsor.name}
+                                                            onError={(e) => {
+                                                                e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(sponsor.name)}&size=120&background=FFD600&color=1a1a1a&bold=true`;
+                                                            }}
+                                                        />
+                                                    ) : (
+                                                        <div className="sponsor-placeholder">
+                                                            <span>{sponsor.name?.charAt(0) || 'S'}</span>
+                                                        </div>
+                                                    )}
+                                                    <div className={`sponsor-tier ${sponsor.tier?.toLowerCase() || 'bronze'}`}>
+                                                        {sponsor.tier || 'Bronze'}
+                                                    </div>
+                                                </div>
+                                                <div className="sponsor-info">
+                                                    <h3 className="sponsor-name">{sponsor.name}</h3>
+                                                    {sponsor.website && (
+                                                        <a 
+                                                            href={sponsor.website} 
+                                                            target="_blank" 
+                                                            rel="noopener noreferrer"
+                                                            className="sponsor-website"
+                                                        >
+                                                            Visit Website
+                                                        </a>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <p className="no-details-message">No sponsors information available</p>
+                                )}
+                            </div>
+                        </div>
+                    )}
 
                     {/* Media Modal */}
                     {selectedMedia && (
@@ -1168,42 +2179,36 @@ const ModernDetailsPage = () => {
                         </div>
                     )}
 
-                    {/* Host/Company Info */}
-                    {/* <div className="host-card">
-                        <div className="host-avatar">
-                            {getOrganizationName().charAt(0)}
-                        </div>
-                        <div className="host-info">
-                            <span className="host-label">
-                                {type === 'events' ? 'Event Organizer' : type === 'jobs' ? 'Company' : 'Organization'}
-                            </span>
-                            <h3 className="host-name">{getOrganizationName()}</h3>
-                            {data.phone && (
-                                <div className="host-contact">
-                                    <span className="contact-label">Phone Number</span>
-                                    <a href={`tel:${data.phone}`} className="contact-value">{data.phone}</a>
-                                </div>
-                            )}
-                            {data.email && (
-                                <div className="host-contact">
-                                    <span className="contact-label">Email</span>
-                                    <a href={`mailto:${data.email}`} className="contact-value">{data.email}</a>
-                                </div>
-                            )}
-                            {data.website && (
-                                <div className="host-contact">
-                                    <span className="contact-label">Website</span>
-                                    <a href={data.website} target="_blank" rel="noopener noreferrer" className="contact-value">
-                                        {data.website}
-                                    </a>
-                                </div>
-                            )}
-                        </div>
-                    </div> */}
                     </div>
                 </div>
             </div>
             {/* End Scrollable Wrapper */}
+
+            {/* Stage Submission Modal */}
+            <StageSubmissionModal
+                isOpen={showSubmissionModal}
+                onClose={() => setShowSubmissionModal(false)}
+                stage={selectedStage}
+                stageIndex={selectedStageIndex}
+                eventId={data?.id}
+                eventTitle={data?.title}
+                onSubmissionSuccess={handleSubmissionSuccess}
+            />
+
+            {/* Quiz Modal */}
+            {showQuizModal && quizStage && (
+                <div className="modal-overlay quiz-modal-overlay">
+                    <div className="modal-container quiz-modal-container">
+                        <QuizInterface
+                            eventId={data?.id}
+                            stageIndex={quizStageIndex}
+                            stage={quizStage}
+                            onQuizComplete={handleQuizComplete}
+                            onClose={handleQuizClose}
+                        />
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

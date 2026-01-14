@@ -5,8 +5,8 @@ const fs = require('fs').promises;
 // Upload new resume
 exports.uploadResume = async (req, res) => {
   try {
-    if (!req.file) {
-      return res.status(400).json({ error: 'No file uploaded' });
+    if (!req.fileUrl) {
+      return res.status(400).json({ error: 'No file uploaded or upload failed' });
     }
 
     const { title = 'My Resume', isDefault = false } = req.body;
@@ -23,15 +23,16 @@ exports.uploadResume = async (req, res) => {
     const resume = await Resume.create({
       userId,
       title,
-      filePath: `/uploads/resumes/${req.file.filename}`,
-      fileName: req.file.originalname,
-      fileSize: req.file.size,
+      filePath: req.fileUrl, // GCS URL
+      fileName: req.uploadedFile.originalName,
+      fileSize: req.uploadedFile.size,
       isDefault
     });
 
     res.json({ 
-      message: 'Resume uploaded successfully', 
-      resume 
+      message: 'Resume uploaded successfully to Google Cloud Storage', 
+      resume,
+      uploadedFile: req.uploadedFile
     });
   } catch (error) {
     console.error('Upload resume error:', error);

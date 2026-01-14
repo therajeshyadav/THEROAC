@@ -349,7 +349,7 @@ const AddContentModal = ({ isOpen, onClose, type, authUser, onSuccess }) => {
                             </div>
 
                             <div className="form-group">
-                                <label htmlFor="benefits">Benefits (one per line)</label>
+                                <label htmlFor="benefits">Perks & Benefits (one per line)</label>
                                 <textarea
                                     id="benefits"
                                     name="benefits"

@@ -183,7 +183,7 @@ const CandidateDashboard = () => {
         statsData,
       ] = await Promise.allSettled([
         apiService.getJobs().catch(() => ({ jobs: [] })),
-        apiService.getEvents().catch(() => ({ events: [] })),
+        apiService.getEvents({ perPage: 50 }).catch(() => ({ events: [] })),
         apiService.getHubContent({ perPage: 100 }).catch(() => ({ hubContent: [] })),
         apiService.getUserApplications().catch(() => ({ applications: [] })),
         apiService.getCandidateStats().catch(() => ({

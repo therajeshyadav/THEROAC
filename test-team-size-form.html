@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Team Size Form Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #1a1a1a; color: white; }
+        .form-group { margin: 15px 0; }
+        label { display: block; margin-bottom: 5px; color: #FFD600; }
+        select { padding: 8px; background: #333; color: white; border: 1px solid #555; }
+        .debug { background: #333; padding: 10px; margin: 10px 0; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h2>🔧 Team Size Form Test</h2>
+    
+    <div class="form-group">
+        <label>Minimum Team Size</label>
+        <select id="minTeamSize">
+            <option value="">No minimum</option>
+            <option value="1">1 member</option>
+            <option value="2">2 members</option>
+            <option value="3">3 members</option>
+            <option value="4">4 members</option>
+        </select>
+    </div>
+    
+    <div class="form-group">
+        <label>Maximum Team Size</label>
+        <select id="maxTeamSize">
+            <option value="1">1 member</option>
+            <option value="2">2 members</option>
+            <option value="3">3 members</option>
+            <option value="4">4 members</option>
+            <option value="5">5 members</option>
+        </select>
+    </div>
+    
+    <button onclick="simulateEventData()">Simulate Event Data Load</button>
+    <button onclick="getCurrentValues()">Get Current Values</button>
+    
+    <div id="debug" class="debug">
+        <h3>Debug Info:</h3>
+        <div id="debugContent">Ready...</div>
+    </div>
+
+    <script>
+        // Simulate event data
+        const mockEventData = {
+            id: 'test-123',
+            title: 'Test Event',
+            minTeamSize: 2,
+            maxTeamSize: 5
+        };
+        
+        function simulateEventData() {
+            console.log('🔍 Simulating event data load:', mockEventData);
+            
+            // Set form values
+            document.getElementById('minTeamSize').value = mockEventData.minTeamSize || '';
+            document.getElementById('maxTeamSize').value = mockEventData.maxTeamSize || '4';
+            
+            updateDebug('Event data loaded successfully');
+        }
+        
+        function getCurrentValues() {
+            const minValue = document.getElementById('minTeamSize').value;
+            const maxValue = document.getElementById('maxTeamSize').value;
+            
+            console.log('📋 Current form values:', { minValue, maxValue });
+            updateDebug(`Min: ${minValue || 'null'}, Max: ${maxValue}`);
+        }
+        
+        function updateDebug(message) {
+            document.getElementById('debugContent').innerHTML = `
+                <p><strong>Last Action:</strong> ${message}</p>
+                <p><strong>Time:</strong> ${new Date().toLocaleTimeString()}</p>
+                <p><strong>Min Team Size:</strong> ${document.getElementById('minTeamSize').value || 'null'}</p>
+                <p><strong>Max Team Size:</strong> ${document.getElementById('maxTeamSize').value}</p>
+            `;
+        }
+        
+        // Add event listeners
+        document.getElementById('minTeamSize').addEventListener('change', function() {
+            console.log('Min team size changed to:', this.value);
+            updateDebug('Min team size changed');
+        });
+        
+        document.getElementById('maxTeamSize').addEventListener('change', function() {
+            console.log('Max team size changed to:', this.value);
+            updateDebug('Max team size changed');
+        });
+        
+        // Initial load
+        updateDebug('Form initialized');
+    </script>
+</body>
+</html>

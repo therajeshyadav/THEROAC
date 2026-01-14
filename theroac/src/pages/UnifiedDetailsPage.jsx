@@ -24,6 +24,7 @@ const UnifiedDetailsPage = () => {
   const [isHeaderSticky, setIsHeaderSticky] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
+  const [teamStatus, setTeamStatus] = useState(null); // Add team status
   const headerRef = useRef(null);
   const leftContentRef = useRef(null);
 
@@ -40,7 +41,6 @@ const UnifiedDetailsPage = () => {
       defaultTab: "description",
       tabs: [
         { id: "description", label: "Job Description" },
-        { id: "dates", label: "Dates & Deadlines" },
         { id: "reviews", label: "Reviews" },
         { id: "faqs", label: "FAQs & Discussions" },
       ],
@@ -53,7 +53,6 @@ const UnifiedDetailsPage = () => {
       tabs: [
         { id: "stages", label: "Stages & Timeline" },
         { id: "details", label: "Details" },
-        { id: "dates", label: "Dates & Deadlines" },
         { id: "prizes", label: "Prizes" },
         { id: "media", label: "Photos & Videos" },
         { id: "reviews", label: "Reviews" },
@@ -411,12 +410,23 @@ const UnifiedDetailsPage = () => {
     }
     const now = new Date();
 
+    // For events, prioritize registrationDeadline
+    if (type === 'events' && data.registrationDeadline) {
+      const deadline = new Date(data.registrationDeadline);
+      const diffTime = deadline - now;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      return Math.max(0, diffDays);
+    }
+
+    // For jobs and internships, use applicationDeadline
     if (data.applicationDeadline) {
       const deadline = new Date(data.applicationDeadline);
       const diffTime = deadline - now;
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
       return Math.max(0, diffDays);
     }
+    
+    // Fallback to endDate
     if (data.endDate) {
       const endDate = new Date(data.endDate);
       const diffTime = endDate - now;

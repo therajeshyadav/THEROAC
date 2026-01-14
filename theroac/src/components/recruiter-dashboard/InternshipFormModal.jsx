@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { X, Upload, Plus, Trash2, Building, MapPin, DollarSign, Users, Globe, Mail, Phone, Calendar } from 'lucide-react';
 import { toast } from 'react-toastify';
+import ImageUpload from './ImageUpload';
 import '../AddContentModal.css';
 import './JobFormModal.css';
 
@@ -48,7 +49,6 @@ const InternshipFormModal = ({ internship, authUser, onClose, onSuccess }) => {
   const [newTag, setNewTag] = useState('');
   const [newEligibility, setNewEligibility] = useState('');
   const [newFAQ, setNewFAQ] = useState({ question: '', answer: '' });
-  const [newMedia, setNewMedia] = useState({ type: 'image', url: '', caption: '' });
 
   useEffect(() => {
     if (internship) {
@@ -177,23 +177,6 @@ const InternshipFormModal = ({ internship, authUser, onClose, onSuccess }) => {
     setFormData(prev => ({
       ...prev,
       faqs: prev.faqs.filter((_, i) => i !== index)
-    }));
-  };
-
-  const addMedia = () => {
-    if (newMedia.url.trim()) {
-      setFormData(prev => ({
-        ...prev,
-        media: [...prev.media, { ...newMedia }]
-      }));
-      setNewMedia({ type: 'image', url: '', caption: '' });
-    }
-  };
-
-  const removeMedia = (index) => {
-    setFormData(prev => ({
-      ...prev,
-      media: prev.media.filter((_, i) => i !== index)
     }));
   };
 
@@ -436,13 +419,13 @@ const InternshipFormModal = ({ internship, authUser, onClose, onSuccess }) => {
               </div>
 
               <div className="form-group">
-                <label>Benefits</label>
+                <label>Perks & Benefits</label>
                 <textarea
                   name="benefits"
                   value={formData.benefits}
                   onChange={handleChange}
                   rows="3"
-                  placeholder="List benefits (certificate, mentorship, etc.)..."
+                  placeholder="List perks & benefits (certificate, mentorship, etc.)..."
                 />
               </div>
 
@@ -629,108 +612,45 @@ const InternshipFormModal = ({ internship, authUser, onClose, onSuccess }) => {
             <div className="form-section">
               <h3>Media & Images</h3>
 
-              <div className="form-group">
-                <label>Company Logo URL</label>
-                <input
-                  type="url"
-                  name="companyLogo"
-                  value={formData.companyLogo}
-                  onChange={handleChange}
-                  placeholder="https://example.com/logo.png"
-                />
-                {formData.companyLogo && (
-                  <div className="image-preview">
-                    <img src={formData.companyLogo} alt="Company Logo" />
-                  </div>
-                )}
-              </div>
+              <ImageUpload
+                label="Company Logo"
+                value={formData.companyLogo}
+                onChange={(url) => setFormData(prev => ({ ...prev, companyLogo: url }))}
+                type="internships"
+                fieldName="image"
+              />
 
-              <div className="form-group">
-                <label>Banner Image URL</label>
-                <input
-                  type="url"
-                  name="bannerImage"
-                  value={formData.bannerImage}
-                  onChange={handleChange}
-                  placeholder="https://example.com/banner.jpg"
-                />
-                {formData.bannerImage && (
-                  <div className="image-preview banner">
-                    <img src={formData.bannerImage} alt="Banner" />
-                  </div>
-                )}
-              </div>
+              <ImageUpload
+                label="Banner Image"
+                value={formData.bannerImage}
+                onChange={(url) => setFormData(prev => ({ ...prev, bannerImage: url }))}
+                type="internships"
+                fieldName="image"
+                previewClass="banner"
+              />
 
-              <div className="form-group">
-                <label>Thumbnail Image URL</label>
-                <input
-                  type="url"
-                  name="thumbnailImage"
-                  value={formData.thumbnailImage}
-                  onChange={handleChange}
-                  placeholder="https://example.com/thumbnail.jpg"
-                />
-                {formData.thumbnailImage && (
-                  <div className="image-preview">
-                    <img src={formData.thumbnailImage} alt="Thumbnail" />
-                  </div>
-                )}
-              </div>
+              <ImageUpload
+                label="Thumbnail Image"
+                value={formData.thumbnailImage}
+                onChange={(url) => setFormData(prev => ({ ...prev, thumbnailImage: url }))}
+                type="internships"
+                fieldName="image"
+              />
 
-              <div className="form-group">
-                <label>Featured Image URL</label>
-                <input
-                  type="url"
-                  name="featuredImage"
-                  value={formData.featuredImage}
-                  onChange={handleChange}
-                  placeholder="https://example.com/featured.jpg"
-                />
-                {formData.featuredImage && (
-                  <div className="image-preview">
-                    <img src={formData.featuredImage} alt="Featured" />
-                  </div>
-                )}
-              </div>
+              <ImageUpload
+                label="Featured Image"
+                value={formData.featuredImage}
+                onChange={(url) => setFormData(prev => ({ ...prev, featuredImage: url }))}
+                type="internships"
+                fieldName="image"
+              />
 
               <div className="form-group">
                 <label>Additional Media</label>
-                <div className="media-list">
-                  {formData.media.map((item, index) => (
-                    <div key={index} className="media-item">
-                      <span className="media-type">{item.type}</span>
-                      <span className="media-url">{item.url}</span>
-                      {item.caption && <span className="media-caption">{item.caption}</span>}
-                      <button type="button" onClick={() => removeMedia(index)} className="btn-remove">
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-                <div className="media-input-group">
-                  <select
-                    value={newMedia.type}
-                    onChange={(e) => setNewMedia({ ...newMedia, type: e.target.value })}
-                  >
-                    <option value="image">Image</option>
-                    <option value="video">Video</option>
-                  </select>
-                  <input
-                    type="url"
-                    value={newMedia.url}
-                    onChange={(e) => setNewMedia({ ...newMedia, url: e.target.value })}
-                    placeholder="Media URL"
-                  />
-                  <input
-                    type="text"
-                    value={newMedia.caption}
-                    onChange={(e) => setNewMedia({ ...newMedia, caption: e.target.value })}
-                    placeholder="Caption (optional)"
-                  />
-                  <button type="button" onClick={addMedia} className="btn-add">
-                    <Plus size={18} />
-                  </button>
-                </div>
+                <p className="form-note">
+                  Additional media files can be uploaded using the image upload fields above. 
+                  For videos, please contact support for assistance.
+                </p>
               </div>
             </div>
             <div className="modal-actions modal-footer">

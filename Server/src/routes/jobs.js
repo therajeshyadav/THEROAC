@@ -4,7 +4,7 @@ const jobController = require('../controllers/jobController');
 const { authenticate } = require('../middlewares/auth');
 const { requireRole } = require('../middlewares/roles');
 const { attachOrganizationContext } = require('../middlewares/organizationMiddleware');
-const imageUpload = require('../middleware/imageUpload');
+const { uploadSingle, uploadToGCSMiddleware, handleUploadError } = require('../middleware/uploadMiddleware');
 
 // Public routes (no authentication required)
 router.get('/', jobController.listJobs);
@@ -20,7 +20,36 @@ router.get('/applications/recruiter', authenticate, attachOrganizationContext, r
 router.get('/:jobId/application-status', authenticate, attachOrganizationContext, jobController.checkJobApplicationStatus);
 
 router.post('/', authenticate, attachOrganizationContext, requireRole(['recruiter','organizer','admin']), jobController.createJob);
-router.post('/upload-image', authenticate, attachOrganizationContext, requireRole(['recruiter','organizer','admin']), imageUpload.single('image'), jobController.uploadJobImage);
+router.post('/upload-image', 
+  authenticate, 
+  attachOrganizationContext, 
+  requireRole(['recruiter','organizer','admin']), 
+  uploadSingle('image'),
+  uploadToGCSMiddleware('images'),
+  handleUploadError,
+  jobController.uploadJobImage
+);
+
+// Separate endpoints for company logo and banner image
+router.post('/upload-company-logo', 
+  authenticate, 
+  attachOrganizationContext, 
+  requireRole(['recruiter','organizer','admin']), 
+  uploadSingle('logo'),
+  uploadToGCSMiddleware('images'),
+  handleUploadError,
+  jobController.uploadCompanyLogo
+);
+
+router.post('/upload-banner-image', 
+  authenticate, 
+  attachOrganizationContext, 
+  requireRole(['recruiter','organizer','admin']), 
+  uploadSingle('banner'),
+  uploadToGCSMiddleware('images'),
+  handleUploadError,
+  jobController.uploadBannerImage
+);
 router.post('/:jobId/apply', authenticate, attachOrganizationContext, jobController.applyToJob);
 
 router.put('/:id', authenticate, attachOrganizationContext, requireRole(['recruiter','organizer','admin']), jobController.updateJob);

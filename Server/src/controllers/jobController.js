@@ -819,20 +819,55 @@ exports.getMyJobs = async (req, res, next) => {
 // Upload image for job
 exports.uploadJobImage = async (req, res, next) => {
   try {
-    if (!req.file) {
-      return res.status(400).json({ message: 'No image file provided' });
+    if (!req.fileUrl) {
+      return res.status(400).json({ message: 'No image file provided or upload failed' });
     }
 
-    // Generate image URL
-    const imageUrl = `${req.protocol}://${req.get('host')}/uploads/images/jobs/${req.file.filename}`;
-
     res.status(200).json({
-      message: 'Image uploaded successfully',
-      imageUrl: imageUrl,
-      filename: req.file.filename
+      message: 'Image uploaded successfully to Google Cloud Storage',
+      imageUrl: req.fileUrl,
+      uploadedFile: req.uploadedFile
     });
   } catch (error) {
     console.error('Error uploading job image:', error);
     res.status(500).json({ message: 'Failed to upload image', error: error.message });
+  }
+};
+
+// Upload company logo for job
+exports.uploadCompanyLogo = async (req, res, next) => {
+  try {
+    if (!req.fileUrl) {
+      return res.status(400).json({ message: 'No logo file provided or upload failed' });
+    }
+
+    res.status(200).json({
+      message: 'Company logo uploaded successfully to Google Cloud Storage',
+      logoUrl: req.fileUrl,
+      companyLogo: req.fileUrl,
+      uploadedFile: req.uploadedFile
+    });
+  } catch (error) {
+    console.error('Error uploading company logo:', error);
+    res.status(500).json({ message: 'Failed to upload company logo', error: error.message });
+  }
+};
+
+// Upload banner image for job
+exports.uploadBannerImage = async (req, res, next) => {
+  try {
+    if (!req.fileUrl) {
+      return res.status(400).json({ message: 'No banner image file provided or upload failed' });
+    }
+
+    res.status(200).json({
+      message: 'Banner image uploaded successfully to Google Cloud Storage',
+      bannerUrl: req.fileUrl,
+      bannerImage: req.fileUrl,
+      uploadedFile: req.uploadedFile
+    });
+  } catch (error) {
+    console.error('Error uploading banner image:', error);
+    res.status(500).json({ message: 'Failed to upload banner image', error: error.message });
   }
 };

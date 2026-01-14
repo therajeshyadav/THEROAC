@@ -13,13 +13,17 @@ const request = async (endpoint, options = {}, retryCount = 0) => {
 
     const config = {
         headers: {
-            'Content-Type': 'application/json',
             ...(token && { Authorization: `Bearer ${token}` }),
             ...options.headers,
         },
         signal: controller.signal,
         ...options,
     };
+
+    // Only set Content-Type for non-FormData requests
+    if (!(options.body instanceof FormData)) {
+        config.headers['Content-Type'] = 'application/json';
+    }
 
     try {
         const response = await fetch(url, config);
@@ -167,8 +171,9 @@ const updateApplicationNotes = async (applicationId, data) => {
 };
 
 // Events endpoints
-const getEvents = async () => {
-    return request('/events');
+const getEvents = async (filters = {}) => {
+    const queryParams = new URLSearchParams(filters).toString();
+    return request(`/events${queryParams ? `?${queryParams}` : ''}`);
 };
 
 const getEventById = async (id) => {
@@ -737,6 +742,77 @@ const getUserBadges = async () => {
     return { badges: [] };
 };
 
+// Event Stages endpoints
+const getEventStages = async (eventId) => {
+    return request(`/events/${eventId}/stages`);
+};
+
+const submitStageSubmission = async (eventId, stageId, submissionData) => {
+    // Check if submissionData is FormData (for file uploads)
+    if (submissionData instanceof FormData) {
+        return request(`/events/${eventId}/stages/${stageId}/submit`, {
+            method: 'POST',
+            body: submissionData, // Don't stringify FormData, and don't set Content-Type
+        });
+    } else {
+        return request(`/events/${eventId}/stages/${stageId}/submit`, {
+            method: 'POST',
+            body: JSON.stringify(submissionData),
+        });
+    }
+};
+
+const getStageSubmissionStatus = async (eventId, stageId) => {
+    return request(`/events/${eventId}/stages/${stageId}/submission-status`);
+};
+
+const getUserStageSubmissions = async (eventId) => {
+    return request(`/events/${eventId}/my-submissions`);
+};
+
+// Quiz endpoints
+const submitStageQuiz = async (eventId, stageIndex, quizData) => {
+    return request(`/events/${eventId}/stages/${stageIndex}/quiz/submit`, {
+        method: 'POST',
+        body: JSON.stringify(quizData),
+    });
+};
+
+const getStageQuizStatus = async (eventId, stageIndex) => {
+    return request(`/events/${eventId}/stages/${stageIndex}/quiz/status`);
+};
+
+const getStageQuizResults = async (eventId, stageIndex) => {
+    return request(`/events/${eventId}/stages/${stageIndex}/quiz/results`);
+};
+
+// Team management endpoints for all team-based events
+const getEventTeamStatus = async (eventId) => {
+    return request(`/events/${eventId}/team-status`);
+};
+
+const getEventProblemStatements = async (eventId) => {
+    return request(`/events/${eventId}/problem-statements`);
+};
+
+const validateTeamForSubmission = async (eventId) => {
+    return request(`/events/${eventId}/validate-team`);
+};
+
+const createEventTeam = async (eventId, teamData) => {
+    return request(`/events/${eventId}/create-team`, {
+        method: 'POST',
+        body: JSON.stringify(teamData),
+    });
+};
+
+const joinEventTeam = async (eventId, teamCode) => {
+    return request(`/events/${eventId}/join-team`, {
+        method: 'POST',
+        body: JSON.stringify({ teamCode }),
+    });
+};
+
 // Export all functions as apiService object
 const apiService = {
     request,
@@ -830,7 +906,19 @@ const apiService = {
     generateQuiz,
     submitQuiz,
     getUserQuizHistory,
-    getUserBadges
+    getUserBadges,
+    getEventStages,
+    submitStageSubmission,
+    getStageSubmissionStatus,
+    getUserStageSubmissions,
+    submitStageQuiz,
+    getStageQuizStatus,
+    getStageQuizResults,
+    getEventTeamStatus,
+    getEventProblemStatements,
+    validateTeamForSubmission,
+    createEventTeam,
+    joinEventTeam
 };
 
 export default apiService;

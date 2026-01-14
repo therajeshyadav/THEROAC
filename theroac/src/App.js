@@ -28,11 +28,13 @@ import VerificationPending from "./pages/VerificationPending";
 import CandidateDashboard from "./pages/CandidateDashboard";
 import RecruiterDashboard from "./pages/RecruiterDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
+import EventParticipantsPage from "./pages/EventParticipantsPage";
 import UnifiedDetailsPage from "./pages/UnifiedDetailsPage";
 import NotificationsPage from "./pages/NotificationsPage";
 import Callback from "./pages/OAuth2Callback";
 import NotFound from "./pages/NotFound";
 import QuizPage from "./pages/QuizPage";
+import TeamBuildingPage from "./pages/TeamBuildingPage";
 
 // ✅ Helper component to handle smooth scrolling to hash IDs
 function ScrollToHashElement() {
@@ -93,7 +95,8 @@ function App() {
   ];
 
   const isAuthPage = authPages.includes(location.pathname);
-  const isDashboardPage = dashboardPages.includes(location.pathname);
+  const isDashboardPage = dashboardPages.includes(location.pathname) || 
+                          location.pathname.startsWith('/event-participants/');
   const isSpecialPage = specialPages.includes(location.pathname);
   const isDetailPage = location.pathname.startsWith("/event-detail/");
   const isValidPage = validPages.includes(location.pathname) || isDetailPage;
@@ -190,6 +193,22 @@ function App() {
                     element={<UnifiedDetailsPage />}
                   />
                   <Route
+                    path="/hackathon/:eventId/team-building"
+                    element={
+                      <ProtectedRoute requiredRole="candidate">
+                        <TeamBuildingPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/event/:eventId/team-building"
+                    element={
+                      <ProtectedRoute requiredRole="candidate">
+                        <TeamBuildingPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
                     path="/notifications"
                     element={
                       <ProtectedRoute>
@@ -224,6 +243,14 @@ function App() {
                   element={
                     <ProtectedRoute requiredRole="recruiter">
                       <RecruiterDashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/event-participants/:eventId"
+                  element={
+                    <ProtectedRoute requiredRole="recruiter">
+                      <EventParticipantsPage />
                     </ProtectedRoute>
                   }
                 />

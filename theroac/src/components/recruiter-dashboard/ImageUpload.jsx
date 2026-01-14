@@ -11,11 +11,12 @@ const ImageUpload = ({
   onChange, 
   type = 'jobs', // jobs, internships, events
   fieldName = 'image',
+  endpoint = 'upload-image', // custom endpoint
   preview = true,
-  previewClass = ''
+  previewClass = '',
+  uniqueId = null // Add unique identifier
 }) => {
   const [uploading, setUploading] = useState(false);
-  const [uploadMode, setUploadMode] = useState('url'); // 'url' or 'file'
 
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
@@ -27,9 +28,9 @@ const ImageUpload = ({
       return;
     }
 
-    // Validate file size (5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('Image size should be less than 5MB');
+    // Validate file size (50MB for images)
+    if (file.size > 50 * 1024 * 1024) {
+      toast.error('Image size should be less than 50MB');
       return;
     }
 
@@ -40,7 +41,7 @@ const ImageUpload = ({
       formData.append(fieldName, file);
 
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_URL}/${type}/upload-image`, {
+      const response = await fetch(`${API_URL}/${type}/${endpoint}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -50,7 +51,19 @@ const ImageUpload = ({
 
       if (response.ok) {
         const data = await response.json();
-        onChange(data.imageUrl);
+        // Handle different response formats based on endpoint
+        let imageUrl;
+        
+        if (endpoint === 'upload-banner-image') {
+          imageUrl = data.bannerImage || data.imageUrl;
+        } else if (endpoint === 'upload-thumbnail-image') {
+          imageUrl = data.thumbnailImage || data.imageUrl;
+        } else {
+          // Fallback for other endpoints
+          imageUrl = data.imageUrl || data.logoUrl || data.bannerUrl || data.companyLogo || data.bannerImage || data.thumbnailImage || data.logo;
+        }
+        
+        onChange(imageUrl);
         toast.success('Image uploaded successfully!');
       } else {
         const error = await response.json();
@@ -64,10 +77,6 @@ const ImageUpload = ({
     }
   };
 
-  const handleUrlChange = (e) => {
-    onChange(e.target.value);
-  };
-
   const clearImage = () => {
     onChange('');
   };
@@ -76,59 +85,25 @@ const ImageUpload = ({
     <div className="image-upload-container">
       <label className="image-upload-label">{label}</label>
       
-      <div className="upload-mode-toggle">
-        <button
-          type="button"
-          className={`mode-btn ${uploadMode === 'url' ? 'active' : ''}`}
-          onClick={() => setUploadMode('url')}
-        >
-          URL
-        </button>
-        <button
-          type="button"
-          className={`mode-btn ${uploadMode === 'file' ? 'active' : ''}`}
-          onClick={() => setUploadMode('file')}
-        >
-          Upload File
-        </button>
+      <div className="file-upload-group">
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleFileUpload}
+          id={`file-${uniqueId || fieldName}-${endpoint}`}
+          className="file-input"
+          disabled={uploading}
+        />
+        <label htmlFor={`file-${uniqueId || fieldName}-${endpoint}`} className="file-upload-label">
+          <Upload size={20} />
+          {uploading ? 'Uploading...' : 'Choose Image'}
+        </label>
+        {value && (
+          <button type="button" className="clear-btn" onClick={clearImage}>
+            <X size={18} />
+          </button>
+        )}
       </div>
-
-      {uploadMode === 'url' ? (
-        <div className="url-input-group">
-          <input
-            type="url"
-            value={value || ''}
-            onChange={handleUrlChange}
-            placeholder="https://example.com/image.jpg"
-            className="url-input"
-          />
-          {value && (
-            <button type="button" className="clear-btn" onClick={clearImage}>
-              <X size={18} />
-            </button>
-          )}
-        </div>
-      ) : (
-        <div className="file-upload-group">
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleFileUpload}
-            id={`file-${fieldName}`}
-            className="file-input"
-            disabled={uploading}
-          />
-          <label htmlFor={`file-${fieldName}`} className="file-upload-label">
-            <Upload size={20} />
-            {uploading ? 'Uploading...' : 'Choose Image'}
-          </label>
-          {value && (
-            <button type="button" className="clear-btn" onClick={clearImage}>
-              <X size={18} />
-            </button>
-          )}
-        </div>
-      )}
 
       {preview && value && (
         <div className={`image-preview ${previewClass}`}>

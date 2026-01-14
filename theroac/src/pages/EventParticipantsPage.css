@@ -1,0 +1,1019 @@
+.event-participants-page {
+  min-height: 100vh;
+  background: #1a1a1a;
+  color: #fff;
+  padding: 2rem;
+}
+
+.event-participants-page .loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: #1a1a1a;
+  color: #fff;
+}
+
+.event-participants-page .loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(255, 214, 0, 0.3);
+  border-top: 4px solid #FFD600;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.event-participants-page .page-header {
+  margin-bottom: 2rem;
+}
+
+.event-participants-page .back-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 1.5rem;
+}
+
+.event-participants-page .back-button:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateX(-2px);
+}
+
+.event-participants-page .event-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 2rem;
+}
+
+.event-participants-page .event-info {
+  flex: 1;
+}
+
+.event-participants-page .event-title {
+  color: #FFD600;
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 1rem 0;
+}
+
+.event-participants-page .event-meta {
+  display: flex;
+  gap: 2rem;
+}
+
+.event-participants-page .event-date,
+.event-participants-page .event-location {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+}
+
+.event-participants-page .event-stats {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.event-participants-page .stat-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  min-width: 120px;
+}
+
+.event-participants-page .stat-card svg {
+  color: #FFD600;
+}
+
+.event-participants-page .stat-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.event-participants-page .stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #FFD600;
+}
+
+.event-participants-page .stat-label {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.event-participants-page .participants-content {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 2rem;
+}
+
+.event-participants-page .content-header {
+  margin-bottom: 2rem;
+}
+
+.event-participants-page .search-section {
+  display: flex;
+  justify-content: center;
+}
+
+.event-participants-page .search-box {
+  position: relative;
+  max-width: 400px;
+  width: 100%;
+}
+
+.event-participants-page .search-box svg {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.event-participants-page .search-box input {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 3rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 0.95rem;
+}
+
+.event-participants-page .search-box input:focus {
+  outline: none;
+  border-color: #FFD600;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.event-participants-page .search-box input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.event-participants-page .empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.event-participants-page .empty-state h3 {
+  color: #fff;
+  margin: 1rem 0 0.5rem 0;
+}
+
+.event-participants-page .teams-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 2rem;
+}
+
+.event-participants-page .team-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.event-participants-page .team-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 214, 0, 0.3);
+}
+
+.event-participants-page .team-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #FFD600, #FFA000);
+}
+
+.event-participants-page .team-header {
+  margin-bottom: 1.5rem;
+}
+
+.event-participants-page .team-name {
+  color: #FFD600;
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem 0;
+}
+
+.event-participants-page .event-badge {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.event-participants-page .event-type {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  width: fit-content;
+}
+
+.event-participants-page .event-type.type-hackathon {
+  background: rgba(156, 39, 176, 0.2);
+  color: #E1BEE7;
+  border: 1px solid rgba(156, 39, 176, 0.4);
+}
+
+.event-participants-page .event-type.type-other {
+  background: rgba(96, 125, 139, 0.2);
+  color: #CFD8DC;
+  border: 1px solid rgba(96, 125, 139, 0.4);
+}
+
+.event-participants-page .event-name {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 500;
+}
+
+.event-participants-page .team-members {
+  margin-bottom: 1.5rem;
+}
+
+.event-participants-page .members-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.event-participants-page .members-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.event-participants-page .member-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.event-participants-page .member-chip:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 214, 0, 0.2);
+}
+
+.event-participants-page .member-chip.more {
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.event-participants-page .member-avatar {
+  width: 32px;
+  height: 32px;
+  background: rgba(255, 214, 0, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #FFD600;
+  border: 2px solid rgba(255, 214, 0, 0.3);
+}
+
+.event-participants-page .member-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.event-participants-page .member-name {
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.event-participants-page .member-role {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.75rem;
+}
+
+.event-participants-page .submission-status {
+  margin-bottom: 1.5rem;
+}
+
+.event-participants-page .status-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.event-participants-page .stages-status {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.event-participants-page .stage-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+}
+
+.event-participants-page .stage-info {
+  flex: 1;
+}
+
+.event-participants-page .stage-name {
+  color: white;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+.event-participants-page .stage-files {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.event-participants-page .file-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  font-size: 0.8rem;
+}
+
+.event-participants-page .file-item.submitted {
+  color: #4CAF50;
+  border: 1px solid rgba(76, 175, 80, 0.2);
+}
+
+.event-participants-page .file-item span {
+  flex: 1;
+}
+
+.event-participants-page .submission-actions {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.event-participants-page .download-btn,
+.event-participants-page .view-btn {
+  background: rgba(255, 214, 0, 0.1);
+  border: 1px solid rgba(255, 214, 0, 0.3);
+  color: #FFD600;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.event-participants-page .download-btn:hover,
+.event-participants-page .view-btn:hover {
+  background: rgba(255, 214, 0, 0.2);
+  border-color: rgba(255, 214, 0, 0.5);
+  transform: translateY(-1px);
+}
+
+.event-participants-page .stage-status {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.event-participants-page .stage-status.submitted {
+  background: rgba(76, 175, 80, 0.2);
+  color: #4CAF50;
+  border: 2px solid rgba(76, 175, 80, 0.4);
+}
+
+.event-participants-page .stage-status.pending {
+  background: rgba(255, 193, 7, 0.2);
+  color: #FFC107;
+  border: 2px solid rgba(255, 193, 7, 0.4);
+}
+
+.event-participants-page .no-submissions {
+  text-align: center;
+  padding: 1rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
+.event-participants-page .team-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.event-participants-page .btn-evaluate,
+.event-participants-page .btn-contact {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.event-participants-page .btn-evaluate {
+  background: linear-gradient(135deg, #4CAF50, #45a049);
+  color: white;
+}
+
+.event-participants-page .btn-evaluate:hover {
+  background: linear-gradient(135deg, #45a049, #3d8b40);
+  transform: translateY(-1px);
+}
+
+.event-participants-page .btn-contact {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.event-participants-page .btn-contact:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Additional Submission Styles */
+.event-participants-page .submission-group {
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.event-participants-page .submission-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.event-participants-page .submission-label {
+  font-size: 0.85rem;
+  color: #4CAF50;
+  font-weight: 500;
+}
+
+.event-participants-page .submission-date {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.event-participants-page .files-list,
+.event-participants-page .links-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.event-participants-page .no-stage-submissions {
+  text-align: center;
+  padding: 0.5rem;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.8rem;
+  font-style: italic;
+}
+
+.event-participants-page .raw-data {
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.7);
+  max-height: 100px;
+  overflow-y: auto;
+}
+
+.event-participants-page .raw-data pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .event-participants-page {
+    padding: 1rem;
+  }
+  
+  .event-participants-page .event-header {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  .event-participants-page .event-stats {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .event-participants-page .teams-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .event-participants-page .team-card {
+    padding: 1.25rem;
+  }
+  
+  .event-participants-page .team-actions {
+    flex-direction: column;
+  }
+}
+/* New styles for enhanced features */
+.event-participants-page .stage-locked {
+  padding: 0.5rem;
+  background: rgba(117, 117, 117, 0.1);
+  border: 1px solid rgba(117, 117, 117, 0.3);
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.8rem;
+  text-align: center;
+  font-style: italic;
+}
+
+.event-participants-page .stage-status.not-submitted {
+  background: rgba(255, 87, 34, 0.2);
+  color: #FF5722;
+  border: 2px solid rgba(255, 87, 34, 0.4);
+}
+
+.event-participants-page .stage-status.locked {
+  background: rgba(117, 117, 117, 0.2);
+  color: #757575;
+  border: 2px solid rgba(117, 117, 117, 0.4);
+}
+
+.event-participants-page .stage-status.shortlisted {
+  background: rgba(76, 175, 80, 0.2);
+  color: #4CAF50;
+  border: 2px solid rgba(76, 175, 80, 0.4);
+}
+
+.event-participants-page .stage-status.rejected {
+  background: rgba(244, 67, 54, 0.2);
+  color: #F44336;
+  border: 2px solid rgba(244, 67, 54, 0.4);
+}
+
+.event-participants-page .contact-email {
+  display: block;
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 0.25rem;
+}
+
+.event-participants-page .btn-contact {
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  padding: 0.75rem;
+}
+
+/* Modal Styles */
+.event-participants-page .modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 2rem;
+}
+
+.event-participants-page .modal-content {
+  background: #1a1a1a;
+  border: 1px solid rgba(255, 214, 0, 0.2);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.event-participants-page .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.event-participants-page .modal-header h3 {
+  color: #FFD600;
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.event-participants-page .close-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 2rem;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+}
+
+.event-participants-page .close-btn:hover {
+  color: #FFD600;
+  transform: rotate(90deg);
+}
+
+.event-participants-page .modal-body {
+  padding: 2rem;
+}
+
+.event-participants-page .team-summary {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.event-participants-page .team-summary h4 {
+  color: #FFD600;
+  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+}
+
+.event-participants-page .members-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.event-participants-page .member-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+}
+
+.event-participants-page .member-name {
+  color: #fff;
+  font-weight: 500;
+}
+
+.event-participants-page .member-role {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.8rem;
+}
+
+.event-participants-page .member-email {
+  color: #FFD600;
+  font-size: 0.8rem;
+}
+
+.event-participants-page .stages-evaluation h4 {
+  color: #FFD600;
+  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+}
+
+.event-participants-page .stage-evaluation {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+}
+
+.event-participants-page .stage-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.event-participants-page .stage-header h5 {
+  color: #fff;
+  margin: 0;
+  font-size: 1rem;
+}
+
+.event-participants-page .stage-status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.event-participants-page .stage-status-badge.submitted {
+  background: rgba(33, 150, 243, 0.2);
+  color: #2196F3;
+  border: 1px solid rgba(33, 150, 243, 0.4);
+}
+
+.event-participants-page .stage-status-badge.shortlisted {
+  background: rgba(76, 175, 80, 0.2);
+  color: #4CAF50;
+  border: 1px solid rgba(76, 175, 80, 0.4);
+}
+
+.event-participants-page .stage-status-badge.rejected {
+  background: rgba(244, 67, 54, 0.2);
+  color: #F44336;
+  border: 1px solid rgba(244, 67, 54, 0.4);
+}
+
+.event-participants-page .stage-status-badge.not-submitted {
+  background: rgba(255, 87, 34, 0.2);
+  color: #FF5722;
+  border: 1px solid rgba(255, 87, 34, 0.4);
+}
+
+.event-participants-page .stage-status-badge.locked {
+  background: rgba(117, 117, 117, 0.2);
+  color: #757575;
+  border: 1px solid rgba(117, 117, 117, 0.4);
+}
+
+.event-participants-page .evaluation-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.event-participants-page .btn-shortlist,
+.event-participants-page .btn-reject {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.event-participants-page .btn-shortlist {
+  background: linear-gradient(135deg, #4CAF50, #45a049);
+  color: white;
+}
+
+.event-participants-page .btn-shortlist:hover {
+  background: linear-gradient(135deg, #45a049, #3d8b40);
+  transform: translateY(-1px);
+}
+
+.event-participants-page .btn-reject {
+  background: linear-gradient(135deg, #F44336, #d32f2f);
+  color: white;
+}
+
+.event-participants-page .btn-reject:hover {
+  background: linear-gradient(135deg, #d32f2f, #c62828);
+  transform: translateY(-1px);
+}
+
+.event-participants-page .stage-note {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.9rem;
+  font-style: italic;
+  margin: 0;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 6px;
+}
+/* Filter Section Styles */
+.event-participants-page .filters-section {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-end;
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+}
+
+.event-participants-page .filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 180px;
+}
+
+.event-participants-page .filter-group label {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.event-participants-page .filter-select {
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.event-participants-page .filter-select:focus {
+  outline: none;
+  border-color: #FFD600;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.event-participants-page .filter-select option {
+  background: #1a1a1a;
+  color: #fff;
+}
+
+.event-participants-page .stage-deadline-info {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+}
+
+.event-participants-page .deadline-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: 1px solid currentColor;
+}
+
+.event-participants-page .deadline-date {
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+.event-participants-page .filter-summary {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 214, 0, 0.1);
+  border: 1px solid rgba(255, 214, 0, 0.2);
+  border-radius: 8px;
+  color: #FFD600;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Enhanced Stage Status Indicators */
+.event-participants-page .stage-item {
+  position: relative;
+}
+
+.event-participants-page .stage-item::before {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  border-radius: 2px;
+  background: transparent;
+}
+
+.event-participants-page .stage-item.stage-shortlisted::before {
+  background: #4CAF50;
+}
+
+.event-participants-page .stage-item.stage-rejected::before {
+  background: #F44336;
+}
+
+.event-participants-page .stage-item.stage-submitted::before {
+  background: #2196F3;
+}
+
+.event-participants-page .stage-item.stage-not-submitted::before {
+  background: #FF5722;
+}
+
+.event-participants-page .stage-item.stage-locked::before {
+  background: #757575;
+}
+
+/* Responsive Filters */
+@media (max-width: 768px) {
+  .event-participants-page .filters-section {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+  
+  .event-participants-page .filter-group {
+    min-width: auto;
+  }
+  
+  .event-participants-page .stage-deadline-info {
+    margin-left: 0;
+    justify-content: center;
+  }
+}
+/* Enhanced Stage Header */
+.event-participants-page .stage-header-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.event-participants-page .stage-deadline {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: normal;
+}
+
+.event-participants-page .deadline-expired {
+  color: #F44336;
+  font-weight: 600;
+}

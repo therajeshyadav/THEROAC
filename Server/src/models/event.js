@@ -34,6 +34,7 @@ Event.init({
   registrationFee: { type: DataTypes.JSON, allowNull: true }, // {amount, currency, type}
   maxParticipants: { type: DataTypes.INTEGER, allowNull: true },
   agenda: { type: DataTypes.JSON, allowNull: true }, // Array of {time, title, description, speaker}
+  stages: { type: DataTypes.JSON, allowNull: true }, // Array of submission stages for competitive events
   speakers: { type: DataTypes.JSON, allowNull: true }, // Array of {name, title, bio, image, socials}
   sponsors: { type: DataTypes.JSON, allowNull: true }, // Array of {name, logo, tier, website}
   media: { type: DataTypes.JSON, allowNull: true }, // Array of {type: 'image'|'video', url: string, thumbnail?: string, caption?: string}
@@ -45,6 +46,9 @@ Event.init({
   featured: { type: DataTypes.BOOLEAN, defaultValue: false },
   views: { type: DataTypes.INTEGER, defaultValue: 0 },
   registrations: { type: DataTypes.INTEGER, defaultValue: 0 },
+  minTeamSize: { type: DataTypes.INTEGER, allowNull: true },
+  maxTeamSize: { type: DataTypes.INTEGER, allowNull: true },
+  problemStatements: { type: DataTypes.JSON, allowNull: true }, // {released: boolean, releaseDate: date, statements: array, guidelines: string}
   createdBy: { type: DataTypes.UUID, allowNull: false },
   organizationId: { type: DataTypes.UUID, allowNull: true }
 }, {

@@ -2,11 +2,18 @@ const express = require('express');
 const router = express.Router();
 const resumeController = require('../controllers/resumeController');
 const { authenticate } = require('../middlewares/auth');
-const upload = require('../middleware/upload');
+const { uploadSingle, uploadToGCSMiddleware, handleUploadError } = require('../middleware/uploadMiddleware');
 
 router.use(authenticate);
 
-router.post('/upload', upload.single('resume'), resumeController.uploadResume);
+// Updated resume upload to use GCS
+router.post('/upload', 
+  uploadSingle('resume'),
+  uploadToGCSMiddleware('documents'),
+  handleUploadError,
+  resumeController.uploadResume
+);
+
 router.get('/', resumeController.getResumes);
 router.put('/:id/default', resumeController.setDefaultResume);
 router.put('/:id', resumeController.updateResume);

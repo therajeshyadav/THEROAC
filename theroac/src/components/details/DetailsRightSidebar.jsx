@@ -173,7 +173,25 @@ const DetailsRightSidebar = ({
                 </div>
                 <div className="stat-content">
                   <span className="stat-label">Team Size</span>
-                  <span className="stat-number">{data.teamSize || 'N/A'}</span>
+                  <span className="stat-number">
+                    {/* Check if it's a team-based event */}
+                    {data.categories && Array.isArray(data.categories) && 
+                     data.categories.some(cat => ['hackathon', 'competition', 'contest', 'challenge'].includes(cat.toLowerCase())) ? (
+                      /* Team-based event - show team size requirements */
+                      data.minTeamSize && data.maxTeamSize ? (
+                        data.minTeamSize === data.maxTeamSize 
+                          ? `${data.maxTeamSize} members`
+                          : `${data.minTeamSize}-${data.maxTeamSize} members`
+                      ) : data.maxTeamSize ? (
+                        data.maxTeamSize === 1 ? 'Individual' : `Up to ${data.maxTeamSize} members`
+                      ) : (
+                        'Up to 4 members'
+                      )
+                    ) : (
+                      /* Non-team event */
+                      'Individual'
+                    )}
+                  </span>
                 </div>
               </div>
 
@@ -183,8 +201,8 @@ const DetailsRightSidebar = ({
                 </div>
                 <div className="stat-content">
                   <span className="stat-label">Registration Deadline</span>
-                  <span className="stat-number">
-                    {getDeadlineDisplay()} days left
+                  <span className={`stat-number ${getDeadlineDisplay() === 0 ? 'deadline-passed' : ''}`}>
+                    {getDeadlineDisplay() === 0 ? 'Deadline Passed' : `${getDeadlineDisplay()} days left`}
                   </span>
                 </div>
               </div>
@@ -229,8 +247,8 @@ const DetailsRightSidebar = ({
                 </div>
                 <div className="stat-content">
                   <span className="stat-label">Application Deadline</span>
-                  <span className="stat-number">
-                    {getDeadlineDisplay()} days left
+                  <span className={`stat-number ${getDeadlineDisplay() === 0 ? 'deadline-passed' : ''}`}>
+                    {getDeadlineDisplay() === 0 ? 'Deadline Passed' : `${getDeadlineDisplay()} days left`}
                   </span>
                 </div>
               </div>
@@ -285,6 +303,9 @@ const DetailsRightSidebar = ({
         </div>
       </div>
 
+      {/* Team Information Card - Show for team-based events */}
+      {/* Removed duplicate - team size already shown in stats above */}
+
       {/* Eligibility Card */}
       <div className="info-card compact">
         <h3 className="card-title">
@@ -292,16 +313,57 @@ const DetailsRightSidebar = ({
           Eligibility
         </h3>
         <div className="eligibility-list compact">
-          {Array.isArray(data.eligibility) ? (
+          {data.eligibility && typeof data.eligibility === 'object' ? (
+            <>
+              {/* Education Level */}
+              {data.eligibility.education && Array.isArray(data.eligibility.education) && data.eligibility.education.length > 0 && (
+                <div className="eligibility-section">
+                  <strong>Education:</strong>
+                  <div className="eligibility-tags">
+                    {data.eligibility.education.map((edu, index) => (
+                      <span key={index} className="eligibility-tag">
+                        {edu === 'undergraduate' ? 'Undergraduate' :
+                         edu === 'postgraduate' ? 'Postgraduate' :
+                         edu === 'engineering' ? 'Engineering Students' :
+                         edu === 'management' ? 'Management' :
+                         edu === 'arts-commerce-sciences' ? 'Arts, Commerce, Sciences & Others' :
+                         edu === 'law' ? 'Law' :
+                         edu === 'medical' ? 'Medical' : edu}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {/* Geographic Restrictions */}
+              {data.eligibility.location && (
+                <div className="eligibility-section">
+                  <strong>Location:</strong>
+                  <span className="eligibility-value">{data.eligibility.location}</span>
+                </div>
+              )}
+              
+              {/* Additional Requirements */}
+              {data.eligibility.additional && (
+                <div className="eligibility-section">
+                  <strong>Additional Requirements:</strong>
+                  <span className="eligibility-value">{data.eligibility.additional}</span>
+                </div>
+              )}
+              
+              {/* If no eligibility criteria set */}
+              {(!data.eligibility.education || data.eligibility.education.length === 0) && 
+               !data.eligibility.location && 
+               !data.eligibility.additional && (
+                <span className="eligibility-item">Open to all</span>
+              )}
+            </>
+          ) : Array.isArray(data.eligibility) ? (
             data.eligibility.map((item, index) => (
               <span key={index} className="eligibility-item">
                 {typeof item === 'string' ? item : JSON.stringify(item)}
               </span>
             ))
-          ) : data.eligibility && typeof data.eligibility === 'object' ? (
-            <span className="eligibility-item">
-              {JSON.stringify(data.eligibility)}
-            </span>
           ) : (
             <span className="eligibility-item">
               {data.eligibility || "Not specified"}

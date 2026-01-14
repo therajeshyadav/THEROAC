@@ -5,8 +5,9 @@ const Hackathon = require('./hackathon');
 const Job = require('./job');
 const HubContent = require('./hubContent');
 const EventRegistration = require('./eventRegistration');
-const HackathonTeam = require('./hackathonTeam');
-const TeamMember = require('./teamMember');
+const EventStageSubmission = require('./eventStageSubmission');
+const EventTeam = require('./EventTeam');
+const EventTeamMember = require('./EventTeamMember');
 const Submission = require('./submission');
 const JobApplication = require('./jobApplication');
 const HubContentApplication = require('./HubContentApplication');
@@ -23,6 +24,7 @@ const Resume = require('./Resume');
 const TalentPipeline = require('./TalentPipeline');
 const Review = require('./Review');
 const FAQ = require('./FAQ');
+const QuizSubmission = require('./QuizSubmission');
 
 // Associations
 User.hasMany(Event, { foreignKey: 'createdBy', as: 'createdEvents' });
@@ -40,18 +42,6 @@ HubContent.belongsTo(User, { foreignKey: 'createdBy', as: 'author' });
 User.belongsToMany(Event, { through: EventRegistration, foreignKey: 'userId', otherKey: 'eventId' });
 Event.belongsToMany(User, { through: EventRegistration, foreignKey: 'eventId', otherKey: 'userId' });
 
-Hackathon.hasMany(HackathonTeam, { foreignKey: 'hackathonId', as: 'teams' });
-HackathonTeam.belongsTo(Hackathon, { foreignKey: 'hackathonId' });
-
-HackathonTeam.hasMany(TeamMember, { foreignKey: 'teamId', as: 'members' });
-TeamMember.belongsTo(HackathonTeam, { foreignKey: 'teamId' });
-
-TeamMember.belongsTo(User, { foreignKey: 'userId' });
-User.hasMany(TeamMember, { foreignKey: 'userId' });
-
-HackathonTeam.hasMany(Submission, { foreignKey: 'teamId', as: 'submissions' });
-Submission.belongsTo(HackathonTeam, { foreignKey: 'teamId' });
-
 Job.belongsToMany(User, { through: JobApplication, foreignKey: 'jobId', otherKey: 'userId' });
 User.belongsToMany(Job, { through: JobApplication, foreignKey: 'userId', otherKey: 'jobId' });
 
@@ -66,6 +56,14 @@ EventRegistration.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 EventRegistration.belongsTo(Event, { foreignKey: 'eventId', as: 'event' });
 User.hasMany(EventRegistration, { foreignKey: 'userId', as: 'eventRegistrations' });
 Event.hasMany(EventRegistration, { foreignKey: 'eventId', as: 'eventRegistrations' });
+
+// Event Stage Submission associations
+EventStageSubmission.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+EventStageSubmission.belongsTo(Event, { foreignKey: 'eventId', as: 'event' });
+EventStageSubmission.belongsTo(User, { foreignKey: 'reviewedBy', as: 'reviewer' });
+User.hasMany(EventStageSubmission, { foreignKey: 'userId', as: 'stageSubmissions' });
+Event.hasMany(EventStageSubmission, { foreignKey: 'eventId', as: 'stageSubmissions' });
+User.hasMany(EventStageSubmission, { foreignKey: 'reviewedBy', as: 'reviewedSubmissions' });
 
 // Hub Content Application associations
 HubContent.belongsToMany(User, { through: HubContentApplication, foreignKey: 'hubContentId', otherKey: 'userId' });
@@ -164,6 +162,26 @@ FAQ.belongsTo(User, { foreignKey: 'answeredBy', as: 'answerer' });
 User.hasMany(FAQ, { foreignKey: 'createdBy', as: 'faqs' });
 User.hasMany(FAQ, { foreignKey: 'answeredBy', as: 'answeredFaqs' });
 
+// QuizSubmission associations
+QuizSubmission.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+QuizSubmission.belongsTo(Event, { foreignKey: 'eventId', as: 'event' });
+User.hasMany(QuizSubmission, { foreignKey: 'userId', as: 'quizSubmissions' });
+Event.hasMany(QuizSubmission, { foreignKey: 'eventId', as: 'quizSubmissions' });
+
+// EventTeam associations
+EventTeam.belongsTo(Event, { foreignKey: 'eventId', as: 'event' });
+EventTeam.belongsTo(User, { foreignKey: 'leaderId', as: 'leader' });
+EventTeam.hasMany(EventTeamMember, { foreignKey: 'teamId', as: 'members' });
+Event.hasMany(EventTeam, { foreignKey: 'eventId', as: 'teams' });
+User.hasMany(EventTeam, { foreignKey: 'leaderId', as: 'ledTeams' });
+
+// EventTeamMember associations
+EventTeamMember.belongsTo(EventTeam, { foreignKey: 'teamId', as: 'team' });
+EventTeamMember.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+EventTeamMember.belongsTo(Event, { foreignKey: 'eventId', as: 'event' });
+User.hasMany(EventTeamMember, { foreignKey: 'userId', as: 'teamMemberships' });
+Event.hasMany(EventTeamMember, { foreignKey: 'eventId', as: 'teamMembers' });
+
 module.exports = {
   sequelize,
   User,
@@ -172,8 +190,9 @@ module.exports = {
   Job,
   HubContent,
   EventRegistration,
-  HackathonTeam,
-  TeamMember,
+  EventStageSubmission,
+  EventTeam,
+  EventTeamMember,
   Submission,
   JobApplication,
   HubContentApplication,
@@ -189,5 +208,6 @@ module.exports = {
   Resume,
   TalentPipeline,
   Review,
-  FAQ
+  FAQ,
+  QuizSubmission
 };

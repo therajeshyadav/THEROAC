@@ -102,7 +102,6 @@ const JobFormModal = ({ job, authUser, onClose, onSuccess }) => {
   const [newPerk, setNewPerk] = useState('');
   const [newEligibility, setNewEligibility] = useState('');
   const [newFAQ, setNewFAQ] = useState({ question: '', answer: '' });
-  const [newMedia, setNewMedia] = useState({ type: 'image', url: '', caption: '' });
 
 
 
@@ -206,23 +205,6 @@ const JobFormModal = ({ job, authUser, onClose, onSuccess }) => {
     setFormData(prev => ({
       ...prev,
       faqs: prev.faqs.filter((_, i) => i !== index)
-    }));
-  };
-
-  const addMedia = () => {
-    if (newMedia.url.trim()) {
-      setFormData(prev => ({
-        ...prev,
-        media: [...prev.media, { ...newMedia }]
-      }));
-      setNewMedia({ type: 'image', url: '', caption: '' });
-    }
-  };
-
-  const removeMedia = (index) => {
-    setFormData(prev => ({
-      ...prev,
-      media: prev.media.filter((_, i) => i !== index)
     }));
   };
 
@@ -499,13 +481,13 @@ const JobFormModal = ({ job, authUser, onClose, onSuccess }) => {
               </div>
 
               <div className="form-group">
-                <label>Benefits</label>
+                <label>Perks & Benefits</label>
                 <textarea
                   name="benefits"
                   value={formData.benefits}
                   onChange={handleChange}
                   rows="4"
-                  placeholder="List benefits..."
+                  placeholder="List perks & benefits..."
                 />
               </div>
 
@@ -801,7 +783,8 @@ const JobFormModal = ({ job, authUser, onClose, onSuccess }) => {
                 value={formData.companyLogo}
                 onChange={(url) => setFormData(prev => ({ ...prev, companyLogo: url }))}
                 type="jobs"
-                fieldName="image"
+                fieldName="logo"
+                endpoint="upload-company-logo"
                 previewClass="logo"
               />
 
@@ -810,48 +793,17 @@ const JobFormModal = ({ job, authUser, onClose, onSuccess }) => {
                 value={formData.bannerImage}
                 onChange={(url) => setFormData(prev => ({ ...prev, bannerImage: url }))}
                 type="jobs"
-                fieldName="image"
+                fieldName="banner"
+                endpoint="upload-banner-image"
                 previewClass="banner"
               />
 
               <div className="form-group">
                 <label>Additional Media</label>
-                <div className="media-list">
-                  {formData.media.map((item, index) => (
-                    <div key={index} className="media-item">
-                      <span className="media-type">{item.type}</span>
-                      <span className="media-url">{item.url}</span>
-                      {item.caption && <span className="media-caption">{item.caption}</span>}
-                      <button type="button" onClick={() => removeMedia(index)} className="btn-remove">
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-                <div className="media-input-group">
-                  <select
-                    value={newMedia.type}
-                    onChange={(e) => setNewMedia({ ...newMedia, type: e.target.value })}
-                  >
-                    <option value="image">Image</option>
-                    <option value="video">Video</option>
-                  </select>
-                  <input
-                    type="url"
-                    value={newMedia.url}
-                    onChange={(e) => setNewMedia({ ...newMedia, url: e.target.value })}
-                    placeholder="Media URL"
-                  />
-                  <input
-                    type="text"
-                    value={newMedia.caption}
-                    onChange={(e) => setNewMedia({ ...newMedia, caption: e.target.value })}
-                    placeholder="Caption (optional)"
-                  />
-                  <button type="button" onClick={addMedia} className="btn-add">
-                    <Plus size={18} />
-                  </button>
-                </div>
+                <p className="form-note">
+                  Additional media files can be uploaded using the image upload fields above. 
+                  For videos, please contact support for assistance.
+                </p>
               </div>
             </div>
             <div className="modal-actions modal-footer">

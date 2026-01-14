@@ -2445,3 +2445,134 @@ plied Button States */
     border: 1px solid #ccc;
   }
 }
+
+/* Team Information Styles */
+.details-page .team-info-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.details-page .team-requirement-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.details-page .team-requirement-item:last-child {
+  border-bottom: none;
+}
+
+.details-page .team-req-label {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.details-page .team-req-value {
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* Team Leader Button Styles */
+.details-page .stage-action-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.details-page .stage-action-btn:disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* Team Information in Right Sidebar - Mobile Responsive */
+@media (max-width: 767px) {
+  .details-page .team-requirement-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+    padding: 0.75rem 0;
+  }
+  
+  .details-page .team-req-label {
+    font-size: 0.85rem;
+  }
+  
+  .details-page .team-req-value {
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+}
+
+@media (max-width: 479px) {
+  .details-page .team-info-content {
+    gap: 0.5rem;
+  }
+  
+  .details-page .team-requirement-item {
+    padding: 0.5rem 0;
+  }
+  
+  .details-page .team-req-label,
+  .details-page .team-req-value {
+    font-size: 0.8rem;
+  }
+}
+/* Eligibility Section Styles */
+.eligibility-section {
+  margin-bottom: 12px;
+}
+
+.eligibility-section strong {
+  display: block;
+  color: #FFD600;
+  font-size: 0.9rem;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.eligibility-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.eligibility-tag {
+  background: rgba(255, 214, 0, 0.1);
+  color: #FFD600;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  border: 1px solid rgba(255, 214, 0, 0.2);
+  font-weight: 500;
+}
+
+.eligibility-value {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+  line-height: 1.4;
+  display: block;
+  margin-top: 2px;
+}
+
+.eligibility-list.compact .eligibility-section:last-child {
+  margin-bottom: 0;
+}
+
+/* Responsive eligibility tags */
+@media (max-width: 768px) {
+  .eligibility-tags {
+    gap: 4px;
+  }
+  
+  .eligibility-tag {
+    font-size: 0.75rem;
+    padding: 3px 6px;
+  }
+}

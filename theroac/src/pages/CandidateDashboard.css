@@ -1157,6 +1157,7 @@ select:focus {
     border-radius: 16px;
     padding: 1.5rem;
     transition: all 0.3s ease;
+    overflow: hidden; /* Prevent overflow */
 }
 
 .application-detailed-item:hover {
@@ -1165,9 +1166,14 @@ select:focus {
 
 .application-content {
     display: grid;
-    grid-template-columns: 1fr auto auto;
+    grid-template-columns: 1fr auto minmax(auto, max-content);
     gap: 1rem;
     align-items: center;
+    width: 100%;
+}
+
+.application-main {
+    min-width: 0; /* Allow text truncation */
 }
 
 .application-main h5 {
@@ -1191,6 +1197,7 @@ select:focus {
     flex-direction: column;
     align-items: center;
     gap: 0.5rem;
+    white-space: nowrap;
 }
 
 .status-section span:first-child {
@@ -1201,6 +1208,8 @@ select:focus {
 .application-actions {
     display: flex;
     gap: 0.5rem;
+    justify-content: flex-end;
+    min-width: 0;
 }
 
 /* Events Detailed */
@@ -2689,6 +2698,7 @@ select::-ms-expand {
     padding: 20px;
     margin-bottom: 16px;
     transition: all 0.3s ease;
+    overflow: hidden; /* Prevent overflow */
 }
 
 .application-detailed-item:hover {
@@ -2703,10 +2713,13 @@ select::-ms-expand {
     justify-content: space-between;
     align-items: center;
     gap: 20px;
+    width: 100%;
+    min-width: 0; /* Allow flex items to shrink */
 }
 
 .application-main {
     flex: 1;
+    min-width: 0; /* Allow text truncation */
 }
 
 .application-main h5 {
@@ -2727,6 +2740,7 @@ select::-ms-expand {
     gap: 16px;
     color: #ccc;
     font-size: 13px;
+    flex-wrap: wrap;
 }
 
 .application-meta span {
@@ -2739,7 +2753,7 @@ select::-ms-expand {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 8px;
+    flex-shrink: 0; /* Don't shrink status */
 }
 
 .status-section {
@@ -2798,16 +2812,37 @@ select::-ms-expand {
     
     .application-actions {
         width: 100%;
+        flex-wrap: wrap; /* Allow wrapping on mobile */
+        flex-direction: row;
+        justify-content: flex-start;
     }
     
-    .application-actions button {
-        flex: 1;
+    .application-actions button,
+    .application-actions a {
+        flex: 0 0 auto;
+        min-width: fit-content;
+        font-size: 12px;
+        padding: 8px 12px;
     }
     
     .filter-tabs {
         overflow-x: auto;
         flex-wrap: nowrap;
         padding-bottom: 8px;
+    }
+}
+
+/* Extra small screens - stack buttons if needed */
+@media (max-width: 480px) {
+    .application-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .application-actions button,
+    .application-actions a {
+        width: 100%;
+        justify-content: center;
     }
 }
 
@@ -3587,4 +3622,740 @@ select::-ms-expand {
     40% {
         transform: scale(1);
     }
+}
+
+/* Assessment Section in Applications */
+.assessment-section {
+  background: rgba(255, 214, 0, 0.05);
+  border: 1px solid rgba(255, 214, 0, 0.2);
+  border-radius: 8px;
+  padding: 16px;
+  margin: 12px 0;
+}
+
+/* Action Buttons for Applications */
+.application-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: nowrap; /* Don't wrap on big screens */
+  min-width: 0;
+}
+
+.application-actions button,
+.application-actions a {
+  flex: 0 0 auto; /* Don't grow or shrink */
+  min-width: fit-content;
+  white-space: nowrap;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.btn-assessment-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 13px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btn-assessment-link:hover {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: #3b82f6;
+  text-decoration: none;
+  transform: translateY(-2px);
+}
+
+.btn-interview-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(139, 92, 246, 0.1);
+  color: #8b5cf6;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 13px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btn-interview-link:hover {
+  background: rgba(139, 92, 246, 0.2);
+  border-color: #8b5cf6;
+  text-decoration: none;
+  transform: translateY(-2px);
+}
+
+.btn-submit {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #FFD600;
+  color: #000;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btn-submit:hover {
+  background: #FFA500;
+  transform: translateY(-2px);
+}
+
+.btn-submitted {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: not-allowed;
+}
+
+/* Submission Modal Enhancements */
+.assessment-info {
+  background: rgba(255, 214, 0, 0.05);
+  border: 1px solid rgba(255, 214, 0, 0.2);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.assessment-info h5 {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #FFD600;
+}
+
+.assessment-description {
+  margin: 8px 0;
+  font-size: 14px;
+  color: #ccc;
+  line-height: 1.5;
+}
+
+.deadline-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0 0 0;
+  font-size: 13px;
+  color: #999;
+}
+
+.deadline-info i {
+  color: #FFD600;
+}
+
+.assessment-link-box {
+  background: #2a2a2a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 20px;
+}
+
+.assessment-link-box label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #999;
+  text-transform: uppercase;
+}
+
+.link-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #3b82f6;
+  text-decoration: none;
+  font-size: 13px;
+  word-break: break-all;
+}
+
+.link-display:hover {
+  text-decoration: underline;
+}
+
+.submission-requirements {
+  margin-bottom: 20px;
+}
+
+.submission-requirements h6 {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+}
+
+.divider-text {
+  text-align: center;
+  position: relative;
+  margin: 20px 0;
+  color: #666;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.divider-text::before,
+.divider-text::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 45%;
+  height: 1px;
+  background: #333;
+}
+
+.divider-text::before {
+  left: 0;
+}
+
+.divider-text::after {
+  right: 0;
+}
+
+.assessment-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.assessment-badge {
+  background: rgba(255, 214, 0, 0.2);
+  color: #FFD600;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.assessment-header h6 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+}
+
+.assessment-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #3b82f6;
+  text-decoration: none;
+  font-size: 13px;
+  margin-bottom: 8px;
+  padding: 8px 12px;
+  background: rgba(59, 130, 246, 0.1);
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.assessment-link:hover {
+  background: rgba(59, 130, 246, 0.2);
+  text-decoration: none;
+}
+
+.assessment-deadline {
+  font-size: 12px;
+  color: #999;
+  margin: 8px 0;
+}
+
+.btn-submit-assessment {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #FFD600;
+  color: #000;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 8px;
+}
+
+.btn-submit-assessment:hover {
+  background: #FFA500;
+  transform: translateY(-2px);
+}
+
+.submission-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: 8px;
+}
+
+.submission-status.submitted {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+/* Submission Modal */
+.submission-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+.submission-modal {
+  background: #1a1a1a;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  border: 1px solid #2a2a2a;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.submission-modal .modal-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid #2a2a2a;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.submission-modal .modal-header h4 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: white;
+}
+
+.submission-modal .modal-header button {
+  background: transparent;
+  border: none;
+  color: #999;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.submission-modal .modal-header button:hover {
+  background: #2a2a2a;
+  color: white;
+}
+
+.submission-modal .modal-body {
+  padding: 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.submission-modal .form-group {
+  margin-bottom: 20px;
+}
+
+.submission-modal .form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: white;
+}
+
+.submission-modal .form-control {
+  width: 100%;
+  padding: 10px 14px;
+  background: #2a2a2a;
+  border: 1px solid #333;
+  border-radius: 6px;
+  color: white;
+  font-size: 14px;
+}
+
+.submission-modal .form-control:focus {
+  outline: none;
+  border-color: #FFD600;
+}
+
+.submission-modal .text-muted {
+  color: #999;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.submission-modal .modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid #2a2a2a;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.submission-modal .btn {
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.submission-modal .btn-secondary {
+  background: #2a2a2a;
+  border: 1px solid #333;
+  color: white;
+}
+
+.submission-modal .btn-secondary:hover {
+  background: #333;
+}
+
+.submission-modal .btn-primary {
+  background: #FFD600;
+  border: none;
+  color: #000;
+}
+
+.submission-modal .btn-primary:hover {
+  background: #FFA500;
+}
+
+.requirements-text {
+  background: #2a2a2a;
+  border-left: 3px solid #FFD600;
+  padding: 12px 16px;
+  margin: 12px 0;
+  font-size: 14px;
+  color: #ccc;
+  line-height: 1.6;
+  border-radius: 4px;
+  white-space: pre-wrap;
+}
+
+/* Stage Badge in Application Meta */
+.stage-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: rgba(255, 214, 0, 0.1);
+  border: 1px solid rgba(255, 214, 0, 0.3);
+  border-radius: 4px;
+  font-size: 12px;
+  color: #FFD600;
+  margin-left: 12px;
+}
+
+.stage-badge i {
+  font-size: 11px;
+}
+
+/* Interview Info Badge */
+.interview-info-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: rgba(76, 175, 80, 0.1);
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  border-radius: 4px;
+  font-size: 12px;
+  color: #4CAF50;
+  margin-left: 12px;
+  font-weight: 500;
+}
+
+.interview-info-badge i {
+  font-size: 11px;
+}
+
+/* Submission Requirements List */
+.requirements-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.requirement-item {
+  background: #2a2a2a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.requirement-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.requirement-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  color: #fff;
+  font-size: 14px;
+}
+
+.required-badge {
+  background: #dc3545;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.requirement-type {
+  background: rgba(255, 214, 0, 0.1);
+  color: #FFD600;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  text-transform: capitalize;
+}
+
+.requirement-description {
+  margin: 0;
+  color: #999;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* Required Star */
+.required-star {
+  color: #dc3545;
+  margin-left: 4px;
+  font-weight: bold;
+}
+
+/* Submission Fields Section */
+.submission-fields {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #2a2a2a;
+}
+
+.submission-fields .form-group {
+  margin-bottom: 16px;
+}
+
+.submission-fields .form-group:last-child {
+  margin-bottom: 0;
+}
+/* Type badge for job vs internship */
+.type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.type-badge.job {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.type-badge.internship {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.type-badge.event {
+  background: rgba(168, 85, 247, 0.1);
+  color: #a855f7;
+  border: 1px solid rgba(168, 85, 247, 0.2);
+}
+
+.type-badge i {
+  font-size: 10px;
+}
+
+/* Event date badge */
+.event-date-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.event-date-badge i {
+  font-size: 10px;
+}
+/* Section toggle tabs */
+.section-toggle-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  padding: 0 24px;
+}
+
+.section-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #6c757d;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.section-tab:hover {
+  border-color: #FFD600;
+  color: #2c3e50;
+  background: #fffbf0;
+}
+
+.section-tab.active {
+  border-color: #FFD600;
+  background: #FFD600;
+  color: #000000;
+}
+
+.section-tab i {
+  font-size: 16px;
+}
+
+/* Update applications list styling */
+.applications-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0 24px;
+}
+
+.overall-empty {
+  text-align: center;
+  padding: 60px 20px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  margin-top: 20px;
+}
+
+.overall-empty h4 {
+  color: #2c3e50;
+  margin-bottom: 12px;
+}
+
+.empty-state-actions {
+  margin-top: 20px;
+}
+
+.empty-state-actions .btn {
+  padding: 12px 24px;
+  font-weight: 600;
+}
+
+/* Dark mode support for sections */
+@media (prefers-color-scheme: dark) {
+  .section-tab {
+    background: #2a2a2a;
+    border-color: #404040;
+    color: #cccccc;
+  }
+  
+  .section-tab:hover {
+    border-color: #FFD600;
+    background: #3a3a3a;
+    color: #ffffff;
+  }
+  
+  .section-tab.active {
+    border-color: #FFD600;
+    background: #FFD600;
+    color: #000000;
+  }
+  
+  .overall-empty {
+    background: #2a2a2a;
+  }
+  
+  .overall-empty h4 {
+    color: #ffffff;
+  }
 }

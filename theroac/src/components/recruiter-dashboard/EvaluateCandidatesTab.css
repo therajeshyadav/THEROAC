@@ -719,12 +719,11 @@
 }
 
 .btn-primary {
-  background: #2196F3 !important;
-  color: white !important;
+  background: #FFD600;
 }
 
 .btn-primary:hover {
-  background: #1976D2 !important;
+  background: #FFD600;
 }
 
 /* Teams Grid Layout */

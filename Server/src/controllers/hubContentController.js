@@ -5,6 +5,10 @@ exports.createHubContent = async (req, res, next) => {
   try {
     const payload = { ...req.body };
 
+    console.log('📥 Received hub content data:', payload);
+    console.log('📋 Eligibility received:', payload.eligibility, 'Type:', typeof payload.eligibility);
+    console.log('💰 Stipend received:', payload.stipend, 'Type:', typeof payload.stipend);
+
     // Validate required fields
     if (!payload.title || !payload.description || !payload.content) {
       return res.status(400).json({
@@ -28,18 +32,12 @@ exports.createHubContent = async (req, res, next) => {
           payload.stipend = null;
         }
       }
-      // Ensure stipend has proper structure
-      if (payload.stipend && typeof payload.stipend === 'object') {
-        payload.stipend = {
-          amount: payload.stipend.amount || '',
-          currency: payload.stipend.currency || 'USD',
-          period: payload.stipend.period || 'monthly'
-        };
-      }
+      // Keep stipend as-is if it's already an object (supports both min/max and amount formats)
+      // Don't modify the structure - just ensure it's valid JSON
     }
 
     // Validate and sanitize JSON fields
-    ['tags', 'skills', 'eligibility', 'media', 'faqs'].forEach(field => {
+    ['tags', 'skills', 'eligibility', 'media', 'faqs', 'stages'].forEach(field => {
       if (payload[field] && typeof payload[field] === 'string') {
         try {
           payload[field] = JSON.parse(payload[field]);
@@ -48,6 +46,9 @@ exports.createHubContent = async (req, res, next) => {
         }
       }
     });
+
+    console.log('✅ After JSON parsing - Eligibility:', payload.eligibility);
+    console.log('✅ After JSON parsing - Stipend:', payload.stipend);
 
     // Handle tags - convert to array if string
     if (payload.tags && !Array.isArray(payload.tags)) {
@@ -79,7 +80,16 @@ exports.createHubContent = async (req, res, next) => {
     payload.category = payload.category || 'career-tips';
     payload.approvalStatus = 'pending'; // Set to pending for admin approval
 
+    console.log('💾 Final payload before saving to DB:', {
+      eligibility: payload.eligibility,
+      stipend: payload.stipend,
+      title: payload.title
+    });
+
     const hubContent = await HubContent.create(payload);
+
+    console.log('✅ Saved to DB - Eligibility:', hubContent.eligibility);
+    console.log('✅ Saved to DB - Stipend:', hubContent.stipend);
 
     // Create notification for admin about new content pending approval
     try {
@@ -280,18 +290,12 @@ exports.updateHubContent = async (req, res, next) => {
           payload.stipend = null;
         }
       }
-      // Ensure stipend has proper structure
-      if (payload.stipend && typeof payload.stipend === 'object') {
-        payload.stipend = {
-          amount: payload.stipend.amount || '',
-          currency: payload.stipend.currency || 'USD',
-          period: payload.stipend.period || 'monthly'
-        };
-      }
+      // Keep stipend as-is if it's already an object (supports both min/max and amount formats)
+      // Don't modify the structure - just ensure it's valid JSON
     }
 
     // Validate and sanitize JSON fields
-    ['tags', 'skills', 'eligibility', 'media', 'faqs'].forEach(field => {
+    ['tags', 'skills', 'eligibility', 'media', 'faqs', 'stages'].forEach(field => {
       if (payload[field] && typeof payload[field] === 'string') {
         try {
           payload[field] = JSON.parse(payload[field]);
@@ -376,6 +380,180 @@ exports.getHubContentBySlug = async (req, res, next) => {
     console.error('Error fetching hub content by slug:', err);
     return res.status(500).json({
       error: 'Failed to fetch hub content. Please try again.'
+    });
+  }
+};
+
+// Get applications for a specific hub content (internship)
+exports.getHubContentApplications = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const recruiterId = req.user.id;
+    
+    // Verify the hub content belongs to this recruiter
+    const hubContent = await HubContent.findOne({
+      where: { 
+        id: id,
+        createdBy: recruiterId 
+      }
+    });
+    
+    if (!hubContent) {
+      return res.status(404).json({ error: 'Hub content not found or unauthorized' });
+    }
+    
+    // Get all applications for this hub content with full candidate details
+    const applications = await HubContentApplication.findAll({
+      where: { hubContentId: id },
+      attributes: [
+        'id', 'userId', 'hubContentId', 'status', 'notes', 
+        'currentStage', 'stageSubmissions', 'createdAt', 'updatedAt'
+      ],
+      include: [
+        {
+          model: User,
+          as: 'user',
+          attributes: [
+            'id', 'fullName', 'email', 'phone', 'headline', 'city', 'state', 'country',
+            'about', 'skills', 'experiences', 'education', 'resumePath',
+            'profilePicture', 'linkedinUrl', 'githubUrl'
+          ]
+        }
+      ],
+      order: [['createdAt', 'DESC']]
+    });
+
+    // Format applications with resumeUrl
+    const formattedApplications = applications.map(app => ({
+      ...app.toJSON(),
+      resumeUrl: app.user?.resumePath
+    }));
+
+    res.json({ applications: formattedApplications });
+  } catch (err) {
+    console.error('Error in getHubContentApplications:', err);
+    return res.status(500).json({
+      error: 'Failed to fetch applications. Please try again.'
+    });
+  }
+};
+
+// Get applications for a specific internship/hub content
+exports.getInternshipApplications = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const recruiterId = req.user.id;
+    
+    // Verify the internship belongs to this recruiter
+    const internship = await HubContent.findOne({
+      where: { 
+        id: id,
+        createdBy: recruiterId 
+      }
+    });
+    
+    if (!internship) {
+      return res.status(404).json({ error: 'Internship not found or unauthorized' });
+    }
+    
+    // Get all applications for this internship with full candidate details
+    const applications = await HubContentApplication.findAll({
+      where: { hubContentId: id },
+      attributes: [
+        'id', 'userId', 'hubContentId', 'status', 'notes', 
+        'currentStage', 'stageSubmissions', 'createdAt', 'updatedAt'
+      ],
+      include: [
+        {
+          model: User,
+          as: 'user',
+          attributes: [
+            'id', 'fullName', 'email', 'phone', 'headline', 'city', 'state', 'country',
+            'about', 'skills', 'experiences', 'education', 'resumePath',
+            'profilePicture', 'linkedinUrl', 'githubUrl'
+          ]
+        }
+      ],
+      order: [['createdAt', 'DESC']]
+    });
+
+    // Format applications with resumeUrl
+    const formattedApplications = applications.map(app => ({
+      ...app.toJSON(),
+      resumeUrl: app.user?.resumePath
+    }));
+
+    res.json({ applications: formattedApplications });
+  } catch (err) {
+    console.error('Error in getInternshipApplications:', err);
+    return res.status(500).json({
+      error: 'Failed to fetch applications. Please try again.'
+    });
+  }
+};
+
+// Update internship application status
+exports.updateInternshipApplicationStatus = async (req, res, next) => {
+  try {
+    const { applicationId } = req.params;
+    const { status } = req.body;
+    const recruiterId = req.user.id;
+    
+    // Find the application
+    const application = await HubContentApplication.findByPk(applicationId, {
+      include: [
+        {
+          model: HubContent,
+          as: 'hubContent',
+          attributes: ['id', 'title', 'createdBy']
+        },
+        {
+          model: User,
+          as: 'user',
+          attributes: ['id', 'fullName', 'email']
+        }
+      ]
+    });
+
+    if (!application) {
+      return res.status(404).json({ error: 'Application not found' });
+    }
+
+    // Verify the internship belongs to this recruiter
+    if (application.hubContent.createdBy !== recruiterId) {
+      return res.status(403).json({ error: 'Unauthorized to update this application' });
+    }
+
+    // Update status
+    application.status = status;
+    await application.save();
+
+    // Send notification to candidate
+    try {
+      const { getNotificationService } = require('../socket');
+      const notificationService = getNotificationService();
+      
+      if (notificationService) {
+        await notificationService.notifyApplicationStatusChange(
+          application.userId,
+          application.hubContent.title,
+          status,
+          application.id
+        );
+      }
+    } catch (notifErr) {
+      console.error('Error sending notification:', notifErr);
+    }
+
+    res.json({ 
+      success: true,
+      message: 'Application status updated successfully',
+      application 
+    });
+  } catch (err) {
+    console.error('Error updating internship application status:', err);
+    return res.status(500).json({
+      error: 'Failed to update application status. Please try again.'
     });
   }
 };
@@ -479,3 +657,144 @@ exports.getROACPrimeHubStatus = async (req, res, next) => {
   }
 };
 
+
+// Get user's hub content applications
+exports.getUserHubContentApplications = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    
+    const applications = await HubContentApplication.findAll({
+      where: { userId },
+      include: [
+        {
+          model: HubContent,
+          as: 'hubContent',
+          attributes: ['id', 'title', 'companyName', 'location', 'contentType', 'stages']
+        }
+      ],
+      order: [['createdAt', 'DESC']]
+    });
+
+    res.json({ applications });
+  } catch (err) {
+    console.error('Error in getUserHubContentApplications:', err);
+    return res.status(500).json({
+      error: 'Failed to fetch hub content applications. Please try again.'
+    });
+  }
+};
+// Submit stage for internship application
+exports.submitInternshipStage = async (req, res) => {
+  try {
+    const { applicationId } = req.params;
+    const { stageIndex, submissions } = req.body;
+    const userId = req.user.id;
+
+    // Find the application
+    const application = await HubContentApplication.findOne({
+      where: { 
+        id: applicationId,
+        userId: userId 
+      },
+      include: [{
+        model: HubContent,
+        as: 'hubContent',
+        attributes: ['id', 'title', 'stages']
+      }]
+    });
+
+    if (!application) {
+      return res.status(404).json({ error: 'Application not found' });
+    }
+
+    // Verify the stage exists
+    if (!application.hubContent.stages || !application.hubContent.stages[stageIndex]) {
+      return res.status(400).json({ error: 'Invalid stage' });
+    }
+
+    // Get existing submissions or initialize empty array
+    const existingSubmissions = application.stageSubmissions || [];
+    
+    // Check if already submitted for this stage
+    const existingSubmissionIndex = existingSubmissions.findIndex(sub => sub.stageIndex === stageIndex);
+    
+    const newSubmission = {
+      stageIndex,
+      submittedAt: new Date(),
+      submissions
+    };
+
+    let updatedSubmissions;
+    if (existingSubmissionIndex >= 0) {
+      // Update existing submission
+      updatedSubmissions = [...existingSubmissions];
+      updatedSubmissions[existingSubmissionIndex] = newSubmission;
+    } else {
+      // Add new submission
+      updatedSubmissions = [...existingSubmissions, newSubmission];
+    }
+
+    // Update application
+    await application.update({
+      stageSubmissions: updatedSubmissions
+    });
+
+    res.json({ 
+      message: 'Stage submission successful',
+      submission: newSubmission
+    });
+  } catch (err) {
+    console.error('Error in submitInternshipStage:', err);
+    return res.status(500).json({
+      error: 'Failed to submit stage. Please try again.'
+    });
+  }
+};
+
+// Move internship candidate to next stage
+exports.moveInternshipToNextStage = async (req, res) => {
+  try {
+    const { applicationId } = req.params;
+    const { stageIndex } = req.body;
+    const recruiterId = req.user.id;
+
+    // Find the application
+    const application = await HubContentApplication.findByPk(applicationId, {
+      include: [{
+        model: HubContent,
+        as: 'hubContent',
+        attributes: ['id', 'title', 'createdBy', 'stages']
+      }]
+    });
+
+    if (!application) {
+      return res.status(404).json({ error: 'Application not found' });
+    }
+
+    // Check if the recruiter owns this internship
+    if (application.hubContent.createdBy !== recruiterId) {
+      return res.status(403).json({ error: 'Unauthorized' });
+    }
+
+    // Verify the stage exists
+    if (!application.hubContent.stages || !application.hubContent.stages[stageIndex]) {
+      return res.status(400).json({ error: 'Invalid stage' });
+    }
+
+    // Update current stage
+    await application.update({
+      currentStage: stageIndex,
+      status: 'shortlisted' // Keep status as shortlisted when moving through stages
+    });
+
+    res.json({ 
+      message: 'Candidate moved to next stage successfully',
+      currentStage: stageIndex
+    });
+  } catch (err) {
+    console.error('Error in moveInternshipToNextStage:', err);
+    return res.status(500).json({
+      error: 'Failed to move candidate. Please try again.'
+    });
+  }
+};

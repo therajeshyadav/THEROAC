@@ -26,7 +26,18 @@ HubContentApplication.init({
     }
   },
   status: {
-    type: DataTypes.ENUM('pending', 'accepted', 'rejected', 'cancelled'),
+    type: DataTypes.ENUM(
+      'pending', 
+      'applied',
+      'reviewing',
+      'shortlisted',
+      'interview',
+      'accepted', 
+      'rejected', 
+      'cancelled',
+      'offered',
+      'hired'
+    ),
     defaultValue: 'pending'
   },
   appliedAt: {
@@ -36,6 +47,17 @@ HubContentApplication.init({
   notes: {
     type: DataTypes.TEXT,
     allowNull: true
+  },
+  currentStage: { 
+    type: DataTypes.INTEGER, 
+    defaultValue: 0, 
+    comment: 'Current recruitment stage index' 
+  },
+  stageSubmissions: { 
+    type: DataTypes.JSON, 
+    allowNull: true,
+    defaultValue: null,
+    comment: 'Stage-wise submissions - [{stageIndex, submittedAt, submissionLink, submissionFile}]'
   }
 }, {
   sequelize,

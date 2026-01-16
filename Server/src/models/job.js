@@ -77,6 +77,12 @@ Job.init({
   urgent: { type: DataTypes.BOOLEAN, defaultValue: false },
   views: { type: DataTypes.INTEGER, defaultValue: 0 },
   applications: { type: DataTypes.INTEGER, defaultValue: 0 },
+  stages: { 
+    type: DataTypes.JSON, 
+    allowNull: true,
+    defaultValue: null,
+    comment: 'Recruitment stages/rounds - [{title, type: "assessment"|"interview"|"final", description, deadline, assessmentFile: {url, name}, assessmentLink, submissions: [{type, label, description, required}]}]'
+  },
   createdBy: { type: DataTypes.UUID, allowNull: false },
   organizationId: { type: DataTypes.UUID, allowNull: true }
 }, {

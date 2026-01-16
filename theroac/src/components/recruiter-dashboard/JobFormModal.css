@@ -1567,3 +1567,214 @@ select option:hover {
   margin-bottom: 0.5rem;
   font-style: italic;
 }
+
+/* Recruitment Stages Styling */
+.stages-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stage-item-card {
+  background: #2a2a2a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 16px;
+  transition: all 0.2s;
+}
+
+.stage-item-card:hover {
+  border-color: #FFD600;
+  box-shadow: 0 2px 8px rgba(255, 214, 0, 0.1);
+}
+
+.stage-header {
+  margin-bottom: 12px;
+}
+
+.stage-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.stage-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.edit-btn {
+  padding: 6px 12px;
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.edit-btn:hover {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: #3b82f6;
+  transform: translateY(-1px);
+}
+
+.stage-form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.btn-cancel {
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-cancel:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+}
+
+.stage-number-badge {
+  font-size: 12px;
+  font-weight: 600;
+  color: #FFD600;
+  background: rgba(255, 214, 0, 0.1);
+  padding: 4px 10px;
+  border-radius: 4px;
+}
+
+.stage-type-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.stage-type-badge.assessment {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+}
+
+.stage-type-badge.interview {
+  background: rgba(139, 92, 246, 0.1);
+  color: #8b5cf6;
+}
+
+.stage-type-badge.final {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.stage-header h4 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+}
+
+.stage-desc {
+  margin: 8px 0 0 0;
+  font-size: 13px;
+  color: #999;
+  line-height: 1.5;
+}
+
+.stage-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid #333;
+}
+
+.stage-detail-item {
+  font-size: 13px;
+  color: #ccc;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stage-detail-item strong {
+  color: #FFD600;
+  min-width: 120px;
+}
+
+.stage-detail-item a {
+  color: #3b82f6;
+  text-decoration: none;
+  word-break: break-all;
+}
+
+.stage-detail-item a:hover {
+  text-decoration: underline;
+}
+
+.stage-input-group {
+  background: #2a2a2a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.stage-input-group .form-row {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.stage-input-group .form-group {
+  margin-bottom: 16px;
+}
+
+.stage-input-group .form-group:last-child {
+  margin-bottom: 0;
+}
+
+.stage-input-group .btn-add {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.field-hint {
+  font-size: 12px;
+  color: #666;
+  margin-top: 6px;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+/* Submission Badges in Stage Display */
+.submission-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.submission-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  background: rgba(255, 214, 0, 0.1);
+  border: 1px solid rgba(255, 214, 0, 0.3);
+  border-radius: 4px;
+  font-size: 12px;
+  color: #FFD600;
+}

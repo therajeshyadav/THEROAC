@@ -16,6 +16,7 @@ router.get('/applications', authenticate, attachOrganizationContext, jobControll
 
 // Generic ID route MUST come after specific routes
 router.get('/:id', jobController.getJob);
+router.get('/:jobId/applications', authenticate, attachOrganizationContext, requireRole(['recruiter','organizer','admin']), jobController.getJobApplications);
 router.get('/applications/recruiter', authenticate, attachOrganizationContext, requireRole(['recruiter','organizer','admin']), jobController.getRecruiterApplications);
 router.get('/:jobId/application-status', authenticate, attachOrganizationContext, jobController.checkJobApplicationStatus);
 
@@ -55,6 +56,8 @@ router.post('/:jobId/apply', authenticate, attachOrganizationContext, jobControl
 router.put('/:id', authenticate, attachOrganizationContext, requireRole(['recruiter','organizer','admin']), jobController.updateJob);
 router.put('/applications/:applicationId/status', authenticate, attachOrganizationContext, requireRole(['recruiter','organizer','admin']), jobController.updateApplicationStatus);
 router.put('/applications/:applicationId/notes', authenticate, attachOrganizationContext, requireRole(['recruiter','organizer','admin']), jobController.updateApplicationNotes);
+router.put('/applications/:applicationId/move-stage', authenticate, attachOrganizationContext, requireRole(['recruiter','organizer','admin']), jobController.moveToNextStage);
+router.post('/applications/:applicationId/submit-stage', authenticate, attachOrganizationContext, jobController.submitStage);
 router.delete('/:id', authenticate, attachOrganizationContext, requireRole(['recruiter','organizer','admin']), jobController.deleteJob);
 
 module.exports = router;

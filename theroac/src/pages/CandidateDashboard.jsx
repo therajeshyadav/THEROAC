@@ -161,12 +161,32 @@ const CandidateDashboard = () => {
         applicationsData.status === "fulfilled"
           ? applicationsData.value.applications || []
           : [];
-      const appliedJobIds = currentApplications
-        .map((app) => app.jobId || app.Job?.id)
+      
+      console.log('🔍 All applications received:', currentApplications);
+      
+      // Extract IDs from all application types
+      const appliedItemIds = currentApplications
+        .map((app) => {
+          // Handle new format with app.item
+          if (app.item?.id) {
+            console.log(`✅ Found application: ${app.applicationType} - ${app.item.title} (ID: ${app.item.id})`);
+            return app.item.id;
+          }
+          // Handle old format
+          const oldId = app.jobId || app.Job?.id || app.eventId || app.hubContentId;
+          if (oldId) {
+            console.log(`✅ Found old format application: ID: ${oldId}`);
+          }
+          return oldId;
+        })
         .filter(Boolean);
 
-      setAppliedItems(new Set(appliedJobIds));
+      console.log('🔍 Applied item IDs:', appliedItemIds);
+      console.log('🔍 Events available:', eventsData.status === "fulfilled" ? eventsData.value?.events?.map(e => ({id: e.id, title: e.title})) : 'No events');
+      
+      setAppliedItems(new Set(appliedItemIds));
     } catch (error) {
+      console.error('Error loading application statuses:', error);
       setAppliedItems(new Set());
     }
   };

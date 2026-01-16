@@ -4,6 +4,8 @@
   padding: 2rem;
   max-width: 1400px;
   margin: 0 auto;
+  position: relative;
+  min-height: 100vh;
 }
 
 .manage-jobs-container .manage-jobs-header {
@@ -1069,4 +1071,29 @@
   .manage-jobs-container .approval-badge {
     border-width: 2px;
   }
+}
+
+/* Clickable Job Title */
+.manage-jobs-container .clickable-title {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  display: inline-block;
+}
+
+.manage-jobs-container .clickable-title:hover {
+  color: #667eea;
+  text-decoration: underline;
+}
+
+.manage-jobs-container .clickable-title::after {
+  content: '👁️';
+  margin-left: 8px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  font-size: 14px;
+}
+
+.manage-jobs-container .clickable-title:hover::after {
+  opacity: 1;
 }

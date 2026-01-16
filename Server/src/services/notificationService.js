@@ -152,6 +152,47 @@ class NotificationService {
     );
   }
 
+  // Interview stage shortlist notification (with date, time, duration)
+  async notifyInterviewStageShortlist(candidateId, jobTitle, stageName, interviewDate, interviewTime, interviewDuration, interviewLink, applicationId, jobId) {
+    const dateObj = new Date(interviewDate);
+    const formattedDate = dateObj.toLocaleDateString('en-US', { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+    
+    return this.createNotification(
+      candidateId,
+      'interview_stage_shortlist',
+      'Interview Scheduled',
+      `Congratulations! You've been shortlisted for ${stageName} for "${jobTitle}". Interview scheduled on ${formattedDate} at ${interviewTime} (Duration: ${interviewDuration} minutes)`,
+      { 
+        applicationId, 
+        jobId,
+        jobTitle, 
+        stageName,
+        interviewDate, 
+        interviewTime,
+        interviewDuration,
+        interviewLink
+      },
+      `/candidate-dashboard?tab=applications`
+    );
+  }
+
+  // Candidate hired/offered notification
+  async notifyJobOffer(candidateId, jobTitle, applicationId, jobId) {
+    return this.createNotification(
+      candidateId,
+      'job_offer',
+      'Job Offer Received',
+      `Congratulations! You have been selected for "${jobTitle}". Check your application for next steps.`,
+      { applicationId, jobId, jobTitle },
+      `/candidate-dashboard?tab=applications`
+    );
+  }
+
   // Interview rescheduled notification
   async notifyInterviewRescheduled(userId, jobTitle, newDate, interviewId) {
     return this.createNotification(

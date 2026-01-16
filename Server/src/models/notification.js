@@ -34,6 +34,8 @@ Notification.init({
       'resubmission_allowed',
       'interview_scheduled',
       'interview_rescheduled',
+      'interview_stage_shortlist',
+      'job_offer',
       'message',
       'system'
     ),

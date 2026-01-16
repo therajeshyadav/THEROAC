@@ -313,7 +313,15 @@ const DetailsRightSidebar = ({
           Eligibility
         </h3>
         <div className="eligibility-list compact">
-          {data.eligibility && typeof data.eligibility === 'object' ? (
+          {Array.isArray(data.eligibility) && data.eligibility.length > 0 ? (
+            // Array format - display each item
+            data.eligibility.map((item, index) => (
+              <span key={index} className="eligibility-item">
+                {typeof item === 'string' ? item : JSON.stringify(item)}
+              </span>
+            ))
+          ) : data.eligibility && typeof data.eligibility === 'object' && !Array.isArray(data.eligibility) ? (
+            // Object format with education, location, additional
             <>
               {/* Education Level */}
               {data.eligibility.education && Array.isArray(data.eligibility.education) && data.eligibility.education.length > 0 && (
@@ -358,16 +366,9 @@ const DetailsRightSidebar = ({
                 <span className="eligibility-item">Open to all</span>
               )}
             </>
-          ) : Array.isArray(data.eligibility) ? (
-            data.eligibility.map((item, index) => (
-              <span key={index} className="eligibility-item">
-                {typeof item === 'string' ? item : JSON.stringify(item)}
-              </span>
-            ))
           ) : (
-            <span className="eligibility-item">
-              {data.eligibility || "Not specified"}
-            </span>
+            // No eligibility data or invalid format
+            <span className="eligibility-item">Open to all</span>
           )}
         </div>
       </div>

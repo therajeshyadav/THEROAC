@@ -3,7 +3,15 @@ import { useState, useEffect } from 'react';
 import apiService from '../../services/api';
 import { toast } from 'react-toastify';
 
-const EventsTab = ({ events, appliedItems, onRegisterEvent, onViewEventDetails }) => {
+const EventsTab = ({ events = [], appliedItems = new Set(), onRegisterEvent, onViewEventDetails }) => {
+  // Ensure events is always an array
+  const safeEvents = Array.isArray(events) ? events : [];
+  
+  // Debug logging
+  console.log('🎪 EventsTab - Events received:', safeEvents.length);
+  console.log('🎪 EventsTab - Applied items:', Array.from(appliedItems));
+  console.log('🎪 EventsTab - Sample events:', safeEvents.slice(0, 3).map(e => ({id: e.id, title: e.title})));
+  
   // State for filters
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -59,7 +67,7 @@ const EventsTab = ({ events, appliedItems, onRegisterEvent, onViewEventDetails }
   };
 
   // Filter events
-  const filteredEvents = events.filter(event => {
+  const filteredEvents = safeEvents.filter(event => {
     // Search filter
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase();
@@ -342,7 +350,18 @@ const EventsTab = ({ events, appliedItems, onRegisterEvent, onViewEventDetails }
               }
             }
             
-            const displayType = event.type || event.category || event.eventType || 'Workshop';
+            // Get event type from categories array or tags
+            let displayType = 'Event';
+            if (event.categories && Array.isArray(event.categories) && event.categories.length > 0) {
+              displayType = event.categories[0]; // Use first category
+            } else if (event.tags && Array.isArray(event.tags) && event.tags.length > 0) {
+              displayType = event.tags[0]; // Fallback to first tag
+            } else if (event.type) {
+              displayType = event.type;
+            }
+            
+            // Capitalize first letter
+            displayType = displayType.charAt(0).toUpperCase() + displayType.slice(1);
             
             return (
               <div key={event.id} className="job-card-detailed" style={{
@@ -409,7 +428,12 @@ const EventsTab = ({ events, appliedItems, onRegisterEvent, onViewEventDetails }
                     </button>
                     <button
                       className={`btn-apply ${appliedItems.has(event.id) ? 'applied' : ''}`}
-                      onClick={() => onRegisterEvent(event.id)}
+                      onClick={() => {
+                        console.log(`🎪 Trying to register for event: ${event.title} (ID: ${event.id})`);
+                        console.log(`🎪 Is already applied: ${appliedItems.has(event.id)}`);
+                        console.log(`🎪 Applied items set:`, Array.from(appliedItems));
+                        onRegisterEvent(event.id);
+                      }}
                       disabled={appliedItems.has(event.id)}
                       style={{
                         backgroundColor: appliedItems.has(event.id) ? '#28a745' : '',

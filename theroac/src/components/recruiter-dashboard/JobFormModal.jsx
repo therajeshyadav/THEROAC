@@ -44,6 +44,7 @@ const JobFormModal = ({ job, authUser, onClose, onSuccess }) => {
     urgent: false,
     eligibility: [],
     faqs: [],
+    stages: [], // Recruitment stages
   });
 
   useEffect(() => {
@@ -91,6 +92,7 @@ const JobFormModal = ({ job, authUser, onClose, onSuccess }) => {
         urgent: job.urgent || false,
         eligibility: job.eligibility || [],
         faqs: job.faqs || [],
+        stages: job.stages || [],
       });
     }
   }, [job]);
@@ -102,6 +104,25 @@ const JobFormModal = ({ job, authUser, onClose, onSuccess }) => {
   const [newPerk, setNewPerk] = useState('');
   const [newEligibility, setNewEligibility] = useState('');
   const [newFAQ, setNewFAQ] = useState({ question: '', answer: '' });
+  const [newStage, setNewStage] = useState({
+    title: '',
+    type: 'assessment',
+    deadline: '',
+    assessmentLink: '',
+    assessmentFile: null,
+    submissionTypes: {
+      githubLink: false,
+      videoLink: false,
+      pdfUpload: false
+    },
+    // Interview specific fields
+    interviewLink: '',
+    interviewDate: '',
+    interviewTime: '',
+    interviewDuration: '' // Duration in minutes
+  });
+
+  const [editingStageIndex, setEditingStageIndex] = useState(null);
 
 
 
@@ -208,6 +229,148 @@ const JobFormModal = ({ job, authUser, onClose, onSuccess }) => {
     }));
   };
 
+  const addStage = () => {
+    if (newStage.title.trim()) {
+      // Convert submissionTypes checkboxes to submissions array
+      const submissions = [];
+      if (newStage.submissionTypes.githubLink) {
+        submissions.push({
+          type: 'link',
+          label: 'GitHub Repository Link',
+          description: 'Share your GitHub repository link',
+          required: true
+        });
+      }
+      if (newStage.submissionTypes.videoLink) {
+        submissions.push({
+          type: 'link',
+          label: 'Video Demonstration Link',
+          description: 'Share a video link (YouTube, Loom, etc.)',
+          required: true
+        });
+      }
+      if (newStage.submissionTypes.pdfUpload) {
+        submissions.push({
+          type: 'document',
+          label: 'PDF Document',
+          description: 'Upload your document in PDF format',
+          required: true
+        });
+      }
+
+      const stageData = { 
+        title: newStage.title,
+        type: newStage.type,
+        deadline: newStage.type === 'interview' ? null : newStage.deadline, // No deadline for interviews
+        assessmentLink: newStage.assessmentLink,
+        assessmentFile: newStage.assessmentFile ? {
+          url: newStage.assessmentFile,
+          name: newStage.assessmentFile.split('/').pop()
+        } : null,
+        submissions: submissions,
+        // Interview fields
+        interviewLink: newStage.interviewLink,
+        interviewDate: newStage.interviewDate,
+        interviewTime: newStage.interviewTime,
+        interviewDuration: newStage.interviewDuration
+      };
+
+      if (editingStageIndex !== null) {
+        // Update existing stage
+        setFormData(prev => ({
+          ...prev,
+          stages: prev.stages.map((stage, idx) => 
+            idx === editingStageIndex ? stageData : stage
+          )
+        }));
+        setEditingStageIndex(null);
+      } else {
+        // Add new stage
+        setFormData(prev => ({
+          ...prev,
+          stages: [...prev.stages, stageData]
+        }));
+      }
+
+      // Reset form
+      setNewStage({
+        title: '',
+        type: 'assessment',
+        deadline: '',
+        assessmentLink: '',
+        assessmentFile: null,
+        submissionTypes: {
+          githubLink: false,
+          videoLink: false,
+          pdfUpload: false
+        },
+        interviewLink: '',
+        interviewDate: '',
+        interviewTime: '',
+        interviewDuration: ''
+      });
+    }
+  };
+
+  const editStage = (index) => {
+    const stage = formData.stages[index];
+    setEditingStageIndex(index);
+    
+    // Populate form with stage data
+    setNewStage({
+      title: stage.title || '',
+      type: stage.type || 'assessment',
+      deadline: stage.deadline || '',
+      assessmentLink: stage.assessmentLink || '',
+      assessmentFile: stage.assessmentFile?.url || null,
+      submissionTypes: {
+        githubLink: stage.submissions?.some(s => s.label.includes('GitHub')) || false,
+        videoLink: stage.submissions?.some(s => s.label.includes('Video')) || false,
+        pdfUpload: stage.submissions?.some(s => s.label.includes('PDF')) || false
+      },
+      interviewLink: stage.interviewLink || '',
+      interviewDate: stage.interviewDate || '',
+      interviewTime: stage.interviewTime || '',
+      interviewDuration: stage.interviewDuration || ''
+    });
+  };
+
+  const cancelEdit = () => {
+    setEditingStageIndex(null);
+    setNewStage({
+      title: '',
+      type: 'assessment',
+      deadline: '',
+      assessmentLink: '',
+      assessmentFile: null,
+      submissionTypes: {
+        githubLink: false,
+        videoLink: false,
+        pdfUpload: false
+      },
+      interviewLink: '',
+      interviewDate: '',
+      interviewTime: '',
+      interviewDuration: ''
+    });
+  };
+
+  const removeStage = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      stages: prev.stages.filter((_, i) => i !== index)
+    }));
+  };
+
+  const updateStage = (index, field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      stages: prev.stages.map((stage, i) => 
+        i === index ? { ...stage, [field]: value } : stage
+      )
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -217,7 +380,8 @@ const JobFormModal = ({ job, authUser, onClose, onSuccess }) => {
       return;
     }
     
-
+    // Debug: Log stages with submissions before sending
+    console.log('📊 Submitting job with stages:', JSON.stringify(formData.stages, null, 2));
     
     setLoading(true);
 
@@ -275,9 +439,10 @@ const JobFormModal = ({ job, authUser, onClose, onSuccess }) => {
   const tabs = [
     { id: 'basic', label: 'Basic Info' },
     { id: 'details', label: 'Job Details' },
-    { id: 'company', label: 'Company Info' },
+    // { id: 'company', label: 'Company Info' },
+    { id: 'stages', label: 'Recruitment Stages' },
     { id: 'media', label: 'Media & Images' },
-    { id: 'contact', label: 'Contact & Apply' },
+    // { id: 'contact', label: 'Contact & Apply' },
     { id: 'faqs', label: 'FAQs' },
   ];
 
@@ -520,90 +685,6 @@ const JobFormModal = ({ job, authUser, onClose, onSuccess }) => {
               </div>
 
               <div className="form-group">
-                <label>Perks</label>
-                <div className="tags-input">
-                  <div className="tags-list">
-                    {formData.perks.map((perk, index) => (
-                      <span key={index} className="tag">
-                        {perk}
-                        <button type="button" onClick={() => removePerk(index)}>
-                          <X size={14} />
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                  <div className="tag-input-row">
-                    <input
-                      type="text"
-                      value={newPerk}
-                      onChange={(e) => setNewPerk(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addPerk())}
-                      placeholder="Add perk (e.g. Health Insurance)"
-                    />
-                    <button type="button" onClick={addPerk} className="btn-add">
-                      <Plus size={18} />
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label>Required Skills</label>
-                <div className="tags-input">
-                  <div className="tags-list">
-                    {formData.skills.map((skill, index) => (
-                      <span key={index} className="tag">
-                        {skill}
-                        <button type="button" onClick={() => removeSkill(index)}>
-                          <X size={14} />
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                  <div className="tag-input-row">
-                    <input
-                      type="text"
-                      value={newSkill}
-                      onChange={(e) => setNewSkill(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addSkill())}
-                      placeholder="Add skill (e.g. React, Node.js)"
-                    />
-                    <button type="button" onClick={addSkill} className="btn-add">
-                      <Plus size={18} />
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label>Categories</label>
-                <div className="tags-input">
-                  <div className="tags-list">
-                    {formData.categories.map((category, index) => (
-                      <span key={index} className="tag">
-                        {category}
-                        <button type="button" onClick={() => removeCategory(index)}>
-                          <X size={14} />
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                  <div className="tag-input-row">
-                    <input
-                      type="text"
-                      value={newCategory}
-                      onChange={(e) => setNewCategory(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addCategory())}
-                      placeholder="Add category (e.g. Technology, Design)"
-                    />
-                    <button type="button" onClick={addCategory} className="btn-add">
-                      <Plus size={18} />
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <div className="form-group">
                 <label>Location Type</label>
                 <select name="locationType" value={formData.locationType} onChange={handleChange}>
                   <option value="remote">Remote</option>
@@ -698,14 +779,14 @@ const JobFormModal = ({ job, authUser, onClose, onSuccess }) => {
               <button type="button" className="cancel-button" onClick={() => setCurrentTab('basic')}>
                 Back
               </button>
-              <button type="button" className="submit-button" onClick={() => setCurrentTab('company')}>
-                Next: Company Info
+              <button type="button" className="submit-button" onClick={() => setCurrentTab('stages')}>
+                Next: Recruitment Stages
               </button>
             </div>
             </>
           )}
 
-          {currentTab === 'company' && (
+          {/* {currentTab === 'company' && (
             <>
             <div className="form-section">
               <h3>Company Information</h3>
@@ -771,7 +852,7 @@ const JobFormModal = ({ job, authUser, onClose, onSuccess }) => {
               </button>
             </div>
             </>
-          )}
+          )} */}
 
           {currentTab === 'media' && (
             <>
@@ -807,17 +888,17 @@ const JobFormModal = ({ job, authUser, onClose, onSuccess }) => {
               </div>
             </div>
             <div className="modal-actions modal-footer">
-              <button type="button" className="cancel-button" onClick={() => setCurrentTab('company')}>
+              <button type="button" className="cancel-button" onClick={() => setCurrentTab('stages')}>
                 Back
               </button>
-              <button type="button" className="submit-button" onClick={() => setCurrentTab('contact')}>
-                Next: Contact & Apply
+              <button type="button" className="submit-button" onClick={() => setCurrentTab('faqs')}>
+                Next: FAQs
               </button>
             </div>
             </>
           )}
 
-          {currentTab === 'contact' && (
+          {/* {currentTab === 'contact' && (
             <>
             <div className="form-section">
               <h3>Contact & Application</h3>
@@ -869,11 +950,282 @@ const JobFormModal = ({ job, authUser, onClose, onSuccess }) => {
               </div>
             </div>
             <div className="modal-actions modal-footer">
-              <button type="button" className="cancel-button" onClick={() => setCurrentTab('media')}>
+              <button type="button" className="cancel-button" onClick={() => setCurrentTab('company')}>
                 Back
               </button>
-              <button type="button" className="submit-button" onClick={() => setCurrentTab('faqs')}>
-                Next: FAQs
+              <button type="button" className="submit-button" onClick={() => setCurrentTab('stages')}>
+                Next: Recruitment Stages
+              </button>
+            </div>
+            </>
+          )} */}
+
+          {/* Recruitment Stages Tab */}
+          {currentTab === 'stages' && (
+            <>
+            <div className="form-section">
+              <h3>Recruitment Stages (Optional)</h3>
+              <p className="section-description">
+                Add assessment rounds, interviews, or other stages in your recruitment process. 
+                Candidates will see these stages and their deadlines.
+              </p>
+
+              {/* Existing Stages */}
+              {formData.stages.length > 0 && (
+                <div className="stages-list">
+                  {formData.stages.map((stage, index) => (
+                    <div key={index} className="stage-item-card">
+                      <div className="stage-header">
+                        <div className="stage-title-row">
+                          <span className="stage-number-badge">Stage {index + 1}</span>
+                          <span className={`stage-type-badge ${stage.type}`}>
+                            {stage.type === 'assessment' ? '📝 Assessment' : 
+                             stage.type === 'interview' ? '💼 Interview' : 
+                             '🎯 Final Round'}
+                          </span>
+                          <div className="stage-actions">
+                            <button type="button" onClick={() => editStage(index)} className="edit-btn">
+                              Edit
+                            </button>
+                            <button type="button" onClick={() => removeStage(index)} className="remove-btn">
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
+                        </div>
+                        <h4>{stage.title}</h4>
+                      </div>
+                      <div className="stage-details">
+                        {stage.deadline && stage.type !== 'interview' && (
+                          <div className="stage-detail-item">
+                            <strong>Deadline:</strong> {new Date(stage.deadline).toLocaleDateString()}
+                          </div>
+                        )}
+                        {stage.assessmentLink && (
+                          <div className="stage-detail-item">
+                            <strong>Assessment Link:</strong> 
+                            <a href={stage.assessmentLink} target="_blank" rel="noopener noreferrer">
+                              {stage.assessmentLink}
+                            </a>
+                          </div>
+                        )}
+                        {stage.assessmentFile && (
+                          <div className="stage-detail-item">
+                            <strong>Assessment File:</strong> {stage.assessmentFile.name || 'Uploaded'}
+                          </div>
+                        )}
+                        {stage.interviewLink && (
+                          <div className="stage-detail-item">
+                            <strong>Interview Link:</strong> 
+                            <a href={stage.interviewLink} target="_blank" rel="noopener noreferrer">
+                              {stage.interviewLink}
+                            </a>
+                          </div>
+                        )}
+                        {stage.interviewDate && (
+                          <div className="stage-detail-item">
+                            <strong>Interview Date:</strong> {new Date(stage.interviewDate).toLocaleDateString()}
+                          </div>
+                        )}
+                        {stage.interviewTime && (
+                          <div className="stage-detail-item">
+                            <strong>Interview Time:</strong> {stage.interviewTime}
+                          </div>
+                        )}
+                        {stage.submissions && stage.submissions.length > 0 && (
+                          <div className="stage-detail-item">
+                            <strong>Required Submissions:</strong>
+                            <div className="submission-badges">
+                              {stage.submissions.map((sub, idx) => (
+                                <span key={idx} className="submission-badge">
+                                  {sub.label}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Add/Edit Stage */}
+              <div className="form-group">
+                <label>{editingStageIndex !== null ? 'Edit Stage' : 'Add New Stage'}</label>
+                <div className="stage-input-group">
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label>Stage Type *</label>
+                      <select
+                        value={newStage.type}
+                        onChange={(e) => setNewStage(prev => ({ ...prev, type: e.target.value }))}
+                      >
+                        <option value="assessment">📝 Assessment Round</option>
+                        <option value="interview">💼 Interview Round</option>
+                        <option value="final">🎯 Final Round</option>
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label>Stage Title *</label>
+                      <input
+                        type="text"
+                        value={newStage.title}
+                        onChange={(e) => setNewStage(prev => ({ ...prev, title: e.target.value }))}
+                        placeholder="e.g., Technical Assessment, HR Interview"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Deadline - Only for non-interview stages */}
+                  {newStage.type !== 'interview' && (
+                    <div className="form-row">
+                      <div className="form-group">
+                        <label>Deadline</label>
+                        <input
+                          type="date"
+                          value={newStage.deadline}
+                          onChange={(e) => setNewStage(prev => ({ ...prev, deadline: e.target.value }))}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {newStage.type === 'assessment' && (
+                    <>
+                      <div className="form-group">
+                        <label>Assessment Link (Optional)</label>
+                        <input
+                          type="url"
+                          value={newStage.assessmentLink}
+                          onChange={(e) => setNewStage(prev => ({ ...prev, assessmentLink: e.target.value }))}
+                          placeholder="https://forms.google.com/... or any assessment platform link"
+                        />
+                      </div>
+
+                      <div className="form-group">
+                        <label>Or Upload Assessment PDF (Optional)</label>
+                        <input
+                          type="url"
+                          value={newStage.assessmentFile || ''}
+                          onChange={(e) => setNewStage(prev => ({ ...prev, assessmentFile: e.target.value }))}
+                          placeholder="Enter PDF URL or upload to cloud and paste link"
+                        />
+                        <p className="field-hint">
+                          💡 Upload your PDF to Google Drive, Dropbox, or any cloud storage and paste the public link here
+                        </p>
+                      </div>
+
+                      <div className="form-group">
+                        <label>What should candidates submit?</label>
+                        <div className="submission-checkboxes">
+                          <label className="checkbox-label">
+                            <input
+                              type="checkbox"
+                              checked={newStage.submissionTypes.githubLink}
+                              onChange={(e) => setNewStage(prev => ({
+                                ...prev,
+                                submissionTypes: { ...prev.submissionTypes, githubLink: e.target.checked }
+                              }))}
+                            />
+                            <span>💻 GitHub Link</span>
+                          </label>
+                          <label className="checkbox-label">
+                            <input
+                              type="checkbox"
+                              checked={newStage.submissionTypes.videoLink}
+                              onChange={(e) => setNewStage(prev => ({
+                                ...prev,
+                                submissionTypes: { ...prev.submissionTypes, videoLink: e.target.checked }
+                              }))}
+                            />
+                            <span>🎥 Video Link</span>
+                          </label>
+                          <label className="checkbox-label">
+                            <input
+                              type="checkbox"
+                              checked={newStage.submissionTypes.pdfUpload}
+                              onChange={(e) => setNewStage(prev => ({
+                                ...prev,
+                                submissionTypes: { ...prev.submissionTypes, pdfUpload: e.target.checked }
+                              }))}
+                            />
+                            <span>📄 PDF Upload</span>
+                          </label>
+                        </div>
+                        <p className="field-hint">
+                          ✅ Select what candidates need to submit after completing the assessment
+                        </p>
+                      </div>
+                    </>
+                  )}
+
+                  {newStage.type === 'interview' && (
+                    <>
+                      <div className="form-group">
+                        <label>Interview Link *</label>
+                        <input
+                          type="url"
+                          value={newStage.interviewLink}
+                          onChange={(e) => setNewStage(prev => ({ ...prev, interviewLink: e.target.value }))}
+                          placeholder="https://meet.google.com/... or Zoom link"
+                        />
+                        <p className="field-hint">
+                          💡 Provide the video call link for the interview (Google Meet, Zoom, Teams, etc.)
+                        </p>
+                      </div>
+
+                      <div className="form-row">
+                        <div className="form-group">
+                          <label>Interview Date *</label>
+                          <input
+                            type="date"
+                            value={newStage.interviewDate}
+                            onChange={(e) => setNewStage(prev => ({ ...prev, interviewDate: e.target.value }))}
+                          />
+                        </div>
+                        <div className="form-group">
+                          <label>Interview Time *</label>
+                          <input
+                            type="time"
+                            value={newStage.interviewTime}
+                            onChange={(e) => setNewStage(prev => ({ ...prev, interviewTime: e.target.value }))}
+                          />
+                        </div>
+                        <div className="form-group">
+                          <label>Duration (minutes) *</label>
+                          <input
+                            type="number"
+                            value={newStage.interviewDuration}
+                            onChange={(e) => setNewStage(prev => ({ ...prev, interviewDuration: e.target.value }))}
+                            placeholder="e.g., 30, 60"
+                            min="15"
+                            step="15"
+                          />
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  <div className="stage-form-actions">
+                    {editingStageIndex !== null && (
+                      <button type="button" onClick={cancelEdit} className="btn-cancel">
+                        Cancel
+                      </button>
+                    )}
+                    <button type="button" onClick={addStage} className="btn-add">
+                      <Plus size={18} />
+                      {editingStageIndex !== null ? 'Update Stage' : 'Add Stage'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="modal-actions modal-footer">
+              <button type="button" className="cancel-button" onClick={() => setCurrentTab('details')}>
+                Back
+              </button>
+              <button type="button" className="submit-button" onClick={() => setCurrentTab('media')}>
+                Next: Media
               </button>
             </div>
             </>
@@ -928,7 +1280,7 @@ const JobFormModal = ({ job, authUser, onClose, onSuccess }) => {
               </div>
             </div>
             <div className="modal-actions modal-footer">
-              <button type="button" className="cancel-button" onClick={() => setCurrentTab('contact')}>
+              <button type="button" className="cancel-button" onClick={() => setCurrentTab('media')}>
                 Back
               </button>
               <button type="submit" className="submit-button" disabled={loading}>

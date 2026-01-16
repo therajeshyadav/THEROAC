@@ -5,6 +5,10 @@ const { getNotificationService } = require('../socket');
 exports.createJob = async (req, res, next) => {
   try {
     const payload = { ...req.body };
+    
+    // Debug: Log stages data
+    console.log('📊 Creating job with stages:', payload.stages);
+    
     payload.createdBy = req.user.id;
     payload.approvalStatus = 'pending'; // Set to pending for admin approval
     
@@ -56,12 +60,12 @@ exports.createJob = async (req, res, next) => {
     }
     
     // Validate and sanitize JSON fields
-    ['perks', 'skills', 'categories', 'eligibility', 'faqs', 'media', 'companySocials', 'contactPerson'].forEach(field => {
+    ['perks', 'skills', 'categories', 'eligibility', 'faqs', 'media', 'companySocials', 'contactPerson', 'stages'].forEach(field => {
       if (payload[field] && typeof payload[field] === 'string') {
         try {
           payload[field] = JSON.parse(payload[field]);
         } catch (e) {
-          payload[field] = field === 'perks' || field === 'skills' || field === 'categories' || field === 'eligibility' || field === 'faqs' || field === 'media' ? [] : null;
+          payload[field] = field === 'perks' || field === 'skills' || field === 'categories' || field === 'eligibility' || field === 'faqs' || field === 'media' || field === 'stages' ? [] : null;
         }
       }
     });
@@ -106,6 +110,9 @@ exports.createJob = async (req, res, next) => {
     }
     
     const job = await Job.create(payload);
+    
+    // Debug: Log created job stages
+    console.log('✅ Job created with stages:', job.stages);
     
     // Create notification for admin about new job pending approval
     try {
@@ -318,21 +325,171 @@ exports.applyToJob = async (req, res, next) => {
 exports.getUserApplications = async (req, res, next) => {
   try {
     const userId = req.user.id;
-    const applications = await JobApplication.findAll({
+    console.log('🔍 Fetching applications for user:', userId);
+    
+    // Get job applications
+    const jobApplications = await JobApplication.findAll({
       where: { userId },
       include: [
         {
           model: Job,
           as: 'job',
-          attributes: ['id', 'title', 'companyName', 'location', 'salary', 'jobType']
+          attributes: ['id', 'title', 'companyName', 'location', 'salary', 'jobType', 'stages']
+        }
+      ],
+      order: [['createdAt', 'DESC']]
+    });
+    console.log('📋 Job applications found:', jobApplications.length);
+
+    // Try to get hub content applications with error handling
+    let hubContentApplications = [];
+    try {
+      const { HubContentApplication, HubContent } = require('../models');
+      
+      hubContentApplications = await HubContentApplication.findAll({
+        where: { userId },
+        include: [
+          {
+            model: HubContent,
+            as: 'hubContent',
+            attributes: ['id', 'title', 'companyName', 'location', 'contentType', 'stages']
+          }
+        ],
+        order: [['createdAt', 'DESC']]
+      });
+      console.log('🎓 Hub content applications found:', hubContentApplications.length);
+    } catch (hubError) {
+      console.error('⚠️ Error fetching hub content applications:', hubError.message);
+      // Continue with just job applications if hub content fails
+    }
+
+    // Get event registrations
+    let eventRegistrations = [];
+    try {
+      const { EventRegistration, Event } = require('../models');
+      
+      eventRegistrations = await EventRegistration.findAll({
+        where: { userId },
+        include: [
+          {
+            model: Event,
+            as: 'event',
+            attributes: ['id', 'title', 'createdBy', 'location', 'categories', 'tags', 'stages', 'startDate', 'endDate']
+          }
+        ],
+        order: [['createdAt', 'DESC']]
+      });
+      console.log('🎪 Event registrations found:', eventRegistrations.length);
+    } catch (eventError) {
+      console.error('⚠️ Error fetching event registrations:', eventError.message);
+      // Continue without events if they fail
+    }
+
+    // Format applications with type indicator
+    const formattedJobApplications = jobApplications.map(app => ({
+      ...app.toJSON(),
+      applicationType: 'job',
+      item: app.job,
+      status: app.status || 'applied'
+    }));
+
+    const formattedHubContentApplications = hubContentApplications.map(app => ({
+      ...app.toJSON(),
+      applicationType: 'internship',
+      item: app.hubContent,
+      status: app.status || 'applied'
+    }));
+
+    const formattedEventRegistrations = eventRegistrations.map(reg => ({
+      ...reg.toJSON(),
+      applicationType: 'event',
+      item: reg.event,
+      status: reg.status || 'registered'
+    }));
+
+    // Combine and sort by creation date
+    const allApplications = [
+      ...formattedJobApplications, 
+      ...formattedHubContentApplications,
+      ...formattedEventRegistrations
+    ].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    console.log('✅ Total applications to return:', allApplications.length);
+    res.json({ applications: allApplications });
+  } catch (err) {
+    console.error('❌ Error in getUserApplications:', err);
+    return res.status(500).json({
+      error: 'Failed to fetch applications. Please try again.'
+    });
+  }
+};
+
+// Get applications for a specific job
+exports.getJobApplications = async (req, res, next) => {
+  try {
+    const { jobId } = req.params;
+    const recruiterId = req.user.id;
+    
+    // Verify the job belongs to this recruiter
+    const job = await Job.findOne({
+      where: { 
+        id: jobId,
+        createdBy: recruiterId 
+      }
+    });
+    
+    if (!job) {
+      return res.status(404).json({ error: 'Job not found or unauthorized' });
+    }
+    
+    // Get all applications for this job with full candidate details
+    const applications = await JobApplication.findAll({
+      where: { jobId: jobId },
+      attributes: [
+        'id', 'userId', 'jobId', 'resumeLink', 'coverLetter', 
+        'status', 'notes', 'metadata', 'currentStage', 'stageSubmissions', 
+        'createdAt', 'updatedAt'
+      ],
+      include: [
+        {
+          model: User,
+          as: 'user',
+          attributes: [
+            'id', 'fullName', 'email', 'phone', 'headline', 'city', 'state', 'country',
+            'about', 'skills', 'experiences', 'education', 'resumePath',
+            'profilePicture', 'linkedinUrl', 'githubUrl'
+          ]
+        },
+        {
+          model: Job,
+          as: 'job',
+          attributes: ['id', 'title', 'stages']
         }
       ],
       order: [['createdAt', 'DESC']]
     });
 
-    res.json({ applications });
+    // Debug: Log applications with stage info
+    console.log('📊 Applications fetched:', applications.length);
+    applications.forEach(app => {
+      if (app.currentStage !== null && app.currentStage !== undefined) {
+        console.log('  - Candidate:', app.user?.fullName, {
+          currentStage: app.currentStage,
+          hasSubmissions: !!app.stageSubmissions,
+          submissionsCount: app.stageSubmissions?.length || 0
+        });
+      }
+    });
+
+    // Format applications with resumeUrl
+    const formattedApplications = applications.map(app => ({
+      ...app.toJSON(),
+      resumeUrl: app.resumeLink || app.user?.resumePath
+    }));
+
+    res.json({ applications: formattedApplications });
   } catch (err) {
-    console.error('Error in getUserApplications:', err);
+    console.error('Error in getJobApplications:', err);
     return res.status(500).json({
       error: 'Failed to fetch applications. Please try again.'
     });
@@ -503,6 +660,15 @@ exports.updateApplicationStatus = async (req, res, next) => {
     }
     
     application.status = finalStatus;
+    
+    // If shortlisting for the first time and job has stages, set currentStage to 0
+    if (!isInternshipApplication && !isEventRegistration && status === 'shortlisted') {
+      const job = await Job.findByPk(application.jobId);
+      if (job && job.stages && job.stages.length > 0) {
+        application.currentStage = 0; // Set to first stage
+      }
+    }
+    
     await application.save();
     
     // Send notification to candidate
@@ -521,12 +687,24 @@ exports.updateApplicationStatus = async (req, res, next) => {
       }
       
       if (contentItem) {
-        await notificationService.notifyApplicationStatusChange(
-          application.userId,
-          contentItem.title,
-          status,
-          application.id
-        );
+        // Check if candidate is being hired/offered
+        if ((status === 'hired' || status === 'offered') && !isInternshipApplication && !isEventRegistration) {
+          // Send job offer notification
+          await notificationService.notifyJobOffer(
+            application.userId,
+            contentItem.title,
+            application.id,
+            contentItem.id
+          );
+        } else {
+          // Send regular status change notification
+          await notificationService.notifyApplicationStatusChange(
+            application.userId,
+            contentItem.title,
+            status,
+            application.id
+          );
+        }
       }
     } catch (notifError) {
       console.error('Failed to send notification:', notifError);
@@ -700,12 +878,12 @@ exports.updateJob = async (req, res, next) => {
     }
     
     // Validate and sanitize JSON fields
-    ['perks', 'skills', 'categories', 'eligibility', 'faqs', 'media', 'companySocials', 'contactPerson'].forEach(field => {
+    ['perks', 'skills', 'categories', 'eligibility', 'faqs', 'media', 'companySocials', 'contactPerson', 'stages'].forEach(field => {
       if (payload[field] && typeof payload[field] === 'string') {
         try {
           payload[field] = JSON.parse(payload[field]);
         } catch (e) {
-          payload[field] = field === 'perks' || field === 'skills' || field === 'categories' || field === 'eligibility' || field === 'faqs' || field === 'media' ? [] : null;
+          payload[field] = field === 'perks' || field === 'skills' || field === 'categories' || field === 'eligibility' || field === 'faqs' || field === 'media' || field === 'stages' ? [] : null;
         }
       }
     });
@@ -869,5 +1047,166 @@ exports.uploadBannerImage = async (req, res, next) => {
   } catch (error) {
     console.error('Error uploading banner image:', error);
     res.status(500).json({ message: 'Failed to upload banner image', error: error.message });
+  }
+};
+
+// Submit stage assessment
+exports.submitStage = async (req, res) => {
+  try {
+    const { applicationId } = req.params;
+    const { stageIndex, submissions } = req.body;
+    const userId = req.user.id;
+
+    // Find the application
+    const application = await JobApplication.findOne({
+      where: { id: applicationId, userId },
+      include: [{ model: Job, as: 'job' }]
+    });
+
+    if (!application) {
+      return res.status(404).json({ message: 'Application not found' });
+    }
+
+    // Verify the stage exists
+    const job = application.job;
+    if (!job.stages || !job.stages[stageIndex]) {
+      return res.status(400).json({ message: 'Invalid stage' });
+    }
+
+    // Create submission record
+    const stageSubmissions = application.stageSubmissions || [];
+    
+    // Check if already submitted for this stage
+    const existingSubmission = stageSubmissions.find(sub => sub.stageIndex === stageIndex);
+    if (existingSubmission) {
+      return res.status(400).json({ message: 'Already submitted for this stage' });
+    }
+
+    // Add new submission
+    stageSubmissions.push({
+      stageIndex,
+      submittedAt: new Date(),
+      submissions
+    });
+
+    // Update application
+    await application.update({
+      stageSubmissions
+    });
+
+    console.log('✅ Stage submission saved:', {
+      applicationId: application.id,
+      currentStage: application.currentStage,
+      stageIndex,
+      submissionsCount: stageSubmissions.length
+    });
+
+    // Send notification to recruiter
+    const notificationService = getNotificationService();
+    if (notificationService) {
+      await notificationService.createNotification(
+        job.createdBy,
+        'stage_submission',
+        'New Stage Submission',
+        `${req.user.fullName} submitted assessment for ${job.title}`,
+        {
+          jobId: job.id,
+          applicationId: application.id,
+          stageIndex
+        },
+        `/recruiter/jobs/${job.id}/applications`
+      );
+    }
+
+    res.status(200).json({
+      message: 'Stage submitted successfully',
+      application
+    });
+  } catch (error) {
+    console.error('Error submitting stage:', error);
+    res.status(500).json({ message: 'Failed to submit stage', error: error.message });
+  }
+};
+
+// Move candidate to next stage
+exports.moveToNextStage = async (req, res) => {
+  try {
+    const { applicationId } = req.params;
+    const { stageIndex } = req.body;
+    const recruiterId = req.user.id;
+
+    // Find the application
+    const application = await JobApplication.findByPk(applicationId, {
+      include: [{
+        model: Job,
+        as: 'job',
+        attributes: ['id', 'title', 'createdBy', 'stages']
+      }]
+    });
+
+    if (!application) {
+      return res.status(404).json({ error: 'Application not found' });
+    }
+
+    // Check if the recruiter owns this job
+    if (application.job.createdBy !== recruiterId) {
+      return res.status(403).json({ error: 'Unauthorized' });
+    }
+
+    // Verify the stage exists
+    if (!application.job.stages || !application.job.stages[stageIndex]) {
+      return res.status(400).json({ error: 'Invalid stage' });
+    }
+
+    // Update current stage
+    await application.update({
+      currentStage: stageIndex,
+      status: 'shortlisted' // Keep status as shortlisted when moving through stages
+    });
+
+    // Send notification to candidate
+    const notificationService = getNotificationService();
+    if (notificationService) {
+      const stage = application.job.stages[stageIndex];
+      const stageName = stage.title;
+      
+      // Check if this is an interview stage
+      if (stage.type === 'interview' && stage.interviewDate && stage.interviewTime) {
+        // Send interview-specific notification with date, time, and duration
+        await notificationService.notifyInterviewStageShortlist(
+          application.userId,
+          application.job.title,
+          stageName,
+          stage.interviewDate,
+          stage.interviewTime,
+          stage.interviewDuration || 'TBD',
+          stage.interviewLink || '',
+          application.id,
+          application.job.id
+        );
+      } else {
+        // Send regular stage advancement notification
+        await notificationService.createNotification(
+          application.userId,
+          'stage_advanced',
+          'Advanced to Next Stage',
+          `You've been shortlisted for ${stageName} in ${application.job.title}`,
+          {
+            jobId: application.job.id,
+            applicationId: application.id,
+            stageIndex
+          },
+          `/candidate/applications/${application.id}`
+        );
+      }
+    }
+
+    res.status(200).json({
+      message: 'Candidate moved to next stage successfully',
+      application
+    });
+  } catch (error) {
+    console.error('Error moving to next stage:', error);
+    res.status(500).json({ error: 'Failed to move candidate', message: error.message });
   }
 };

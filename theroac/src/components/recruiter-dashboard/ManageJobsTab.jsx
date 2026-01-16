@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Eye, Users, Search, Briefcase } from 'lucide-react';
 import JobFormModal from './JobFormModal';
 import InternshipFormModal from './InternshipFormModal';
+import JobEvaluationOverlay from './JobEvaluationOverlay';
 import { toast } from 'react-toastify';
 import './ManageJobsTab.css';
 
@@ -17,6 +18,7 @@ const ManageJobsTab = ({ authUser, setJobsTabLoading, pendingModalType, onModalT
   const [editingJob, setEditingJob] = useState(null);
   const [editingInternship, setEditingInternship] = useState(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(null);
+  const [showEvaluation, setShowEvaluation] = useState(null);
 
   // Handle pending modal type from dashboard
   useEffect(() => {
@@ -213,11 +215,19 @@ const ManageJobsTab = ({ authUser, setJobsTabLoading, pendingModalType, onModalT
 
   return (
     <div className="manage-jobs-container">
-      <div className="manage-jobs-header">
-        <div>
-          <h2>Manage Jobs & Internships</h2>
-          <p>Create, edit, and manage all your job postings and internships</p>
-        </div>
+      {showEvaluation ? (
+        <JobEvaluationOverlay
+          job={showEvaluation.type === 'job' ? showEvaluation.data : null}
+          internship={showEvaluation.type === 'internship' ? showEvaluation.data : null}
+          onClose={() => setShowEvaluation(null)}
+        />
+      ) : (
+        <>
+          <div className="manage-jobs-header">
+            <div>
+              <h2>Manage Jobs & Internships</h2>
+              <p>Create, edit, and manage all your job postings and internships</p>
+            </div>
         <div className="header-buttons">
           <button 
             className={`btn-view-toggle ${activeView === 'jobs' ? 'active' : ''}`}
@@ -317,7 +327,13 @@ const ManageJobsTab = ({ authUser, setJobsTabLoading, pendingModalType, onModalT
                         <img src={job.companyLogo} alt={job.companyName} className="company-logo-small" />
                       )}
                       <div>
-                        <div className="job-title">{job.title}</div>
+                        <div 
+                          className="job-title clickable-title" 
+                          onClick={() => setShowEvaluation({ type: 'job', data: job })}
+                          title="Click to view applications"
+                        >
+                          {job.title}
+                        </div>
                         {job.featured && <span className="badge-featured">Featured</span>}
                         {job.urgent && <span className="badge-urgent">Urgent</span>}
                         {job.approvalStatus === 'pending' && job.rejectionReason && (
@@ -436,7 +452,13 @@ const ManageJobsTab = ({ authUser, setJobsTabLoading, pendingModalType, onModalT
                         <img src={internship.companyLogo} alt={internship.companyName} className="company-logo-small" />
                       )}
                       <div>
-                        <div className="job-title">{internship.title}</div>
+                        <div 
+                          className="job-title clickable-title" 
+                          onClick={() => setShowEvaluation({ type: 'internship', data: internship })}
+                          title="Click to view applications"
+                        >
+                          {internship.title}
+                        </div>
                         {internship.featured && <span className="badge-featured">Featured</span>}
                         {internship.approvalStatus === 'pending' && internship.rejectionReason && (
                           <span className="badge-resubmission">Resubmission</span>
@@ -549,7 +571,7 @@ const ManageJobsTab = ({ authUser, setJobsTabLoading, pendingModalType, onModalT
         </div>
       )}
 
-      {showFormModal && activeView === 'jobs' && (
+      {!showEvaluation && showFormModal && activeView === 'jobs' && (
         <JobFormModal
           job={editingJob}
           authUser={authUser}
@@ -561,7 +583,7 @@ const ManageJobsTab = ({ authUser, setJobsTabLoading, pendingModalType, onModalT
         />
       )}
 
-      {showFormModal && activeView === 'internships' && (
+      {!showEvaluation && showFormModal && activeView === 'internships' && (
         <InternshipFormModal
           internship={editingInternship}
           authUser={authUser}
@@ -573,7 +595,7 @@ const ManageJobsTab = ({ authUser, setJobsTabLoading, pendingModalType, onModalT
         />
       )}
 
-      {showDeleteConfirm && (
+      {!showEvaluation && showDeleteConfirm && (
         <div className="modal-overlay">
           <div className="delete-confirm-modal">
             <h3>Delete {activeView === 'jobs' ? 'Job' : 'Internship'}?</h3>
@@ -594,6 +616,8 @@ const ManageJobsTab = ({ authUser, setJobsTabLoading, pendingModalType, onModalT
             </div>
           </div>
         </div>
+      )}
+        </>
       )}
     </div>
   );

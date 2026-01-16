@@ -302,19 +302,7 @@ const EventParticipantsPage = () => {
       </div>
 
       <div className="participants-content">
-        <div className="content-header">
-          <div className="search-section">
-            {/* <div className="search-box">
-              <Search size={20} />
-              <input
-                type="text"
-                placeholder="Search teams or participants..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div> */}
-          </div>
-          
+        <div className="content-header"> 
           {/* Stage and Status Filters */}
           <div className="filters-section">
             <div className="filter-group">
@@ -442,7 +430,7 @@ const EventParticipantsPage = () => {
                   </div>
                 </div>
 
-                <div className="submission-status">
+                <div className="submission-statusEvent">
                   <div className="status-header">
                     <FileText size={16} />
                     <span>Submissions ({team.submissionsCount || 0})</span>

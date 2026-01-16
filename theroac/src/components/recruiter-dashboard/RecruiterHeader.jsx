@@ -182,7 +182,7 @@ const RecruiterHeader = ({
             <li>
               <a href="/recruiter-dashboard?tab=evaluate" onClick={closeMobileMenu}>
                 <i className="fa-solid fa-user-check" style={{ marginRight: "0.5rem" }}></i>
-                Evaluate Candidates
+                Evaluate Events
               </a>
             </li>
             <li>

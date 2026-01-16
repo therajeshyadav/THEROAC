@@ -13,7 +13,7 @@ import {
 
 const navItems = [
   { id: "dashboard", icon: Grid, label: "Dashboard" },
-  { id: "evaluate", icon: UserCheck, label: "Evaluate Candidates" },
+  { id: "evaluate", icon: UserCheck, label: "Evaluate Events" },
   { id: "jobs", icon: Briefcase, label: "Jobs & Internships" },
   { id: "team", icon: UsersRound, label: "Team Management" },
   { id: "opportunities", icon: Star, label: "Opportunities" },

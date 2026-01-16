@@ -143,7 +143,7 @@ const EvaluateCandidatesTab = ({ authUser }) => {
                   <div className="event-card-header">
                     <div>
                       <h3>{event.title}</h3>
-                      <div className="event-meta">
+                      <div className="event-metaEvaluate">
                         <Calendar size={14} />
                         {new Date(event.startDate).toLocaleDateString()}
                         <MapPin size={14} />

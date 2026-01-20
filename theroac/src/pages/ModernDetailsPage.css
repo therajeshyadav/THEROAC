@@ -4132,3 +4132,72 @@
         font-size: 0.85rem;
     }
 }
+/* Problem Statement Section */
+.problem-statement-section {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-top: 0.5rem;
+}
+
+.problem-statement-title {
+    color: #495057;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0 1rem 0;
+}
+
+.problem-statement-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.problem-statement-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.problem-statement-btn.link-btn {
+    background: #007bff;
+    color: white;
+}
+
+.problem-statement-btn.link-btn:hover {
+    background: #0056b3;
+    transform: translateY(-1px);
+}
+
+.problem-statement-btn.pdf-btn {
+    background: #dc3545;
+    color: white;
+}
+
+.problem-statement-btn.pdf-btn:hover {
+    background: #c82333;
+    transform: translateY(-1px);
+}
+
+.problem-statement-btn.ppt-btn {
+    background: #fd7e14;
+    color: white;
+}
+
+.problem-statement-btn.ppt-btn:hover {
+    background: #e8590c;
+    transform: translateY(-1px);
+}
+
+.problem-statement-btn:active {
+    transform: translateY(0);
+}

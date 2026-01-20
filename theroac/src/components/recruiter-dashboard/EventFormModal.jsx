@@ -134,7 +134,12 @@ const EventFormModal = ({ event, onClose, onSuccess }) => {
         // Explicitly handle team size fields
         minTeamSize: event.minTeamSize || null,
         maxTeamSize: event.maxTeamSize || 4,
+        // Handle problem statements
+        problemStatements: event.problemStatements || null,
       });
+      
+      // Debug: Check what problemStatements data we're getting
+      console.log('Loading event data - problemStatements:', event.problemStatements);
     }
   }, [event]);
 
@@ -763,6 +768,129 @@ const EventFormModal = ({ event, onClose, onSuccess }) => {
                           <option value="10">10 members</option>
                         </select>
                       </div>
+                    </div>
+
+                    {/* Problem Statement Section */}
+                    <div className="form-section">
+                      <h4>Problem Statement</h4>
+                      <div className="form-group">
+                        <label>Problem Statement Type</label>
+                        <select
+                          value={formData.problemStatements?.type || "none"}
+                          onChange={(e) => {
+                            const type = e.target.value;
+                            console.log('Problem statement type changed to:', type);
+                            setFormData(prev => ({
+                              ...prev,
+                              problemStatements: type === "none" ? null : {
+                                type,
+                                url: "",
+                                title: ""
+                              }
+                            }));
+                          }}
+                        >
+                          <option value="none">No Problem Statement</option>
+                          <option value="link">Link/URL</option>
+                          <option value="pdf">PDF Document</option>
+                          <option value="ppt">PowerPoint Presentation</option>
+                        </select>
+                      </div>
+
+                      {formData.problemStatements?.type === "link" && (
+                        <div className="form-group">
+                          <label>Problem Statement Link</label>
+                          <input
+                            type="url"
+                            value={formData.problemStatements?.url || ""}
+                            onChange={(e) => setFormData(prev => ({
+                              ...prev,
+                              problemStatements: {
+                                ...prev.problemStatements,
+                                url: e.target.value
+                              }
+                            }))}
+                            placeholder="https://example.com/problem-statement"
+                          />
+                        </div>
+                      )}
+
+                      {(formData.problemStatements?.type === "pdf" || formData.problemStatements?.type === "ppt") && (
+                        <div className="form-group">
+                          <label>Upload {formData.problemStatements.type.toUpperCase()}</label>
+                          <input
+                            type="file"
+                            accept={formData.problemStatements.type === "pdf" ? ".pdf" : ".ppt,.pptx"}
+                            onChange={async (e) => {
+                              const file = e.target.files[0];
+                              if (file) {
+                                // For now, just store the file name and create a temporary URL
+                                // In production, you would upload to your server
+                                setFormData(prev => ({
+                                  ...prev,
+                                  problemStatements: {
+                                    ...prev.problemStatements,
+                                    fileName: file.name,
+                                    url: URL.createObjectURL(file) // Temporary URL for preview
+                                  }
+                                }));
+                                
+                                // Optional: Actual upload to server
+                                try {
+                                  const formDataUpload = new FormData();
+                                  formDataUpload.append('file', file);
+                                  
+                                  const token = localStorage.getItem("token");
+                                  const response = await fetch(`${API_URL}/events/upload-problem-statement`, {
+                                    method: 'POST',
+                                    headers: {
+                                      'Authorization': `Bearer ${token}`
+                                    },
+                                    body: formDataUpload
+                                  });
+                                  
+                                  if (response.ok) {
+                                    const data = await response.json();
+                                    setFormData(prev => ({
+                                      ...prev,
+                                      problemStatements: {
+                                        ...prev.problemStatements,
+                                        url: data.url // Use server URL instead of temporary URL
+                                      }
+                                    }));
+                                  }
+                                } catch (error) {
+                                  console.error('Upload error:', error);
+                                  // Keep the temporary URL if upload fails
+                                }
+                              }
+                            }}
+                          />
+                          {formData.problemStatements?.fileName && (
+                            <p className="file-info">
+                              Selected: {formData.problemStatements.fileName}
+                            </p>
+                          )}
+                        </div>
+                      )}
+
+                      {formData.problemStatements?.type && formData.problemStatements.type !== "none" && (
+                        <div className="form-group">
+                          <label>Title (Optional)</label>
+                          <input
+                            type="text"
+                            value={formData.problemStatements?.title || ""}
+                            onChange={(e) => setFormData(prev => ({
+                              ...prev,
+                              problemStatements: {
+                                ...prev.problemStatements,
+                                title: e.target.value
+                              }
+                            }))}
+                            placeholder="e.g. Hackathon Problem Statement"
+                          />
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}

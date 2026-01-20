@@ -159,7 +159,20 @@ exports.getProblemStatements = async (req, res, next) => {
       return res.status(404).json({ error: 'Event not found' });
     }
 
-    // Check if problem statements are configured and released
+    // Check for simple problem statement format first
+    if (event.problemStatements && event.problemStatements.type) {
+      return res.json({
+        released: true,
+        available: true,
+        simple: true,
+        type: event.problemStatements.type,
+        url: event.problemStatements.url,
+        title: event.problemStatements.title || 'Problem Statement',
+        fileName: event.problemStatements.fileName
+      });
+    }
+
+    // Fallback to complex problem statements format
     const problemStatements = event.problemStatements || {};
     const now = new Date();
     const releaseDate = problemStatements.releaseDate ? new Date(problemStatements.releaseDate) : null;

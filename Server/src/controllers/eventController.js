@@ -39,7 +39,8 @@ exports.createEvent = async (req, res, next) => {
       featured, 
       status,
       minTeamSize, // Add team size fields
-      maxTeamSize
+      maxTeamSize,
+      problemStatements // Add problem statements field
     } = req.body;
 
     // Validate required fields
@@ -137,6 +138,7 @@ exports.createEvent = async (req, res, next) => {
       status: status || 'upcoming',
       minTeamSize: minTeamSize ? parseInt(minTeamSize) : null, // Add team size fields
       maxTeamSize: maxTeamSize ? parseInt(maxTeamSize) : null,
+      problemStatements: problemStatements || null, // Add problem statements field
       createdBy: req.user.id,
       organizationId,
       approvalStatus: 'pending' // Set to pending for admin approval
@@ -200,6 +202,7 @@ exports.createEvent = async (req, res, next) => {
 exports.updateEvent = async (req, res, next) => {
   try {
     const eventId = req.params.id;
+    
     const { 
       title, 
       description, 
@@ -236,7 +239,8 @@ exports.updateEvent = async (req, res, next) => {
       featured, 
       status,
       minTeamSize, // Add team size fields
-      maxTeamSize
+      maxTeamSize,
+      problemStatements // Add problem statements field
     } = req.body;
 
     // Find the event
@@ -311,6 +315,7 @@ exports.updateEvent = async (req, res, next) => {
     if (status !== undefined) updatePayload.status = status;
     if (minTeamSize !== undefined) updatePayload.minTeamSize = minTeamSize ? parseInt(minTeamSize) : null; // Add team size fields
     if (maxTeamSize !== undefined) updatePayload.maxTeamSize = maxTeamSize ? parseInt(maxTeamSize) : null;
+    if (problemStatements !== undefined) updatePayload.problemStatements = problemStatements; // Add problem statements field
 
     // Update the event
     await event.update(updatePayload);
@@ -1144,5 +1149,23 @@ exports.getTeamSubmissions = async (req, res, next) => {
       message: 'Failed to fetch team submissions', 
       error: error.message 
     });
+  }
+};
+
+// Upload problem statement file for event
+exports.uploadProblemStatement = async (req, res, next) => {
+  try {
+    if (!req.fileUrl) {
+      return res.status(400).json({ message: 'No problem statement file provided or upload failed' });
+    }
+
+    res.status(200).json({
+      message: 'Problem statement uploaded successfully to Google Cloud Storage',
+      url: req.fileUrl,
+      uploadedFile: req.uploadedFile
+    });
+  } catch (error) {
+    console.error('Error uploading problem statement:', error);
+    res.status(500).json({ message: 'Failed to upload problem statement', error: error.message });
   }
 };

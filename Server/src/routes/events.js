@@ -77,6 +77,17 @@ router.post('/upload-media',
   eventController.uploadEventMedia
 );
 
+// Problem statement upload endpoint
+router.post('/upload-problem-statement', 
+  authenticate, 
+  attachOrganizationContext, 
+  requireRole(['recruiter', 'organizer', 'admin', 'superadmin']), 
+  uploadSingle('file'),
+  uploadToGCSMiddleware('documents'),
+  handleUploadError,
+  eventController.uploadProblemStatement
+);
+
 router.post('/:id/register', authenticate, attachOrganizationContext, eventController.registerForEvent);
 
 // Quiz routes for event stages

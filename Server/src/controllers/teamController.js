@@ -72,6 +72,7 @@ exports.getTeamStatus = async (req, res, next) => {
         eligibilityMessage,
         registrationDeadline: event.registrationDeadline,
         isRegistrationDeadlinePassed,
+        evaluations: team.submissionData?.evaluations || [], // Include evaluation data
         members: allMembers.map(member => ({
           id: member.user.id,
           name: member.user.fullName,

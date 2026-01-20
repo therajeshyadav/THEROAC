@@ -162,11 +162,6 @@ const TeamBuildingPage = () => {
             <div className="team-building-page">
                 <div className="team-building-container">
                     <div className="team-building-header">
-                        <button className="back-btn" onClick={handleBackToEvent}>
-                            <ArrowLeft size={20} />
-                            Back to Event
-                        </button>
-                        
                         <div className="header-info">
                             <h1 className="page-title">Your Team</h1>
                             <p className="event-title">{event.title}</p>
@@ -252,11 +247,6 @@ const TeamBuildingPage = () => {
         <div className="team-building-page">
             <div className="team-building-container">
                 <div className="team-building-header">
-                    <button className="back-btn" onClick={handleBackToEvent}>
-                        <ArrowLeft size={20} />
-                        Back to Event
-                    </button>
-                    
                     <div className="header-info">
                         <h1 className="page-title">Team Creation</h1>
                         <p className="event-title">{event.title}</p>

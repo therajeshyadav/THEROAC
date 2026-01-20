@@ -228,6 +228,50 @@ const ModernDetailsPage = () => {
         return true;
     };
 
+    // Helper function to render team management button
+    const renderTeamButton = (stage, index) => {
+        if (!teamStatus?.hasTeam) return null;
+        
+        return (
+            <button 
+                className="stage-action-btn team-manage"
+                onClick={() => handleTeamBuilding(stage, index)}
+                title="View and manage your team"
+            >
+                👥 View Team ({teamStatus.memberCount}/{teamStatus.maxMembers})
+            </button>
+        );
+    };
+
+    // Helper function to check if user is qualified for current stage
+    const isQualifiedForStage = (stageIndex) => {
+        if (stageIndex === 0) return true; // First stage is always accessible
+        
+        // For team-based events, check team evaluation status
+        if (needsTeamManagement() && teamStatus?.hasTeam) {
+            const evaluations = teamStatus.evaluations || [];
+            const previousStageIndex = stageIndex - 1;
+            
+            // Find evaluation for previous stage
+            const previousEvaluation = evaluations.find(evaluation => evaluation.stageIndex === previousStageIndex);
+            
+            // If no evaluation exists, check if previous stage deadline has passed
+            if (!previousEvaluation) {
+                const previousStage = data.stages[previousStageIndex];
+                const prevDeadline = previousStage?.deadline ? new Date(previousStage.deadline) : null;
+                return prevDeadline && new Date() > prevDeadline; // Allow if deadline passed
+            }
+            
+            // Check if shortlisted in previous stage
+            return previousEvaluation.status === 'shortlisted';
+        }
+        
+        // For non-team events, check if previous stage is completed (deadline passed)
+        const previousStage = data.stages[stageIndex - 1];
+        const prevDeadline = previousStage?.deadline ? new Date(previousStage.deadline) : null;
+        return prevDeadline && new Date() > prevDeadline;
+    };
+
     // Set default active tab based on type
     useEffect(() => {
         if (type === 'jobs') {
@@ -569,14 +613,31 @@ const ModernDetailsPage = () => {
             return <span className="stage-status-badge not-registered">Not Registered</span>;
         }
         
-        // Sequential logic: Check if previous stages are completed
+        // Sequential logic: Check if user is qualified for this stage
         if (index > 0) {
-            const previousStage = data.stages[index - 1];
-            const prevDeadline = previousStage.deadline ? new Date(previousStage.deadline) : null;
-            
-            // If previous stage hasn't ended yet, this stage should be locked
-            if (prevDeadline && now < prevDeadline) {
-                return <span className="stage-status-badge locked">Locked - Complete Previous Stage</span>;
+            if (!isQualifiedForStage(index)) {
+                // Check if it's because of evaluation or deadline
+                if (needsTeamManagement() && teamStatus?.hasTeam) {
+                    const evaluations = teamStatus.evaluations || [];
+                    const previousStageIndex = index - 1;
+                    const previousEvaluation = evaluations.find(evaluation => evaluation.stageIndex === previousStageIndex);
+                    
+                    if (previousEvaluation && previousEvaluation.status === 'rejected') {
+                        return <span className="stage-status-badge rejected">Not Qualified - Rejected in Previous Stage</span>;
+                    } else if (previousEvaluation && previousEvaluation.status === 'pending') {
+                        return <span className="stage-status-badge pending">Pending Evaluation</span>;
+                    } else if (!previousEvaluation) {
+                        const previousStage = data.stages[previousStageIndex];
+                        const prevDeadline = previousStage?.deadline ? new Date(previousStage.deadline) : null;
+                        if (prevDeadline && new Date() < prevDeadline) {
+                            return <span className="stage-status-badge locked">Locked - Complete Previous Stage</span>;
+                        } else {
+                            return <span className="stage-status-badge pending">Awaiting Evaluation Results</span>;
+                        }
+                    }
+                } else {
+                    return <span className="stage-status-badge locked">Locked - Complete Previous Stage</span>;
+                }
             }
         }
         
@@ -692,10 +753,13 @@ const ModernDetailsPage = () => {
                     
                     if (!teamStatus?.isEligibleForSubmission) {
                         return (
-                            <div className="team-incomplete-warning">
-                                <span className="warning-text">
-                                    ⚠️ {teamStatus?.eligibilityMessage || 'Team not eligible for quiz'}
-                                </span>
+                            <div className="stage-actions-group">
+                                <div className="team-incomplete-warning">
+                                    <span className="warning-text">
+                                        ⚠️ {teamStatus?.eligibilityMessage || 'Team not eligible for quiz'}
+                                    </span>
+                                </div>
+                                {renderTeamButton(stage, index)}
                             </div>
                         );
                     }
@@ -736,6 +800,18 @@ const ModernDetailsPage = () => {
             }
             
             if (deadline && now > deadline) {
+                // If user has existing team, show team management button
+                if (teamStatus?.hasTeam) {
+                    return (
+                        <div className="stage-actions-group">
+                            <div className="stage-info-only">
+                                <span className="stage-status-text">⏰ Registration Ended</span>
+                            </div>
+                            {renderTeamButton(stage, index)}
+                        </div>
+                    );
+                }
+                
                 return (
                     <button className="stage-action-btn disabled" disabled>
                         Stage 1 Ended
@@ -744,7 +820,7 @@ const ModernDetailsPage = () => {
             }
             
             if (startDate && deadline && now >= startDate && now <= deadline) {
-                // Phase 1: Team Creation (first priority)
+                // Phase 1: Team Creation/Management (first priority)
                 if (!teamStatus || !teamStatus.hasTeam) {
                     return (
                         <button 
@@ -754,6 +830,22 @@ const ModernDetailsPage = () => {
                             🏗️ Create Team
                         </button>
                     );
+                } else {
+                    // User has a team - show team management button
+                    const teamButton = (
+                        <button 
+                            className="stage-action-btn team-manage"
+                            onClick={() => handleTeamBuilding(stage, index)}
+                            title="View and manage your team"
+                        >
+                            👥 View Team ({teamStatus.memberCount}/{teamStatus.maxMembers})
+                        </button>
+                    );
+                    
+                    // If team is incomplete and registration deadline hasn't passed, show team button prominently
+                    if (!teamStatus.isEligibleForSubmission && !teamStatus.isRegistrationDeadlinePassed) {
+                        return teamButton;
+                    }
                 }
                 
                 // Team exists - now check stage requirements based on recruiter's configuration
@@ -776,6 +868,7 @@ const ModernDetailsPage = () => {
                                             <div className="submission-completed-indicator">
                                                 ✅ Project Submitted
                                             </div>
+                                            {renderTeamButton(stage, index)}
                                         </div>
                                     );
                                 }
@@ -787,10 +880,13 @@ const ModernDetailsPage = () => {
                                         </div>
                                         {/* FIRST_SUBMISSION_BUTTON_INSTANCE */}
                                         {!canTeamParticipate() ? (
-                                            <div className="team-deadline-passed">
-                                                <span className="deadline-text">
-                                                    ⏰ Registration deadline has passed. Team cannot participate.
-                                                </span>
+                                            <div className="stage-actions-group">
+                                                <div className="team-deadline-passed">
+                                                    <span className="deadline-text">
+                                                        ⏰ Registration deadline has passed. Team cannot participate.
+                                                    </span>
+                                                </div>
+                                                {renderTeamButton(stage, index)}
                                             </div>
                                         ) : teamStatus?.isEligibleForSubmission ? (
                                             <button 
@@ -802,18 +898,24 @@ const ModernDetailsPage = () => {
                                                 💡 {teamStatus?.isLeader ? 'Submit Project Idea' : 'Team Leader Submits'}
                                             </button>
                                         ) : (
-                                            <div className="team-incomplete-warning">
-                                                <span className="warning-text">
-                                                    ⚠️ {teamStatus?.eligibilityMessage || 'Team not eligible for submissions'}
-                                                </span>
+                                            <div className="stage-actions-group">
+                                                <div className="team-incomplete-warning">
+                                                    <span className="warning-text">
+                                                        ⚠️ {teamStatus?.eligibilityMessage || 'Team not eligible for submissions'}
+                                                    </span>
+                                                </div>
+                                                {renderTeamButton(stage, index)}
                                             </div>
                                         )}
                                     </div>
                                 );
                             } else {
                                 return (
-                                    <div className="stage-info-only">
-                                        <span className="stage-status-text">✅ Quiz Completed ({quizStatus.submission?.score}%)</span>
+                                    <div className="stage-actions-group">
+                                        <div className="stage-info-only">
+                                            <span className="stage-status-text">✅ Quiz Completed ({quizStatus.submission?.score}%)</span>
+                                        </div>
+                                        {renderTeamButton(stage, index)}
                                     </div>
                                 );
                             }
@@ -821,20 +923,26 @@ const ModernDetailsPage = () => {
                             // Quiz available - check team eligibility and deadline first
                             if (!canTeamParticipate()) {
                                 return (
-                                    <div className="team-deadline-passed">
-                                        <span className="deadline-text">
-                                            ⏰ Registration deadline has passed. Team cannot participate.
-                                        </span>
+                                    <div className="stage-actions-group">
+                                        <div className="team-deadline-passed">
+                                            <span className="deadline-text">
+                                                ⏰ Registration deadline has passed. Team cannot participate.
+                                            </span>
+                                        </div>
+                                        {renderTeamButton(stage, index)}
                                     </div>
                                 );
                             }
                             
                             if (!teamStatus?.isEligibleForSubmission) {
                                 return (
-                                    <div className="team-incomplete-warning">
-                                        <span className="warning-text">
-                                            ⚠️ {teamStatus?.eligibilityMessage || 'Team not eligible for quiz'}
-                                        </span>
+                                    <div className="stage-actions-group">
+                                        <div className="team-incomplete-warning">
+                                            <span className="warning-text">
+                                                ⚠️ {teamStatus?.eligibilityMessage || 'Team not eligible for quiz'}
+                                            </span>
+                                        </div>
+                                        {renderTeamButton(stage, index)}
                                     </div>
                                 );
                             }
@@ -917,10 +1025,13 @@ const ModernDetailsPage = () => {
                                         </button>
                                         {/* SECOND_SUBMISSION_BUTTON_INSTANCE */}
                                         {!canTeamParticipate() ? (
-                                            <div className="team-deadline-passed">
-                                                <span className="deadline-text">
-                                                    ⏰ Registration deadline has passed. Team cannot participate.
-                                                </span>
+                                            <div className="stage-actions-group">
+                                                <div className="team-deadline-passed">
+                                                    <span className="deadline-text">
+                                                        ⏰ Registration deadline has passed. Team cannot participate.
+                                                    </span>
+                                                </div>
+                                                {renderTeamButton(stage, index)}
                                             </div>
                                         ) : teamStatus?.isEligibleForSubmission ? (
                                             <button 
@@ -932,10 +1043,13 @@ const ModernDetailsPage = () => {
                                                 💡 {teamStatus?.isLeader ? 'Submit Project Idea' : 'Team Leader Submits'}
                                             </button>
                                         ) : (
-                                            <div className="team-incomplete-warning">
-                                                <span className="warning-text">
-                                                    ⚠️ {teamStatus?.eligibilityMessage || 'Team not eligible for submissions'}
-                                                </span>
+                                            <div className="stage-actions-group">
+                                                <div className="team-incomplete-warning">
+                                                    <span className="warning-text">
+                                                        ⚠️ {teamStatus?.eligibilityMessage || 'Team not eligible for submissions'}
+                                                    </span>
+                                                </div>
+                                                {renderTeamButton(stage, index)}
                                             </div>
                                         )}
                                     </div>
@@ -956,20 +1070,26 @@ const ModernDetailsPage = () => {
                             // Check team eligibility and registration deadline before showing submit button
                             if (!canTeamParticipate()) {
                                 return (
-                                    <div className="team-deadline-passed">
-                                        <span className="deadline-text">
-                                            ⏰ Registration deadline has passed. Team cannot participate.
-                                        </span>
+                                    <div className="stage-actions-group">
+                                        <div className="team-deadline-passed">
+                                            <span className="deadline-text">
+                                                ⏰ Registration deadline has passed. Team cannot participate.
+                                            </span>
+                                        </div>
+                                        {renderTeamButton(stage, index)}
                                     </div>
                                 );
                             }
                             
                             if (!teamStatus?.isEligibleForSubmission) {
                                 return (
-                                    <div className="team-incomplete-warning">
-                                        <span className="warning-text">
-                                            ⚠️ {teamStatus?.eligibilityMessage || 'Team not eligible for submissions'}
-                                        </span>
+                                    <div className="stage-actions-group">
+                                        <div className="team-incomplete-warning">
+                                            <span className="warning-text">
+                                                ⚠️ {teamStatus?.eligibilityMessage || 'Team not eligible for submissions'}
+                                            </span>
+                                        </div>
+                                        {renderTeamButton(stage, index)}
                                     </div>
                                 );
                             }
@@ -987,8 +1107,11 @@ const ModernDetailsPage = () => {
                         }
                     }
                     
-                    // No quiz, no submissions - team created but nothing to show
-                    // Don't show any button, team creation phase is complete
+                    // No quiz, no submissions - team created but show team management
+                    if (teamStatus?.hasTeam) {
+                        return renderTeamButton(stage, index);
+                    }
+                    
                     return null;
                 }
             }
@@ -1047,19 +1170,57 @@ const ModernDetailsPage = () => {
             );
         }
         
-        // For submission stages (Stage 2+) - check if previous stages are complete
+        // For submission stages (Stage 2+) - check if user is qualified
         if (index > 0) {
-            const previousStage = data.stages[index - 1];
-            const prevDeadline = previousStage.deadline ? new Date(previousStage.deadline) : null;
-            
-            // If previous stage hasn't ended yet, this stage should be locked
-            if (prevDeadline && now < prevDeadline) {
-                const daysLeft = Math.ceil((prevDeadline - now) / (1000 * 60 * 60 * 24));
-                return (
-                    <button className="stage-action-btn locked" disabled>
-                        🔒 Unlocks in {daysLeft} days
-                    </button>
-                );
+            if (!isQualifiedForStage(index)) {
+                // Check if it's because of evaluation or deadline
+                if (needsTeamManagement() && teamStatus?.hasTeam) {
+                    const evaluations = teamStatus.evaluations || [];
+                    const previousStageIndex = index - 1;
+                    const previousEvaluation = evaluations.find(evaluation => evaluation.stageIndex === previousStageIndex);
+                    
+                    if (previousEvaluation && previousEvaluation.status === 'rejected') {
+                        return (
+                            <button className="stage-action-btn rejected" disabled>
+                                ❌ Not Qualified
+                            </button>
+                        );
+                    } else if (previousEvaluation && previousEvaluation.status === 'pending') {
+                        return (
+                            <button className="stage-action-btn pending" disabled>
+                                ⏳ Awaiting Results
+                            </button>
+                        );
+                    } else if (!previousEvaluation) {
+                        const previousStage = data.stages[previousStageIndex];
+                        const prevDeadline = previousStage?.deadline ? new Date(previousStage.deadline) : null;
+                        if (prevDeadline && new Date() < prevDeadline) {
+                            const daysLeft = Math.ceil((prevDeadline - new Date()) / (1000 * 60 * 60 * 24));
+                            return (
+                                <button className="stage-action-btn locked" disabled>
+                                    🔒 Unlocks in {daysLeft} days
+                                </button>
+                            );
+                        } else {
+                            return (
+                                <button className="stage-action-btn pending" disabled>
+                                    ⏳ Awaiting Evaluation
+                                </button>
+                            );
+                        }
+                    }
+                } else {
+                    const previousStage = data.stages[index - 1];
+                    const prevDeadline = previousStage?.deadline ? new Date(previousStage.deadline) : null;
+                    if (prevDeadline && new Date() < prevDeadline) {
+                        const daysLeft = Math.ceil((prevDeadline - new Date()) / (1000 * 60 * 60 * 24));
+                        return (
+                            <button className="stage-action-btn locked" disabled>
+                                🔒 Unlocks in {daysLeft} days
+                            </button>
+                        );
+                    }
+                }
             }
         }
         
@@ -1126,20 +1287,26 @@ const ModernDetailsPage = () => {
                     // Quiz available - check team eligibility and deadline first
                     if (!canTeamParticipate()) {
                         return (
-                            <div className="team-deadline-passed">
-                                <span className="deadline-text">
-                                    ⏰ Registration deadline has passed. Team cannot participate.
-                                </span>
+                            <div className="stage-actions-group">
+                                <div className="team-deadline-passed">
+                                    <span className="deadline-text">
+                                        ⏰ Registration deadline has passed. Team cannot participate.
+                                    </span>
+                                </div>
+                                {renderTeamButton(stage, index)}
                             </div>
                         );
                     }
                     
                     if (!teamStatus?.isEligibleForSubmission) {
                         return (
-                            <div className="team-incomplete-warning">
-                                <span className="warning-text">
-                                    ⚠️ {teamStatus?.eligibilityMessage || 'Team not eligible for quiz'}
-                                </span>
+                            <div className="stage-actions-group">
+                                <div className="team-incomplete-warning">
+                                    <span className="warning-text">
+                                        ⚠️ {teamStatus?.eligibilityMessage || 'Team not eligible for quiz'}
+                                    </span>
+                                </div>
+                                {renderTeamButton(stage, index)}
                             </div>
                         );
                     }

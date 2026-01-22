@@ -16,6 +16,10 @@ exports.getProfile = async (req, res, next) => {
     delete user.resetPasswordToken;
     delete user.resetPasswordExpires;
 
+    // Debug: Log badges being sent
+    console.log('Sending user profile with badges:', user.badges);
+    console.log('User ID:', user.id, 'Quiz completed:', user.profileQuizCompleted);
+
     return res.status(200).json({
       success: true,
       message: 'Profile fetched successfully',

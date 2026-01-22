@@ -227,6 +227,111 @@
   margin-top: 8px;
 }
 
+.quizSection .primaryBtn:disabled {
+  background: rgba(255, 214, 0, 0.3);
+  color: rgba(26, 23, 25, 0.6);
+  cursor: not-allowed;
+}
+
+.quizInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 8px 0;
+}
+
+.quizInfo .mutedSmall {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ---------- RTE badge section ---------- */
+.rteBadgeSection {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.badgeDisplay {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.badgeItem {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 20px;
+  background: rgba(255, 214, 0, 0.05);
+  border: 2px solid rgba(255, 214, 0, 0.3);
+  border-radius: 16px;
+  min-width: 300px;
+}
+
+.badgeIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: rgba(255, 214, 0, 0.1);
+}
+
+.badgeIconSvg {
+  width: 32px;
+  height: 32px;
+}
+
+.badgeGold {
+  color: #ffd700;
+}
+
+.badgeSilver {
+  color: #c0c0c0;
+}
+
+.badgeBronze {
+  color: #cd7f32;
+}
+
+.badgeInfo {
+  flex: 1;
+}
+
+.badgeName {
+  margin: 0 0 5px 0;
+  color: #ffd600;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.badgeLevel {
+  margin: 0 0 5px 0;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+}
+
+.badgeScore {
+  display: inline-block;
+  background: rgba(255, 214, 0, 0.2);
+  color: #ffd600;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.badgeDescription {
+  margin: 8px 0 0 0;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+  font-style: italic;
+}
+
 /* responsive */
 @media (max-width: 768px) {
   .cover {

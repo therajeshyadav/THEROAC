@@ -5,10 +5,11 @@ const request = async (endpoint, options = {}, retryCount = 0) => {
     const url = `${API_BASE_URL}${endpoint}`;
     const token = localStorage.getItem('token');
 
-    // Create timeout controller - longer timeout for admin endpoints
+    // Create timeout controller - longer timeout for admin endpoints and AI endpoints
     const controller = new AbortController();
     const isAdminEndpoint = endpoint.startsWith('/admin');
-    const timeoutDuration = isAdminEndpoint ? 45000 : 20000; // 45s for admin, 20s for others
+    const isAIEndpoint = endpoint.startsWith('/profile-quiz');
+    const timeoutDuration = isAIEndpoint ? 60000 : (isAdminEndpoint ? 45000 : 20000); // 60s for AI, 45s for admin, 20s for others
     const timeoutId = setTimeout(() => controller.abort(), timeoutDuration);
 
     const config = {
@@ -918,7 +919,25 @@ const apiService = {
     getEventProblemStatements,
     validateTeamForSubmission,
     createEventTeam,
-    joinEventTeam
+    joinEventTeam,
+    
+    // Profile Quiz APIs
+    generateProfileQuiz: (skills) => {
+        console.log('API: Generating profile quiz for skills:', skills);
+        return request('/profile-quiz/generate', {
+            method: 'POST',
+            body: JSON.stringify({ skills })
+        });
+    },
+    
+    submitProfileQuiz: (data) => request('/profile-quiz/submit', {
+        method: 'POST',
+        body: JSON.stringify(data)
+    }),
+    
+    getProfileQuizStatus: () => request('/profile-quiz/status'),
+    
+    getUserProfileBadges: (userId) => request(`/profile-quiz/badges${userId ? `/${userId}` : ''}`)
 };
 
 export default apiService;

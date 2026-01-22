@@ -52,7 +52,11 @@ User.init({
   companyWebsite: { type: DataTypes.STRING, allowNull: true },
   linkedinUrl: { type: DataTypes.STRING, allowNull: true },
   twitterUrl: { type: DataTypes.STRING, allowNull: true },
-  githubUrl: { type: DataTypes.STRING, allowNull: true }
+  githubUrl: { type: DataTypes.STRING, allowNull: true },
+  // Profile quiz and badges
+  badges: { type: DataTypes.JSON, defaultValue: [] },
+  profileQuizCompleted: { type: DataTypes.BOOLEAN, defaultValue: false },
+  profileQuizCompletedAt: { type: DataTypes.DATE, allowNull: true }
 }, {
   sequelize,
   modelName: 'User',

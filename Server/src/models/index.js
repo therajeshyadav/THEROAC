@@ -25,6 +25,7 @@ const TalentPipeline = require('./TalentPipeline');
 const Review = require('./Review');
 const FAQ = require('./FAQ');
 const QuizSubmission = require('./QuizSubmission');
+const ProfileQuizSubmission = require('./ProfileQuizSubmission');
 
 // Associations
 User.hasMany(Event, { foreignKey: 'createdBy', as: 'createdEvents' });
@@ -182,6 +183,10 @@ EventTeamMember.belongsTo(Event, { foreignKey: 'eventId', as: 'event' });
 User.hasMany(EventTeamMember, { foreignKey: 'userId', as: 'teamMemberships' });
 Event.hasMany(EventTeamMember, { foreignKey: 'eventId', as: 'teamMembers' });
 
+// ProfileQuizSubmission associations
+ProfileQuizSubmission.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+User.hasMany(ProfileQuizSubmission, { foreignKey: 'userId', as: 'profileQuizSubmissions' });
+
 module.exports = {
   sequelize,
   User,
@@ -209,5 +214,6 @@ module.exports = {
   TalentPipeline,
   Review,
   FAQ,
-  QuizSubmission
+  QuizSubmission,
+  ProfileQuizSubmission
 };

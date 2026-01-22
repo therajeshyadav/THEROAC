@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { User } from "lucide-react";
+import { User, Award } from "lucide-react";
 import styles from "./CandidateProfilePage.module.css";
+import ProfileQuiz from "../ProfileQuiz";
 
 // Default empty profile (new user)
 function getEmptyProfile() {
@@ -19,6 +20,7 @@ function getEmptyProfile() {
     skills: [],
     experiences: [],
     education: [],
+    badges: [], // Add badges field
   };
 }
 
@@ -36,9 +38,11 @@ const CandidateProfilePage = ({ initialProfile, onSaveProfile }) => {
   const [showPhoneModal, setShowPhoneModal] = useState(false);
   const [tempPhone, setTempPhone] = useState("");
   const [isPhoneMandatory, setIsPhoneMandatory] = useState(false);
+  const [showProfileQuiz, setShowProfileQuiz] = useState(false);
 
   // Jab initialProfile aaye (backend se), state update karo
   useEffect(() => {
+    console.log('initialProfile received:', initialProfile); // Debug log
     if (initialProfile) {
       const updatedProfile = {
         ...getEmptyProfile(),
@@ -53,7 +57,9 @@ const CandidateProfilePage = ({ initialProfile, onSaveProfile }) => {
         skills: Array.isArray(initialProfile.skills) ? initialProfile.skills : [],
         experiences: Array.isArray(initialProfile.experiences) ? initialProfile.experiences : [],
         education: Array.isArray(initialProfile.education) ? initialProfile.education : [],
+        badges: Array.isArray(initialProfile.badges) ? initialProfile.badges : [], // Add badges
       };
+      console.log('Updated profile with badges:', updatedProfile.badges); // Debug log
       setProfile(updatedProfile);
 
       // Check if phone number is missing and show modal
@@ -227,6 +233,67 @@ const CandidateProfilePage = ({ initialProfile, onSaveProfile }) => {
     } finally {
       setSaving(false);
     }
+  };
+
+  // -------- PROFILE QUIZ HANDLERS --------
+  const handleStartProfileQuiz = () => {
+    if (!profile.skills || profile.skills.length === 0) {
+      alert("Please add skills to your profile first to take the assessment quiz.");
+      return;
+    }
+    setShowProfileQuiz(true);
+  };
+
+  const handleQuizComplete = async (results) => {
+    console.log('Quiz completed:', results);
+    
+    // Update profile with new badges immediately for UI
+    if (results.badges && results.badges.length > 0) {
+      setProfile(prev => ({
+        ...prev,
+        badges: results.badges
+      }));
+    }
+    
+    setShowProfileQuiz(false);
+    
+    // Clear localStorage and fetch fresh user data
+    try {
+      console.log('Fetching fresh user data...');
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:4000/api'}/users/me`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log('API Response:', data);
+        const updatedUser = data.user || data;
+        console.log('Updated user badges:', updatedUser.badges);
+        
+        // Update localStorage with fresh data including badges
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        console.log('Updated localStorage with badges:', updatedUser.badges);
+        
+        // Force page refresh to reload with new data
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      } else {
+        console.error('API response not ok:', response.status);
+      }
+    } catch (error) {
+      console.error('Error fetching updated user data:', error);
+      // Fallback: just refresh the page
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+    }
+  };
+
+  const handleCloseQuiz = () => {
+    setShowProfileQuiz(false);
   };
 
   return (
@@ -549,17 +616,81 @@ const CandidateProfilePage = ({ initialProfile, onSaveProfile }) => {
         )}
       </Section>
 
-      {/* ================== QUIZ FOR BADGE ================== */}
-      <Section title="Quiz for Badge">
+      {/* ================== RTE BADGE ================== */}
+      <Section 
+        title="RTE Badge" 
+        action={
+          <Award size={20} style={{ color: '#ffd600' }} />
+        }
+      >
+        <div className={styles.rteBadgeSection}>
+          {/* Debug: Show badges data */}
+          {console.log('Profile badges:', profile.badges)}
+          {profile.badges && profile.badges.length > 0 ? (
+            <div className={styles.badgeDisplay}>
+              {profile.badges.map((badge, index) => (
+                <div key={index} className={styles.badgeItem}>
+                  <div className={styles.badgeIcon}>
+                    <Award 
+                      size={32} 
+                      className={`${styles.badgeIconSvg} ${styles[`badge${badge.type.charAt(0).toUpperCase() + badge.type.slice(1)}`]}`} 
+                    />
+                  </div>
+                  <div className={styles.badgeInfo}>
+                    <h4 className={styles.badgeName}>{badge.name}</h4>
+                    <p className={styles.badgeLevel}>{badge.level} Level</p>
+                    <span className={styles.badgeScore}>{badge.score}%</span>
+                    <p className={styles.badgeDescription}>{badge.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div>
+              <p className={styles.text}>
+                Complete the RTE assessment to earn your skill badge.
+              </p>
+              {/* Debug info */}
+              <p className={styles.mutedSmall} style={{marginTop: '10px'}}>
+                Debug: Badges length = {profile.badges ? profile.badges.length : 'undefined'}
+              </p>
+            </div>
+          )}
+        </div>
+      </Section>
+
+      {/* ================== SKILL ASSESSMENT ================== */}
+      <Section 
+        title="Skill Assessment" 
+        action={
+          <Award size={20} style={{ color: '#ffd700' }} />
+        }
+      >
         <div className={styles.quizSection}>
           <p className={styles.text}>
-            Take skill-based quizzes to earn badges and showcase your expertise to recruiters.
+            Take a one-time skill assessment quiz to earn badges and showcase your expertise to recruiters.
+            The quiz will be generated based on your profile skills.
           </p>
+          <div className={styles.quizInfo}>
+            <p className={styles.mutedSmall}>
+              • Questions based on your skills: {profile.skills?.length > 0 ? profile.skills.join(', ') : 'Add skills first'}
+            </p>
+            <p className={styles.mutedSmall}>
+              • Earn Gold, Silver, or Bronze badges
+            </p>
+            <p className={styles.mutedSmall}>
+              • One-time opportunity per profile
+            </p>
+          </div>
           <button
             className={styles.primaryBtn}
-            onClick={() => navigate('/quiz')}
+            onClick={handleStartProfileQuiz}
+            disabled={!profile.skills || profile.skills.length === 0}
           >
-            Take Quiz
+            {!profile.skills || profile.skills.length === 0 
+              ? 'Add Skills First' 
+              : 'Take Skill Assessment'
+            }
           </button>
         </div>
       </Section>
@@ -601,6 +732,15 @@ const CandidateProfilePage = ({ initialProfile, onSaveProfile }) => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* ================== PROFILE QUIZ MODAL ================== */}
+      {showProfileQuiz && (
+        <ProfileQuiz
+          userSkills={profile.skills}
+          onQuizComplete={handleQuizComplete}
+          onClose={handleCloseQuiz}
+        />
       )}
     </div>
   );

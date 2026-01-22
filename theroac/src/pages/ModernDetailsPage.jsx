@@ -2162,7 +2162,7 @@ const ModernDetailsPage = () => {
                         data.problemStatements.type && (
                           <div className="info-item">
                             <strong>Problem Statement:</strong>
-                            <span>
+                            <div>
                               {data.problemStatements.type === "link" && (
                                 <a
                                   href={data.problemStatements.url}
@@ -2172,6 +2172,7 @@ const ModernDetailsPage = () => {
                                   style={{
                                     color: "#007bff",
                                     textDecoration: "none",
+                                    textAlign: "center",
                                   }}
                                 >
                                   🔗 View Problem Statement
@@ -2205,7 +2206,7 @@ const ModernDetailsPage = () => {
                                   📊 Download Presentation
                                 </a>
                               )}
-                            </span>
+                            </div>
                           </div>
                         )}
                     </div>

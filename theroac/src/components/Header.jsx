@@ -84,11 +84,11 @@ const Header = () => {
                     <li>
                       {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
                       <a href="#">
-                        Blogs <i className="fa-solid fa-angle-down"></i>
+                        Courses <i className="fa-solid fa-angle-down"></i>
                       </a>
                       <ul className="dropdown-padding">
-                        <li><a href="/blog">Our Blog</a></li>
-                        <li><a href="/blog-single">Blog Details</a></li>
+                        <li><a href="/quiz">Quiz</a></li>
+                        <li><a href="/blog-single">UpComming Courses</a></li>
                       </ul>
                     </li>
                     {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}

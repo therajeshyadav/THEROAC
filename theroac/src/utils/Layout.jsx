@@ -153,22 +153,22 @@ const Layout = ({ children }) => {
                 </li>
               </ul>
             </li>
-            <li className={`has-sub ${openSubMenu === "blogs" ? "open" : ""}`}>
+            <li className={`has-sub ${openSubMenu === "courses" ? "open" : ""}`}>
               <div
                 className="submenu-button"
-                onClick={() => toggleSubMenu("blogs")}
+                onClick={() => toggleSubMenu("courses")}
               >
-                Blogs
+                Courses
               </div>
               <ul className="sub-menu">
                 <li>
-                  <a href="/blog" onClick={() => setMenuOpen(false)}>
-                    Our Blog
+                  <a href="/quiz" onClick={() => setMenuOpen(false)}>
+                   Quiz
                   </a>
                 </li>
                 <li>
                   <a href="/blog-single" onClick={() => setMenuOpen(false)}>
-                    Blog Details
+                   UpComming Courses
                   </a>
                 </li>
               </ul>

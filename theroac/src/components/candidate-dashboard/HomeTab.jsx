@@ -195,7 +195,7 @@ const HomeTab = ({
                       >
                         {app.status || 'Pending'}
                       </span>
-                      <i className="fas fa-chevron-right" style={{ marginLeft: '12px', color: '#999', fontSize: '14px' }} />
+                      {/* <i className="fas fa-chevron-right" style={{ marginLeft: '12px', color: '#999', fontSize: '14px' }} /> */}
                     </div>
                   </div>
                 ))

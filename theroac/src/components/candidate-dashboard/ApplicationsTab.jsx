@@ -377,6 +377,8 @@ const ApplicationsTab = ({ applications, getStatusColor, onViewJobDetails, refre
             <span>
               <i className="fas fa-calendar" /> {applicationType === 'event' ? 'Registered' : 'Applied'}: {new Date(app.createdAt).toLocaleDateString()}
             </span>
+         </div>
+            <div className="application-status">
             <span
               className="status-badge"
               style={{ backgroundColor: getStatusColor(app.status) }}

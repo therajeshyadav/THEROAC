@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { Bookmark } = require('../models');
+const { Bookmark, Job, Event, HubContent } = require('../models');
 const { authenticate } = require('../middlewares/auth');
 
 // Toggle bookmark
@@ -54,9 +54,15 @@ router.get('/status/:itemType/:itemId', authenticate, async (req, res) => {
 router.get('/my-bookmarks', authenticate, async (req, res) => {
   try {
     const userId = req.user.id;
+
     const bookmarks = await Bookmark.findAll({
       where: { userId },
-      order: [['createdAt', 'DESC']]
+      order: [['createdAt', 'DESC']],
+      include: [
+        { model: Job, required: false },
+        { model: Event, required: false },
+        { model: HubContent, required: false }
+      ]
     });
 
     return res.json(bookmarks);
@@ -65,5 +71,6 @@ router.get('/my-bookmarks', authenticate, async (req, res) => {
     return res.status(500).json({ error: 'Failed to fetch bookmarks' });
   }
 });
+
 
 module.exports = router;

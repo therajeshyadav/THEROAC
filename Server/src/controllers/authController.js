@@ -1,25 +1,35 @@
-const { User } = require('../models');
-const jwt = require('jsonwebtoken');
-const crypto = require('crypto');
-const { Op } = require('sequelize');
-const emailService = require('../utils/emailService');
-const bcrypt = require('bcryptjs');
+const { User } = require("../models");
+const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
+const { Op } = require("sequelize");
+const emailService = require("../utils/emailService");
+const bcrypt = require("bcryptjs");
 
 exports.register = async (req, res, next) => {
   try {
-    const { name, fullName, email, password, phone, role = 'candidate', provider = 'email' } = req.body;
+    const {
+      name,
+      fullName,
+      email,
+      password,
+      phone,
+      role = "candidate",
+      provider = "email",
+    } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ message: 'Email and password are required' });
+      return res
+        .status(400)
+        .json({ message: "Email and password are required" });
     }
 
     // Check only email uniqueness, phone can be shared by multiple users
     const existing = await User.findOne({ where: { email } });
     if (existing) {
-      return res.status(400).json({ message: 'Email already registered' });
+      return res.status(400).json({ message: "Email already registered" });
     }
 
-    const emailVerificationToken = crypto.randomBytes(32).toString('hex');
+    const emailVerificationToken = crypto.randomBytes(32).toString("hex");
 
     const user = await User.create({
       fullName: fullName || name,
@@ -31,14 +41,22 @@ exports.register = async (req, res, next) => {
       emailVerificationToken,
       isVerified: false,
       failedLoginAttempts: 0,
-      preferences: { emailNotifications: true, pushNotifications: true, darkMode: false },
-      signupSource: 'website',
+      preferences: {
+        emailNotifications: true,
+        pushNotifications: true,
+        darkMode: false,
+      },
+      signupSource: "website",
     });
 
     try {
-      await emailService.sendVerificationEmail(email, emailVerificationToken, user.fullName);
+      await emailService.sendVerificationEmail(
+        email,
+        emailVerificationToken,
+        user.fullName,
+      );
     } catch (emailError) {
-      console.error('Failed to send verification email:', emailError);
+      console.error("Failed to send verification email:", emailError);
     }
 
     const userResponse = {
@@ -50,30 +68,31 @@ exports.register = async (req, res, next) => {
     };
 
     return res.status(201).json({
-      message: 'Registration successful! Please check your email to verify your account.',
+      message:
+        "Registration successful! Please check your email to verify your account.",
       user: userResponse,
       needsVerification: true,
     });
   } catch (err) {
-    console.error('Error in register:', err);
+    console.error("Error in register:", err);
 
     // Handle Sequelize unique constraint errors
-    if (err.name === 'SequelizeUniqueConstraintError') {
-      const field = err.errors[0]?.path || 'field';
+    if (err.name === "SequelizeUniqueConstraintError") {
+      const field = err.errors[0]?.path || "field";
       return res.status(400).json({
-        message: `This ${field} is already registered`
+        message: `This ${field} is already registered`,
       });
     }
 
     // Handle validation errors
-    if (err.name === 'SequelizeValidationError') {
+    if (err.name === "SequelizeValidationError") {
       return res.status(400).json({
-        message: err.errors[0]?.message || 'Validation error'
+        message: err.errors[0]?.message || "Validation error",
       });
     }
 
     return res.status(500).json({
-      message: 'Registration failed. Please try again.'
+      message: "Registration failed. Please try again.",
     });
   }
 };
@@ -82,18 +101,21 @@ exports.login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
     if (!email || !password)
-      return res.status(400).json({ message: 'Email and password are required' });
+      return res
+        .status(400)
+        .json({ message: "Email and password are required" });
 
     const user = await User.findOne({ where: { email } });
-    if (!user) return res.status(404).json({ message: 'User not found' });
+    if (!user) return res.status(404).json({ message: "User not found" });
 
     // Check if user is banned
-    if (user.status === 'banned') {
+    if (user.status === "banned") {
       return res.status(403).json({
-        message: 'Your account has been banned. Please contact admin for further assistance.',
+        message:
+          "Your account has been banned. Please contact admin for further assistance.",
         isBanned: true,
-        supportEmail: 'support@theroac.com',
-        supportPhone: '+91-0000000000'
+        supportEmail: "support@theroac.com",
+        supportPhone: "+91-0000000000",
       });
     }
 
@@ -101,12 +123,12 @@ exports.login = async (req, res, next) => {
     if (!valid) {
       user.failedLoginAttempts = (user.failedLoginAttempts || 0) + 1;
       await user.save();
-      return res.status(401).json({ message: 'Invalid credentials' });
+      return res.status(401).json({ message: "Invalid credentials" });
     }
 
     if (!user.isVerified) {
       return res.status(403).json({
-        message: 'Please verify your email before logging in.',
+        message: "Please verify your email before logging in.",
         needsVerification: true,
       });
     }
@@ -118,7 +140,7 @@ exports.login = async (req, res, next) => {
     const token = jwt.sign(
       { id: user.id, role: user.role },
       process.env.JWT_SECRET,
-      { expiresIn: '7d' }
+      { expiresIn: "7d" },
     );
 
     const userResponse = {
@@ -135,14 +157,14 @@ exports.login = async (req, res, next) => {
     };
 
     return res.status(200).json({
-      message: 'Login successful',
+      message: "Login successful",
       user: userResponse,
       token,
     });
   } catch (err) {
-    console.error('Error in login:', err);
+    console.error("Error in login:", err);
     return res.status(500).json({
-      message: 'Login failed. Please try again.'
+      message: "Login failed. Please try again.",
     });
   }
 };
@@ -150,7 +172,7 @@ exports.login = async (req, res, next) => {
 exports.me = async (req, res, next) => {
   try {
     const user = await User.findByPk(req.user.id);
-    if (!user) return res.status(404).json({ message: 'User not found' });
+    if (!user) return res.status(404).json({ message: "User not found" });
 
     const userResponse = {
       id: user.id,
@@ -172,6 +194,7 @@ exports.me = async (req, res, next) => {
       skills: user.skills || [],
       experiences: user.experiences || [],
       education: user.education || [],
+      badges: user.badges || [],
       // Company information (for recruiters)
       company: user.company || null,
       // Preferences (hiring, communication, metrics)
@@ -180,9 +203,9 @@ exports.me = async (req, res, next) => {
 
     res.json(userResponse);
   } catch (err) {
-    console.error('Error in me:', err);
+    console.error("Error in me:", err);
     return res.status(500).json({
-      message: 'Failed to fetch user data. Please try again.'
+      message: "Failed to fetch user data. Please try again.",
     });
   }
 };
@@ -192,15 +215,21 @@ exports.verifyEmail = async (req, res, next) => {
     const { token } = req.query;
 
     if (!token)
-      return res.status(400).json({ message: 'Verification token is required' });
+      return res
+        .status(400)
+        .json({ message: "Verification token is required" });
 
-    const user = await User.findOne({ where: { emailVerificationToken: token } });
+    const user = await User.findOne({
+      where: { emailVerificationToken: token },
+    });
 
     if (!user)
-      return res.status(400).json({ message: 'Invalid or expired verification token' });
+      return res
+        .status(400)
+        .json({ message: "Invalid or expired verification token" });
 
     if (user.isVerified)
-      return res.status(400).json({ message: 'Email already verified' });
+      return res.status(400).json({ message: "Email already verified" });
 
     user.isVerified = true;
     user.emailVerifiedAt = new Date();
@@ -210,14 +239,14 @@ exports.verifyEmail = async (req, res, next) => {
     try {
       await emailService.sendWelcomeEmail(user.email, user.fullName);
     } catch (emailError) {
-      console.error('Failed to send welcome email:', emailError);
+      console.error("Failed to send welcome email:", emailError);
     }
 
-    return res.status(200).json({ message: 'Email verified successfully!' });
+    return res.status(200).json({ message: "Email verified successfully!" });
   } catch (err) {
-    console.error('Error in verifyEmail:', err);
+    console.error("Error in verifyEmail:", err);
     return res.status(500).json({
-      message: 'Email verification failed. Please try again.'
+      message: "Email verification failed. Please try again.",
     });
   }
 };
@@ -225,33 +254,36 @@ exports.verifyEmail = async (req, res, next) => {
 exports.resendVerification = async (req, res, next) => {
   try {
     const { email } = req.body;
-    if (!email) return res.status(400).json({ message: 'Email is required' });
+    if (!email) return res.status(400).json({ message: "Email is required" });
 
     const user = await User.findOne({ where: { email } });
-    if (!user) return res.status(404).json({ message: 'User not found' });
+    if (!user) return res.status(404).json({ message: "User not found" });
 
     if (user.isVerified)
-      return res.status(400).json({ message: 'Email already verified' });
+      return res.status(400).json({ message: "Email already verified" });
 
-    const token = crypto.randomBytes(32).toString('hex');
+    const token = crypto.randomBytes(32).toString("hex");
     user.emailVerificationToken = token;
     await user.save();
 
     try {
       await emailService.sendVerificationEmail(email, token, user.fullName);
-      return res.status(200).json({ message: 'Verification email sent successfully!' });
+      return res
+        .status(200)
+        .json({ message: "Verification email sent successfully!" });
     } catch (emailError) {
-      console.error('Failed to send verification email:', emailError.message);
+      console.error("Failed to send verification email:", emailError.message);
       // Still return success since token is saved, but inform about email issue
       return res.status(200).json({
-        message: 'Verification token generated. Email service temporarily unavailable.',
-        warning: 'Please try again in a few moments or contact support.'
+        message:
+          "Verification token generated. Email service temporarily unavailable.",
+        warning: "Please try again in a few moments or contact support.",
       });
     }
   } catch (err) {
-    console.error('Error in resendVerification:', err);
+    console.error("Error in resendVerification:", err);
     return res.status(500).json({
-      message: 'Failed to resend verification email. Please try again.'
+      message: "Failed to resend verification email. Please try again.",
     });
   }
 };
@@ -259,16 +291,15 @@ exports.resendVerification = async (req, res, next) => {
 exports.forgotPassword = async (req, res, next) => {
   try {
     const { email } = req.body;
-    if (!email)
-      return res.status(400).json({ message: 'Email is required' });
+    if (!email) return res.status(400).json({ message: "Email is required" });
 
     const user = await User.findOne({ where: { email } });
     if (!user)
       return res.json({
-        message: 'If that email exists, a password reset link has been sent.',
+        message: "If that email exists, a password reset link has been sent.",
       });
 
-    const resetToken = crypto.randomBytes(32).toString('hex');
+    const resetToken = crypto.randomBytes(32).toString("hex");
     const resetExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
 
     user.resetPasswordToken = resetToken;
@@ -278,12 +309,12 @@ exports.forgotPassword = async (req, res, next) => {
     await emailService.sendPasswordResetEmail(email, resetToken, user.fullName);
 
     return res.json({
-      message: 'If that email exists, a password reset link has been sent.',
+      message: "If that email exists, a password reset link has been sent.",
     });
   } catch (err) {
-    console.error('Error in forgotPassword:', err);
+    console.error("Error in forgotPassword:", err);
     return res.status(500).json({
-      message: 'Failed to process password reset request. Please try again.'
+      message: "Failed to process password reset request. Please try again.",
     });
   }
 };
@@ -293,7 +324,9 @@ exports.resetPassword = async (req, res, next) => {
     const { token, password } = req.body;
 
     if (!token || !password)
-      return res.status(400).json({ message: 'Token and new password are required' });
+      return res
+        .status(400)
+        .json({ message: "Token and new password are required" });
 
     const user = await User.findOne({
       where: {
@@ -303,7 +336,9 @@ exports.resetPassword = async (req, res, next) => {
     });
 
     if (!user)
-      return res.status(400).json({ message: 'Invalid or expired reset token' });
+      return res
+        .status(400)
+        .json({ message: "Invalid or expired reset token" });
 
     user.passwordHash = password; // Model hook will hash it automatically
     user.resetPasswordToken = null;
@@ -311,11 +346,11 @@ exports.resetPassword = async (req, res, next) => {
     user.failedLoginAttempts = 0;
     await user.save();
 
-    return res.status(200).json({ message: 'Password reset successfully!' });
+    return res.status(200).json({ message: "Password reset successfully!" });
   } catch (err) {
-    console.error('Error in resetPassword:', err);
+    console.error("Error in resetPassword:", err);
     return res.status(500).json({
-      message: 'Password reset failed. Please try again.'
+      message: "Password reset failed. Please try again.",
     });
   }
 };
@@ -324,25 +359,27 @@ exports.socialCallback = async (req, res) => {
   try {
     const user = req.user;
     // Check if user is banned
-    if (user.status === 'banned') {
-      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-      return res.redirect(`${frontendUrl}/login?error=banned&supportEmail=support@theroac.com`);
+    if (user.status === "banned") {
+      const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+      return res.redirect(
+        `${frontendUrl}/login?error=banned&supportEmail=support@theroac.com`,
+      );
     }
 
     const token = jwt.sign(
       { id: user.id, role: user.role },
       process.env.JWT_SECRET,
-      { expiresIn: '7d' }
+      { expiresIn: "7d" },
     );
 
     user.lastLogin = new Date();
     await user.save();
 
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
     res.redirect(`${frontendUrl}/oauth2callback?token=${token}`);
   } catch (error) {
-    console.error('Social callback error:', error);
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    console.error("Social callback error:", error);
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
     res.redirect(`${frontendUrl}/login?error=auth_failed`);
   }
 };

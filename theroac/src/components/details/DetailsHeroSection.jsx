@@ -3,7 +3,7 @@ import React from "react";
 
 const DetailsHeroSection = ({ data }) => {
   if (!data) return null;
-
+  console.log("Hero Section Data:", data);
   return (
     <div className="hero-section-wrapper">
       <div

@@ -1,8 +1,7 @@
-
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import UniversalNotifications from './common/UniversalNotifications';
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import UniversalNotifications from "./common/UniversalNotifications";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -10,19 +9,19 @@ const Header = () => {
 
   const handleDashboardClick = (e) => {
     e.preventDefault();
-    if (user?.role === 'admin') {
-      navigate('/admin-dashboard');
-    } else if (user?.role === 'recruiter') {
-      navigate('/recruiter-dashboard');
+    if (user?.role === "admin") {
+      navigate("/admin-dashboard");
+    } else if (user?.role === "recruiter") {
+      navigate("/recruiter-dashboard");
     } else {
-      navigate('/candidate-dashboard');
+      navigate("/candidate-dashboard");
     }
   };
 
   const handleLogout = (e) => {
     e.preventDefault();
     logout();
-    navigate('/', { replace: true });
+    navigate("/", { replace: true });
   };
 
   const buttonStyle = {
@@ -43,17 +42,19 @@ const Header = () => {
     overflow: "hidden",
     textDecoration: "none",
     cursor: "pointer",
-    border: "none"
+    border: "none",
   };
 
   return (
     <header>
-      <div className="header-area homepage10 header header-sticky d-none d-lg-block" id="header">
+      <div
+        className="header-area homepage10 header header-sticky d-none d-lg-block"
+        id="header"
+      >
         <div className="container">
           <div className="row align-items-center">
             <div className="col-lg-12 p-0">
               <div className="header-elements d-flex justify-content-between align-items-center">
-
                 {/* Logo */}
                 <div className="site-logo">
                   <a href="/">
@@ -63,36 +64,69 @@ const Header = () => {
 
                 {/* Main Menu */}
                 <div className="main-menu">
-                  <ul className="d-flex align-items-center m-0 p-0" style={{ listStyle: "none" }}>
-                    <li><a href="/">Home</a></li>
-                    <li><a href="/discover">Discover</a></li>
+                  <ul
+                    className="d-flex align-items-center m-0 p-0"
+                    style={{ listStyle: "none" }}
+                  >
+                    <li>
+                      <a href="/">Home</a>
+                    </li>
+                    <li>
+                      <a href="/discover">Discover</a>
+                    </li>
                     <li>
                       {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
                       <a href="#">
                         Events <i className="fa-solid fa-angle-down"></i>
                       </a>
                       <ul className="dropdown-padding">
-                        <li><a href="/UpcomingEvents">Upcoming Events</a></li>
-                        <li><a href="/PastEvents">Past Events</a></li>
-                        <li><a href="/Workshops&Training">Workshops & Training</a></li>
-                        <li><a href="/Hackathons&Competitions">Hackathons & Competitions</a></li>
-                        <li><a href="/Conferences&Meetups">Conferences & Meetups</a></li>
+                        <li>
+                          <a href="/UpcomingEvents">Upcoming Events</a>
+                        </li>
+                        <li>
+                          <a href="/PastEvents">Past Events</a>
+                        </li>
+                        <li>
+                          <a href="/Workshops&Training">Workshops & Training</a>
+                        </li>
+                        <li>
+                          <a href="/Hackathons&Competitions">
+                            Hackathons & Competitions
+                          </a>
+                        </li>
+                        <li>
+                          <a href="/Conferences&Meetups">
+                            Conferences & Meetups
+                          </a>
+                        </li>
                       </ul>
                     </li>
                     {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-                    <li><a href="#Jobs">Jobs</a></li>
                     <li>
-                      {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+                      <a href="#Jobs">Jobs</a>
+                    </li>
+                    <li>
                       <a href="#">
                         Courses <i className="fa-solid fa-angle-down"></i>
                       </a>
                       <ul className="dropdown-padding">
-                        <li><a href="/quiz">Quiz</a></li>
-                        <li><a href="/blog-single">UpComming Courses</a></li>
+                        {/* 🔒 Quiz only for logged-in users */}
+                        {isAuthenticated && (
+                          <li>
+                            <a href="/quiz">Quiz</a>
+                          </li>
+                        )}
+
+                        <li>
+                          <a href="/blog-single">Upcoming Courses</a>
+                        </li>
                       </ul>
                     </li>
+
                     {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-                    <li><a href="#">Contact Us</a></li>
+                    <li>
+                      <a href="#">Contact Us</a>
+                    </li>
                   </ul>
                 </div>
 
@@ -103,7 +137,7 @@ const Header = () => {
                       <UniversalNotifications />
                     </div>
                   )}
-                  
+
                   {isAuthenticated ? (
                     // Show Dashboard and Logout buttons when authenticated
                     <>
@@ -117,10 +151,7 @@ const Header = () => {
                       </div>
 
                       <div className="ms-3">
-                        <button
-                          onClick={handleLogout}
-                          style={buttonStyle}
-                        >
+                        <button onClick={handleLogout} style={buttonStyle}>
                           Logout
                         </button>
                       </div>
@@ -129,19 +160,13 @@ const Header = () => {
                     // Show Login and Join as Recruiter buttons when not authenticated
                     <>
                       <div className="btn-area1">
-                        <a
-                          href="/login"
-                          style={buttonStyle}
-                        >
+                        <a href="/login" style={buttonStyle}>
                           Login
                         </a>
                       </div>
 
                       <div className="ms-3 d-none d-xl-block">
-                        <a
-                          href="/signup?type=recruiter"
-                          style={buttonStyle}
-                        >
+                        <a href="/signup?type=recruiter" style={buttonStyle}>
                           Join as Recruiter
                         </a>
                       </div>

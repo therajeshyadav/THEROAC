@@ -56,8 +56,10 @@ const DashboardTabs = ({
 
   if (activeTab === "jobs") {
     // Extract internships from hubContent to pass to JobsTab
-    const internships = hubContent ? hubContent.filter(item => item.contentType === 'internship') : [];
-    
+    const internships = hubContent
+      ? hubContent.filter((item) => item.contentType === "internship")
+      : [];
+
     return (
       <JobsTab
         jobs={jobs}
@@ -83,13 +85,10 @@ const DashboardTabs = ({
 
   if (activeTab === "prime-hub") {
     return (
-      <PrimeHubTab
-        hubContent={hubContent}
-        appliedItems={appliedItems}
-        onApplyHubContent={onApplyHubContent}
-        onViewHubContentDetails={onViewHubContentDetails}
-        setActiveTab={setActiveTab}
-      />
+      <div style={{ padding: "40px", textAlign: "center", color: "#aaa" }}>
+        <h3>ROAC Prime is coming soon 🚧</h3>
+        <p>This section is currently locked.</p>
+      </div>
     );
   }
 
@@ -109,10 +108,7 @@ const DashboardTabs = ({
 
   if (activeTab === "profile") {
     return (
-      <ProfileTab
-        initialProfile={authUser}
-        onSaveProfile={onSaveProfile}
-      />
+      <ProfileTab initialProfile={authUser} onSaveProfile={onSaveProfile} />
     );
   }
 

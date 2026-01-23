@@ -466,13 +466,13 @@ const RecruiterDashboard = () => {
           </div>
         </div>
 
-        <AddContentModal
+        {/* <AddContentModal
           isOpen={showAddModal}
           onClose={() => setShowAddModal(false)}
           type={modalType}
           authUser={authUser}
           onSuccess={handleModalSuccess}
-        />
+        /> */}
       </div>
     </div>
   );

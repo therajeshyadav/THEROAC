@@ -1559,7 +1559,7 @@ nts/Festivals Section */
 }
 
 .event-date {
-    background: #FFD600;
+    /* background: #FFD600; */
     color: #1A1719;
     border-radius: 12px;
     padding: 0.75rem;

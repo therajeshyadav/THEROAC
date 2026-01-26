@@ -18,10 +18,10 @@ passport.deserializeUser(async (id, done) => {
 });
 
 // Google Strategy
-if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+if (process.env.GMAIL_CLIENT_ID && process.env.GMAIL_CLIENT_SECRET) {
     passport.use(new GoogleStrategy({
-        clientID: process.env.GOOGLE_CLIENT_ID,
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        clientID: process.env.GMAIL_CLIENT_ID,
+        clientSecret: process.env.GMAIL_CLIENT_SECRET,
         callbackURL: `${process.env.BASE_URL || 'http://localhost:4000'}/api/auth/google/callback`
     },
         async (accessToken, refreshToken, profile, done) => {

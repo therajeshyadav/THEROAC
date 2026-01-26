@@ -1466,3 +1466,51 @@
   padding-top: 8px;
   border-top: 1px solid rgba(255, 214, 0, 0.1);
 }
+
+
+.submission-dynamic-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.submission-dynamic-table th {
+  background: #f3f4f6;
+  padding: 6px 8px;
+  border: 1px solid #e5e7eb;
+  font-weight: 600;
+}
+
+.submission-dynamic-table td {
+  padding: 6px 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.submission-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.job-eval-applications-table th:nth-child(3) {
+  text-align: center;
+}
+
+.job-eval-applications-table th {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.job-eval-applications-table td {
+  vertical-align: middle;
+}
+
+.job-eval-applications-table td:nth-child(3) {
+  text-align: center;
+}
+
+
+
+

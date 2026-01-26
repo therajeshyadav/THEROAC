@@ -34,7 +34,7 @@ const RecruiterHeader = ({
             style={{ cursor: "pointer" }}
           >
             <img
-              src="assets/img/logo/logo5.png"
+              src="/assets/img/logo/logo5.png"
               alt="ROAC Logo"
               className="dashboard-logo header-logo"
             />
@@ -98,7 +98,7 @@ const RecruiterHeader = ({
             <div className="mobile-header-elements">
               <div className="mobile-logo">
                 <a href="/">
-                  <img src="assets/img/logo/logo5.png" alt="ROAC Logo" />
+                  <img src="/assets/img/logo/logo5.png" alt="ROAC Logo" />
                 </a>
               </div>
               <div
@@ -124,7 +124,7 @@ const RecruiterHeader = ({
       >
         <div className="logosicon-area">
           <div className="logos">
-            <img src="assets/img/logo/logo5.png" alt="ROAC Logo" />
+            <img src="/assets/img/logo/logo5.png" alt="ROAC Logo" />
           </div>
           <div className="menu-close" onClick={closeMobileMenu}>
             <i className="fa-solid fa-xmark"></i>

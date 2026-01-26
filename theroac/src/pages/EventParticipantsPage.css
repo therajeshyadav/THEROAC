@@ -2,7 +2,33 @@
   min-height: 100vh;
   background: #1a1a1a;
   color: #fff;
-  padding: 2rem;
+  padding: 0;
+  padding-top: 100px; /* Increased space for fixed header */
+}
+
+/* Page Navigation */
+.page-navigation {
+  padding: 20px 24px 10px;
+}
+
+.back-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.back-button:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 214, 0, 0.5);
+  color: #FFD600;
 }
 
 .event-participants-page .loading-container {
@@ -31,7 +57,10 @@
 }
 
 .event-participants-page .page-header {
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
+  padding: 20px 24px 16px;
+  position: relative;
+  z-index: 1;
 }
 
 .event-participants-page .back-button {
@@ -57,7 +86,8 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 2rem;
+  gap: 1.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .event-participants-page .event-info {
@@ -66,9 +96,12 @@
 
 .event-participants-page .event-title {
   color: #FFD600;
-  font-size: 2rem;
+  font-size: 2.2rem;
   font-weight: 700;
-  margin: 0 0 1rem 0;
+  margin: 0 0 0.75rem 0;
+  line-height: 1.2;
+  text-align: left;
+  word-wrap: break-word;
 }
 
 .event-participants-page .event-meta {
@@ -128,6 +161,7 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
   padding: 1.5rem;
+  margin: 0 24px;
 }
 
 .event-participants-page .content-header {

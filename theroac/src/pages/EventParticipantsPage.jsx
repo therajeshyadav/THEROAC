@@ -14,6 +14,7 @@ import {
   Search,
 } from "lucide-react";
 import { toast } from "react-toastify";
+import RecruiterHeader from "../components/recruiter-dashboard/RecruiterHeader";
 import "./EventParticipantsPage.css";
 
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:4000/api";
@@ -30,8 +31,34 @@ const EventParticipantsPage = () => {
   const [filterStage, setFilterStage] = useState("all"); // Stage filter
   const [filterStatus, setFilterStatus] = useState("all"); // Status filter
   const [expandedStage, setExpandedStage] = useState(null);
+  
+  // Header related state
+  const [authUser, setAuthUser] = useState(null);
+  const [notifications, setNotifications] = useState([]);
+
+  // Helper function for user initials
+  const getUserInitials = (name) => {
+    if (!name) return "U";
+    return name
+      .split(" ")
+      .map((word) => word.charAt(0))
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
 
   useEffect(() => {
+    // Load user data for header
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const userData = JSON.parse(localStorage.getItem('user'));
+        setAuthUser(userData);
+      } catch (error) {
+        console.error('Error loading user data:', error);
+      }
+    }
+    
     if (eventId) {
       fetchEventDetails();
       fetchEventParticipants();
@@ -311,7 +338,30 @@ const EventParticipantsPage = () => {
 
   return (
     <div className="event-participants-page">
+      <RecruiterHeader
+        authUser={authUser}
+        notifications={notifications}
+        onNotificationClick={() => {}}
+        onOpenSettings={() => navigate('/recruiter-dashboard?tab=settings')}
+        getUserInitials={getUserInitials}
+        onLogout={() => {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          navigate('/login');
+        }}
+      />
+      
       <div className="page-header">
+        {/* <div className="page-navigation">
+          <button 
+            className="back-button"
+            onClick={() => navigate('/recruiter-dashboard')}
+          >
+            <ArrowLeft size={20} />
+            Back to Dashboard
+          </button>
+        </div> */}
+        
         <div className="event-header">
           <div className="event-info">
             <h1 className="event-title">

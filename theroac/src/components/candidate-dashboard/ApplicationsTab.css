@@ -1,0 +1,315 @@
+/* Applications Table Styles */
+.applications-table-container {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.applications-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: transparent;
+}
+
+.applications-table thead {
+  background: rgba(255, 214, 0, 0.1);
+  border-bottom: 2px solid rgba(255, 214, 0, 0.3);
+}
+
+.applications-table th {
+  padding: 16px 12px;
+  text-align: left;
+  font-weight: 600;
+  color: #FFD600;
+  font-size: 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  white-space: nowrap;
+}
+
+.applications-table tbody tr {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background-color 0.2s ease;
+}
+
+.applications-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.applications-table td {
+  padding: 16px 12px;
+  vertical-align: top;
+  color: #fff;
+  font-size: 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Position Cell */
+.position-cell {
+  min-width: 200px;
+}
+
+.position-info .position-title {
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+  line-height: 1.3;
+}
+
+.position-info .event-date {
+  color: #ccc;
+  font-size: 12px;
+  display: block;
+}
+
+.position-info .event-date i {
+  color: #FFD600;
+  margin-right: 4px;
+}
+
+/* Company Cell */
+.company-cell {
+  min-width: 150px;
+}
+
+.company-name {
+  color: #ccc;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Type Cell */
+.type-cell {
+  min-width: 100px;
+}
+
+.type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.type-badge i {
+  font-size: 11px;
+}
+
+/* Date Cell */
+.date-cell {
+  min-width: 100px;
+}
+
+.applied-date {
+  color: #ccc;
+  font-size: 13px;
+}
+
+/* Status Cell */
+.status-cell {
+  min-width: 120px;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+/* Stage Cell */
+.stage-cell {
+  min-width: 140px;
+  vertical-align: top;
+  padding: 16px 8px !important;
+}
+
+.stage-info {
+  display: block;
+  width: 100%;
+}
+
+.stage-info .stage-name {
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  display: block;
+  margin: 0 0 6px 0;
+  line-height: 1.3;
+  word-wrap: break-word;
+  max-width: 120px;
+  white-space: normal;
+}
+
+.stage-info .interview-date {
+  color: #FFD600;
+  font-size: 11px;
+  display: block;
+  margin: 0;
+  line-height: 1.2;
+  white-space: nowrap;
+  clear: both;
+}
+
+.stage-info .interview-date i {
+  margin-right: 4px;
+  font-size: 10px;
+}
+
+.no-stage {
+  color: #666;
+  font-style: italic;
+}
+
+/* Actions Cell */
+.actions-cell {
+  min-width: 120px;
+  text-align: center;
+}
+
+.table-actions {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn-table-action {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.btn-table-action:hover {
+  transform: translateY(-1px);
+}
+
+.btn-interview {
+  background: #4CAF50;
+  color: #fff;
+}
+
+.btn-interview:hover {
+  background: #45a049;
+}
+
+.btn-assessment {
+  background: #2196F3;
+  color: #fff;
+}
+
+.btn-assessment:hover {
+  background: #1976D2;
+}
+
+.btn-submit {
+  background: #FFD600;
+  color: #000;
+}
+
+.btn-submit:hover {
+  background: #FFC700;
+}
+
+.btn-submitted {
+  background: #28a745;
+  color: #fff;
+  cursor: not-allowed;
+}
+
+.btn-view {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ccc;
+}
+
+.btn-view:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .applications-table th,
+  .applications-table td {
+    padding: 12px 8px;
+    font-size: 13px;
+  }
+  
+  .position-cell {
+    min-width: 180px;
+  }
+  
+  .company-cell {
+    min-width: 130px;
+  }
+  
+  .stage-cell {
+    min-width: 120px;
+  }
+  
+  .stage-info .stage-name {
+    font-size: 12px;
+    max-width: 100px;
+  }
+}
+
+@media (max-width: 992px) {
+  .applications-table-container {
+    overflow-x: auto;
+  }
+  
+  .applications-table {
+    min-width: 800px;
+  }
+  
+  .applications-table th,
+  .applications-table td {
+    padding: 10px 6px;
+    font-size: 12px;
+  }
+  
+  .btn-table-action {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .table-actions {
+    gap: 4px;
+  }
+}
+
+@media (max-width: 768px) {
+  .applications-table {
+    min-width: 700px;
+  }
+  
+  .position-info .position-title {
+    font-size: 14px;
+  }
+  
+  .type-badge {
+    padding: 3px 8px;
+    font-size: 11px;
+  }
+  
+  .status-badge {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+}

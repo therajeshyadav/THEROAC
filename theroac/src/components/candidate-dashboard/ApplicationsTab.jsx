@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { ExternalLink, Upload, CheckCircle } from 'lucide-react';
 import { toast } from 'react-toastify';
+import './ApplicationsTab.css';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000/api';
 
@@ -232,8 +233,8 @@ const ApplicationsTab = ({ applications, getStatusColor, onViewJobDetails, refre
     }
   };
 
-  // Render application item component
-  const renderApplicationItem = (app) => {
+  // Render application table row component
+  const renderApplicationTableRow = (app) => {
     // Handle job, internship, and event applications
     const itemData = app.item || app.job || app.Job || app.hubContent || app.event || null;
     const applicationType = app.applicationType || 'job';
@@ -252,65 +253,90 @@ const ApplicationsTab = ({ applications, getStatusColor, onViewJobDetails, refre
     // Get appropriate icon and display text
     const getTypeInfo = (type) => {
       switch(type) {
-        case 'job': return { icon: 'fa-briefcase', label: 'Job' };
-        case 'internship': return { icon: 'fa-graduation-cap', label: 'Internship' };
-        case 'event': return { icon: 'fa-calendar-alt', label: 'Event' };
-        default: return { icon: 'fa-briefcase', label: 'Job' };
+        case 'job': return { icon: 'fa-briefcase', label: 'Job', color: '#4CAF50' };
+        case 'internship': return { icon: 'fa-graduation-cap', label: 'Internship', color: '#2196F3' };
+        case 'event': return { icon: 'fa-calendar-alt', label: 'Event', color: '#FF9800' };
+        default: return { icon: 'fa-briefcase', label: 'Job', color: '#4CAF50' };
       }
     };
 
     const typeInfo = getTypeInfo(applicationType);
 
     return (
-      <div key={app.id} className="application-detailed-item">
-        <div className="application-content">
-          <div className="application-main">
-            <h5>{itemData?.title || 'Title'}</h5>
-            <p className="company-name">
-              {itemData?.companyName || itemData?.company || itemData?.organizer || 'Organization'}
-            </p>
-            <div className="application-meta">
-              <span className={`type-badge ${applicationType}`}>
-                <i className={`fas ${typeInfo.icon}`} />
-                {typeInfo.label}
-              </span>
-              {hasStages && currentStage && (
-                <span className="stage-badge">
-                  <i className="fas fa-layer-group" /> {currentStage.title}
-                </span>
-              )}
-              {/* Show interview date/time for interview stages */}
-              {hasStages && currentStage?.type === 'interview' && currentStage?.interviewDate && (
-                <span className="interview-info-badge">
+      <tr key={app.id} className="application-table-row">
+        <td className="position-cell">
+          <div className="position-info">
+            <h6 className="position-title">{itemData?.title || 'Title'}</h6>
+            {applicationType === 'event' && itemData?.startDate && (
+              <small className="event-date">
+                <i className="fas fa-clock" /> 
+                {new Date(itemData.startDate).toLocaleDateString()}
+              </small>
+            )}
+          </div>
+        </td>
+        
+        <td className="company-cell">
+          <span className="company-name">
+            {itemData?.companyName || itemData?.company || itemData?.organizer || 'Organization'}
+          </span>
+        </td>
+        
+        <td className="type-cell">
+          <span className="type-badge" style={{ backgroundColor: typeInfo.color }}>
+            <i className={`fas ${typeInfo.icon}`} />
+            {typeInfo.label}
+          </span>
+        </td>
+        
+        <td className="date-cell">
+          <span className="applied-date">
+            {new Date(app.createdAt).toLocaleDateString('en-US', { 
+              month: 'short', 
+              day: 'numeric',
+              year: 'numeric'
+            })}
+          </span>
+        </td>
+        
+        <td className="status-cell">
+          <span
+            className="status-badge"
+            style={{ backgroundColor: getStatusColor(app.status) }}
+          >
+            {app.status || 'Pending'}
+          </span>
+        </td>
+        
+        <td className="stage-cell">
+          {hasStages && currentStage ? (
+            <div className="stage-info">
+              <div className="stage-name">{currentStage.title}</div>
+              {currentStage.type === 'interview' && currentStage.interviewDate && (
+                <div className="interview-date">
                   <i className="fas fa-video" /> 
                   {new Date(currentStage.interviewDate).toLocaleDateString('en-US', { 
                     month: 'short', 
                     day: 'numeric' 
                   })}
-                  {currentStage.interviewTime && ` at ${currentStage.interviewTime}`}
-                  {currentStage.interviewDuration && ` (${currentStage.interviewDuration} min)`}
-                </span>
-              )}
-              {applicationType === 'event' && itemData?.startDate && (
-                <span className="event-date-badge">
-                  <i className="fas fa-clock" /> 
-                  {new Date(itemData.startDate).toLocaleDateString()}
-                </span>
+                  {currentStage.interviewTime && ` ${currentStage.interviewTime}`}
+                </div>
               )}
             </div>
-          </div>
-          
-          {/* Action buttons - Order: Assessment Link, Submit, View Details */}
-          <div className="application-actions">
+          ) : (
+            <span className="no-stage">-</span>
+          )}
+        </td>
+        
+        <td className="actions-cell">
+          <div className="table-actions">
             {/* Interview Link - Show only on interview date */}
             {isShortlisted && hasStages && currentStage?.type === 'interview' && currentStage?.interviewLink && (() => {
-              // Check if today is the interview date
               if (!currentStage.interviewDate) return false;
               
               const today = new Date();
               const interviewDate = new Date(currentStage.interviewDate);
               
-              // Compare dates (ignore time)
               const isSameDay = today.getFullYear() === interviewDate.getFullYear() &&
                                 today.getMonth() === interviewDate.getMonth() &&
                                 today.getDate() === interviewDate.getDate();
@@ -321,73 +347,58 @@ const ApplicationsTab = ({ applications, getStatusColor, onViewJobDetails, refre
                 href={currentStage.interviewLink} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="btn-interview-link"
+                className="btn-table-action btn-interview"
+                title="Join Interview"
               >
-                <ExternalLink size={16} />
-                Join Interview
+                <ExternalLink size={14} />
               </a>
             )}
             
-            {/* Assessment Link - Show when shortlisted and has assessment link */}
+            {/* Assessment Link */}
             {isShortlisted && hasStages && currentStage?.type === 'assessment' && currentStage?.assessmentLink && (
               <a 
                 href={currentStage.assessmentLink} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="btn-assessment-link"
+                className="btn-table-action btn-assessment"
+                title="Assessment Link"
               >
-                <ExternalLink size={16} />
-                Assessment Link
+                <ExternalLink size={14} />
               </a>
             )}
             
-            {/* Submit Button - Show only for assessment stages when shortlisted */}
+            {/* Submit Button */}
             {isShortlisted && hasStages && currentStage?.type === 'assessment' && (
               hasSubmitted ? (
-                <button className="btn-submitted" disabled>
-                  <CheckCircle size={16} />
-                  Submitted
+                <button className="btn-table-action btn-submitted" disabled title="Submitted">
+                  <CheckCircle size={14} />
                 </button>
               ) : (
                 <button 
-                  className="btn-submit"
+                  className="btn-table-action btn-submit"
                   onClick={() => handleSubmit(app.id, app.currentStage || 0)}
+                  title="Submit Assessment"
                 >
-                  <Upload size={16} />
-                  Submit Assessment
+                  <Upload size={14} />
                 </button>
               )
             )}
             
-            {/* View Details - Always show */}
+            {/* View Details */}
             <button
-              className="btn-secondary"
+              className="btn-table-action btn-view"
               onClick={() => {
                 if (itemForUrl) {
                   onViewJobDetails(itemForUrl);
                 }
               }}
+              title="View Details"
             >
-              View Details
+              <i className="fas fa-eye" />
             </button>
           </div>
-          
-          {/* Show status badge with applied date - Last */}
-          <div className="application-status">
-            <span>
-              <i className="fas fa-calendar" /> {applicationType === 'event' ? 'Registered' : 'Applied'}: {new Date(app.createdAt).toLocaleDateString()}
-            </span>
-         </div>
-            <div className="application-status">
-            <span
-              className="status-badge"
-              style={{ backgroundColor: getStatusColor(app.status) }}
-            >
-              {app.status || 'Pending'}
-            </span>
-          </div>
-        </div>
-      </div>
+        </td>
+      </tr>
     );
   };
 
@@ -507,8 +518,23 @@ const ApplicationsTab = ({ applications, getStatusColor, onViewJobDetails, refre
 
         <div className="applications-detailed">
           {filteredApplications.length > 0 ? (
-            <div className="applications-list">
-              {filteredApplications.map(renderApplicationItem)}
+            <div className="applications-table-container">
+              <table className="applications-table">
+                <thead>
+                  <tr>
+                    <th>Position</th>
+                    <th>Company/Organizer</th>
+                    <th>Type</th>
+                    <th>Applied Date</th>
+                    <th>Status</th>
+                    <th>Stage</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredApplications.map(renderApplicationTableRow)}
+                </tbody>
+              </table>
             </div>
           ) : (
             <div className="no-data">

@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import apiService from '../../services/api';
 import { toast } from 'react-toastify';
+import './EventsTab.css'; // Import the shared styles
 
 const JobsTab = ({ jobs, internships = [], dashboardStats, appliedItems, onApplyJob, onViewJobDetails }) => {
   // Combine jobs and internships
@@ -326,95 +327,67 @@ const JobsTab = ({ jobs, internships = [], dashboardStats, appliedItems, onApply
             const displayType = isInternship ? job.duration || 'Internship' : (job.jobType || 'Full-time');
             
             return (
-              <div key={job.id} className="job-card-detailed" style={{
-                display: 'block',
-                visibility: 'visible',
-                opacity: 1,
-                width: '100%',
-                minHeight: '180px',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                borderRadius: '12px',
-                padding: '1rem',
-                background: 'rgba(255, 255, 255, 0.05)'
-              }}>
-                <div className="job-card-header">
-                  <div className="company-logo">
+              <div key={job.id} className="job-card">
+                <div className="job-left">
+                  <div className="job-logo">
                     {job.companyLogo ? (
-                      <img src={job.companyLogo} alt={companyName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      <img src={job.companyLogo} alt={companyName} />
                     ) : (
                       <i className="fas fa-building" />
                     )}
                   </div>
-                  <div className="job-basic-info">
-                    <h5>{job.title}</h5>
-                    <p className="company-name">{companyName}</p>
-                    {isInternship && <span className="badge" style={{ background: '#FFD600', color: '#000', padding: '2px 8px', borderRadius: '4px', fontSize: '12px' }}>Internship</span>}
-                  </div>
-                  <button 
-                    className="save-job-btn"
-                    onClick={() => handleBookmarkJob(job.id, isInternship)}
-                    style={{ color: bookmarkedJobs.has(job.id) ? '#FFD600' : '#666' }}
-                  >
-                    <i className={bookmarkedJobs.has(job.id) ? "fas fa-bookmark" : "far fa-bookmark"} />
-                  </button>
-                </div>
-
-                <div className="job-details-grid">
-                  <div className="detail-item">
-                    <i className="fas fa-map-marker-alt" />
-                    <span>{displayLocation}</span>
-                  </div>
-                  <div className="detail-item">
-                    <i className="fas fa-rupee-sign" />
-                    <span><strong>{salaryLabel}:</strong> {displaySalary}</span>
-                  </div>
-                  <div className="detail-item">
-                    <i className="fas fa-briefcase" />
-                    <span>{job.experience || job.experienceLevel || 'fresher'}</span>
-                  </div>
-                  <div className="detail-item">
-                    <i className="fas fa-calendar" />
-                    <span>{displayType}</span>
+                  <div className="job-meta">
+                    <span>
+                      <i className="fas fa-map-marker-alt" /> {displayLocation}
+                    </span>
+                    <span>
+                      <i className="fas fa-rupee-sign" /> {displaySalary}
+                    </span>
+                    <span>
+                      <i className="fas fa-briefcase" /> {job.experience || job.experienceLevel || 'Fresher'}
+                    </span>
                   </div>
                 </div>
 
-                {/* Skills section hidden as requested */}
+                <div className="job-body">
+                  <div className="job-top">
+                    <div>
+                      <h5 className="job-title">{job.title}</h5>
+                      <span className="job-type">{displayType}</span>
+                      <p className="job-company">{companyName}</p>
+                    </div>
 
-                <div className="job-card-footer">
-                  <span className="posted-time">
-                    Posted {new Date(job.createdAt).toLocaleDateString()}
-                  </span>
-                  <div className="job-actions">
-                    <button className="btn-secondary" onClick={() => onViewJobDetails(job)}>
-                      View Details
-                    </button>
                     <button
-                      className={`btn-apply ${appliedItems.has(job.id) ? 'applied' : ''}`}
-                      onClick={() => onApplyJob(job.id)}
-                      disabled={appliedItems.has(job.id)}
-                      style={{
-                        backgroundColor: appliedItems.has(job.id) ? '#28a745' : '',
-                        borderColor: appliedItems.has(job.id) ? '#28a745' : '',
-                        cursor: appliedItems.has(job.id) ? 'not-allowed' : 'pointer',
-                        opacity: appliedItems.has(job.id) ? 0.7 : 1
-                      }}
+                      className={`bookmark-btn ${bookmarkedJobs.has(job.id) ? "active" : ""}`}
+                      onClick={() => handleBookmarkJob(job.id, isInternship)}
                     >
-                      {appliedItems.has(job.id) ? (
-                        <span
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '4px'
-                          }}
-                        >
-                          <span>✓</span>
-                          Applied
-                        </span>
-                      ) : (
-                        'Apply Now'
-                      )}
+                      <i
+                        className={
+                          bookmarkedJobs.has(job.id)
+                            ? "fas fa-bookmark"
+                            : "far fa-bookmark"
+                        }
+                      />
                     </button>
+                  </div>
+
+                  <div className="job-bottom">
+                    <div className="job-actionsC">
+                      <button
+                        className="btn-outlineC"
+                        onClick={() => onViewJobDetails(job)}
+                      >
+                        View Details
+                      </button>
+
+                      <button
+                        className={`btn-primaryC ${appliedItems.has(job.id) ? "applied" : ""}`}
+                        onClick={() => onApplyJob(job.id)}
+                        disabled={appliedItems.has(job.id)}
+                      >
+                        {appliedItems.has(job.id) ? "Applied" : "Apply Now"}
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>

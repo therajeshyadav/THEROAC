@@ -333,6 +333,27 @@ Bookmark.belongsTo(HubContent, {
   constraints: false,
 });
 
+// Like → Actual Item relations
+// ===============================
+
+// Like → Job
+Like.belongsTo(Job, {
+  foreignKey: "itemId",
+  constraints: false,
+});
+
+// Like → Event
+Like.belongsTo(Event, {
+  foreignKey: "itemId",
+  constraints: false,
+});
+
+// Like → Internship (HubContent)
+Like.belongsTo(HubContent, {
+  foreignKey: "itemId",
+  constraints: false,
+});
+
 module.exports = {
   sequelize,
   User,

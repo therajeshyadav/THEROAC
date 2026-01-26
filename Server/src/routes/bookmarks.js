@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { Bookmark, Job, Event, HubContent } = require('../models');
+const { Bookmark, Job, Event, HubContent, User, Organization } = require('../models');
 const { authenticate } = require('../middlewares/auth');
 
 // Toggle bookmark
@@ -60,7 +60,14 @@ router.get('/my-bookmarks', authenticate, async (req, res) => {
       order: [['createdAt', 'DESC']],
       include: [
         { model: Job, required: false },
-        { model: Event, required: false },
+        { 
+          model: Event, 
+          required: false,
+          include: [
+            { model: User, as: 'organizer', required: false },
+            { model: Organization, as: 'organization', required: false }
+          ]
+        },
         { model: HubContent, required: false }
       ]
     });

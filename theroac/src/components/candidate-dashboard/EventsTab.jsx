@@ -503,7 +503,7 @@ const EventsTab = ({
                         className="btn-outlineC"
                         onClick={() => onViewEventDetails(event)}
                       >
-                        View Details
+                        Details
                       </button>
 
                       <button

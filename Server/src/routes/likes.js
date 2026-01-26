@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { Like } = require('../models');
+const { Like, Job, Event, HubContent, User, Organization } = require('../models');
 const { authenticate } = require('../middlewares/auth');
 
 // Toggle like
@@ -54,9 +54,22 @@ router.get('/status/:itemType/:itemId', authenticate, async (req, res) => {
 router.get('/my-likes', authenticate, async (req, res) => {
   try {
     const userId = req.user.id;
+
     const likes = await Like.findAll({
       where: { userId },
-      order: [['createdAt', 'DESC']]
+      order: [['createdAt', 'DESC']],
+      include: [
+        { model: Job, required: false },
+        { 
+          model: Event, 
+          required: false,
+          include: [
+            { model: User, as: 'organizer', required: false },
+            { model: Organization, as: 'organization', required: false }
+          ]
+        },
+        { model: HubContent, required: false }
+      ]
     });
 
     return res.json(likes);

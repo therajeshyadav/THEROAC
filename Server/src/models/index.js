@@ -26,6 +26,8 @@ const Review = require("./Review");
 const FAQ = require("./FAQ");
 const QuizSubmission = require("./QuizSubmission");
 const ProfileQuizSubmission = require("./ProfileQuizSubmission");
+const TrainingUser = require("./TrainingUser");
+const Payment = require("./Payment");
 
 // Associations
 User.hasMany(Event, { foreignKey: "createdBy", as: "createdEvents" });
@@ -295,6 +297,13 @@ EventTeamMember.belongsTo(Event, { foreignKey: "eventId", as: "event" });
 User.hasMany(EventTeamMember, { foreignKey: "userId", as: "teamMemberships" });
 Event.hasMany(EventTeamMember, { foreignKey: "eventId", as: "teamMembers" });
 
+// payment-related associations
+User.hasOne(TrainingUser, { foreignKey: "userId" });
+TrainingUser.belongsTo(User, { foreignKey: "userId" });
+TrainingUser.hasMany(Payment, { foreignKey: "trainingUserId" });
+Payment.belongsTo(TrainingUser, { foreignKey: "trainingUserId" });
+
+
 // ProfileQuizSubmission associations
 ProfileQuizSubmission.belongsTo(User, { foreignKey: "userId", as: "user" });
 User.hasMany(ProfileQuizSubmission, {
@@ -353,4 +362,6 @@ module.exports = {
   FAQ,
   QuizSubmission,
   ProfileQuizSubmission,
+  TrainingUser,
+  Payment
 };

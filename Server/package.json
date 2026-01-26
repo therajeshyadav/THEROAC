@@ -14,8 +14,10 @@
     "gcs:setup": "npm run gcs:create && npm run gcs:check"
   },
   "dependencies": {
+    "@dev_innovations_labs/phonepe-pg-sdk": "^1.0.5",
     "@google-cloud/storage": "^7.18.0",
     "@google/generative-ai": "^0.24.1",
+    "axios": "^1.13.2",
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
     "dotenv": "^16.0.0",
@@ -31,8 +33,10 @@
     "passport-linkedin-oauth2": "^2.0.0",
     "pg": "^8.11.0",
     "pg-hstore": "^2.3.4",
+    "pg-sdk-node": "https://phonepe.mycloudrepo.io/public/repositories/phonepe-pg-sdk-node/releases/v2/phonepe-pg-sdk-node-2.0.3.tgz",
     "sequelize": "^6.32.1",
-    "socket.io": "^4.8.1"
+    "socket.io": "^4.8.1",
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.22",

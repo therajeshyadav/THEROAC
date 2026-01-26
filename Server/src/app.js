@@ -60,6 +60,7 @@ app.use('/api/events', eventStageRoutes); // Event stages routes
 app.use('/api/hackathons', hackathonRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/hub-content', hubContentRoutes);
+app.use('/api/payment/phonepe', require('./routes/phonepePayment'));
 
 // Apply authentication and organization context to protected routes
 app.use('/api/users', authenticate, attachOrganizationContext, userRoutes);

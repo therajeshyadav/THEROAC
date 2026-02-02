@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const candidateDashboardController = require('../controllers/candidateDashboardController');
-const { authenticate } = require('../middlewares/auth');
+const { authenticate } = require('../middleware/auth');
 
 router.use(authenticate);
 

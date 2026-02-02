@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const organizationController = require('../controllers/organizationController');
-const { authenticate } = require('../middlewares/auth');
+const { authenticate } = require('../middleware/auth');
 const { 
   checkOrganizationPermission, 
   checkOrganizationOwner, 
   checkOrganizationMember 
-} = require('../middlewares/organizationMiddleware');
+} = require('../middleware/organizationMiddleware');
 
 // Organization CRUD
 router.post('/', authenticate, organizationController.createOrganization);

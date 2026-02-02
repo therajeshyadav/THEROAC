@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const jobController = require('../controllers/jobController');
-const { authenticate } = require('../middlewares/auth');
-const { requireRole } = require('../middlewares/roles');
-const { attachOrganizationContext } = require('../middlewares/organizationMiddleware');
+const { authenticate } = require('../middleware/auth');
+const { requireRole } = require('../middleware/roles');
+const { attachOrganizationContext } = require('../middleware/organizationMiddleware');
 const { uploadSingle, uploadToGCSMiddleware, handleUploadError } = require('../middleware/uploadMiddleware');
 
 // Public routes (no authentication required)

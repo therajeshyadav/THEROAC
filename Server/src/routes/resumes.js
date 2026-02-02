@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const resumeController = require('../controllers/resumeController');
-const { authenticate } = require('../middlewares/auth');
+const { authenticate } = require('../middleware/auth');
 const { uploadSingle, uploadToGCSMiddleware, handleUploadError } = require('../middleware/uploadMiddleware');
 
 router.use(authenticate);

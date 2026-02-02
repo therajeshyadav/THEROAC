@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const teamController = require('../controllers/teamController');
-const { authenticate } = require('../middlewares/auth');
-const { attachOrganizationContext } = require('../middlewares/organizationMiddleware');
+const { authenticate } = require('../middleware/auth');
+const { attachOrganizationContext } = require('../middleware/organizationMiddleware');
 
 // Public routes (no authentication required)
 router.get('/', (req,res)=>res.send('Hackathons list - use /events instead'));

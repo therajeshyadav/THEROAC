@@ -28,6 +28,8 @@ const QuizSubmission = require("./QuizSubmission");
 const ProfileQuizSubmission = require("./ProfileQuizSubmission");
 const TrainingUser = require("./TrainingUser");
 const Payment = require("./Payment");
+const RoacWallet = require("./RoacWallet");
+const RoacLedger = require("./RoacLedger");
 
 // Associations
 User.hasMany(Event, { foreignKey: "createdBy", as: "createdEvents" });
@@ -311,10 +313,6 @@ User.hasMany(ProfileQuizSubmission, {
   as: "profileQuizSubmissions",
 });
 
-// ===============================
-// Bookmark → Actual Item relations
-// ===============================
-
 // Bookmark → Job
 Bookmark.belongsTo(Job, {
   foreignKey: "itemId",
@@ -333,9 +331,6 @@ Bookmark.belongsTo(HubContent, {
   constraints: false,
 });
 
-// Like → Actual Item relations
-// ===============================
-
 // Like → Job
 Like.belongsTo(Job, {
   foreignKey: "itemId",
@@ -353,6 +348,13 @@ Like.belongsTo(HubContent, {
   foreignKey: "itemId",
   constraints: false,
 });
+
+User.hasOne(RoacWallet, { foreignKey: 'userId' });
+RoacWallet.belongsTo(User, { foreignKey: 'userId' });
+RoacWallet.hasMany(RoacLedger, { foreignKey: 'walletId' });
+RoacLedger.belongsTo(RoacWallet, { foreignKey: 'walletId' });
+User.hasMany(RoacLedger, { foreignKey: 'userId' });
+RoacLedger.belongsTo(User, { foreignKey: 'userId' });
 
 module.exports = {
   sequelize,
@@ -384,5 +386,7 @@ module.exports = {
   QuizSubmission,
   ProfileQuizSubmission,
   TrainingUser,
-  Payment
+  Payment,
+  RoacWallet,
+  RoacLedger,
 };

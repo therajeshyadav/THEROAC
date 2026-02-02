@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const faqController = require('../controllers/faqController');
-const { authenticate } = require('../middlewares/auth');
-const { attachOrganizationContext } = require('../middlewares/organizationMiddleware');
+const { authenticate } = require('../middleware/auth');
+const { attachOrganizationContext } = require('../middleware/organizationMiddleware');
 
 // Get FAQs for a specific item
 router.get('/:itemType/:itemId', faqController.getFAQs);

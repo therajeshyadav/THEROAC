@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/userController');
-const { authenticate } = require('../middlewares/auth');
-const { requireRole } = require('../middlewares/roles');
+const { authenticate } = require('../middleware/auth');
+const { requireRole } = require('../middleware/roles');
 const { uploadSingle, uploadToGCSMiddleware, handleUploadError } = require('../middleware/uploadMiddleware');
 
 router.get('/me', authenticate, userController.getProfile);

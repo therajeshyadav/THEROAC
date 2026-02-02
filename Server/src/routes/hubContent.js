@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const hubContentController = require('../controllers/hubContentController');
-const { authenticate } = require('../middlewares/auth');
-const { requireRole } = require('../middlewares/roles');
-const { attachOrganizationContext } = require('../middlewares/organizationMiddleware');
+const { authenticate } = require('../middleware/auth');
+const { requireRole } = require('../middleware/roles');
+const { attachOrganizationContext } = require('../middleware/organizationMiddleware');
 
 // Public routes
 router.get('/', hubContentController.listHubContent);

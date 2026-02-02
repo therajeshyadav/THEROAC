@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const profileQuizController = require('../controllers/profileQuizController');
-const { authenticate } = require('../middlewares/auth');
+const { authenticate } = require('../middleware/auth');
 
 // Generate profile quiz based on user skills
 router.post('/generate', authenticate, profileQuizController.generateProfileQuiz);

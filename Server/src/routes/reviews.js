@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const reviewController = require('../controllers/reviewController');
-const { authenticate } = require('../middlewares/auth');
-const { attachOrganizationContext } = require('../middlewares/organizationMiddleware');
+const { authenticate } = require('../middleware/auth');
+const { attachOrganizationContext } = require('../middleware/organizationMiddleware');
 
 // Get reviews for a specific item
 router.get('/:itemType/:itemId', reviewController.getReviews);

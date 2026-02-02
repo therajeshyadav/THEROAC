@@ -128,7 +128,7 @@ exports.createEvent = async (req, res, next) => {
       contactInfo: contactInfo || null,
       socials: socials || null,
       agenda: agenda || [],
-      stages: stages || [], // New: submission stages
+      stages: stages || [],
       speakers: speakers || [],
       sponsors: sponsors || [],
       prizes: prizes || [],
@@ -136,17 +136,16 @@ exports.createEvent = async (req, res, next) => {
       eligibility: eligibility || null,
       featured: featured || false,
       status: status || 'upcoming',
-      minTeamSize: minTeamSize ? parseInt(minTeamSize) : null, // Add team size fields
+      minTeamSize: minTeamSize ? parseInt(minTeamSize) : null,  
       maxTeamSize: maxTeamSize ? parseInt(maxTeamSize) : null,
-      problemStatements: problemStatements || null, // Add problem statements field
+      problemStatements: problemStatements || null,
       createdBy: req.user.id,
       organizationId,
-      approvalStatus: 'pending' // Set to pending for admin approval
+      approvalStatus: 'pending'
     };
 
     const event = await Event.create(payload);
     
-    // Create notification for admin about new event pending approval
     try {
       const { getNotificationService } = require('../socket');
       const notificationService = getNotificationService();

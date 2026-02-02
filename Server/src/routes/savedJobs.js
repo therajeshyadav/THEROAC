@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const savedJobController = require('../controllers/savedJobController');
-const { authenticate } = require('../middlewares/auth');
+const { authenticate } = require('../middleware/auth');
 
 router.use(authenticate);
 

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { Like, Job, Event, HubContent, User, Organization } = require('../models');
-const { authenticate } = require('../middlewares/auth');
+const { authenticate } = require('../middleware/auth');
 
 // Toggle like
 router.post('/toggle', authenticate, async (req, res) => {

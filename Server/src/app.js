@@ -27,8 +27,9 @@ const reviewRoutes = require('./routes/reviews');
 const faqRoutes = require('./routes/faqs');
 const quizRoutes = require('./routes/quiz');
 const profileQuizRoutes = require('./routes/profileQuiz');
-const errorHandler = require('./middlewares/errorHandler');
-const { attachOrganizationContext } = require('./middlewares/organizationMiddleware');
+const walletRoutes = require('./routes/roacWallet');
+const errorHandler = require('./middleware/errorHandler');
+const { attachOrganizationContext } = require('./middleware/organizationMiddleware');
 
 const app = express();
 app.use(helmet({
@@ -52,7 +53,7 @@ app.use(passport.initialize());
 app.use('/api/auth', authRoutes);
 
 // Attach organization context to authenticated requests (after auth routes)
-const { authenticate } = require('./middlewares/auth');
+const { authenticate } = require('./middleware/auth');
 
 // Public routes (authentication handled per-route inside these routers)
 app.use('/api/events', eventRoutes);
@@ -79,8 +80,9 @@ app.use('/api/resumes', authenticate, attachOrganizationContext, resumeRoutes);
 app.use('/api/talent-pipeline', authenticate, attachOrganizationContext, talentPipelineRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/faqs', faqRoutes);
-app.use('/api/quiz', quizRoutes); // Removed authentication for testing
+app.use('/api/quiz', quizRoutes);
 app.use('/api/profile-quiz', authenticate, attachOrganizationContext, profileQuizRoutes);
+app.use('/api/', authenticate, walletRoutes);
 
 // health check
 app.get('/health', (req, res) => res.json({ ok: true }));

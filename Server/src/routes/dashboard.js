@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const dashboardController = require('../controllers/dashboardController');
-const { authenticate } = require('../middlewares/auth');
-const { requireRole } = require('../middlewares/roles');
+const { authenticate } = require('../middleware/auth');
+const { requireRole } = require('../middleware/roles');
 
 // Candidate dashboard routes (require authentication only)
 router.get('/candidate/stats', authenticate, dashboardController.getCandidateStats);

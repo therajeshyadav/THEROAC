@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { authenticate } = require('../middlewares/auth');
+const { authenticate } = require('../middleware/auth');
 const { uploadAny, uploadToGCSMiddleware, handleUploadError } = require('../middleware/uploadMiddleware');
 const { validateTeamEligibility } = require('../middleware/teamValidation');
 

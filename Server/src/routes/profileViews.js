@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { ProfileView, User } = require('../models');
-const { authenticate } = require('../middlewares/auth');
+const { authenticate } = require('../middleware/auth');
 const { getNotificationService } = require('../socket');
 
 // Track profile view

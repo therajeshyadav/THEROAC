@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const talentPipelineController = require('../controllers/talentPipelineController');
-const { authenticate } = require('../middlewares/auth');
+const { authenticate } = require('../middleware/auth');
 
 // All routes require authentication
 router.use(authenticate);

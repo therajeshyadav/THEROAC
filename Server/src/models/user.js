@@ -75,6 +75,18 @@ User.init({
         const rounds = Number(process.env.BCRYPT_ROUNDS) || 10;
         user.passwordHash = await bcrypt.hash(user.passwordHash, rounds);
       }
+    },
+    afterCreate: async (user, options) => {
+      const { RoacWallet } = sequelize.models;
+
+      if (!RoacWallet) {
+        throw new Error('RoacWallet model not initialized');
+      }
+
+      await RoacWallet.create(
+        { userId: user.id },
+        { transaction: options.transaction }
+      );
     }
   }
 });

@@ -2,9 +2,9 @@ const express = require('express');
 const router = express.Router();
 const eventController = require('../controllers/eventController');
 const teamController = require('../controllers/teamController');
-const { authenticate } = require('../middlewares/auth');
-const { requireRole } = require('../middlewares/roles');
-const { attachOrganizationContext } = require('../middlewares/organizationMiddleware');
+const { authenticate } = require('../middleware/auth');
+const { requireRole } = require('../middleware/roles');
+const { attachOrganizationContext } = require('../middleware/organizationMiddleware');
 const { uploadSingle, uploadToGCSMiddleware, handleUploadError } = require('../middleware/uploadMiddleware');
 const { validateTeamEligibility } = require('../middleware/teamValidation');
 

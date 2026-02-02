@@ -39,11 +39,13 @@ const DashboardHeader = ({ activeTab, setActiveTab, authUser, logout }) => {
               style={{ cursor: 'pointer' }}
             >
               <img
-                src="assets/img/logo/logo5.png"
+                src={`${window.location.origin}/assets/img/logo/logo5.png`}
                 alt="ROAC Logo"
                 className="dashboard-logo"
                 onError={(e) => {
-                  e.target.style.display = 'none';
+                  console.error('Logo failed to load:', e.target.src);
+                  // Try fallback
+                  e.target.src = '/logo.png';
                 }}
               />
             </div>
@@ -161,7 +163,7 @@ const DashboardHeader = ({ activeTab, setActiveTab, authUser, logout }) => {
             <div className="mobile-header-elements">
               <div className="mobile-logo">
                 <a href="/">
-                  <img src="assets/img/logo/logo5.png" alt="ROAC Logo" />
+                  <img src={`${window.location.origin}/assets/img/logo/logo5.png`} alt="ROAC Logo" />
                 </a>
               </div>
               <div
@@ -187,7 +189,7 @@ const DashboardHeader = ({ activeTab, setActiveTab, authUser, logout }) => {
       >
         <div className="logosicon-area">
           <div className="logos">
-            <img src="assets/img/logo/logo5.png" alt="ROAC Logo" />
+            <img src={`${window.location.origin}/assets/img/logo/logo5.png`} alt="ROAC Logo" />
           </div>
           <div className="menu-close" onClick={closeMobileMenu}>
             <i className="fa-solid fa-xmark"></i>

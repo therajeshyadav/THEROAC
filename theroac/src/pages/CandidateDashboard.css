@@ -3482,7 +3482,7 @@ select::-ms-expand {
 }
 
 /* Tablet Portrait (768px - 1023px) - HEADER BECOMES MOBILE MENU */
-@media (max-width: 1023px) {
+@media (max-width: 991px) {
     .candidate-header {
         display: none !important;
     }

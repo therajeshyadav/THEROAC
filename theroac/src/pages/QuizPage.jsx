@@ -1,11 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Trophy, Clock, CheckCircle, XCircle, ArrowLeft, Award } from 'lucide-react';
+import { Trophy, Clock, CheckCircle, XCircle, Award } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 import apiService from '../services/api';
+import DashboardHeader from '../components/candidate-dashboard/DashboardHeader';
+import RecruiterHeader from '../components/recruiter-dashboard/RecruiterHeader';
+import AdminHeader from '../components/Admin-dashboards/AdminHeader';
 import './QuizPage.css';
+import './CandidateDashboard.css';
+import './RecruiterDashboard.css';
+import './AdminDashboard.css';
 
 const QuizPage = () => {
   const navigate = useNavigate();
+  const { user: authUser, logout } = useAuth();
   const [currentStep, setCurrentStep] = useState('selection'); // 'selection', 'quiz', 'result'
   const [quizTypes, setQuizTypes] = useState([]);
   const [selectedQuizType, setSelectedQuizType] = useState(null);
@@ -17,12 +25,36 @@ const QuizPage = () => {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [userBadges, setUserBadges] = useState([]);
+  const [notifications, setNotifications] = useState([]);
 
   // Load quiz types on component mount
   useEffect(() => {
     loadQuizTypes();
     loadUserBadges();
+    loadNotifications();
   }, []);
+
+  const loadNotifications = async () => {
+    try {
+      const response = await apiService.getNotifications();
+      setNotifications(response.notifications || []);
+    } catch (error) {
+      console.error('Failed to load notifications:', error);
+    }
+  };
+
+  // Handle navigation from header tabs
+  const handleTabChange = (tab) => {
+    const userRole = authUser?.role?.toLowerCase();
+    
+    if (userRole === 'candidate') {
+      navigate('/candidate-dashboard', { state: { activeTab: tab } });
+    } else if (userRole === 'recruiter') {
+      navigate('/recruiter-dashboard', { state: { activeTab: tab } });
+    } else if (userRole === 'admin') {
+      navigate('/admin-dashboard', { state: { activeTab: tab } });
+    }
+  };
 
   // Timer effect
   useEffect(() => {
@@ -180,15 +212,56 @@ const QuizPage = () => {
     );
   }
 
+  // Render appropriate header based on user role
+  const renderHeader = () => {
+    if (!authUser) return null;
+
+    const userRole = authUser.role?.toLowerCase();
+
+    switch (userRole) {
+      case 'candidate':
+        return (
+          <DashboardHeader
+            activeTab="quiz"
+            setActiveTab={handleTabChange}
+            authUser={authUser}
+            logout={logout}
+          />
+        );
+      case 'recruiter':
+        return (
+          <RecruiterHeader
+            activeTab="quiz"
+            authUser={authUser}
+            notifications={notifications}
+            onNotificationClick={() => navigate('/notifications')}
+            onLogoClick={() => navigate('/recruiter-dashboard')}
+          />
+        );
+      case 'admin':
+        return (
+          <AdminHeader
+            authUser={authUser}
+            onLogoClick={() => navigate('/admin-dashboard')}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="quiz-page">
+      {/* Role-based Header */}
+      {renderHeader()}
+
       <div className="quiz-container">
-        {/* Header */}
-        <div className="quiz-header">
-          <div className="quiz-header-left">
-            <h1>Skill Assessment Quiz</h1>
+        {/* Quiz Title Section */}
+        <div className="quiz-title-section">
+          <div className="quiz-title-left">
+            <h1 className="quiz-main-title">Skill Assessment Quiz</h1>
           </div>
-          <div className="quiz-header-right">
+          <div className="quiz-title-right">
             <div className="quiz-badge-count">
               <Award size={18} />
               <span>{userBadges.length} Badge{userBadges.length !== 1 ? 's' : ''}</span>

@@ -150,7 +150,7 @@ const Header = () => {
                         </button>
                       </div>
 
-                      <div className="ms-3">
+                      <div className="ms-3 btn-area1">
                         <button onClick={handleLogout} style={buttonStyle}>
                           Logout
                         </button>
@@ -165,7 +165,7 @@ const Header = () => {
                         </a>
                       </div>
 
-                      <div className="ms-3 d-none d-xl-block">
+                      <div className="ms-3 btn-area1">
                         <a href="/signup?type=recruiter" style={buttonStyle}>
                           Join as Recruiter
                         </a>

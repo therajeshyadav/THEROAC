@@ -3,89 +3,95 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { redirectToDashboard } from "../utils/roleRedirect";
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:4000";
+
 export default function OAuth2Callback() {
   const [status, setStatus] = useState("loading");
   const [message, setMessage] = useState("Processing authorization...");
   const navigate = useNavigate();
-  const { updateUser } = useAuth(); // Assuming useAuth exposes a way to update state or we just rely on localStorage
+  const { setAuthFromToken } = useAuth();
 
   useEffect(() => {
-    const handleAuth = async () => {
+    const run = async () => {
       const params = new URLSearchParams(window.location.search);
       const token = params.get("token");
       const code = params.get("code");
-
-      // Handle Social Login Token
       if (token) {
         try {
-          localStorage.setItem('token', token);
-          
-          // Fetch user data to determine role for redirection
-          const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:4000'}/api/auth/me`, {
+          localStorage.setItem("token", token);
+
+          const res = await fetch(`${API_BASE_URL}auth/me`, {
             headers: {
-              'Authorization': `Bearer ${token}`
-            }
+              Authorization: `Bearer ${token}`,
+            },
           });
-          
-          if (response.ok) {
-            const userData = await response.json();
-            localStorage.setItem('user', JSON.stringify(userData));
-            
-            setStatus("success");
-            setMessage("Login successful! Redirecting...");
-            
-            setTimeout(() => {
-              // Redirect based on user role
-              redirectToDashboard(userData.role);
-            }, 1000);
-          } else {
-            throw new Error('Failed to fetch user data');
-          }
+
+          if (!res.ok) throw new Error("User fetch failed");
+
+          const user = await res.json();
+          localStorage.setItem("user", JSON.stringify(user));
+          setAuthFromToken(token, user);
+
+          setStatus("success");
+          setMessage("Login successful! Redirecting...");
+
+          setTimeout(() => {
+            redirectToDashboard(user.role);
+          }, 800);
+
           return;
-        } catch (e) {
+        } catch (err) {
+          console.error(err);
           setStatus("error");
           setMessage("Login failed. Please try again.");
           return;
         }
       }
 
-      // Handle Gmail Code (Previous Logic)
-      if (!code) {
-        setStatus("error");
-        setMessage("❌ Authorization failed: Missing code or token.");
+      if (code) {
+        try {
+          const res = await fetch(
+            `${API_BASE_URL}/api/gmail/callback?code=${encodeURIComponent(code)}`
+          );
+
+          const data = await res.json();
+
+          if (data?.success) {
+            setStatus("success");
+            setMessage(
+              "Gmail connected successfully! You can now send emails."
+            );
+          } else {
+            throw new Error("Gmail auth failed");
+          }
+        } catch (err) {
+          console.error(err);
+          setStatus("error");
+          setMessage("Gmail authorization failed. Please try again.");
+        }
         return;
       }
-
-      try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/gmail/callback?code=${code}`);
-        const data = await response.json();
-
-        if (data.success) {
-          setStatus("success");
-          setMessage("✅ Gmail Connected Successfully! You can now send emails through The ROAC system.");
-        } else {
-          setStatus("error");
-          setMessage("❌ Authorization failed. Please try again.");
-        }
-      } catch (err) {
-        setStatus("error");
-        setMessage("❌ Something went wrong. Please try again later.");
-      }
+      setStatus("error");
+      setMessage("Authorization failed. Missing token or code.");
     };
 
-    handleAuth();
-  }, []);
+    run();
+  }, [navigate, setAuthFromToken]);
 
   return (
     <div style={styles.container}>
       <div style={styles.card}>
-        <h1 style={status === "success" ? styles.success : status === "error" ? styles.error : styles.neutral}>
-          {status === "loading" ? "🔄 Connecting Gmail..." : message.split("!")[0] + "!"}
-        </h1>
-        {status !== "loading" && (
-          <p style={styles.text}>{message.replace(message.split("!")[0] + "!", "").trim()}</p>
-        )}
-        {status === "loading" && <p style={styles.text}>{message}</p>}
+        <h2
+          style={
+            status === "success"
+              ? styles.success
+              : status === "error"
+              ? styles.error
+              : styles.neutral
+          }
+        >
+          {status === "loading" ? "🔄 Processing..." : message}
+        </h2>
       </div>
     </div>
   );
@@ -99,16 +105,11 @@ const styles = {
   },
   card: {
     display: "inline-block",
-    padding: "30px",
+    padding: "32px",
     borderRadius: "12px",
     background: "#f8f8f8",
-    boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
-    maxWidth: "480px",
-  },
-  text: {
-    color: "#333",
-    fontSize: "16px",
-    lineHeight: "1.6",
+    boxShadow: "0 2px 8px rgba(0,0,0,0.12)",
+    maxWidth: "520px",
   },
   success: {
     color: "#2E7D32",

@@ -15,7 +15,7 @@ exports.authenticate = async (req, res, next) => {
       return res.status(403).json({ 
         error: 'Your account has been banned. Please contact admin for further assistance.',
         isBanned: true,
-        supportEmail: 'support@theroac.com',
+        supportEmail: 'query@theroac.com',
         supportPhone: '+91-0000000000'
       });
     }

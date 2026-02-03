@@ -11,7 +11,7 @@ async function testQuizAPI() {
     
     console.log(`📡 Testing: GET /events/${eventId}/stages/${stageIndex}/quiz/status`);
     
-    const response = await fetch(`${API_BASE_URL}/events/${eventId}/stages/${stageIndex}/quiz/status`, {
+    const response = await fetch(`${BACKEND_URL}/api/events/${eventId}/stages/${stageIndex}/quiz/status`, {
       headers: {
         'Authorization': `Bearer your-token-here` // Replace with actual token
       }

@@ -182,10 +182,22 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('user', JSON.stringify(updatedUser));
   };
 
+  const setAuthFromToken = (token, userData) => {
+    if (!token || !userData) return;
+
+    localStorage.setItem('token', token);
+    localStorage.setItem('user', JSON.stringify(userData));
+
+    setUser(userData);
+    setIsAuthenticated(true);
+    setLoading(false);
+  };
+
   const value = {
     user,
     isAuthenticated,
     loading,
+    setAuthFromToken,
     login,
     register,
     logout,

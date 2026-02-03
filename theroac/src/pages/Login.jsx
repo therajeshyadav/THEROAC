@@ -7,133 +7,113 @@ import BannedUserScreen from '../components/BannedUserScreen';
 import { redirectToDashboard } from '../utils/roleRedirect';
 import './Auth.css';
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:4000';
+
 const Login = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { login, isAuthenticated, user, loading } = useAuth();
+  const { login, isAuthenticated, user } = useAuth();
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    rememberMe: false
+    rememberMe: false,
   });
+
   const [submitLoading, setSubmitLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [bannedUserInfo, setBannedUserInfo] = useState(null);
   const preloaderVisible = usePreloader(300);
 
+  useEffect(() => {
+    const token = searchParams.get('token');
 
+    if (token) {
+      localStorage.setItem('token', token);
 
+      toast.success('Logged in successfully');
+
+      // Prevent token staying in URL
+      navigate('/dashboard', { replace: true });
+    }
+  }, [searchParams, navigate]);
+
+  /* ----------------------------------
+     INPUT HANDLING
+  ---------------------------------- */
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : value,
     }));
   };
 
-
-
   const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
+    setShowPassword((prev) => !prev);
   };
 
   const handleGoogleLogin = () => {
-    // Redirect to backend Google auth endpoint
-    // Standard OAuth flow usually starts with a redirect to backend which then redirects to Google
-    window.location.href = 'http://localhost:4000/api/auth/google';
+    window.location.href = `${API_BASE_URL}auth/google`;
   };
 
   const handleLinkedInLogin = () => {
-    // Redirect to backend LinkedIn auth endpoint
-    window.location.href = 'http://localhost:4000/api/auth/linkedin';
+    window.location.href = `${API_BASE_URL}auth/linkedin`;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (submitLoading) return;
     setSubmitLoading(true);
 
     try {
       const result = await login({
-        email: formData.email,
-        password: formData.password
+        email: formData.email.trim(),
+        password: formData.password,
+        rememberMe: formData.rememberMe,
       });
 
-      if (result.success) {
-        // Check if there's a redirect URL stored (from Quick Apply or other pages)
+      if (result?.success) {
         const redirectUrl = sessionStorage.getItem('redirectAfterLogin');
 
-        if (redirectUrl) {
-          // Clear the stored redirect URL
+        if (redirectUrl && redirectUrl.startsWith('/')) {
           sessionStorage.removeItem('redirectAfterLogin');
-          // Redirect to the stored page
-          window.location.href = redirectUrl;
+          navigate(redirectUrl);
         } else {
-          // Normal login - redirect based on user role
           redirectToDashboard(result.user?.role);
         }
         return;
+      }
+
+      if (result?.isBanned) {
+        setBannedUserInfo({
+          supportEmail: result.supportEmail,
+          supportPhone: result.supportPhone,
+        });
+        return;
+      }
+
+      const errorMsg = result?.error?.toLowerCase() || '';
+      const needsVerification =
+        result?.needsVerification ||
+        errorMsg.includes('verify');
+
+      if (needsVerification) {
+        toast.warning('Please verify your email first.');
+        navigate(`/resend-verification?email=${encodeURIComponent(formData.email)}`);
       } else {
-        // Check if user is banned
-        if (result.isBanned) {
-          setBannedUserInfo({
-            supportEmail: result.supportEmail,
-            supportPhone: result.supportPhone
-          });
-          return;
-        }
-
-        // Check if error message contains verification-related keywords
-        const errorMsg = result.error || '';
-        const isVerificationError =
-          result.needsVerification ||
-          errorMsg.toLowerCase().includes('verify') ||
-          errorMsg.toLowerCase().includes('verification') ||
-          errorMsg.toLowerCase().includes('not verified');
-
-        if (isVerificationError) {
-          // Show warning toast for unverified email
-          toast.warning(
-            'Please verify your email before logging in. Redirecting to resend verification...',
-            {
-              position: "top-center",
-              autoClose: 3000,
-              hideProgressBar: false,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-            }
-          );
-
-          // Don't set error state, just redirect with email as query parameter
-          setTimeout(() => {
-            navigate(`/resend-verification?email=${encodeURIComponent(formData.email)}`);
-          }, 1500);
-        } else {
-          toast.error(result.error || 'Login failed', {
-            position: "top-right",
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-          });
-        }
+        toast.error(result?.error || 'Login failed');
       }
     } catch (err) {
-      toast.error('Login failed. Please try again.', {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
+      toast.error('Login failed. Please try again.');
     } finally {
       setSubmitLoading(false);
     }
   };
 
-  // Show banned user screen if user is banned
+  /* ----------------------------------
+     BANNED USER VIEW
+  ---------------------------------- */
   if (bannedUserInfo) {
     return (
       <BannedUserScreen
@@ -144,29 +124,27 @@ const Login = () => {
     );
   }
 
+  /* ----------------------------------
+     UI
+  ---------------------------------- */
   return (
     <div className="auth-container">
       {preloaderVisible && (
         <div className="preloader">
           <div className="loading-container">
-            <div className="loading"></div>
+            <div className="loading" />
             <div id="loading-icon">
-              <img src="assets/img/logo/preloader.png" alt="" />
+              <img src="/assets/img/logo/preloader.png" alt="Loading" />
             </div>
           </div>
         </div>
       )}
-      <div className="paginacontainer">
-        <div className="progress-wrap warp2">
-          <svg className="progress-circle svg-content" width="100%" height="100%" viewBox="-1 -1 102 102">
-            <path d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98" />
-          </svg>
-        </div>
-      </div>
+
       <div className="container row justify-content-between auth-card">
         <div className="col-5 align-content-center">
-          <img src="assets/img/login/Login-pana.svg" alt="" />
+          <img src="/assets/img/login/Login-pana.svg" alt="Login Illustration" />
         </div>
+
         <div className="col-6">
           <div className="auth-header">
             <h2>Hello Again</h2>
@@ -175,10 +153,11 @@ const Login = () => {
 
           <div className="social-login-container">
             <button type="button" className="social-btn google" onClick={handleGoogleLogin}>
-              <i className="fab fa-google"></i>
+              <i className="fab fa-google" />
             </button>
+
             <button type="button" className="social-btn linkedin" onClick={handleLinkedInLogin}>
-              <i className="fab fa-linkedin-in"></i>
+              <i className="fab fa-linkedin-in" />
             </button>
           </div>
 
@@ -197,28 +176,28 @@ const Login = () => {
                 required
                 disabled={submitLoading}
               />
-              <i className="fa-solid fa-envelope input-icon"></i>
+              <i className="fa-solid fa-envelope input-icon" />
             </div>
 
             <div className="form-group password-group">
               <input
-                type={showPassword ? "text" : "password"}
+                type={showPassword ? 'text' : 'password'}
                 name="password"
                 placeholder="Password"
                 value={formData.password}
                 onChange={handleChange}
-                autoComplete="current-password"
                 required
                 disabled={submitLoading}
               />
-              <i className="fa-solid fa-lock input-icon"></i>
+              <i className="fa-solid fa-lock input-icon" />
+
               <button
                 type="button"
                 className="password-toggle"
                 onClick={togglePasswordVisibility}
                 disabled={submitLoading}
               >
-                <i className={`fa-solid ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+                <i className={`fa-solid ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`} />
               </button>
             </div>
 
@@ -230,11 +209,12 @@ const Login = () => {
                   checked={formData.rememberMe}
                   onChange={handleChange}
                 />
-                <span className="checkmark"></span>
+                <span className="checkmark" />
                 Remember me
               </label>
+
               <Link
-                to={formData.email ? `/forgot-password?email=${encodeURIComponent(formData.email)}` : "/forgot-password"}
+                to={formData.email ? `/forgot-password?email=${encodeURIComponent(formData.email)}` : '/forgot-password'}
                 className="forgot-link"
               >
                 Forgot Password?
@@ -244,8 +224,7 @@ const Login = () => {
             <button type="submit" className="auth-btn" disabled={submitLoading}>
               {submitLoading ? (
                 <>
-                  <i className="fas fa-spinner fa-spin"></i>
-                  Logging in...
+                  <i className="fas fa-spinner fa-spin" /> Logging in...
                 </>
               ) : (
                 'Login'
@@ -254,7 +233,9 @@ const Login = () => {
           </form>
 
           <div className="auth-footer">
-            <p>Don't have an account? <Link to="/register">Register</Link></p>
+            <p>
+              Don&apos;t have an account? <Link to="/register">Register</Link>
+            </p>
           </div>
         </div>
       </div>

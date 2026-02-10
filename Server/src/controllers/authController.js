@@ -154,6 +154,7 @@ exports.login = async (req, res, next) => {
       bio: user.bio,
       role: user.role,
       isVerified: user.isVerified,
+      badges: user.badges || [], // Add badges to login response
     };
 
     return res.status(200).json({

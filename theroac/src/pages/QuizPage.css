@@ -504,23 +504,59 @@
 .badge-earned h3 {
   color: #ffd600;
   margin-bottom: 15px;
+  font-size: 1.5rem;
 }
 
 .badge {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 15px;
   font-size: 1.2rem;
 }
 
 .badge-icon {
-  font-size: 2rem;
+  font-size: 3rem;
+  animation: badgeBounce 1s ease-in-out infinite;
+}
+
+@keyframes badgeBounce {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.badge-icon.badge-gold {
+  filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.8));
+}
+
+.badge-icon.badge-silver {
+  filter: drop-shadow(0 0 10px rgba(192, 192, 192, 0.8));
+}
+
+.badge-icon.badge-bronze {
+  filter: drop-shadow(0 0 10px rgba(205, 127, 50, 0.8));
+}
+
+.badge-details {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  text-align: left;
 }
 
 .badge-name {
   color: #ffffff;
-  font-weight: 600;
+  font-weight: 700;
+  font-size: 1.3rem;
+}
+
+.badge-description {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
 }
 
 .result-actions {
@@ -591,4 +627,36 @@
     padding: 6px 12px;
     font-size: 0.85rem;
   }
+}
+
+/* Coins Earned Section */
+.coins-earned {
+  background: linear-gradient(135deg, rgba(255, 214, 0, 0.15), rgba(255, 138, 0, 0.15));
+  border: 2px solid rgba(255, 214, 0, 0.4);
+  border-radius: 16px;
+  padding: 25px;
+  margin-bottom: 30px;
+  animation: coinPulse 2s ease-in-out infinite;
+}
+
+@keyframes coinPulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(255, 214, 0, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(255, 214, 0, 0.5);
+  }
+}
+
+.coins-earned h3 {
+  color: #ffd600;
+  margin-bottom: 10px;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.coins-earned p {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1rem;
+  line-height: 1.5;
 }

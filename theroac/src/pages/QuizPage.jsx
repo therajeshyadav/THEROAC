@@ -100,12 +100,7 @@ const QuizPage = () => {
       const quizData = response.quiz || response.data;
       setQuiz(quizData);
       
-      // Store correct answers for scoring
-      const correctAnswers = {};
-      quizData.questions.forEach(q => {
-        correctAnswers[q.id] = q.correctAnswer;
-      });
-      setCorrectAnswersMap(correctAnswers);
+      // Don't store correct answers on frontend anymore - backend will handle evaluation
       
       setTimeLeft((quizData.timeLimit || quizType.timeLimit || 30) * 60); // Convert minutes to seconds
       setCurrentStep('quiz');
@@ -143,33 +138,30 @@ const QuizPage = () => {
     try {
       setLoading(true);
       
-      // Calculate score locally
-      let correctCount = 0;
-      const totalQuestions = quiz.questions.length;
+      // Convert answers object to array format for backend
+      const answersArray = quiz.questions.map(question => answers[question.id] || null);
       
-      quiz.questions.forEach(question => {
-        const userAnswer = answers[question.id];
-        const correctAnswer = correctAnswersMap[question.id];
-        if (userAnswer === correctAnswer) {
-          correctCount++;
-        }
-      });
-      
-      const score = Math.round((correctCount / totalQuestions) * 100);
-      const passed = score >= 70; // 70% passing threshold
       const timeSpent = (selectedQuizType.timeLimit * 60) - timeLeft;
       
-      const result = {
-        score,
-        correctAnswers: correctCount,
-        totalQuestions,
+      // Submit to backend for evaluation
+      const response = await apiService.submitRETQuiz({
+        topic: selectedQuizType.topic,
+        difficulty: selectedQuizType.difficulty,
+        questions: quiz.questions,
+        answers: answersArray,
         timeSpent,
-        passed,
-        badge: passed ? {
-          id: `badge_${selectedQuizType.id}`,
-          name: `${selectedQuizType.name} Expert`,
-          icon: selectedQuizType.icon
-        } : null
+        completedAt: new Date().toISOString()
+      });
+      
+      // Backend returns calculated results with coins and badge
+      const result = {
+        score: response.results.score,
+        correctAnswers: response.results.correctAnswers,
+        totalQuestions: response.results.totalQuestions,
+        timeSpent: response.results.timeSpent,
+        passed: response.results.passed,
+        coinsEarned: response.results.coinsEarned,
+        badge: response.results.badge // Backend sends badge if passed
       };
       
       setResult(result);
@@ -430,11 +422,29 @@ const QuizPage = () => {
 
             {result.badge && (
               <div className="badge-earned">
-                <h3>Badge Earned!</h3>
+                <h3>🏆 Badge Earned!</h3>
                 <div className="badge">
-                  <span className="badge-icon">{result.badge.icon}</span>
-                  <span className="badge-name">{result.badge.name}</span>
+                  <span className={`badge-icon badge-${result.badge.type}`}>
+                    {result.badge.type === 'gold' && '🥇'}
+                    {result.badge.type === 'silver' && '🥈'}
+                    {result.badge.type === 'bronze' && '🥉'}
+                  </span>
+                  <div className="badge-details">
+                    <span className="badge-name">{result.badge.name}</span>
+                    <span className="badge-description">{result.badge.description}</span>
+                  </div>
                 </div>
+              </div>
+            )}
+
+            {result.coinsEarned && (
+              <div className="coins-earned">
+                <h3>🪙 Coins Earned: {result.coinsEarned}</h3>
+                <p>
+                  {result.passed 
+                    ? '5 coins for attempting + 25 coins for passing!' 
+                    : '5 coins for attempting. Pass with 70% to earn 25 more!'}
+                </p>
               </div>
             )}
 

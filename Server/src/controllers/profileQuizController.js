@@ -125,12 +125,13 @@ const calculateRTEBadge = (overallScore) => {
   
   if (badgeType) {
     return {
-      name: 'RTE',
+      name: 'RET',
       type: badgeType,
       level: level,
       score: overallScore,
       earnedAt: new Date().toISOString(),
-      description: 'Real-Time Evaluation - Comprehensive skill assessment'
+      description: 'Recruitment Eligibility Test - Comprehensive skill assessment',
+      category: 'Profile Quiz'
     };
   }
   

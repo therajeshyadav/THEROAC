@@ -26,6 +26,7 @@ const Review = require("./Review");
 const FAQ = require("./FAQ");
 const QuizSubmission = require("./QuizSubmission");
 const ProfileQuizSubmission = require("./ProfileQuizSubmission");
+const RETSubmission = require("./RETSubmission");
 const TrainingUser = require("./TrainingUser");
 const Payment = require("./Payment");
 const RoacWallet = require("./RoacWallet");
@@ -313,6 +314,19 @@ User.hasMany(ProfileQuizSubmission, {
   as: "profileQuizSubmissions",
 });
 
+
+// RETSubmission associations
+RETSubmission.belongsTo(User, { foreignKey: "userId", as: "user" });
+User.hasMany(RETSubmission, {
+  foreignKey: "userId",
+  as: "retSubmissions",
+});
+
+// ===============================
+// Bookmark → Actual Item relations
+// ===============================
+
+
 // Bookmark → Job
 Bookmark.belongsTo(Job, {
   foreignKey: "itemId",
@@ -385,6 +399,7 @@ module.exports = {
   FAQ,
   QuizSubmission,
   ProfileQuizSubmission,
+  RETSubmission,
   TrainingUser,
   Payment,
   RoacWallet,

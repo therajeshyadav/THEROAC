@@ -700,6 +700,14 @@ const generateQuiz = async (quizType) => {
     };
 };
 
+const submitRETQuiz = async (quizData) => {
+    // Submit to backend for evaluation
+    return request('/quiz/submit', {
+        method: 'POST',
+        body: JSON.stringify(quizData)
+    });
+};
+
 const submitQuiz = async (quizData) => {
     // Since your backend doesn't have submit endpoint yet, calculate score locally
     // But the quiz questions came from Gemini AI
@@ -905,6 +913,7 @@ const apiService = {
     createReview,
     getQuizTypes,
     generateQuiz,
+    submitRETQuiz,
     submitQuiz,
     getUserQuizHistory,
     getUserBadges,

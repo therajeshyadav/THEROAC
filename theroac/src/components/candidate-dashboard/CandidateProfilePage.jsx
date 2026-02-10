@@ -45,6 +45,17 @@ const CandidateProfilePage = ({ initialProfile, onSaveProfile }) => {
     console.log("initialProfile received:", initialProfile); // Debug log
     console.log("FULL initialProfile =", initialProfile);
     console.log("initialProfile.badges =", initialProfile?.badges);
+    
+    // Check if user has completed Profile Quiz
+    const hasProfileQuizBadge = initialProfile?.badges && 
+      Array.isArray(initialProfile.badges) && 
+      initialProfile.badges.some(badge => 
+        badge.category === 'Profile Quiz' || 
+        badge.name === 'RET' || 
+        badge.name === 'RTE'  // Old badge name
+      );
+    console.log("Has Profile Quiz Badge:", hasProfileQuizBadge);
+    
     if (initialProfile) {
       const updatedProfile = {
         ...getEmptyProfile(),
@@ -716,9 +727,25 @@ const CandidateProfilePage = ({ initialProfile, onSaveProfile }) => {
           <button
             className={styles.primaryBtn}
             onClick={handleStartProfileQuiz}
-            disabled={!profile.skills || profile.skills.length === 0}
+            disabled={
+              !profile.skills || 
+              profile.skills.length === 0 || 
+              (initialProfile?.badges && Array.isArray(initialProfile.badges) && 
+               initialProfile.badges.some(badge => 
+                 badge.category === 'Profile Quiz' || 
+                 badge.name === 'RET' || 
+                 badge.name === 'RTE'  // Old badge name
+               ))
+            }
           >
-            {!profile.skills || profile.skills.length === 0
+            {(initialProfile?.badges && Array.isArray(initialProfile.badges) && 
+              initialProfile.badges.some(badge => 
+                badge.category === 'Profile Quiz' || 
+                badge.name === 'RET' || 
+                badge.name === 'RTE'  // Old badge name
+              ))
+              ? "Quiz Already Completed ✓"
+              : !profile.skills || profile.skills.length === 0
               ? "Add Skills First"
               : "Take Skill Assessment"}
           </button>

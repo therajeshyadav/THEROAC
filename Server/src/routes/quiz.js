@@ -1,5 +1,7 @@
 const express = require('express');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
+const { RETSubmission, User } = require('../models');
+const { authenticate } = require('../middlewares/auth');
 
 const router = express.Router();
 
@@ -132,6 +134,122 @@ router.get("/topics", (req, res) => {
   ];
 
   res.json(topics);
+});
+
+// Submit RET Quiz
+router.post("/submit", authenticate, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { topic, difficulty, questions, answers, timeSpent, completedAt } = req.body;
+
+    // Validate input
+    if (!topic || !difficulty || !questions || !answers) {
+      return res.status(400).json({ 
+        error: "Missing required fields" 
+      });
+    }
+
+    // Calculate score
+    let correctCount = 0;
+    const totalQuestions = questions.length;
+
+    questions.forEach((question, index) => {
+      const userAnswer = answers[index];
+      const correctAnswer = question.correctAnswer;
+      
+      if (userAnswer === correctAnswer) {
+        correctCount++;
+      }
+    });
+
+    const score = Math.round((correctCount / totalQuestions) * 100);
+    const passed = score >= 70; // 70% passing threshold
+
+    // Calculate coins earned
+    let coinsEarned = 5; // 5 coins for attempting
+    if (passed) {
+      coinsEarned += 25; // Additional 25 coins for passing
+    }
+
+    // Create badge if passed
+    let badge = null;
+    if (passed) {
+      let badgeType = 'bronze';
+      let level = 'Proficient';
+      
+      if (score >= 90) {
+        badgeType = 'gold';
+        level = 'Expert';
+      } else if (score >= 80) {
+        badgeType = 'silver';
+        level = 'Advanced';
+      }
+      
+      badge = {
+        name: `${topic} ${level}`,
+        type: badgeType,
+        level: level,
+        score: score,
+        earnedAt: new Date().toISOString(),
+        description: `Passed ${topic} RET with ${score}% score`,
+        category: 'RET'
+      };
+    }
+
+    // Save submission to database
+    const submission = await RETSubmission.create({
+      userId,
+      topic,
+      difficulty,
+      questions,
+      answers,
+      score,
+      correctAnswers: correctCount,
+      totalQuestions,
+      timeSpent: timeSpent || 0,
+      completedAt: completedAt || new Date(),
+      passed,
+      coinsEarned
+    });
+
+    // Update user's badges if passed (add or update badge for this topic)
+    if (badge) {
+      const user = await User.findByPk(userId);
+      let currentBadges = user.badges || [];
+      
+      // Remove old badge for same topic if exists
+      currentBadges = currentBadges.filter(b => b.name !== badge.name && !b.name.startsWith(topic));
+      
+      // Add new badge
+      currentBadges.push(badge);
+      
+      await user.update({ badges: currentBadges });
+    }
+
+    // TODO: Award coins to user (implement coinService)
+    // await coinService.awardCoins(userId, coinsEarned, 'ret_submission', submission.id, `RET Quiz: ${topic}`);
+
+    res.status(201).json({
+      message: 'Quiz submitted successfully',
+      results: {
+        score,
+        correctAnswers: correctCount,
+        totalQuestions,
+        timeSpent,
+        passed,
+        coinsEarned,
+        badge,
+        submissionId: submission.id
+      }
+    });
+
+  } catch (error) {
+    console.error("Quiz submission error:", error);
+    res.status(500).json({
+      error: "Quiz submission failed",
+      details: error.message
+    });
+  }
 });
 
 module.exports = router;

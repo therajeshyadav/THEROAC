@@ -1,7 +1,7 @@
 const express = require('express');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const { RETSubmission, User } = require('../models');
-const { authenticate } = require('../middlewares/auth');
+const { authenticate } = require('../middleware/auth');
 
 const router = express.Router();
 

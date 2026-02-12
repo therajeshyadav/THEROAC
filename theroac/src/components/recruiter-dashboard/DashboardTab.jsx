@@ -17,6 +17,7 @@ import {
   MessageSquare,
   MoreVertical,
 } from "lucide-react";
+import HostModal from "./HostModal";
 
 const DashboardTab = ({
   authUser,
@@ -35,11 +36,9 @@ const DashboardTab = ({
   onOpenModal,
   onTabChange,
 }) => {
-  const [showHostDropdown, setShowHostDropdown] = useState(false);
-  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
+  const [showHostModal, setShowHostModal] = useState(false);
   const [heatmapData, setHeatmapData] = useState(null);
   const [chartPeriod, setChartPeriod] = useState('year');
-  const hostButtonRef = useRef(null);
   
   // Fetch activity heatmap data
   useEffect(() => {
@@ -233,37 +232,16 @@ const DashboardTab = ({
   };
 
   const calculateDropdownPosition = () => {
-    if (hostButtonRef.current) {
-      const rect = hostButtonRef.current.getBoundingClientRect();
-      const position = {
-        top: rect.bottom + 8,
-        left: rect.right - 220,
-      };
-      setDropdownPosition(position);
-    }
+    // No longer needed - using modal instead
   };
 
   const handleHostDropdownToggle = () => {
-    if (!showHostDropdown) {
-      calculateDropdownPosition();
-    }
-    setShowHostDropdown(!showHostDropdown);
+    setShowHostModal(!showHostModal);
   };
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        showHostDropdown &&
-        !event.target.closest(".host-dropdown-container") &&
-        !event.target.closest(".host-dropdown")
-      ) {
-        setShowHostDropdown(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [showHostDropdown]);
+    // No longer needed - modal handles its own closing
+  }, [showHostModal]);
 
   const chartData = getAnalyticsData();
   const maxApplications = Math.max(...chartData.map((d) => d.applications), 1);
@@ -288,76 +266,26 @@ const DashboardTab = ({
           </p>
         </div>
         <div className="welcome-actions">
-          <div className="host-dropdown-container">
-            <button
-              ref={hostButtonRef}
-              className="btn-host"
-              onClick={handleHostDropdownToggle}
-            >
-              <Plus className="w-4 h-4" /> Host
-              <ChevronDown className="w-4 h-4" />
-            </button>
-            {showHostDropdown && (
-              <div
-                className="host-dropdown"
-                style={{
-                  top: `${dropdownPosition.top}px`,
-                  left: `${dropdownPosition.left}px`,
-                }}
-              >
-                <button
-                  className="dropdown-item"
-                  onClick={() => {
-                    if (onTabChange) onTabChange("jobs", "job");
-                    setShowHostDropdown(false);
-                  }}
-                >
-                  <Briefcase className="w-4 h-4" />
-                  Add Job Posting
-                </button>
-                <button
-                  className="dropdown-item"
-                  onClick={() => {
-                    if (onTabChange) onTabChange("jobs", "internship");
-                    setShowHostDropdown(false);
-                  }}
-                >
-                  <Users className="w-4 h-4" />
-                  Add Internship
-                </button>
-                {(authUser?.role === "recruiter" ||
-                  authUser?.role === "organizer" ||
-                  authUser?.role === "admin" ||
-                  authUser?.role === "superadmin") && (
-                  <button
-                    className="dropdown-item"
-                    onClick={() => {
-                      if (onTabChange) onTabChange("events", "event");
-                      setShowHostDropdown(false);
-                    }}
-                  >
-                    <Calendar className="w-4 h-4" />
-                    Create Event
-                  </button>
-                )}
-                <button
-                  className="dropdown-item"
-                  onClick={() => {
-                    onOpenModal("hub-content");
-                    setShowHostDropdown(false);
-                  }}
-                >
-                  <Star className="w-4 h-4" />
-                  Add Career Insight
-                </button>
-              </div>
-            )}
-          </div>
+          <button
+            className="btn-host"
+            onClick={handleHostDropdownToggle}
+          >
+            <Plus className="w-4 h-4" /> Host
+          </button>
           <button className="btn-help">
             <HelpCircle className="w-5 h-5" />
           </button>
         </div>
       </div>
+
+      {/* Host Modal */}
+      <HostModal
+        isOpen={showHostModal}
+        onClose={() => setShowHostModal(false)}
+        onTabChange={onTabChange}
+        onOpenModal={onOpenModal}
+        authUser={authUser}
+      />
 
       {/* Stats Cards */}
       <div className="recruiter-stats-grid">

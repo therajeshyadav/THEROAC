@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Eye, Users, Search, Briefcase } from 'lucide-react';
 import JobFormModal from './JobFormModal';
 import InternshipFormModal from './InternshipFormModal';
+import QuickListingForm from './QuickListingForm';
 import JobEvaluationOverlay from './JobEvaluationOverlay';
 import { toast } from 'react-toastify';
 import './ManageJobsTab.css';
@@ -13,8 +14,10 @@ const ManageJobsTab = ({ authUser, setJobsTabLoading, pendingModalType, onModalT
   const [internships, setInternships] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
-  const [activeView, setActiveView] = useState('jobs'); // 'jobs' or 'internships'
+  const [filterType, setFilterType] = useState('all'); // 'all', 'jobs', 'internships'
   const [showFormModal, setShowFormModal] = useState(false);
+  const [showQuickForm, setShowQuickForm] = useState(false);
+  const [quickFormType, setQuickFormType] = useState(null);
   const [editingJob, setEditingJob] = useState(null);
   const [editingInternship, setEditingInternship] = useState(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(null);
@@ -24,10 +27,10 @@ const ManageJobsTab = ({ authUser, setJobsTabLoading, pendingModalType, onModalT
   useEffect(() => {
     if (pendingModalType) {
       if (pendingModalType === 'job') {
-        setActiveView('jobs');
+        setFilterType('jobs');
         handleCreateJob();
       } else if (pendingModalType === 'internship') {
-        setActiveView('internships');
+        setFilterType('internships');
         handleCreateInternship();
       }
       if (onModalTypeHandled) {
@@ -38,6 +41,15 @@ const ManageJobsTab = ({ authUser, setJobsTabLoading, pendingModalType, onModalT
 
   useEffect(() => {
     fetchData();
+    
+    // Listen for refresh events from QuickListingForm
+    const handleRefresh = (event) => {
+      if (event.detail.type === 'job' || event.detail.type === 'internship') {
+        fetchData();
+      }
+    };
+    
+    window.addEventListener('refreshListings', handleRefresh);
     
     // Check if user came from a notification
     const urlParams = new URLSearchParams(window.location.search);
@@ -55,6 +67,10 @@ const ManageJobsTab = ({ authUser, setJobsTabLoading, pendingModalType, onModalT
       const newUrl = window.location.pathname + window.location.search.replace(/[?&]showPending=true/, '');
       window.history.replaceState({}, '', newUrl);
     }
+    
+    return () => {
+      window.removeEventListener('refreshListings', handleRefresh);
+    };
   }, []);
 
   const fetchData = async () => {
@@ -90,7 +106,9 @@ const ManageJobsTab = ({ authUser, setJobsTabLoading, pendingModalType, onModalT
         },
       });
       const data = await response.json();
+      console.log('Internships API Response:', data);
       const userInternships = data.hubContent || [];
+      console.log('Internships Array:', userInternships);
       setInternships(userInternships);
     } catch (error) {
       console.error('Error fetching internships:', error);
@@ -101,13 +119,15 @@ const ManageJobsTab = ({ authUser, setJobsTabLoading, pendingModalType, onModalT
   const handleCreateJob = () => {
     setEditingJob(null);
     setEditingInternship(null);
-    setShowFormModal(true);
+    setQuickFormType('job');
+    setShowQuickForm(true);
   };
 
   const handleCreateInternship = () => {
     setEditingInternship(null);
     setEditingJob(null);
-    setShowFormModal(true);
+    setQuickFormType('internship');
+    setShowQuickForm(true);
   };
 
   const handleEditJob = (job) => {
@@ -167,11 +187,8 @@ const ManageJobsTab = ({ authUser, setJobsTabLoading, pendingModalType, onModalT
   };
 
   const handleFormSuccess = () => {
-    if (activeView === 'jobs') {
-      fetchJobs();
-    } else {
-      fetchInternships();
-    }
+    fetchJobs();
+    fetchInternships();
     setShowFormModal(false);
     setEditingJob(null);
     setEditingInternship(null);
@@ -184,10 +201,18 @@ const ManageJobsTab = ({ authUser, setJobsTabLoading, pendingModalType, onModalT
     
     if (filterStatus === 'all') {
       matchesFilter = true;
+    } else if (filterStatus === 'draft') {
+      matchesFilter = job.approvalStatus === 'draft';
     } else if (filterStatus === 'rejected') {
       matchesFilter = job.approvalStatus === 'rejected';
     } else if (filterStatus === 'pending') {
       matchesFilter = job.approvalStatus === 'pending';
+    } else if (filterStatus === 'open') {
+      matchesFilter = job.status === 'open';
+    } else if (filterStatus === 'closed') {
+      matchesFilter = job.status === 'closed';
+    } else if (filterStatus === 'paused') {
+      matchesFilter = job.status === 'paused';
     } else {
       matchesFilter = job.status === filterStatus;
     }
@@ -202,16 +227,43 @@ const ManageJobsTab = ({ authUser, setJobsTabLoading, pendingModalType, onModalT
     
     if (filterStatus === 'all') {
       matchesFilter = true;
+    } else if (filterStatus === 'draft') {
+      matchesFilter = internship.approvalStatus === 'draft';
     } else if (filterStatus === 'rejected') {
       matchesFilter = internship.approvalStatus === 'rejected';
     } else if (filterStatus === 'pending') {
       matchesFilter = internship.approvalStatus === 'pending';
+    } else if (filterStatus === 'open') {
+      // Internships use 'published' instead of 'open'
+      matchesFilter = internship.status === 'published';
+    } else if (filterStatus === 'closed') {
+      // Internships use 'archived' instead of 'closed'
+      matchesFilter = internship.status === 'archived';
     } else {
       matchesFilter = internship.status === filterStatus;
     }
     
     return matchesSearch && matchesFilter;
   });
+
+  // Combine and filter by type
+  const allItems = [
+    ...filteredJobs.map(job => ({ ...job, itemType: 'job' })),
+    ...filteredInternships.map(internship => ({ ...internship, itemType: 'internship' }))
+  ];
+
+  console.log('Filtered Jobs:', filteredJobs.length);
+  console.log('Filtered Internships:', filteredInternships.length);
+  console.log('All Items:', allItems.length);
+  console.log('Filter Type:', filterType);
+
+  const displayItems = filterType === 'all' 
+    ? allItems 
+    : filterType === 'jobs' 
+      ? allItems.filter(item => item.itemType === 'job')
+      : allItems.filter(item => item.itemType === 'internship');
+
+  console.log('Display Items:', displayItems.length);
 
   return (
     <div className="manage-jobs-container">
@@ -228,350 +280,277 @@ const ManageJobsTab = ({ authUser, setJobsTabLoading, pendingModalType, onModalT
               <h2>Manage Jobs & Internships</h2>
               <p>Create, edit, and manage all your job postings and internships</p>
             </div>
-        <div className="header-buttons">
-          <button 
-            className={`btn-view-toggle ${activeView === 'jobs' ? 'active' : ''}`}
-            onClick={() => setActiveView('jobs')}
-          >
-            <Briefcase size={18} /> Jobs ({jobs.length})
-          </button>
-          <button 
-            className={`btn-view-toggle ${activeView === 'internships' ? 'active' : ''}`}
-            onClick={() => setActiveView('internships')}
-          >
-            <Users size={18} /> Internships ({internships.length})
-          </button>
-          <button 
-            className="btn-primary" 
-            onClick={activeView === 'jobs' ? handleCreateJob : handleCreateInternship}
-          >
-            <Plus size={20} /> Create New {activeView === 'jobs' ? 'Job' : 'Internship'}
-          </button>
-        </div>
-      </div>
+            <div className="header-buttons">
+              <button 
+                className="btn-primary" 
+                onClick={handleCreateJob}
+              >
+                <Plus size={20} /> Create Job
+              </button>
+              <button 
+                className="btn-primary" 
+                onClick={handleCreateInternship}
+              >
+                <Plus size={20} /> Create Internship
+              </button>
+            </div>
+          </div>
 
-      <div className="manage-jobs-filters">
-        <div className="search-box">
-          <Search size={20} />
-          <input
-            type="text"
-            placeholder={`Search ${activeView}...`}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-        <div className="filter-buttons">
-          <button
-            className={filterStatus === 'all' ? 'active' : ''}
-            onClick={() => setFilterStatus('all')}
-          >
-            All ({activeView === 'jobs' ? jobs.length : internships.length})
-          </button>
-          <button
-            className={filterStatus === 'open' ? 'active' : ''}
-            onClick={() => setFilterStatus('open')}
-          >
-            Open ({activeView === 'jobs' ? jobs.filter(j => j.status === 'open').length : internships.filter(i => i.status === 'published').length})
-          </button>
-          <button
-            className={filterStatus === 'closed' ? 'active' : ''}
-            onClick={() => setFilterStatus('closed')}
-          >
-            Closed ({activeView === 'jobs' ? jobs.filter(j => j.status === 'closed').length : internships.filter(i => i.status === 'archived').length})
-          </button>
-          <button
-            className={filterStatus === 'pending' ? 'active' : ''}
-            onClick={() => setFilterStatus('pending')}
-          >
-            Pending Approval ({activeView === 'jobs' ? jobs.filter(j => j.approvalStatus === 'pending').length : internships.filter(i => i.approvalStatus === 'pending').length})
-          </button>
-          <button
-            className={filterStatus === 'rejected' ? 'active' : ''}
-            onClick={() => setFilterStatus('rejected')}
-          >
-            Rejected ({activeView === 'jobs' ? jobs.filter(j => j.approvalStatus === 'rejected').length : internships.filter(i => i.approvalStatus === 'rejected').length})
-          </button>
-          {activeView === 'jobs' && (
-            <button
-              className={filterStatus === 'paused' ? 'active' : ''}
-              onClick={() => setFilterStatus('paused')}
-            >
-              Paused ({jobs.filter(j => j.status === 'paused').length})
-            </button>
-          )}
-        </div>
-      </div>
+          <div className="manage-jobs-filters">
+            <div className="search-box">
+              <Search size={20} />
+              <input
+                type="text"
+                placeholder="Search jobs and internships..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            <div className="filter-buttons">
+              <button
+                className={filterType === 'all' ? 'active' : ''}
+                onClick={() => setFilterType('all')}
+              >
+                All ({jobs.length + internships.length})
+              </button>
+              <button
+                className={filterType === 'jobs' ? 'active' : ''}
+                onClick={() => setFilterType('jobs')}
+              >
+                <Briefcase size={16} /> Jobs ({jobs.length})
+              </button>
+              <button
+                className={filterType === 'internships' ? 'active' : ''}
+                onClick={() => setFilterType('internships')}
+              >
+                <Users size={16} /> Internships ({internships.length})
+              </button>
+            </div>
+            <div className="filter-buttons" style={{ marginTop: '1rem' }}>
+              <button
+                className={filterStatus === 'all' ? 'active' : ''}
+                onClick={() => setFilterStatus('all')}
+              >
+                All Status
+              </button>
+              <button
+                className={filterStatus === 'open' ? 'active' : ''}
+                onClick={() => setFilterStatus('open')}
+              >
+                Open ({jobs.filter(j => j.status === 'open').length + internships.filter(i => i.status === 'published').length})
+              </button>
+              <button
+                className={filterStatus === 'closed' ? 'active' : ''}
+                onClick={() => setFilterStatus('closed')}
+              >
+                Closed ({jobs.filter(j => j.status === 'closed').length + internships.filter(i => i.status === 'archived').length})
+              </button>
+              <button
+                className={filterStatus === 'draft' ? 'active' : ''}
+                onClick={() => setFilterStatus('draft')}
+              >
+                Drafts ({jobs.filter(j => j.approvalStatus === 'draft').length + internships.filter(i => i.approvalStatus === 'draft').length})
+              </button>
+              <button
+                className={filterStatus === 'pending' ? 'active' : ''}
+                onClick={() => setFilterStatus('pending')}
+              >
+                Pending ({jobs.filter(j => j.approvalStatus === 'pending').length + internships.filter(i => i.approvalStatus === 'pending').length})
+              </button>
+              <button
+                className={filterStatus === 'rejected' ? 'active' : ''}
+                onClick={() => setFilterStatus('rejected')}
+              >
+                Rejected ({jobs.filter(j => j.approvalStatus === 'rejected').length + internships.filter(i => i.approvalStatus === 'rejected').length})
+              </button>
+              <button
+                className={filterStatus === 'paused' ? 'active' : ''}
+                onClick={() => setFilterStatus('paused')}
+              >
+                Paused ({jobs.filter(j => j.status === 'paused').length})
+              </button>
+            </div>
+          </div>
 
-      {activeView === 'jobs' && filteredJobs.length > 0 ? (
-        <div className="jobs-table">
-          <table>
-            <thead>
-              <tr>
-                <th>Job Title</th>
-                <th>Company</th>
-                <th>Type</th>
-                <th>Location</th>
-                <th>Views</th>
-                <th>Applications</th>
-                <th>Status</th>
-                <th>Approval</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredJobs.map(job => (
-                <tr key={job.id}>
-                  <td>
-                    <div className="job-title-cell">
-                      {job.companyLogo && (
-                        <img src={job.companyLogo} alt={job.companyName} className="company-logo-small" />
-                      )}
-                      <div>
-                        <div 
-                          className="job-title clickable-title" 
-                          onClick={() => setShowEvaluation({ type: 'job', data: job })}
-                          title="Click to view applications"
-                        >
-                          {job.title}
+          {displayItems.length > 0 ? (
+            <div className="jobs-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Title</th>
+                    <th>Company</th>
+                    <th>Details</th>
+                    <th>Location</th>
+                    <th>Views</th>
+                    <th>Applications</th>
+                    <th>Status</th>
+                    <th>Approval</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {displayItems.map(item => (
+                    <tr 
+                      key={`${item.itemType}-${item.id}`}
+                      className={item.approvalStatus === 'rejected' ? 'rejected-row' : ''}
+                    >
+                      <td>
+                        <span className={`badge-type ${item.itemType === 'job' ? 'badge-job' : 'badge-internship'}`}>
+                          {item.itemType === 'job' ? 'Job' : 'Internship'}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="job-title-cell">
+                          {item.companyLogo && (
+                            <img src={item.companyLogo} alt={item.companyName} className="company-logo-small" />
+                          )}
+                          <div>
+                            <div 
+                              className="job-title clickable-title" 
+                              onClick={() => setShowEvaluation({ type: item.itemType, data: item })}
+                              title="Click to view applications"
+                            >
+                              {item.title}
+                            </div>
+                            {item.featured && <span className="badge-featured">Featured</span>}
+                            {item.urgent && <span className="badge-urgent">Urgent</span>}
+                            {item.approvalStatus === 'pending' && item.rejectionReason && (
+                              <span className="badge-resubmission">Resubmission</span>
+                            )}
+                          </div>
                         </div>
-                        {job.featured && <span className="badge-featured">Featured</span>}
-                        {job.urgent && <span className="badge-urgent">Urgent</span>}
-                        {job.approvalStatus === 'pending' && job.rejectionReason && (
-                          <span className="badge-resubmission">Resubmission</span>
-                        )}
-                      </div>
-                    </div>
-                  </td>
-                  <td>{job.companyName}</td>
-                  <td>
-                    <span className="badge-type">{job.jobType}</span>
-                  </td>
-                  <td>{job.location || 'Remote'}</td>
-                  <td>
-                    <div className="stat-cell">
-                      <Eye size={16} />
-                      {job.views || 0}
-                    </div>
-                  </td>
-                  <td>
-                    <div className="stat-cell">
-                      <Users size={16} />
-                      {job.applications || 0}
-                    </div>
-                  </td>
-                  <td>
-                    <span className={`status-badge status-${job.status}`}>
-                      {job.status}
-                    </span>
-                  </td>
-                  <td>
-                    <div className="approval-status-cell">
-                      <span className={`approval-badge approval-${job.approvalStatus || 'pending'}`}>
-                        {job.approvalStatus || 'pending'}
-                      </span>
-                      {job.approvalStatus === 'rejected' && job.rejectionReason && (
-                        <div className="rejection-reason-tooltip" title={job.rejectionReason}>
-                          ⚠️
+                      </td>
+                      <td>{item.companyName}</td>
+                      <td>
+                        <span className="badge-type">
+                          {item.itemType === 'job' ? item.jobType : (item.duration || 'N/A')}
+                        </span>
+                      </td>
+                      <td>{item.location || 'Remote'}</td>
+                      <td>
+                        <div className="stat-cell">
+                          <Eye size={16} />
+                          {item.views || 0}
                         </div>
-                      )}
-                    </div>
-                  </td>
-                  <td>
-                    <div className="action-buttons">
-                      {job.approvalStatus === 'rejected' ? (
-                        <button
-                          className="btn-icon btn-resubmit"
-                          onClick={() => handleEditJob(job)}
-                          title="Edit & Resubmit"
-                        >
-                          <Edit size={18} />
-                          <span className="btn-text">Resubmit</span>
-                        </button>
-                      ) : job.approvalStatus === 'approved' ? (
-                        <>
-                          <button
-                            className="btn-icon"
-                            onClick={() => handleEditJob(job)}
-                            title="Edit"
-                          >
-                            <Edit size={18} />
-                          </button>
-                          <button
-                            className="btn-icon btn-view"
-                            onClick={() => window.open(`/event-detail/jobs/${job.slug}`, '_blank')}
-                            title="View Live"
-                          >
-                            <Eye size={18} />
-                          </button>
-                        </>
-                      ) : (
-                        <button
-                          className="btn-icon"
-                          onClick={() => handleEditJob(job)}
-                          title="Edit"
-                        >
-                          <Edit size={18} />
-                        </button>
-                      )}
-                      <button
-                        className="btn-icon btn-danger"
-                        onClick={() => setShowDeleteConfirm(job.id)}
-                        title="Delete"
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      ) : activeView === 'internships' && filteredInternships.length > 0 ? (
-        <div className="jobs-table">
-          <table>
-            <thead>
-              <tr>
-                <th>Internship Title</th>
-                <th>Company</th>
-                <th>Duration</th>
-                <th>Location</th>
-                <th>Views</th>
-                <th>Applications</th>
-                <th>Status</th>
-                <th>Approval</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredInternships.map(internship => (
-                <tr key={internship.id}>
-                  <td>
-                    <div className="job-title-cell">
-                      {internship.companyLogo && (
-                        <img src={internship.companyLogo} alt={internship.companyName} className="company-logo-small" />
-                      )}
-                      <div>
-                        <div 
-                          className="job-title clickable-title" 
-                          onClick={() => setShowEvaluation({ type: 'internship', data: internship })}
-                          title="Click to view applications"
-                        >
-                          {internship.title}
+                      </td>
+                      <td>
+                        <div className="stat-cell">
+                          <Users size={16} />
+                          {item.applications || 0}
                         </div>
-                        {internship.featured && <span className="badge-featured">Featured</span>}
-                        {internship.approvalStatus === 'pending' && internship.rejectionReason && (
-                          <span className="badge-resubmission">Resubmission</span>
-                        )}
-                      </div>
-                    </div>
-                  </td>
-                  <td>{internship.companyName || 'N/A'}</td>
-                  <td>
-                    <span className="badge-type">{internship.duration || 'N/A'}</span>
-                  </td>
-                  <td>{internship.location || 'Remote'}</td>
-                  <td>
-                    <div className="stat-cell">
-                      <Eye size={16} />
-                      {internship.views || 0}
-                    </div>
-                  </td>
-                  <td>
-                    <div className="stat-cell">
-                      <Users size={16} />
-                      {internship.applications || 0}
-                    </div>
-                  </td>
-                  <td>
-                    <span className={`status-badge status-${internship.status}`}>
-                      {internship.status}
-                    </span>
-                  </td>
-                  <td>
-                    <div className="approval-status-cell">
-                      <span className={`approval-badge approval-${internship.approvalStatus || 'pending'}`}>
-                        {internship.approvalStatus || 'pending'}
-                      </span>
-                      {internship.approvalStatus === 'rejected' && internship.rejectionReason && (
-                        <div className="rejection-reason-tooltip" title={internship.rejectionReason}>
-                          ⚠️
+                      </td>
+                      <td>
+                        <span className={`status-badge status-${item.status}`}>
+                          {item.status}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="approval-status-cell">
+                          <span className={`approval-badge approval-${item.approvalStatus || 'pending'}`}>
+                            {item.approvalStatus || 'pending'}
+                          </span>
+                          {item.approvalStatus === 'rejected' && item.rejectionReason && (
+                            <div className="rejection-reason-tooltip" title={item.rejectionReason}>
+                              ⚠️
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </div>
-                  </td>
-                  <td>
-                    <div className="action-buttons">
-                      {internship.approvalStatus === 'rejected' ? (
-                        <button
-                          className="btn-icon btn-resubmit"
-                          onClick={() => handleEditInternship(internship)}
-                          title="Edit & Resubmit"
-                        >
-                          <Edit size={18} />
-                          <span className="btn-text">Resubmit</span>
-                        </button>
-                      ) : internship.approvalStatus === 'approved' ? (
-                        <>
+                      </td>
+                      <td>
+                        <div className="action-buttons">
+                          {item.approvalStatus === 'rejected' ? (
+                            <button
+                              className="btn-icon btn-resubmit"
+                              onClick={() => item.itemType === 'job' ? handleEditJob(item) : handleEditInternship(item)}
+                              title="Edit & Resubmit"
+                            >
+                              <Edit size={18} />
+                              <span className="btn-text">Resubmit</span>
+                            </button>
+                          ) : item.approvalStatus === 'approved' ? (
+                            <>
+                              <button
+                                className="btn-icon"
+                                onClick={() => item.itemType === 'job' ? handleEditJob(item) : handleEditInternship(item)}
+                                title="Edit"
+                              >
+                                <Edit size={18} />
+                              </button>
+                              <button
+                                className="btn-icon btn-view"
+                                onClick={() => window.open(`/event-detail/${item.itemType === 'job' ? 'jobs' : 'internships'}/${item.slug}`, '_blank')}
+                                title="View Live"
+                              >
+                                <Eye size={18} />
+                              </button>
+                            </>
+                          ) : (
+                            <button
+                              className="btn-icon"
+                              onClick={() => item.itemType === 'job' ? handleEditJob(item) : handleEditInternship(item)}
+                              title="Edit"
+                            >
+                              <Edit size={18} />
+                            </button>
+                          )}
                           <button
-                            className="btn-icon"
-                            onClick={() => handleEditInternship(internship)}
-                            title="Edit"
+                            className="btn-icon btn-danger"
+                            onClick={() => setShowDeleteConfirm(item.id)}
+                            title="Delete"
                           >
-                            <Edit size={18} />
+                            <Trash2 size={18} />
                           </button>
-                          <button
-                            className="btn-icon btn-view"
-                            onClick={() => window.open(`/event-detail/internships/${internship.slug}`, '_blank')}
-                            title="View Live"
-                          >
-                            <Eye size={18} />
-                          </button>
-                        </>
-                      ) : (
-                        <button
-                          className="btn-icon"
-                          onClick={() => handleEditInternship(internship)}
-                          title="Edit"
-                        >
-                          <Edit size={18} />
-                        </button>
-                      )}
-                      <button
-                        className="btn-icon btn-danger"
-                        onClick={() => setShowDeleteConfirm(internship.id)}
-                        title="Delete"
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      ) : (
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
         <div className="empty-state">
-          <div className="empty-icon">{activeView === 'jobs' ? '📋' : '🎓'}</div>
-          <h3>No {activeView} found</h3>
+          <div className="empty-icon">📋</div>
+          <h3>No items found</h3>
           <p>
             {searchQuery || filterStatus !== 'all'
               ? 'Try adjusting your filters'
-              : `Create your first ${activeView === 'jobs' ? 'job posting' : 'internship'} to get started`}
+              : 'Create your first job or internship to get started'}
           </p>
           {!searchQuery && filterStatus === 'all' && (
-            <button 
-              className="btn-primary" 
-              onClick={activeView === 'jobs' ? handleCreateJob : handleCreateInternship}
-            >
-              <Plus size={20} /> Create First {activeView === 'jobs' ? 'Job' : 'Internship'}
-            </button>
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+              <button 
+                className="btn-primary" 
+                onClick={handleCreateJob}
+              >
+                <Plus size={20} /> Create Job
+              </button>
+              <button 
+                className="btn-primary" 
+                onClick={handleCreateInternship}
+              >
+                <Plus size={20} /> Create Internship
+              </button>
+            </div>
           )}
         </div>
       )}
 
-      {!showEvaluation && showFormModal && activeView === 'jobs' && (
+      {/* Quick Listing Form for Create */}
+      {showQuickForm && (
+        <QuickListingForm
+          isOpen={showQuickForm}
+          onClose={() => {
+            setShowQuickForm(false);
+            setQuickFormType(null);
+          }}
+          contentType={quickFormType}
+          authUser={authUser}
+        />
+      )}
+
+      {/* Edit Forms */}
+      {!showEvaluation && showFormModal && editingJob && (
         <JobFormModal
           job={editingJob}
           authUser={authUser}
@@ -583,7 +562,7 @@ const ManageJobsTab = ({ authUser, setJobsTabLoading, pendingModalType, onModalT
         />
       )}
 
-      {!showEvaluation && showFormModal && activeView === 'internships' && (
+      {!showEvaluation && showFormModal && editingInternship && (
         <InternshipFormModal
           internship={editingInternship}
           authUser={authUser}
@@ -598,8 +577,8 @@ const ManageJobsTab = ({ authUser, setJobsTabLoading, pendingModalType, onModalT
       {!showEvaluation && showDeleteConfirm && (
         <div className="modal-overlay">
           <div className="delete-confirm-modal">
-            <h3>Delete {activeView === 'jobs' ? 'Job' : 'Internship'}?</h3>
-            <p>Are you sure you want to delete this {activeView === 'jobs' ? 'job posting' : 'internship'}? This action cannot be undone.</p>
+            <h3>Delete Item?</h3>
+            <p>Are you sure you want to delete this item? This action cannot be undone.</p>
             <div className="modal-actions">
               <button
                 className="btn-secondary"
@@ -609,7 +588,12 @@ const ManageJobsTab = ({ authUser, setJobsTabLoading, pendingModalType, onModalT
               </button>
               <button
                 className="btn-danger"
-                onClick={() => activeView === 'jobs' ? handleDeleteJob(showDeleteConfirm) : handleDeleteInternship(showDeleteConfirm)}
+                onClick={() => {
+                  const item = displayItems.find(i => i.id === showDeleteConfirm);
+                  if (item) {
+                    item.itemType === 'job' ? handleDeleteJob(showDeleteConfirm) : handleDeleteInternship(showDeleteConfirm);
+                  }
+                }}
               >
                 Delete
               </button>

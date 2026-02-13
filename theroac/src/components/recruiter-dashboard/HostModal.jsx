@@ -1,9 +1,13 @@
 import { useState } from "react";
 import { X, ChevronRight, Trophy, Briefcase, ClipboardCheck, Target, Code, Building, Globe, GraduationCap, Lock } from "lucide-react";
 import "./HostModal.css";
+import QuickListingForm from "./QuickListingForm";
 
 const HostModal = ({ isOpen, onClose, onTabChange, onOpenModal, authUser }) => {
   const [currentView, setCurrentView] = useState("main"); // main, opportunity, jobs
+  const [showListingForm, setShowListingForm] = useState(false);
+  const [selectedContentType, setSelectedContentType] = useState(null);
+  const [selectedOpportunityType, setSelectedOpportunityType] = useState(null);
 
   if (!isOpen) return null;
 
@@ -20,18 +24,19 @@ const HostModal = ({ isOpen, onClose, onTabChange, onOpenModal, authUser }) => {
   };
 
   const handleJobSelect = () => {
-    onClose();
-    if (onTabChange) onTabChange("jobs", "job");
+    setSelectedContentType("job");
+    setShowListingForm(true);
   };
 
   const handleInternshipSelect = () => {
-    onClose();
-    if (onTabChange) onTabChange("jobs", "internship");
+    setSelectedContentType("internship");
+    setShowListingForm(true);
   };
 
   const handleOpportunityTypeSelect = (type) => {
-    onClose();
-    if (onTabChange) onTabChange("events", "event");
+    setSelectedContentType("opportunity");
+    setSelectedOpportunityType(type);
+    setShowListingForm(true);
   };
 
   const handleOrganizerDashboard = () => {
@@ -40,8 +45,9 @@ const HostModal = ({ isOpen, onClose, onTabChange, onOpenModal, authUser }) => {
   };
 
   return (
-    <div className="host-modal-overlay" onClick={onClose}>
-      <div className="host-modal-container" onClick={(e) => e.stopPropagation()}>
+    <>
+      <div className="host-modal-overlay" onClick={onClose}>
+        <div className="host-modal-container" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="host-modal-header">
           <h2>{currentView === "main" ? "Host" : currentView === "opportunity" ? "Select Opportunity" : "Select Jobs & Internships"}</h2>
@@ -226,8 +232,22 @@ const HostModal = ({ isOpen, onClose, onTabChange, onOpenModal, authUser }) => {
             </>
           )}
         </div>
+        </div>
       </div>
-    </div>
+
+      {/* Quick Listing Form */}
+      <QuickListingForm
+        isOpen={showListingForm}
+        onClose={() => {
+          setShowListingForm(false);
+          setCurrentView("main");
+          onClose();
+        }}
+        contentType={selectedContentType}
+        opportunityType={selectedOpportunityType}
+        authUser={authUser}
+      />
+    </>
   );
 };
 

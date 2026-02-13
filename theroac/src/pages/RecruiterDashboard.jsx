@@ -380,7 +380,7 @@ const RecruiterDashboard = () => {
           )}
 
           <div className="organizer-main">
-            <div className="max-w-[1200px]">
+            <div>
               {activeTab === "dashboard" && (
                 <DashboardTab
                   authUser={authUser}

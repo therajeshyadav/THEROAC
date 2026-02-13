@@ -565,9 +565,9 @@ html, body {
     left: 70px;
     right: 0;
     bottom: 0;
-    padding: 1.5rem 2rem 2rem 2rem;
-    overflow-y: auto;
-    overflow-x: visible;
+    padding: 1rem 0.25rem 2rem 0.25rem !important;
+    overflow-y: auto !important;
+    overflow-x: hidden;
     background: transparent;
     z-index: 1;
 }

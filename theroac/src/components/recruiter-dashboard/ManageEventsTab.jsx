@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Eye, Users, Search, Calendar, MapPin } from 'lucide-react';
 import { toast } from 'react-toastify';
 import EventFormModal from './EventFormModal';
+import QuickListingForm from './QuickListingForm';
 import './ManageJobsTab.css'; // Reuse same CSS
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000/api';
@@ -12,10 +13,24 @@ const ManageEventsTab = ({ authUser, setEventsTabLoading, pendingModalType, onMo
   const [filterStatus, setFilterStatus] = useState('all');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(null);
   const [showFormModal, setShowFormModal] = useState(false);
+  const [showQuickForm, setShowQuickForm] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
 
   useEffect(() => {
     fetchEvents();
+    
+    // Listen for refresh events from QuickListingForm
+    const handleRefresh = (event) => {
+      if (event.detail.type === 'opportunity') {
+        fetchEvents();
+      }
+    };
+    
+    window.addEventListener('refreshListings', handleRefresh);
+    
+    return () => {
+      window.removeEventListener('refreshListings', handleRefresh);
+    };
   }, []);
 
   // Handle pending modal type from dashboard
@@ -54,7 +69,7 @@ const ManageEventsTab = ({ authUser, setEventsTabLoading, pendingModalType, onMo
 
   const handleCreateEvent = () => {
     setEditingEvent(null);
-    setShowFormModal(true);
+    setShowQuickForm(true);
   };
 
   const handleEditEvent = (event) => {
@@ -97,6 +112,8 @@ const ManageEventsTab = ({ authUser, setEventsTabLoading, pendingModalType, onMo
     let matchesFilter = false;
     if (filterStatus === 'all') {
       matchesFilter = true;
+    } else if (filterStatus === 'draft') {
+      matchesFilter = event.approvalStatus === 'draft';
     } else if (filterStatus === 'pending') {
       matchesFilter = event.approvalStatus === 'pending';
     } else if (filterStatus === 'approved') {
@@ -154,6 +171,12 @@ const ManageEventsTab = ({ authUser, setEventsTabLoading, pendingModalType, onMo
             onClick={() => setFilterStatus('all')}
           >
             All ({events.length})
+          </button>
+          <button
+            className={filterStatus === 'draft' ? 'active' : ''}
+            onClick={() => setFilterStatus('draft')}
+          >
+            Drafts ({events.filter(e => e.approvalStatus === 'draft').length})
           </button>
           <button
             className={filterStatus === 'approved' ? 'active' : ''}
@@ -287,6 +310,17 @@ const ManageEventsTab = ({ authUser, setEventsTabLoading, pendingModalType, onMo
         </div>
       )}
 
+      {/* Quick Listing Form for Create */}
+      {showQuickForm && (
+        <QuickListingForm
+          isOpen={showQuickForm}
+          onClose={() => setShowQuickForm(false)}
+          contentType="opportunity"
+          authUser={authUser}
+        />
+      )}
+
+      {/* Edit Form */}
       {showFormModal && (
         <EventFormModal
           event={editingEvent}

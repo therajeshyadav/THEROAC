@@ -28,6 +28,29 @@ const SettingsTab = ({
     }));
   };
 
+  const handleLogoUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        alert('Please upload an image file (JPG, PNG)');
+        return;
+      }
+      
+      // Validate file size (max 1MB)
+      if (file.size > 1024 * 1024) {
+        alert('Logo size should be less than 1MB');
+        return;
+      }
+      
+      setProfileData((prev) => ({
+        ...prev,
+        companyLogoFile: file,
+        companyLogo: URL.createObjectURL(file)
+      }));
+    }
+  };
+
   const handleCommaSeparatedChange = (e) => {
     const { name, value } = e.target;
     setProfileData((prev) => ({
@@ -46,6 +69,35 @@ const SettingsTab = ({
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
+      const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000/api';
+      
+      // First upload company logo if there's a new file
+      let companyLogoUrl = profileData.company?.logo || profileData.companyLogo;
+      if (profileData.companyLogoFile) {
+        const logoFormData = new FormData();
+        logoFormData.append('image', profileData.companyLogoFile);
+        
+        console.log('Uploading company logo to GCS...');
+        
+        const uploadResponse = await fetch(`${API_URL}/jobs/upload-image`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          },
+          body: logoFormData
+        });
+        
+        if (uploadResponse.ok) {
+          const uploadData = await uploadResponse.json();
+          // Backend returns imageUrl field
+          companyLogoUrl = uploadData.imageUrl || uploadData.url;
+          console.log('Logo uploaded successfully to GCS:', companyLogoUrl);
+        } else {
+          const errorData = await uploadResponse.json();
+          console.error('Logo upload failed:', errorData);
+          throw new Error(errorData.message || 'Logo upload failed');
+        }
+      }
       
       // Include all fields - personal + company + preferences
       const userFields = {
@@ -59,6 +111,7 @@ const SettingsTab = ({
         // Company info stored in user profile
         company: {
           name: profileData.companyName,
+          logo: companyLogoUrl,
           industryType: profileData.industryType,
           companySize: profileData.companySize,
           foundedYear: profileData.foundedYear,
@@ -85,9 +138,10 @@ const SettingsTab = ({
         }
       };
 
+      console.log('Updating profile with company logo:', companyLogoUrl);
+      console.log('Full update payload:', userFields);
 
       // Update user profile
-      const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000/api';
       const userResponse = await fetch(`${API_URL}/users/me`, {
         method: 'PUT',
         headers: {
@@ -103,8 +157,6 @@ const SettingsTab = ({
 
       const response = await userResponse.json();
       
-      const updatedUser = response.user || response;
-      
       // Fetch fresh user data from server to get company field
       const freshUserResponse = await fetch(`${API_URL}/users/me`, {
         headers: {
@@ -119,13 +171,40 @@ const SettingsTab = ({
         // Update local storage with fresh data
         localStorage.setItem('user', JSON.stringify(freshUser));
         
-        // Store current tab before reload so we come back to settings
-        sessionStorage.setItem('activeTab', 'settings');
+        // Update profileData state with fresh data
+        setProfileData({
+          fullName: freshUser.fullName || '',
+          email: freshUser.email || '',
+          phone: freshUser.phone || '',
+          city: freshUser.city || '',
+          state: freshUser.state || '',
+          country: freshUser.country || '',
+          bio: freshUser.bio || '',
+          role: freshUser.role || '',
+          companyName: freshUser.company?.name || '',
+          companyLogo: freshUser.company?.logo || '',
+          industryType: freshUser.company?.industryType || '',
+          companySize: freshUser.company?.companySize || '',
+          foundedYear: freshUser.company?.foundedYear || '',
+          headOffice: freshUser.company?.headOffice || '',
+          website: freshUser.company?.website || '',
+          aboutCompany: freshUser.company?.aboutCompany || '',
+          workLocations: freshUser.preferences?.workLocations?.join(', ') || '',
+          hiringFor: freshUser.preferences?.hiringFor?.join(', ') || '',
+          totalJobsPosted: freshUser.preferences?.metrics?.totalJobsPosted || '',
+          activeJobs: freshUser.preferences?.metrics?.activeJobs || '',
+          totalCandidatesHired: freshUser.preferences?.metrics?.totalCandidatesHired || '',
+          responseRate: freshUser.preferences?.metrics?.responseRate || '',
+          averageResponseTimeHours: freshUser.preferences?.metrics?.averageResponseTimeHours || '',
+          allowDirectMessage: freshUser.preferences?.communication?.allowDirectMessage ?? true,
+          preferredContact: freshUser.preferences?.communication?.preferredContact || 'platform_chat',
+          supportEmail: freshUser.preferences?.communication?.supportEmail || ''
+        });
         
         setIsEditingProfile(false);
         
-        // Reload page to reflect changes
-        window.location.reload();
+        // Show success message
+        alert('Profile updated successfully!');
       } else {
         throw new Error('Failed to fetch updated profile');
       }
@@ -368,6 +447,73 @@ const SettingsTab = ({
               <h4 className="settings-section-title">
                 Company Information
               </h4>
+              
+              {/* Company Logo Upload */}
+              <div className="settings-form-grid single-column" style={{ marginBottom: "1.5rem" }}>
+                <div className="settings-form-group">
+                  <label className="settings-input-label">Company Logo</label>
+                  <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
+                    <label 
+                      htmlFor="company-logo-upload" 
+                      style={{ 
+                        width: "100px", 
+                        height: "100px", 
+                        borderRadius: "12px", 
+                        overflow: "hidden",
+                        border: "2px dashed rgba(255, 214, 0, 0.3)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        cursor: "pointer",
+                        background: "rgba(255, 255, 255, 0.05)",
+                        transition: "all 0.3s ease"
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.borderColor = "rgba(255, 214, 0, 0.6)"}
+                      onMouseLeave={(e) => e.currentTarget.style.borderColor = "rgba(255, 214, 0, 0.3)"}
+                    >
+                      {profileData?.companyLogo ? (
+                        <img 
+                          src={profileData.companyLogo} 
+                          alt="Company Logo" 
+                          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                        />
+                      ) : (
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="rgba(255, 214, 0, 0.5)" strokeWidth="2">
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                          <polyline points="17 8 12 3 7 8" />
+                          <line x1="12" y1="3" x2="12" y2="15" />
+                        </svg>
+                      )}
+                    </label>
+                    <input
+                      type="file"
+                      id="company-logo-upload"
+                      accept="image/jpeg,image/jpg,image/png"
+                      onChange={handleLogoUpload}
+                      style={{ display: "none" }}
+                    />
+                    <div style={{ flex: 1 }}>
+                      <label 
+                        htmlFor="company-logo-upload" 
+                        style={{ 
+                          color: "#FFD600", 
+                          cursor: "pointer",
+                          fontSize: "0.95rem",
+                          fontWeight: "600",
+                          display: "block",
+                          marginBottom: "0.5rem"
+                        }}
+                      >
+                        {profileData?.companyLogo ? "Change Logo" : "Upload Logo"}
+                      </label>
+                      <small style={{ color: "rgba(255, 255, 255, 0.5)", fontSize: "0.85rem", display: "block" }}>
+                        Supported: JPG, JPEG, PNG. Max 1 MB
+                      </small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
               <div className="settings-form-grid">
                 <div className="settings-form-group">
                   <label className="settings-input-label">Company Name</label>
@@ -658,6 +804,39 @@ const SettingsTab = ({
               <h4 className="settings-section-title">
                 Company Information
               </h4>
+              
+              {/* Company Logo Display */}
+              {(displayProfile?.companyLogo || displayProfile?.company?.logo) && (
+                <div className="settings-form-grid single-column" style={{ marginBottom: "1.5rem" }}>
+                  <div>
+                    <label className="settings-view-label">Company Logo</label>
+                    <div style={{ 
+                      marginTop: "0.5rem",
+                      width: "120px",
+                      height: "120px",
+                      borderRadius: "12px",
+                      overflow: "hidden",
+                      border: "2px solid rgba(255, 214, 0, 0.3)",
+                      background: "rgba(255, 255, 255, 0.05)"
+                    }}>
+                      <img 
+                        src={displayProfile?.companyLogo || displayProfile?.company?.logo} 
+                        alt="Company Logo" 
+                        style={{ 
+                          width: "100%", 
+                          height: "100%", 
+                          objectFit: "cover" 
+                        }}
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                          e.target.parentElement.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:rgba(255,255,255,0.5)">Logo not available</div>';
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+              
               <div className="settings-form-grid">
                 <InfoItem
                   label="Company Name"

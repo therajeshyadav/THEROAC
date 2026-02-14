@@ -1,0 +1,207 @@
+.unified-stepper-header {
+  padding: 1.5rem 2rem;
+  background: linear-gradient(135deg, rgba(26, 26, 26, 0.95) 0%, rgba(45, 45, 45, 0.95) 100%);
+  border-bottom: 1px solid rgba(255, 214, 0, 0.2);
+  backdrop-filter: blur(10px);
+  overflow-x: auto;
+}
+
+.unified-stepper-container {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 1rem;
+  min-width: max-content;
+  padding-bottom: 0.5rem;
+}
+
+.unified-stepper-header::-webkit-scrollbar {
+  height: 4px;
+}
+
+.unified-stepper-header::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.unified-stepper-header::-webkit-scrollbar-thumb {
+  background: rgba(255, 214, 0, 0.3);
+  border-radius: 2px;
+}
+
+.unified-stepper-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 120px;
+  max-width: 120px;
+  position: relative;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.unified-stepper-step.clickable {
+  cursor: pointer;
+}
+
+.unified-stepper-step.clickable:hover .unified-step-circle {
+  transform: scale(1.1);
+  border-color: #FFD600;
+}
+
+.unified-step-circle {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 2;
+}
+
+.unified-stepper-step.active .unified-step-circle {
+  background: linear-gradient(135deg, #FFD600 0%, #FFA500 100%);
+  border-color: #FFD600;
+  box-shadow: 0 0 20px rgba(255, 214, 0, 0.5);
+  animation: unified-pulse 2s infinite;
+}
+
+.unified-stepper-step.completed .unified-step-circle {
+  background: rgba(76, 175, 80, 0.2);
+  border-color: #4CAF50;
+  color: #4CAF50;
+}
+
+.unified-step-icon {
+  font-size: 1.5rem;
+}
+
+.unified-stepper-step.active .unified-step-icon {
+  filter: brightness(0);
+}
+
+.unified-step-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  text-align: center;
+  width: 100%;
+}
+
+.unified-step-number {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.unified-step-title {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  text-align: center;
+}
+
+.unified-stepper-step.active .unified-step-number,
+.unified-stepper-step.active .unified-step-title {
+  color: #FFD600;
+}
+
+.unified-stepper-step.completed .unified-step-title {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.unified-step-connector {
+  flex-shrink: 0;
+  width: 40px;
+  height: 2px;
+  position: relative;
+  margin: 0 0.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.unified-connector-line {
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.unified-step-connector.completed .unified-connector-line {
+  background: linear-gradient(90deg, #4CAF50 0%, rgba(76, 175, 80, 0.5) 100%);
+}
+
+@keyframes unified-pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(255, 214, 0, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(255, 214, 0, 0.8);
+  }
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .unified-stepper-header {
+    padding: 1.5rem 1rem 1rem;
+  }
+
+  .unified-step-circle {
+    width: 45px;
+    height: 45px;
+  }
+
+  .unified-step-icon {
+    font-size: 1.25rem;
+  }
+
+  .unified-step-title {
+    font-size: 0.75rem;
+  }
+
+  .unified-step-connector {
+    width: 30px;
+  }
+}
+
+@media (max-width: 768px) {
+  .unified-stepper-container {
+    justify-content: flex-start;
+  }
+
+  .unified-stepper-step {
+    min-width: 90px;
+    max-width: 90px;
+  }
+
+  .unified-step-circle {
+    width: 40px;
+    height: 40px;
+  }
+
+  .unified-step-icon {
+    font-size: 1rem;
+  }
+
+  .unified-step-number {
+    font-size: 0.65rem;
+  }
+
+  .unified-step-title {
+    font-size: 0.7rem;
+  }
+
+  .unified-step-connector {
+    width: 20px;
+  }
+}

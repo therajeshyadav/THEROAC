@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Eye, Users, Search, Calendar, MapPin } from 'lucide-react';
 import { toast } from 'react-toastify';
-import EventFormModal from './EventFormModal';
 import QuickListingForm from './QuickListingForm';
+import UnifiedEditModal from './UnifiedEditModal/UnifiedEditModal';
 import './ManageJobsTab.css'; // Reuse same CSS
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000/api';
@@ -12,7 +12,7 @@ const ManageEventsTab = ({ authUser, setEventsTabLoading, pendingModalType, onMo
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(null);
-  const [showFormModal, setShowFormModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [showQuickForm, setShowQuickForm] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
 
@@ -74,13 +74,14 @@ const ManageEventsTab = ({ authUser, setEventsTabLoading, pendingModalType, onMo
 
   const handleEditEvent = (event) => {
     setEditingEvent(event);
-    setShowFormModal(true);
+    setShowEditModal(true);
   };
 
-  const handleFormSuccess = () => {
+  const handleEditSuccess = () => {
     fetchEvents();
-    setShowFormModal(false);
+    setShowEditModal(false);
     setEditingEvent(null);
+    toast.success('Event updated successfully');
   };
 
   const handleDeleteEvent = async (eventId) => {
@@ -320,15 +321,18 @@ const ManageEventsTab = ({ authUser, setEventsTabLoading, pendingModalType, onMo
         />
       )}
 
-      {/* Edit Form */}
-      {showFormModal && (
-        <EventFormModal
-          event={editingEvent}
+      {/* Unified Edit Modal */}
+      {showEditModal && editingEvent && (
+        <UnifiedEditModal
+          isOpen={showEditModal}
           onClose={() => {
-            setShowFormModal(false);
+            setShowEditModal(false);
             setEditingEvent(null);
           }}
-          onSuccess={handleFormSuccess}
+          contentType="opportunity"
+          editData={editingEvent}
+          authUser={authUser}
+          onSuccess={handleEditSuccess}
         />
       )}
 

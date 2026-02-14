@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Eye, Users, Search, Briefcase } from 'lucide-react';
-import JobFormModal from './JobFormModal';
-import InternshipFormModal from './InternshipFormModal';
 import QuickListingForm from './QuickListingForm';
+import UnifiedEditModal from './UnifiedEditModal/UnifiedEditModal';
 import JobEvaluationOverlay from './JobEvaluationOverlay';
 import { toast } from 'react-toastify';
 import './ManageJobsTab.css';
@@ -15,11 +14,11 @@ const ManageJobsTab = ({ authUser, setJobsTabLoading, pendingModalType, onModalT
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterType, setFilterType] = useState('all'); // 'all', 'jobs', 'internships'
-  const [showFormModal, setShowFormModal] = useState(false);
   const [showQuickForm, setShowQuickForm] = useState(false);
   const [quickFormType, setQuickFormType] = useState(null);
-  const [editingJob, setEditingJob] = useState(null);
-  const [editingInternship, setEditingInternship] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingItem, setEditingItem] = useState(null);
+  const [editingType, setEditingType] = useState(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(null);
   const [showEvaluation, setShowEvaluation] = useState(null);
 
@@ -117,29 +116,29 @@ const ManageJobsTab = ({ authUser, setJobsTabLoading, pendingModalType, onModalT
   };
 
   const handleCreateJob = () => {
-    setEditingJob(null);
-    setEditingInternship(null);
+    setEditingItem(null);
+    setEditingType(null);
     setQuickFormType('job');
     setShowQuickForm(true);
   };
 
   const handleCreateInternship = () => {
-    setEditingInternship(null);
-    setEditingJob(null);
+    setEditingItem(null);
+    setEditingType(null);
     setQuickFormType('internship');
     setShowQuickForm(true);
   };
 
   const handleEditJob = (job) => {
-    setEditingJob(job);
-    setEditingInternship(null);
-    setShowFormModal(true);
+    setEditingItem(job);
+    setEditingType('job');
+    setShowEditModal(true);
   };
 
   const handleEditInternship = (internship) => {
-    setEditingInternship(internship);
-    setEditingJob(null);
-    setShowFormModal(true);
+    setEditingItem(internship);
+    setEditingType('internship');
+    setShowEditModal(true);
   };
 
   const handleDeleteJob = async (jobId) => {
@@ -186,12 +185,13 @@ const ManageJobsTab = ({ authUser, setJobsTabLoading, pendingModalType, onModalT
     }
   };
 
-  const handleFormSuccess = () => {
+  const handleEditSuccess = () => {
     fetchJobs();
     fetchInternships();
-    setShowFormModal(false);
-    setEditingJob(null);
-    setEditingInternship(null);
+    setShowEditModal(false);
+    setEditingItem(null);
+    setEditingType(null);
+    toast.success('Updated successfully');
   };
 
   const filteredJobs = jobs.filter(job => {
@@ -549,28 +549,19 @@ const ManageJobsTab = ({ authUser, setJobsTabLoading, pendingModalType, onModalT
         />
       )}
 
-      {/* Edit Forms */}
-      {!showEvaluation && showFormModal && editingJob && (
-        <JobFormModal
-          job={editingJob}
-          authUser={authUser}
+      {/* Unified Edit Modal */}
+      {!showEvaluation && showEditModal && editingItem && (
+        <UnifiedEditModal
+          isOpen={showEditModal}
           onClose={() => {
-            setShowFormModal(false);
-            setEditingJob(null);
+            setShowEditModal(false);
+            setEditingItem(null);
+            setEditingType(null);
           }}
-          onSuccess={handleFormSuccess}
-        />
-      )}
-
-      {!showEvaluation && showFormModal && editingInternship && (
-        <InternshipFormModal
-          internship={editingInternship}
+          contentType={editingType}
+          editData={editingItem}
           authUser={authUser}
-          onClose={() => {
-            setShowFormModal(false);
-            setEditingInternship(null);
-          }}
-          onSuccess={handleFormSuccess}
+          onSuccess={handleEditSuccess}
         />
       )}
 

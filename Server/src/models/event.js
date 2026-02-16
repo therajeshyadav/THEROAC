@@ -7,6 +7,8 @@ Event.init({
   id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
   title: { type: DataTypes.STRING, allowNull: false },
   slug: { type: DataTypes.STRING, allowNull: false, unique: true },
+  companyName: { type: DataTypes.STRING, allowNull: true },
+  companyLogo: { type: DataTypes.TEXT, allowNull: true },
   description: { type: DataTypes.TEXT, allowNull: true },
   bannerImage: { type: DataTypes.TEXT, allowNull: true },
   thumbnailImage: { type: DataTypes.TEXT, allowNull: true },
@@ -49,6 +51,87 @@ Event.init({
   minTeamSize: { type: DataTypes.INTEGER, allowNull: true },
   maxTeamSize: { type: DataTypes.INTEGER, allowNull: true },
   problemStatements: { type: DataTypes.JSON, allowNull: true }, // {released: boolean, releaseDate: date, statements: array, guidelines: string}
+  
+  // Opportunity specific fields
+  opportunityType: { type: DataTypes.STRING, allowNull: true }, // competition, quiz, hackathon, webinar, cultural, scholarship
+  opportunitySubType: { type: DataTypes.STRING, allowNull: true }, // Sub-type based on opportunityType
+  organizationName: { type: DataTypes.STRING, allowNull: true }, // Organization name for opportunities
+  participationType: { type: DataTypes.STRING, allowNull: true, defaultValue: 'individual' }, // individual or team
+  mode: { type: DataTypes.STRING, allowNull: true, defaultValue: 'online' }, // online or offline
+  
+  workingDays: { type: DataTypes.JSON, allowNull: true },
+  hideOpenings: { type: DataTypes.BOOLEAN, defaultValue: false },
+  festivalCampaign: { type: DataTypes.STRING, allowNull: true },
+  registrationSettings: {
+    type: DataTypes.JSON,
+    allowNull: true,
+    comment: 'Registration settings - {platform, timeline, maxLimit, status, formFields, screeningQuestions}'
+  },
+  prizesList: {
+    type: DataTypes.JSON,
+    allowNull: true,
+    comment: 'Detailed prizes list - [{rank, prizeType, amount, currency, perks, otherDetails}]'
+  },
+  prizeDescription: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+    comment: 'What do participants receive description'
+  },
+  prizeDeliverDays: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    comment: 'Prize delivery timeline'
+  },
+  participationCertificate: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+    comment: 'Whether participation certificate will be provided'
+  },
+  paymentSettings: {
+    type: DataTypes.JSON,
+    allowNull: true,
+    comment: 'Payment settings - {hasRegistrationFee, platform, tickets, accountDetails, serviceChargeFrom, paymentMethods}'
+  },
+  importantDates: {
+    type: DataTypes.JSON,
+    allowNull: true,
+    comment: 'Important dates - [{title, date}]'
+  },
+  attachments: {
+    type: DataTypes.JSON,
+    allowNull: true,
+    comment: 'File attachments - [{name, url, size}]'
+  },
+  gallery: {
+    type: DataTypes.JSON,
+    allowNull: true,
+    comment: 'Image gallery - [{url, caption}]'
+  },
+  mobileBanner: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+    comment: 'Mobile banner image URL'
+  },
+  themeColor: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    comment: 'Theme color for the event'
+  },
+  terms: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+    comment: 'Terms and conditions'
+  },
+  additionalNotes: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+    comment: 'Additional notes or information'
+  },
+  socialLinks: {
+    type: DataTypes.JSON,
+    allowNull: true,
+    comment: 'Social media links - {discord, slack, etc}'
+  },
   createdBy: { type: DataTypes.UUID, allowNull: false },
   organizationId: { type: DataTypes.UUID, allowNull: true }
 }, {

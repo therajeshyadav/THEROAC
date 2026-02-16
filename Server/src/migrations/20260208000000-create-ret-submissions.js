@@ -76,8 +76,16 @@ module.exports = {
       }
     });
 
-    // Add index for userId and createdAt
-    await queryInterface.addIndex('ret_submissions', ['userId', 'createdAt']);
+    // Add index for userId and createdAt (check if exists first)
+    try {
+      await queryInterface.addIndex('ret_submissions', ['userId', 'createdAt'], {
+        name: 'ret_submissions_user_id_created_at'
+      });
+    } catch (error) {
+      if (!error.message.includes('already exists')) {
+        throw error;
+      }
+    }
   },
 
   down: async (queryInterface, Sequelize) => {

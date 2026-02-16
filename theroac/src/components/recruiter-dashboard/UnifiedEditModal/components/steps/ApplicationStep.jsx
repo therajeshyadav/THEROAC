@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link2, Plus, Settings, Lock } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Link2, Plus, Settings, Lock, User, Mail, Phone, FileText, Users, Building, MapPin, Accessibility } from 'lucide-react';
 import '../StepStyles.css';
 
 const ApplicationStep = ({ formData, setFormData, contentType }) => {
@@ -13,22 +13,72 @@ const ApplicationStep = ({ formData, setFormData, contentType }) => {
     setFormData({ ...formData, [field]: value });
   };
 
+  // Application Form Fields with lucide-react icons
+  const defaultFormFields = [
+    { id: 'name', label: 'Name', required: true, locked: true, icon: User },
+    { id: 'email', label: 'Email', required: true, locked: true, icon: Mail },
+    { id: 'mobile', label: 'Mobile number', required: true, locked: false, icon: Phone },
+    { id: 'resume', label: 'CV/Resume', required: true, locked: false, icon: FileText },
+    { id: 'gender', label: 'Gender', required: true, locked: false, icon: Users },
+    { id: 'college', label: 'Current College/Organization', required: true, locked: false, icon: Building },
+    { id: 'userType', label: 'User Type', required: true, locked: false, icon: User },
+    { id: 'location', label: "Applicant's location", required: true, locked: false, icon: MapPin },
+    { id: 'differently', label: 'Differently abled', required: true, locked: false, icon: Accessibility },
+  ];
+
+  // Initialize form fields if not present
+  useEffect(() => {
+    if (!formData.applicationFormFields || formData.applicationFormFields.length === 0) {
+      setFormData({ ...formData, applicationFormFields: defaultFormFields });
+    }
+  }, []);
+
+  // Auto-set registration timeline: listing creation date to 15 days from creation
+  useEffect(() => {
+    if (!formData.applicationStartDate || !formData.applicationEndDate) {
+      // Use listing creation date if available (for edit), otherwise use current date (for new listing)
+      const baseDate = formData.createdAt ? new Date(formData.createdAt) : new Date();
+      const startDate = new Date(baseDate);
+      const endDate = new Date(baseDate);
+      endDate.setDate(endDate.getDate() + 15); // 15 days from listing creation date
+      
+      // Format to datetime-local format (YYYY-MM-DDTHH:MM)
+      const formatDateTime = (date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
+      };
+      
+      if (!formData.applicationStartDate) {
+        handleChange('applicationStartDate', formatDateTime(startDate));
+      }
+      if (!formData.applicationEndDate) {
+        handleChange('applicationEndDate', formatDateTime(endDate));
+      }
+    }
+  }, [formData.createdAt]); // Re-run when createdAt is available
+
+  // Format date for display
+  const formatDisplayDate = (dateString) => {
+    if (!dateString) return 'Not set';
+    const date = new Date(dateString);
+    const options = { 
+      day: 'numeric', 
+      month: 'short', 
+      year: '2-digit',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    };
+    return date.toLocaleString('en-US', options);
+  };
+
   const isOpportunity = contentType === 'opportunity';
   const title = isOpportunity ? 'Registration Settings' : 'Application Settings';
   const description = 'Manage the candidate application experience, application status, limits, and timelines.';
-
-  // Application Form Fields with lucide-react icons
-  const defaultFormFields = [
-    { id: 'name', label: 'Name', required: true, locked: true },
-    { id: 'email', label: 'Email', required: true, locked: true },
-    { id: 'mobile', label: 'Mobile number', required: true, locked: false },
-    { id: 'resume', label: 'CV/Resume', required: true, locked: false },
-    { id: 'gender', label: 'Gender', required: true, locked: false },
-    { id: 'college', label: 'Current College/Organization', required: true, locked: false },
-    { id: 'userType', label: 'User Type', required: true, locked: false },
-    { id: 'location', label: "Applicant's location", required: true, locked: false },
-    { id: 'differently', label: 'Differently abled', required: true, locked: false },
-  ];
 
   const suggestedQuestions = [
     'Cover Letter', 'Expected Salary', 'Highest Qualification',
@@ -141,11 +191,11 @@ const ApplicationStep = ({ formData, setFormData, contentType }) => {
               <span style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '0.9rem' }}>
                 Applications will be open from{' '}
                 <span style={{ color: '#fff', fontWeight: '600' }}>
-                  {formData.applicationStartDate || '12 Feb 26, 12:00 AM'}
+                  {formatDisplayDate(formData.applicationStartDate)}
                 </span>
                 {' '}to{' '}
                 <span style={{ color: '#fff', fontWeight: '600' }}>
-                  {formData.applicationEndDate || '12 Feb 26, 8:38 AM'}
+                  {formatDisplayDate(formData.applicationEndDate)}
                 </span>
               </span>
             </div>
@@ -255,52 +305,63 @@ const ApplicationStep = ({ formData, setFormData, contentType }) => {
 
         {/* Form Fields List */}
         <div className="unified-form-group unified-full-width">
-          {(formData.applicationFormFields || defaultFormFields).map((field) => (
-            <div 
-              key={field.id}
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                padding: '1rem',
-                background: 'rgba(255, 255, 255, 0.03)',
-                borderRadius: '8px',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                marginBottom: '0.75rem'
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                <span style={{ color: '#fff', fontSize: '0.95rem' }}>{field.label}</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <span style={{ 
-                  fontSize: '0.85rem', 
-                  color: field.required ? '#FFD600' : 'rgba(255, 255, 255, 0.5)' 
-                }}>
-                  {field.required ? 'Required' : 'Optional'}
-                </span>
-                {field.locked ? (
-                  <Lock size={16} style={{ color: 'rgba(255, 255, 255, 0.3)' }} />
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => toggleFormField(field.id)}
-                    style={{
-                      background: 'transparent',
-                      border: 'none',
-                      color: 'rgba(255, 255, 255, 0.6)',
-                      cursor: 'pointer',
-                      padding: '0.25rem',
-                      display: 'flex',
-                      alignItems: 'center'
-                    }}
-                  >
-                    <Settings size={16} />
-                  </button>
-                )}
-              </div>
-            </div>
-          ))}
+          <div style={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            gap: '0.75rem',
+            marginTop: '1rem'
+          }}>
+            {(formData.applicationFormFields || defaultFormFields).map((field) => {
+              const IconComponent = field.icon || User;
+              return (
+                <div 
+                  key={field.id}
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '1rem',
+                    background: 'rgba(255, 255, 255, 0.03)',
+                    borderRadius: '8px',
+                    border: '1px solid rgba(255, 255, 255, 0.1)'
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <IconComponent size={20} style={{ color: 'rgba(255, 255, 255, 0.6)' }} />
+                    <span style={{ color: '#fff', fontSize: '0.95rem' }}>{field.label}</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <span style={{ 
+                      fontSize: '0.85rem', 
+                      color: field.required ? '#FFD600' : 'rgba(255, 255, 255, 0.5)' 
+                    }}>
+                      {field.required ? 'Required' : 'Optional'}
+                    </span>
+                    {field.locked ? (
+                      <Lock size={16} style={{ color: 'rgba(255, 255, 255, 0.3)' }} />
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => toggleFormField(field.id)}
+                        style={{
+                          background: 'transparent',
+                          border: 'none',
+                          color: 'rgba(255, 255, 255, 0.6)',
+                          cursor: 'pointer',
+                          padding: '0.25rem',
+                          display: 'flex',
+                          alignItems: 'center'
+                        }}
+                        title="Toggle Required/Optional"
+                      >
+                        <Settings size={16} />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
 
         {/* Screening Questions Section */}

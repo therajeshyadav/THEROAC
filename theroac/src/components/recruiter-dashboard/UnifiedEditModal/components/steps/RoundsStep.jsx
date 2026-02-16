@@ -92,7 +92,11 @@ const RoundsStep = ({ formData, setFormData, contentType }) => {
   };
 
   const handleSaveRound = () => {
-    if (!roundForm.name.trim() || !roundForm.description.trim() || !roundForm.liveDate || !roundForm.closeDate) {
+    // Ensure name and description exist before calling trim
+    const name = roundForm.name || '';
+    const description = roundForm.description || '';
+    
+    if (!name.trim() || !description.trim() || !roundForm.liveDate || !roundForm.closeDate) {
       return;
     }
 
@@ -572,7 +576,7 @@ const RoundsStep = ({ formData, setFormData, contentType }) => {
               <button 
                 className="btn-primary" 
                 onClick={handleSaveRound}
-                disabled={!roundForm.name.trim() || !roundForm.description.trim() || !roundForm.liveDate || !roundForm.closeDate}
+                disabled={!roundForm.name?.trim() || !roundForm.description?.trim() || !roundForm.liveDate || !roundForm.closeDate}
               >
                 Save
               </button>

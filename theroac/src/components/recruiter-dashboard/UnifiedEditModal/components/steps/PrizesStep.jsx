@@ -197,7 +197,7 @@ const PrizesStep = ({ formData, setFormData }) => {
             </div>
           ) : (
             <div>
-              {formData.prizesList.map((prize, index) => (
+              {(Array.isArray(formData.prizesList) ? formData.prizesList : []).map((prize, index) => (
                 <div key={prize.id} style={{
                   padding: '1rem',
                   background: 'rgba(255, 255, 255, 0.03)',
@@ -211,7 +211,7 @@ const PrizesStep = ({ formData, setFormData }) => {
                   <div style={{ fontSize: '0.9rem', color: '#FFD600' }}>
                     {prize.prizeType === 'cash' ? `${prize.currency} ${prize.amount}` : 'Kind'}
                   </div>
-                  {prize.perks.length > 0 && (
+                  {prize.perks && Array.isArray(prize.perks) && prize.perks.length > 0 && (
                     <div style={{ fontSize: '0.85rem', color: 'rgba(255, 255, 255, 0.6)', marginTop: '0.5rem' }}>
                       Perks: {prize.perks.join(', ')}
                     </div>

@@ -136,8 +136,31 @@ const getJobBySlug = async (slug) => {
 };
 
 const createJob = async (jobData) => {
+    // Check if jobData is FormData
+    if (jobData instanceof FormData) {
+        return request('/jobs', {
+            method: 'POST',
+            body: jobData,
+        });
+    }
+    
     return request('/jobs', {
         method: 'POST',
+        body: JSON.stringify(jobData),
+    });
+};
+
+const updateJob = async (jobId, jobData) => {
+    // Check if jobData is FormData
+    if (jobData instanceof FormData) {
+        return request(`/jobs/${jobId}`, {
+            method: 'PUT',
+            body: jobData,
+        });
+    }
+    
+    return request(`/jobs/${jobId}`, {
+        method: 'PUT',
         body: JSON.stringify(jobData),
     });
 };
@@ -186,8 +209,32 @@ const getEventBySlug = async (slug) => {
 };
 
 const createEvent = async (eventData) => {
+    // Check if eventData is FormData
+    if (eventData instanceof FormData) {
+        return request('/events', {
+            method: 'POST',
+            body: eventData,
+            // Don't pass headers for FormData, let request function handle it
+        });
+    }
+    
     return request('/events', {
         method: 'POST',
+        body: JSON.stringify(eventData),
+    });
+};
+
+const updateEvent = async (eventId, eventData) => {
+    // Check if eventData is FormData
+    if (eventData instanceof FormData) {
+        return request(`/events/${eventId}`, {
+            method: 'PUT',
+            body: eventData,
+        });
+    }
+    
+    return request(`/events/${eventId}`, {
+        method: 'PUT',
         body: JSON.stringify(eventData),
     });
 };
@@ -836,6 +883,7 @@ const apiService = {
     getJobById,
     getJobBySlug,
     createJob,
+    updateJob,
     applyToJob,
     getUserApplications,
     getRecruiterApplications,
@@ -845,6 +893,7 @@ const apiService = {
     getEventById,
     getEventBySlug,
     createEvent,
+    updateEvent,
     registerForEvent,
     applyToHubContent,
     getHackathons,

@@ -37,9 +37,16 @@ const upload = multer({
   fileFilter: fileFilter,
   limits: {
     fileSize: 1024 * 1024 * 1024, // 1GB limit (maximum practical size)
-    files: 20 // Maximum 20 files at once
+    files: 20, // Maximum 20 files at once
+    fieldSize: 50 * 1024 * 1024, // 50MB for field values (for base64 images)
+    fields: 100 // Maximum number of non-file fields
   }
 });
+
+// Middleware for accepting FormData without files
+const uploadNone = () => {
+  return upload.none();
+};
 
 // Middleware for single file upload
 const uploadSingle = (fieldName = 'file') => {
@@ -156,6 +163,7 @@ module.exports = {
   uploadMultiple,
   uploadFields,
   uploadAny,
+  uploadNone,
   uploadToGCSMiddleware,
   handleUploadError,
   upload

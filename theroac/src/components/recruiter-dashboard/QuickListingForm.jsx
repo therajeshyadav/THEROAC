@@ -77,10 +77,12 @@ Requirements
       
       // Salary/Stipend
       payStructure: "range",
+      salaryFixed: "",
       salaryPeriod: "monthly",
       salaryCurrency: "INR",
       salaryMin: "",
       salaryMax: "",
+      salaryVariable: "",
       hideSalary: false,
       benefits: [],
     };
@@ -226,11 +228,21 @@ Requirements
       // Prepare form data for API
       const apiData = new FormData();
       
+      // Debug: Log what we're sending
+      console.log('📤 Preparing to send data:', {
+        contentType,
+        title: formData.title,
+        organizationName: formData.organizationName,
+        opportunityType: formData.opportunityType
+      });
+      
       // Add logo file or URL
       if (formData.logo) {
         apiData.append("logo", formData.logo);
+        console.log('📎 Adding logo file:', formData.logo.name);
       } else if (formData.logoPreview) {
         apiData.append("companyLogo", formData.logoPreview);
+        console.log('📎 Adding logo URL:', formData.logoPreview);
       }
 
       // Add basic fields
@@ -247,12 +259,23 @@ Requirements
         
         // Salary
         if (formData.payStructure !== "unpaid") {
-          apiData.append("salary", JSON.stringify({
-            min: formData.salaryMin,
-            max: formData.salaryMax,
+          const salaryData = {
+            structure: formData.payStructure,
             currency: formData.salaryCurrency,
             period: formData.salaryPeriod
-          }));
+          };
+          
+          if (formData.payStructure === "fixed") {
+            salaryData.fixed = formData.salaryFixed;
+          } else if (formData.payStructure === "range") {
+            salaryData.min = formData.salaryMin;
+            salaryData.max = formData.salaryMax;
+          } else if (formData.payStructure === "fixed-variable") {
+            salaryData.fixed = formData.salaryFixed;
+            salaryData.variable = formData.salaryVariable;
+          }
+          
+          apiData.append("salary", JSON.stringify(salaryData));
         }
 
         // Benefits
@@ -273,12 +296,25 @@ Requirements
       } else if (contentType === "opportunity") {
         // Opportunity/Event specific fields
         apiData.append("eventType", formData.opportunityType);
+        apiData.append("opportunityType", formData.opportunityType); // Add this for new field
         apiData.append("locationType", formData.mode);
+        apiData.append("mode", formData.mode); // Add this for new field
+        apiData.append("participationType", formData.participationType || "individual");
+        
+        // Add default dates if not provided (required by backend)
+        const now = new Date();
+        const futureDate = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 days from now
+        apiData.append("startDate", now.toISOString());
+        apiData.append("endDate", futureDate.toISOString());
         
         // Team size
         if (formData.participationType === "team") {
           apiData.append("minTeamSize", formData.teamSizeMin);
           apiData.append("maxTeamSize", formData.teamSizeMax);
+        } else {
+          // For individual participation, set team size to 1
+          apiData.append("minTeamSize", 1);
+          apiData.append("maxTeamSize", 1);
         }
       }
 
@@ -296,6 +332,12 @@ Requirements
       }
 
       // Make API call
+      console.log('🚀 Making API call to:', contentType === "opportunity" ? 'createEvent' : 'createJob');
+      console.log('📦 FormData entries:');
+      for (let pair of apiData.entries()) {
+        console.log(`  ${pair[0]}:`, typeof pair[1] === 'object' ? pair[1].name || '[File]' : pair[1]);
+      }
+      
       let response;
       if (contentType === "job" || contentType === "internship") {
         response = await apiService.createJob(apiData);
@@ -303,7 +345,7 @@ Requirements
         response = await apiService.createEvent(apiData);
       }
 
-      console.log("Created successfully:", response);
+      console.log("✅ Created successfully:", response);
       
       // Show success message
       toast.success(isDraft ? "Saved as draft!" : "Published successfully!");
@@ -318,7 +360,22 @@ Requirements
       
     } catch (error) {
       console.error("Error creating listing:", error);
-      setErrors({ submit: error.message || "Failed to create listing" });
+      console.error("Error details:", {
+        message: error.message,
+        stack: error.stack,
+        response: error.response
+      });
+      
+      // Show user-friendly error message
+      let errorMessage = "Failed to create listing. ";
+      if (error.message === "Failed to fetch") {
+        errorMessage += "Please check if the server is running on http://localhost:4000";
+      } else {
+        errorMessage += error.message || "Please try again.";
+      }
+      
+      toast.error(errorMessage);
+      setErrors({ submit: errorMessage });
     } finally {
       setLoading(false);
     }
@@ -376,7 +433,7 @@ Requirements
                 </div>
               </div>
               {errors.logo && <span className="error-message">{errors.logo}</span>}
-              {!formData.logo && <span className="logo-required">Logo required</span>}
+              {!formData.logo && !formData.logoPreview && <span className="logo-required">Logo required</span>}
             </div>
 
             {/* Title */}
@@ -1052,7 +1109,12 @@ const RemainingFormSections = ({
 
           {formData.payStructure !== "unpaid" && (
             <div className="form-group">
-              <label>Enter {contentType === "internship" ? "stipend" : "salary"} range</label>
+              <label>
+                Enter {contentType === "internship" ? "stipend" : "salary"} 
+                {formData.payStructure === "fixed" ? " amount" : 
+                 formData.payStructure === "range" ? " range" : 
+                 " (fixed + variable)"}
+              </label>
               <div className="form-row">
                 <select
                   name="salaryPeriod"
@@ -1071,22 +1133,61 @@ const RemainingFormSections = ({
                   <option value="USD">USD ($)</option>
                 </select>
               </div>
-              <div className="form-row" style={{ marginTop: "1rem" }}>
-                <input
-                  type="number"
-                  name="salaryMin"
-                  value={formData.salaryMin}
-                  onChange={handleInputChange}
-                  placeholder="Min 0"
-                />
-                <input
-                  type="number"
-                  name="salaryMax"
-                  value={formData.salaryMax}
-                  onChange={handleInputChange}
-                  placeholder="Max 0"
-                />
-              </div>
+              
+              {/* Fixed: Single amount */}
+              {formData.payStructure === "fixed" && (
+                <div style={{ marginTop: "1rem" }}>
+                  <input
+                    type="number"
+                    name="salaryFixed"
+                    value={formData.salaryFixed || ''}
+                    onChange={handleInputChange}
+                    placeholder="Enter amount"
+                    style={{ width: '100%' }}
+                  />
+                </div>
+              )}
+              
+              {/* Range: Min and Max */}
+              {formData.payStructure === "range" && (
+                <div className="form-row" style={{ marginTop: "1rem" }}>
+                  <input
+                    type="number"
+                    name="salaryMin"
+                    value={formData.salaryMin}
+                    onChange={handleInputChange}
+                    placeholder="Min 0"
+                  />
+                  <input
+                    type="number"
+                    name="salaryMax"
+                    value={formData.salaryMax}
+                    onChange={handleInputChange}
+                    placeholder="Max 0"
+                  />
+                </div>
+              )}
+              
+              {/* Fixed + Variable */}
+              {formData.payStructure === "fixed-variable" && (
+                <div className="form-row" style={{ marginTop: "1rem" }}>
+                  <input
+                    type="number"
+                    name="salaryFixed"
+                    value={formData.salaryFixed || ''}
+                    onChange={handleInputChange}
+                    placeholder="Fixed amount"
+                  />
+                  <input
+                    type="number"
+                    name="salaryVariable"
+                    value={formData.salaryVariable || ''}
+                    onChange={handleInputChange}
+                    placeholder="Variable amount"
+                  />
+                </div>
+              )}
+              
               <div className="checkbox-group">
                 <input
                   type="checkbox"

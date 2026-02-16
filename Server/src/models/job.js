@@ -83,6 +83,66 @@ Job.init({
     defaultValue: null,
     comment: 'Recruitment stages/rounds - [{title, type: "assessment"|"interview"|"final", description, deadline, assessmentFile: {url, name}, assessmentLink, submissions: [{type, label, description, required}]}]'
   },
+  workingDays: {
+    type: DataTypes.JSON,
+    allowNull: true,
+    comment: 'Working days configuration - ["5 Days", "6 Days", etc]'
+  },
+  jobSchedule: {
+    type: DataTypes.JSON,
+    allowNull: true,
+    comment: 'Job schedule options - ["Day shift", "Night shift", etc]'
+  },
+  hideOpenings: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+    comment: 'Hide number of openings from candidates'
+  },
+  festivalCampaign: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    comment: 'Linked festival or campaign name'
+  },
+  applicationSettings: {
+    type: DataTypes.JSON,
+    allowNull: true,
+    comment: 'Application settings - {platform, timeline, maxLimit, status, formFields, screeningQuestions}'
+  },
+  importantDates: {
+    type: DataTypes.JSON,
+    allowNull: true,
+    comment: 'Important dates - [{title, date}]'
+  },
+  attachments: {
+    type: DataTypes.JSON,
+    allowNull: true,
+    comment: 'File attachments - [{name, url, size}]'
+  },
+  gallery: {
+    type: DataTypes.JSON,
+    allowNull: true,
+    comment: 'Image gallery - [{url, caption}]'
+  },
+  mobileBanner: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+    comment: 'Mobile banner image URL'
+  },
+  themeColor: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    comment: 'Theme color for the listing'
+  },
+  terms: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+    comment: 'Terms and conditions'
+  },
+  additionalNotes: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+    comment: 'Additional notes or information'
+  },
   createdBy: { type: DataTypes.UUID, allowNull: false },
   organizationId: { type: DataTypes.UUID, allowNull: true }
 }, {

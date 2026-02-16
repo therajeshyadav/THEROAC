@@ -168,6 +168,42 @@
   font-weight: 600;
 }
 
+/* Special styling for rejected button by class (for ManageEventsTab where order is different) */
+.manage-jobs-container .filter-buttons button.rejected-btn {
+  border-color: rgba(255, 68, 68, 0.3);
+}
+
+.manage-jobs-container .filter-buttons button.rejected-btn:hover {
+  background: rgba(255, 68, 68, 0.08);
+  border-color: rgba(255, 68, 68, 0.4);
+  color: #FF4444;
+}
+
+.manage-jobs-container .filter-buttons button.rejected-btn.active {
+  background: rgba(255, 68, 68, 0.15);
+  border-color: rgba(255, 68, 68, 0.5);
+  color: #FF4444;
+  font-weight: 600;
+}
+
+/* Override nth-child(6) for upcoming button - reset to default golden */
+.manage-jobs-container .filter-buttons button.upcoming-btn {
+  border-color: rgba(255, 214, 0, 0.2);
+}
+
+.manage-jobs-container .filter-buttons button.upcoming-btn:hover {
+  background: rgba(255, 214, 0, 0.08);
+  border-color: rgba(255, 214, 0, 0.3);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.manage-jobs-container .filter-buttons button.upcoming-btn.active {
+  background: rgba(255, 214, 0, 0.15);
+  border-color: rgba(255, 214, 0, 0.5);
+  color: #FFD600;
+  font-weight: 600;
+}
+
 .manage-jobs-container .loading-state {
   text-align: center;
   padding: 4rem 2rem;

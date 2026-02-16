@@ -35,8 +35,18 @@ const AdditionalInfoStep = ({ formData, setFormData, contentType }) => {
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const currentAttachments = formData.attachments || [];
-      handleChange('attachments', [...currentAttachments, { name: file.name, size: file.size, id: Date.now() }]);
+      // Convert file to base64
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const currentAttachments = formData.attachments || [];
+        handleChange('attachments', [...currentAttachments, { 
+          name: file.name, 
+          size: file.size, 
+          url: reader.result,
+          id: Date.now() 
+        }]);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -44,13 +54,42 @@ const AdditionalInfoStep = ({ formData, setFormData, contentType }) => {
     const files = Array.from(e.target.files);
     if (files.length > 0) {
       const currentGallery = formData.gallery || [];
-      const newImages = files.map(file => ({
-        name: file.name,
-        url: URL.createObjectURL(file),
-        id: Date.now() + Math.random()
-      }));
-      handleChange('gallery', [...currentGallery, ...newImages]);
+      
+      // Convert each file to base64
+      files.forEach(file => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const newImage = {
+            name: file.name,
+            url: reader.result, // base64 data
+            caption: '',
+            id: Date.now() + Math.random()
+          };
+          handleChange('gallery', [...(formData.gallery || []), newImage]);
+        };
+        reader.readAsDataURL(file);
+      });
     }
+  };
+
+  const removeAttachment = (id) => {
+    const updated = (formData.attachments || []).filter(att => att.id !== id);
+    handleChange('attachments', updated);
+  };
+
+  const removeGalleryImage = (id) => {
+    const updated = (formData.gallery || []).filter(img => img.id !== id);
+    handleChange('gallery', updated);
+  };
+
+  const removeImportantDate = (id) => {
+    const updated = (formData.importantDates || []).filter(date => date.id !== id);
+    handleChange('importantDates', updated);
+  };
+
+  const removeContact = (id) => {
+    const updated = (formData.contacts || []).filter(contact => contact.id !== id);
+    handleChange('contacts', updated);
   };
 
   return (
@@ -160,6 +199,50 @@ const AdditionalInfoStep = ({ formData, setFormData, contentType }) => {
               Registration deadline will be shown by default under important dates. Hence, you may not write it here explicitly.
             </p>
           </div>
+
+          {/* Display added important dates */}
+          {formData.importantDates && Array.isArray(formData.importantDates) && formData.importantDates.length > 0 && (
+            <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              {formData.importantDates.map(date => (
+                <div key={date.id} style={{
+                  padding: '0.75rem',
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  borderRadius: '8px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <Calendar size={16} style={{ color: '#FFD600' }} />
+                    <div>
+                      <div style={{ fontSize: '0.95rem', color: '#fff', fontWeight: '500' }}>{date.title}</div>
+                      <div style={{ fontSize: '0.85rem', color: 'rgba(255, 255, 255, 0.6)' }}>
+                        {new Date(date.date).toLocaleDateString('en-US', { 
+                          year: 'numeric', 
+                          month: 'short', 
+                          day: 'numeric' 
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeImportantDate(date.id)}
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      color: '#ff4444',
+                      cursor: 'pointer',
+                      padding: '0.25rem'
+                    }}
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Contact Info Section */}
@@ -243,6 +326,48 @@ const AdditionalInfoStep = ({ formData, setFormData, contentType }) => {
             <Plus size={20} /> Add Contact
           </button>
 
+          {/* Display added contacts */}
+          {formData.contacts && Array.isArray(formData.contacts) && formData.contacts.length > 0 && (
+            <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              {formData.contacts.map(contact => (
+                <div key={contact.id} style={{
+                  padding: '0.75rem',
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  borderRadius: '8px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <User size={16} style={{ color: '#FFD600' }} />
+                    <div>
+                      <div style={{ fontSize: '0.95rem', color: '#fff', fontWeight: '500' }}>{contact.name}</div>
+                      <div style={{ fontSize: '0.85rem', color: 'rgba(255, 255, 255, 0.6)' }}>
+                        {contact.email && <span>{contact.email}</span>}
+                        {contact.email && contact.mobile && <span> • </span>}
+                        {contact.mobile && <span>{contact.mobile}</span>}
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeContact(contact.id)}
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      color: '#ff4444',
+                      cursor: 'pointer',
+                      padding: '0.25rem'
+                    }}
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
           <div className="unified-checkbox-group" style={{ marginTop: '1rem' }}>
             <input
               type="checkbox"
@@ -305,6 +430,44 @@ const AdditionalInfoStep = ({ formData, setFormData, contentType }) => {
               <FileText size={20} /> Browse file
             </div>
           </label>
+
+          {/* Display uploaded attachments */}
+          {formData.attachments && Array.isArray(formData.attachments) && formData.attachments.length > 0 && (
+            <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              {formData.attachments.map(att => (
+                <div key={att.id} style={{
+                  padding: '0.75rem',
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  borderRadius: '8px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <FileText size={16} style={{ color: '#FFD600' }} />
+                    <span style={{ fontSize: '0.9rem', color: '#fff' }}>{att.name}</span>
+                    <span style={{ fontSize: '0.8rem', color: 'rgba(255, 255, 255, 0.5)' }}>
+                      ({(att.size / 1024).toFixed(1)} KB)
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeAttachment(att.id)}
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      color: '#ff4444',
+                      cursor: 'pointer',
+                      padding: '0.25rem'
+                    }}
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Upload Gallery Section */}
@@ -351,6 +514,53 @@ const AdditionalInfoStep = ({ formData, setFormData, contentType }) => {
               <Plus size={32} style={{ color: '#FFD600' }} />
             </div>
           </label>
+
+          {/* Display uploaded gallery images */}
+          {formData.gallery && Array.isArray(formData.gallery) && formData.gallery.length > 0 && (
+            <div style={{ 
+              marginTop: '1rem', 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))',
+              gap: '1rem'
+            }}>
+              {formData.gallery.map(img => (
+                <div key={img.id} style={{ position: 'relative' }}>
+                  <img 
+                    src={img.url} 
+                    alt={img.name}
+                    style={{
+                      width: '100%',
+                      height: '120px',
+                      objectFit: 'cover',
+                      borderRadius: '8px',
+                      border: '1px solid rgba(255, 255, 255, 0.1)'
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeGalleryImage(img.id)}
+                    style={{
+                      position: 'absolute',
+                      top: '4px',
+                      right: '4px',
+                      background: 'rgba(0, 0, 0, 0.7)',
+                      border: 'none',
+                      borderRadius: '50%',
+                      width: '24px',
+                      height: '24px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#ff4444',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Social Links */}

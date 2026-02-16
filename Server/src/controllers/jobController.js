@@ -9,6 +9,14 @@ exports.createJob = async (req, res, next) => {
     // Debug: Log stages data
     console.log('📊 Creating job with stages:', payload.stages);
     
+    // Map locationType values to enum
+    if (payload.locationType) {
+      let locationType = payload.locationType.toLowerCase();
+      if (locationType === 'in office' || locationType === 'in-office') locationType = 'onsite';
+      if (locationType === 'field job' || locationType === 'field-job') locationType = 'onsite';
+      payload.locationType = locationType;
+    }
+    
     payload.createdBy = req.user.id;
     payload.approvalStatus = 'pending'; // Set to pending for admin approval
     
@@ -60,12 +68,12 @@ exports.createJob = async (req, res, next) => {
     }
     
     // Validate and sanitize JSON fields
-    ['perks', 'skills', 'categories', 'eligibility', 'faqs', 'media', 'companySocials', 'contactPerson', 'stages'].forEach(field => {
+    ['perks', 'skills', 'categories', 'eligibility', 'faqs', 'media', 'companySocials', 'contactPerson', 'stages', 'workingDays', 'jobSchedule', 'applicationSettings', 'importantDates', 'attachments', 'gallery'].forEach(field => {
       if (payload[field] && typeof payload[field] === 'string') {
         try {
           payload[field] = JSON.parse(payload[field]);
         } catch (e) {
-          payload[field] = field === 'perks' || field === 'skills' || field === 'categories' || field === 'eligibility' || field === 'faqs' || field === 'media' || field === 'stages' ? [] : null;
+          payload[field] = ['perks', 'skills', 'categories', 'eligibility', 'faqs', 'media', 'stages', 'workingDays', 'jobSchedule', 'importantDates', 'attachments', 'gallery'].includes(field) ? [] : null;
         }
       }
     });
@@ -855,7 +863,13 @@ exports.updateJob = async (req, res, next) => {
     
     const payload = { ...req.body };
     
-
+    // Map locationType values to enum
+    if (payload.locationType) {
+      let locationType = payload.locationType.toLowerCase();
+      if (locationType === 'in office' || locationType === 'in-office') locationType = 'onsite';
+      if (locationType === 'field job' || locationType === 'field-job') locationType = 'onsite';
+      payload.locationType = locationType;
+    }
     
     // Validate and sanitize salary field
     if (payload.salary) {
@@ -878,12 +892,12 @@ exports.updateJob = async (req, res, next) => {
     }
     
     // Validate and sanitize JSON fields
-    ['perks', 'skills', 'categories', 'eligibility', 'faqs', 'media', 'companySocials', 'contactPerson', 'stages'].forEach(field => {
+    ['perks', 'skills', 'categories', 'eligibility', 'faqs', 'media', 'companySocials', 'contactPerson', 'stages', 'workingDays', 'jobSchedule', 'applicationSettings', 'importantDates', 'attachments', 'gallery'].forEach(field => {
       if (payload[field] && typeof payload[field] === 'string') {
         try {
           payload[field] = JSON.parse(payload[field]);
         } catch (e) {
-          payload[field] = field === 'perks' || field === 'skills' || field === 'categories' || field === 'eligibility' || field === 'faqs' || field === 'media' || field === 'stages' ? [] : null;
+          payload[field] = ['perks', 'skills', 'categories', 'eligibility', 'faqs', 'media', 'stages', 'workingDays', 'jobSchedule', 'importantDates', 'attachments', 'gallery'].includes(field) ? [] : null;
         }
       }
     });

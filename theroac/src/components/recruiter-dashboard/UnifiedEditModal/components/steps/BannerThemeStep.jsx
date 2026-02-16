@@ -3,8 +3,8 @@ import { Upload, X, Image } from 'lucide-react';
 import '../StepStyles.css';
 
 const BannerThemeStep = ({ formData, setFormData }) => {
-  const [bannerWebPreview, setBannerWebPreview] = useState(formData.bannerWeb || null);
-  const [bannerMobilePreview, setBannerMobilePreview] = useState(formData.bannerMobile || null);
+  const [bannerWebPreview, setBannerWebPreview] = useState(formData.bannerImage || null);
+  const [bannerMobilePreview, setBannerMobilePreview] = useState(formData.mobileBanner || null);
 
   const handleChange = (field, value) => {
     setFormData({ ...formData, [field]: value });
@@ -16,7 +16,7 @@ const BannerThemeStep = ({ formData, setFormData }) => {
       const reader = new FileReader();
       reader.onloadend = () => {
         setBannerWebPreview(reader.result);
-        handleChange('bannerWeb', reader.result);
+        handleChange('bannerImage', reader.result);
       };
       reader.readAsDataURL(file);
     }
@@ -28,7 +28,7 @@ const BannerThemeStep = ({ formData, setFormData }) => {
       const reader = new FileReader();
       reader.onloadend = () => {
         setBannerMobilePreview(reader.result);
-        handleChange('bannerMobile', reader.result);
+        handleChange('mobileBanner', reader.result);
       };
       reader.readAsDataURL(file);
     }
@@ -36,12 +36,12 @@ const BannerThemeStep = ({ formData, setFormData }) => {
 
   const removeBannerWeb = () => {
     setBannerWebPreview(null);
-    handleChange('bannerWeb', null);
+    handleChange('bannerImage', null);
   };
 
   const removeBannerMobile = () => {
     setBannerMobilePreview(null);
-    handleChange('bannerMobile', null);
+    handleChange('mobileBanner', null);
   };
 
   const themeColors = [

@@ -3,6 +3,11 @@ const { Op } = require('sequelize');
 
 exports.createEvent = async (req, res, next) => {
   try {
+    console.log('📥 CREATE EVENT REQUEST RECEIVED');
+    console.log('Request body:', req.body);
+    console.log('Request headers:', req.headers);
+    console.log('User:', req.user ? req.user.id : 'No user');
+    
     const { 
       title, 
       description, 
@@ -103,10 +108,12 @@ exports.createEvent = async (req, res, next) => {
     const payload = {
       title,
       slug,
+      companyName: companyName || req.body.companyName || null,
+      companyLogo: companyLogo || req.body.companyLogo || null,
       description: description || null,
       startDate: parsedStartDate,
       endDate: parsedEndDate,
-      locationType: locationType || 'online',
+      locationType: req.body.mode || locationType || 'online', // Use mode if available, fallback to locationType
       location: location || null,
       venue: venue || null,
       city: city || null,
@@ -119,26 +126,51 @@ exports.createEvent = async (req, res, next) => {
       registrationFee: registrationFee || null,
       registrationLink: registrationLink || null,
       tags: tags || [],
-      categories: categories || [],
+      categories: typeof categories === 'string' ? JSON.parse(categories) : (categories || []),
       requirements: requirements || null,
       whatToBring: whatToBring || [],
       bannerImage: bannerImage || null,
       thumbnailImage: thumbnailImage || null,
       media: media || [],
-      contactInfo: contactInfo || null,
-      socials: socials || null,
+      contactInfo: typeof contactInfo === 'string' ? JSON.parse(contactInfo) : (contactInfo || null),
+      socials: typeof socials === 'string' ? JSON.parse(socials) : (socials || null),
       agenda: agenda || [],
       stages: stages || [],
       speakers: speakers || [],
       sponsors: sponsors || [],
       prizes: prizes || [],
       faqs: faqs || [],
-      eligibility: eligibility || null,
+      eligibility: typeof eligibility === 'string' ? JSON.parse(eligibility) : (eligibility || null),
       featured: featured || false,
       status: status || 'upcoming',
       minTeamSize: minTeamSize ? parseInt(minTeamSize) : null,  
       maxTeamSize: maxTeamSize ? parseInt(maxTeamSize) : null,
       problemStatements: problemStatements || null,
+      
+      // Opportunity specific fields
+      opportunityType: req.body.opportunityType || null,
+      opportunitySubType: req.body.opportunitySubType || null,
+      participationType: req.body.participationType || 'individual',
+      mode: req.body.mode || locationType || 'online', // Sync mode with locationType
+      
+      // New unified edit modal fields
+      workingDays: req.body.workingDays || null,
+      hideOpenings: req.body.hideOpenings || false,
+      festivalCampaign: req.body.festivalCampaign || null,
+      registrationSettings: typeof req.body.registrationSettings === 'string' ? JSON.parse(req.body.registrationSettings) : (req.body.registrationSettings || null),
+      prizesList: req.body.prizesList || null,
+      prizeDescription: req.body.prizeDescription || null,
+      prizeDeliverDays: req.body.prizeDeliverDays || null,
+      participationCertificate: req.body.participationCertificate === 'true' || req.body.participationCertificate === true,
+      paymentSettings: typeof req.body.paymentSettings === 'string' ? JSON.parse(req.body.paymentSettings) : (req.body.paymentSettings || null),
+      importantDates: typeof req.body.importantDates === 'string' ? JSON.parse(req.body.importantDates) : (req.body.importantDates || null),
+      attachments: typeof req.body.attachments === 'string' ? JSON.parse(req.body.attachments) : (req.body.attachments || null),
+      gallery: typeof req.body.gallery === 'string' ? JSON.parse(req.body.gallery) : (req.body.gallery || null),
+      mobileBanner: req.body.mobileBanner || null,
+      themeColor: req.body.themeColor || null,
+      terms: req.body.terms || null,
+      additionalNotes: req.body.additionalNotes || null,
+      socialLinks: typeof req.body.socialLinks === 'string' ? JSON.parse(req.body.socialLinks) : (req.body.socialLinks || null),
       createdBy: req.user.id,
       organizationId,
       approvalStatus: 'pending'
@@ -201,6 +233,11 @@ exports.createEvent = async (req, res, next) => {
 exports.updateEvent = async (req, res, next) => {
   try {
     const eventId = req.params.id;
+    
+    console.log('📥 UPDATE EVENT REQUEST');
+    console.log('Event ID:', eventId);
+    console.log('Body keys:', Object.keys(req.body));
+    console.log('Stages/Rounds:', req.body.stages);
     
     const { 
       title, 
@@ -279,10 +316,21 @@ exports.updateEvent = async (req, res, next) => {
       }
     }
     
+    if (req.body.companyName !== undefined) updatePayload.companyName = req.body.companyName;
+    if (req.body.companyLogo !== undefined) updatePayload.companyLogo = req.body.companyLogo;
     if (description !== undefined) updatePayload.description = description;
     if (startDate !== undefined) updatePayload.startDate = new Date(startDate);
     if (endDate !== undefined) updatePayload.endDate = new Date(endDate);
-    if (locationType !== undefined) updatePayload.locationType = locationType;
+    
+    // Sync locationType and mode fields
+    if (req.body.mode !== undefined) {
+      updatePayload.mode = req.body.mode;
+      updatePayload.locationType = req.body.mode; // Keep them in sync
+    } else if (locationType !== undefined) {
+      updatePayload.locationType = locationType;
+      updatePayload.mode = locationType; // Keep them in sync
+    }
+    
     if (location !== undefined) updatePayload.location = location;
     if (venue !== undefined) updatePayload.venue = venue;
     if (city !== undefined) updatePayload.city = city;
@@ -294,27 +342,52 @@ exports.updateEvent = async (req, res, next) => {
     if (maxParticipants !== undefined) updatePayload.maxParticipants = maxParticipants ? parseInt(maxParticipants) : null;
     if (registrationFee !== undefined) updatePayload.registrationFee = registrationFee;
     if (registrationLink !== undefined) updatePayload.registrationLink = registrationLink;
-    if (tags !== undefined) updatePayload.tags = tags;
-    if (categories !== undefined) updatePayload.categories = categories;
+    if (tags !== undefined) updatePayload.tags = typeof tags === 'string' ? JSON.parse(tags) : tags;
+    if (categories !== undefined) updatePayload.categories = typeof categories === 'string' ? JSON.parse(categories) : categories;
     if (requirements !== undefined) updatePayload.requirements = requirements;
-    if (whatToBring !== undefined) updatePayload.whatToBring = whatToBring;
+    if (whatToBring !== undefined) updatePayload.whatToBring = typeof whatToBring === 'string' ? JSON.parse(whatToBring) : whatToBring;
     if (bannerImage !== undefined) updatePayload.bannerImage = bannerImage;
     if (thumbnailImage !== undefined) updatePayload.thumbnailImage = thumbnailImage;
-    if (media !== undefined) updatePayload.media = media;
-    if (contactInfo !== undefined) updatePayload.contactInfo = contactInfo;
-    if (socials !== undefined) updatePayload.socials = socials;
-    if (agenda !== undefined) updatePayload.agenda = agenda;
-    if (stages !== undefined) updatePayload.stages = stages; // New: submission stages
-    if (speakers !== undefined) updatePayload.speakers = speakers;
-    if (sponsors !== undefined) updatePayload.sponsors = sponsors;
-    if (prizes !== undefined) updatePayload.prizes = prizes;
-    if (faqs !== undefined) updatePayload.faqs = faqs;
-    if (eligibility !== undefined) updatePayload.eligibility = eligibility;
+    if (media !== undefined) updatePayload.media = typeof media === 'string' ? JSON.parse(media) : media;
+    if (contactInfo !== undefined) updatePayload.contactInfo = typeof contactInfo === 'string' ? JSON.parse(contactInfo) : contactInfo;
+    if (socials !== undefined) updatePayload.socials = typeof socials === 'string' ? JSON.parse(socials) : socials;
+    if (agenda !== undefined) updatePayload.agenda = typeof agenda === 'string' ? JSON.parse(agenda) : agenda;
+    if (stages !== undefined) updatePayload.stages = typeof stages === 'string' ? JSON.parse(stages) : stages; // New: submission stages
+    if (speakers !== undefined) updatePayload.speakers = typeof speakers === 'string' ? JSON.parse(speakers) : speakers;
+    if (sponsors !== undefined) updatePayload.sponsors = typeof sponsors === 'string' ? JSON.parse(sponsors) : sponsors;
+    if (prizes !== undefined) updatePayload.prizes = typeof prizes === 'string' ? JSON.parse(prizes) : prizes;
+    if (faqs !== undefined) updatePayload.faqs = typeof faqs === 'string' ? JSON.parse(faqs) : faqs;
+    if (eligibility !== undefined) updatePayload.eligibility = typeof eligibility === 'string' ? JSON.parse(eligibility) : eligibility;
     if (featured !== undefined) updatePayload.featured = featured;
     if (status !== undefined) updatePayload.status = status;
     if (minTeamSize !== undefined) updatePayload.minTeamSize = minTeamSize ? parseInt(minTeamSize) : null; // Add team size fields
     if (maxTeamSize !== undefined) updatePayload.maxTeamSize = maxTeamSize ? parseInt(maxTeamSize) : null;
     if (problemStatements !== undefined) updatePayload.problemStatements = problemStatements; // Add problem statements field
+    
+    // Opportunity specific fields
+    if (req.body.opportunityType !== undefined) updatePayload.opportunityType = req.body.opportunityType;
+    if (req.body.opportunitySubType !== undefined) updatePayload.opportunitySubType = req.body.opportunitySubType;
+    if (req.body.participationType !== undefined) updatePayload.participationType = req.body.participationType;
+    if (req.body.mode !== undefined) updatePayload.mode = req.body.mode;
+    
+    // New unified edit modal fields
+    if (req.body.workingDays !== undefined) updatePayload.workingDays = req.body.workingDays;
+    if (req.body.hideOpenings !== undefined) updatePayload.hideOpenings = req.body.hideOpenings;
+    if (req.body.festivalCampaign !== undefined) updatePayload.festivalCampaign = req.body.festivalCampaign;
+    if (req.body.registrationSettings !== undefined) updatePayload.registrationSettings = typeof req.body.registrationSettings === 'string' ? JSON.parse(req.body.registrationSettings) : req.body.registrationSettings;
+    if (req.body.prizesList !== undefined) updatePayload.prizesList = req.body.prizesList;
+    if (req.body.prizeDescription !== undefined) updatePayload.prizeDescription = req.body.prizeDescription;
+    if (req.body.prizeDeliverDays !== undefined) updatePayload.prizeDeliverDays = req.body.prizeDeliverDays;
+    if (req.body.participationCertificate !== undefined) updatePayload.participationCertificate = req.body.participationCertificate === 'true' || req.body.participationCertificate === true;
+    if (req.body.paymentSettings !== undefined) updatePayload.paymentSettings = typeof req.body.paymentSettings === 'string' ? JSON.parse(req.body.paymentSettings) : req.body.paymentSettings;
+    if (req.body.importantDates !== undefined) updatePayload.importantDates = typeof req.body.importantDates === 'string' ? JSON.parse(req.body.importantDates) : req.body.importantDates;
+    if (req.body.attachments !== undefined) updatePayload.attachments = typeof req.body.attachments === 'string' ? JSON.parse(req.body.attachments) : req.body.attachments;
+    if (req.body.gallery !== undefined) updatePayload.gallery = typeof req.body.gallery === 'string' ? JSON.parse(req.body.gallery) : req.body.gallery;
+    if (req.body.mobileBanner !== undefined) updatePayload.mobileBanner = req.body.mobileBanner;
+    if (req.body.themeColor !== undefined) updatePayload.themeColor = req.body.themeColor;
+    if (req.body.terms !== undefined) updatePayload.terms = req.body.terms;
+    if (req.body.additionalNotes !== undefined) updatePayload.additionalNotes = req.body.additionalNotes;
+    if (req.body.socialLinks !== undefined) updatePayload.socialLinks = typeof req.body.socialLinks === 'string' ? JSON.parse(req.body.socialLinks) : req.body.socialLinks;
 
     // Update the event
     await event.update(updatePayload);

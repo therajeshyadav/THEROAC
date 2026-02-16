@@ -29,12 +29,14 @@
 .unified-form-group {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
 }
 
 .unified-form-group.unified-full-width,
 .unified-full-width {
   grid-column: 1 / -1;
+  margin-bottom: 1.5rem;
 }
 
 .unified-form-label {
@@ -595,4 +597,346 @@
 
 .unified-reset-btn:active {
   transform: rotate(180deg) scale(0.9);
+}
+
+
+/* Logo Upload Styles */
+.logo-upload-area {
+  margin-top: 8px;
+}
+
+.logo-preview-container {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.logo-preview-image {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 2px solid #333;
+}
+
+.change-logo-btn {
+  padding: 8px 16px;
+  background: #FFD600;
+  color: #000;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.change-logo-btn:hover {
+  background: #FFC700;
+}
+
+.logo-upload-placeholder {
+  width: 120px;
+  height: 80px;
+  border: 2px dashed #444;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.logo-upload-placeholder:hover {
+  border-color: #FFD600;
+  background: rgba(255, 214, 0, 0.05);
+}
+
+.logo-upload-placeholder span {
+  font-size: 13px;
+  color: #888;
+}
+
+/* Select with Tooltip */
+.select-with-tooltip {
+  position: relative;
+}
+
+.field-disabled-tooltip {
+  position: absolute;
+  top: -35px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #2d2d2d;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.field-disabled-tooltip::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid #2d2d2d;
+}
+
+/* Category Selection */
+.selected-categories-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.category-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(255, 214, 0, 0.1);
+  border: 1px solid #FFD600;
+  border-radius: 20px;
+  font-size: 13px;
+  color: #FFD600;
+}
+
+.category-remove-btn {
+  background: none;
+  border: none;
+  color: #FFD600;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s;
+}
+
+.category-remove-btn:hover {
+  color: #FFC700;
+}
+
+.category-select-wrapper {
+  position: relative;
+}
+
+.category-select-trigger {
+  cursor: pointer;
+  user-select: none;
+}
+
+.category-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 300px;
+  overflow-y: auto;
+  background: #2d2d2d;
+  border: 1px solid #444;
+  border-radius: 8px;
+  margin-top: 4px;
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.category-option {
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #333;
+}
+
+.category-option:last-child {
+  border-bottom: none;
+}
+
+.category-option:hover {
+  background: rgba(255, 214, 0, 0.1);
+}
+
+.category-option.selected {
+  background: rgba(255, 214, 0, 0.15);
+  color: #FFD600;
+}
+
+.category-checkmark {
+  color: #FFD600;
+  font-weight: bold;
+}
+
+/* Label with Action */
+.label-with-action {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.generate-ai-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.generate-ai-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+/* Rich Text Area */
+.rich-text-area {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.6;
+}
+
+/* Button Group */
+.button-group {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.option-btn {
+  flex: 1;
+  padding: 12px 20px;
+  background: #2d2d2d;
+  border: 2px solid #444;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.option-btn:hover {
+  border-color: #FFD600;
+  background: rgba(255, 214, 0, 0.05);
+}
+
+.option-btn.active {
+  border-color: #FFD600;
+  background: rgba(255, 214, 0, 0.1);
+  color: #FFD600;
+}
+
+/* Team Size Inputs */
+.team-size-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.team-size-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.team-size-input-group label {
+  font-size: 13px;
+  color: #888;
+  font-weight: 500;
+}
+
+/* Scrollbar for Category Dropdown */
+.category-dropdown::-webkit-scrollbar {
+  width: 8px;
+}
+
+.category-dropdown::-webkit-scrollbar-track {
+  background: #1a1a1a;
+  border-radius: 4px;
+}
+
+.category-dropdown::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 4px;
+}
+
+.category-dropdown::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+
+/* Disabled Field Styling */
+.disabled-field {
+  background: #1a1a1a !important;
+  cursor: not-allowed !important;
+  opacity: 0.6;
+}
+
+.disabled-field:hover {
+  border-color: #444 !important;
+}
+
+
+/* Section Spacing */
+.unified-form-section {
+  margin-bottom: 2.5rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.unified-form-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.unified-section-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #FFD600;
+  margin-bottom: 1.5rem;
+  margin-top: 0;
+}
+
+/* Input Spacing */
+.unified-form-input,
+.unified-form-textarea {
+  margin-top: 0.25rem;
+}
+
+.unified-form-hint {
+  margin-top: 0.25rem;
+}
+
+/* Button Group Spacing */
+.button-group {
+  margin-top: 0.5rem;
+}
+
+/* Team Size Inputs Spacing */
+.team-size-inputs {
+  margin-top: 0.75rem;
 }

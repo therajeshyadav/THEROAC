@@ -228,9 +228,9 @@
 }
 
 .pill-button.active {
-  background: rgba(59, 130, 246, 0.2);
-  border-color: #3B82F6;
-  color: #3B82F6;
+  background: rgba(255, 214, 0, 0.2);
+  border-color: #FFD600;
+  color: #FFD600;
 }
 
 /* Benefits Pills */
@@ -294,8 +294,8 @@
 
 /* Default Info Box */
 .default-info-box {
-  background: rgba(59, 130, 246, 0.1);
-  border: 1px solid rgba(59, 130, 246, 0.3);
+  background: rgba(255, 214, 0, 0.1);
+  border: 1px solid rgba(255, 214, 0, 0.3);
   border-radius: 12px;
   padding: 1rem 1.25rem;
   display: flex;
@@ -309,7 +309,7 @@
 }
 
 .default-info-text h4 {
-  color: #3B82F6;
+  color: #FFD600;
   font-size: 0.95rem;
   font-weight: 600;
   margin: 0 0 0.25rem 0;
@@ -323,10 +323,10 @@
 
 .change-button {
   padding: 0.5rem 1rem;
-  background: rgba(59, 130, 246, 0.2);
-  border: 1px solid #3B82F6;
+  background: rgba(255, 214, 0, 0.2);
+  border: 1px solid #FFD600;
   border-radius: 20px;
-  color: #3B82F6;
+  color: #FFD600;
   font-size: 0.85rem;
   font-weight: 500;
   cursor: pointer;
@@ -547,9 +547,9 @@
 }
 
 .criteria-option-btn.active {
-  background: rgba(59, 130, 246, 0.2);
-  border-color: #3B82F6;
-  color: #3B82F6;
+  background: rgba(255, 214, 0, 0.2);
+  border-color: #FFD600;
+  color: #FFD600;
 }
 
 /* Criteria Input Section */

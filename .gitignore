@@ -76,3 +76,7 @@ Server/.env
 .vscode/
 dist/
 .DS_Store
+
+# Documentation files
+*.md
+!README.md

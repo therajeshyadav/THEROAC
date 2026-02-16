@@ -2132,7 +2132,16 @@ const ModernDetailsPage = () => {
                       <div className="info-item">
                         <strong>Event Type:</strong>
                         <span>
-                          {data.categories && data.categories[0]
+                          {/* Display opportunityType with proper label, fallback to categories */}
+                          {data.opportunityType ? (
+                            data.opportunityType === 'competition' ? 'General & Case Competitions' :
+                            data.opportunityType === 'quiz' ? 'Quizzes' :
+                            data.opportunityType === 'hackathon' ? 'Hackathons & Coding Challenges' :
+                            data.opportunityType === 'webinar' ? 'Webinars, Conferences & Workshops' :
+                            data.opportunityType === 'cultural' ? 'Creative & Cultural Events' :
+                            data.opportunityType === 'scholarship' ? 'Scholarships' :
+                            data.opportunityType
+                          ) : data.categories && data.categories[0]
                             ? data.categories[0]
                             : "Workshop"}
                         </span>

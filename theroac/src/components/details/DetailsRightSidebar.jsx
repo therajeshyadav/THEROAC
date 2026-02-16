@@ -174,22 +174,24 @@ const DetailsRightSidebar = ({
                 <div className="stat-content">
                   <span className="stat-label">Team Size</span>
                   <span className="stat-number">
-                    {/* Check if it's a team-based event */}
-                    {data.categories && Array.isArray(data.categories) && 
-                     data.categories.some(cat => ['hackathon', 'competition', 'contest', 'challenge'].includes(cat.toLowerCase())) ? (
-                      /* Team-based event - show team size requirements */
-                      data.minTeamSize && data.maxTeamSize ? (
-                        data.minTeamSize === data.maxTeamSize 
-                          ? `${data.maxTeamSize} members`
-                          : `${data.minTeamSize}-${data.maxTeamSize} members`
-                      ) : data.maxTeamSize ? (
-                        data.maxTeamSize === 1 ? 'Individual' : `Up to ${data.maxTeamSize} members`
-                      ) : (
-                        'Up to 4 members'
-                      )
-                    ) : (
-                      /* Non-team event */
+                    {/* Check participationType first, then team size fields */}
+                    {data.participationType === 'individual' || 
+                     (data.minTeamSize === 1 && data.maxTeamSize === 1) ? (
                       'Individual'
+                    ) : data.participationType === 'team' || 
+                       (data.minTeamSize && data.maxTeamSize) ? (
+                      /* Team-based event - show team size requirements */
+                      data.minTeamSize === data.maxTeamSize 
+                        ? `${data.maxTeamSize} members`
+                        : `${data.minTeamSize}-${data.maxTeamSize} members`
+                    ) : data.maxTeamSize ? (
+                      data.maxTeamSize === 1 ? 'Individual' : `Up to ${data.maxTeamSize} members`
+                    ) : (
+                      /* Fallback: check categories for team-based events */
+                      data.categories && Array.isArray(data.categories) && 
+                      data.categories.some(cat => ['hackathon', 'competition', 'contest', 'challenge'].includes(cat.toLowerCase())) 
+                        ? 'Up to 4 members' 
+                        : 'Individual'
                     )}
                   </span>
                 </div>
@@ -321,9 +323,39 @@ const DetailsRightSidebar = ({
               </span>
             ))
           ) : data.eligibility && typeof data.eligibility === 'object' && !Array.isArray(data.eligibility) ? (
-            // Object format with education, location, additional
+            // Object format - check for new format (whoCanApply) or old format (education)
             <>
-              {/* Education Level */}
+              {/* New format: whoCanApply, collegeRestriction, genderRestriction */}
+              {data.eligibility.whoCanApply && (
+                <div className="eligibility-section">
+                  <strong>Who Can Apply:</strong>
+                  <span className="eligibility-value">
+                    {data.eligibility.whoCanApply === 'Everyone can apply' ? 'Open to all' : data.eligibility.whoCanApply}
+                  </span>
+                </div>
+              )}
+              
+              {data.eligibility.collegeRestriction && data.eligibility.collegeRestriction !== 'Everyone can apply' && (
+                <div className="eligibility-section">
+                  <strong>College/Organization:</strong>
+                  <span className="eligibility-value">
+                    {data.eligibility.collegeRestriction}
+                    {data.eligibility.collegeRestrictionDetail && ` - ${data.eligibility.collegeRestrictionDetail}`}
+                  </span>
+                </div>
+              )}
+              
+              {data.eligibility.genderRestriction && data.eligibility.genderRestriction !== 'Everyone can apply' && (
+                <div className="eligibility-section">
+                  <strong>Gender:</strong>
+                  <span className="eligibility-value">
+                    {data.eligibility.genderRestriction}
+                    {data.eligibility.genderRestrictionDetail && ` - ${data.eligibility.genderRestrictionDetail}`}
+                  </span>
+                </div>
+              )}
+              
+              {/* Old format: education, location, additional */}
               {data.eligibility.education && Array.isArray(data.eligibility.education) && data.eligibility.education.length > 0 && (
                 <div className="eligibility-section">
                   <strong>Education:</strong>
@@ -359,8 +391,11 @@ const DetailsRightSidebar = ({
                 </div>
               )}
               
-              {/* If no eligibility criteria set */}
-              {(!data.eligibility.education || data.eligibility.education.length === 0) && 
+              {/* If no eligibility criteria set in either format */}
+              {(!data.eligibility.whoCanApply || data.eligibility.whoCanApply === 'Everyone can apply') &&
+               (!data.eligibility.collegeRestriction || data.eligibility.collegeRestriction === 'Everyone can apply') &&
+               (!data.eligibility.genderRestriction || data.eligibility.genderRestriction === 'Everyone can apply') &&
+               (!data.eligibility.education || data.eligibility.education.length === 0) && 
                !data.eligibility.location && 
                !data.eligibility.additional && (
                 <span className="eligibility-item">Open to all</span>

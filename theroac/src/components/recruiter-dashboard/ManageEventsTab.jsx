@@ -192,13 +192,13 @@ const ManageEventsTab = ({ authUser, setEventsTabLoading, pendingModalType, onMo
             Pending ({events.filter(e => e.approvalStatus === 'pending').length})
           </button>
           <button
-            className={filterStatus === 'rejected' ? 'active' : ''}
+            className={`${filterStatus === 'rejected' ? 'active' : ''} rejected-btn`}
             onClick={() => setFilterStatus('rejected')}
           >
             Rejected ({events.filter(e => e.approvalStatus === 'rejected').length})
           </button>
           <button
-            className={filterStatus === 'upcoming' ? 'active' : ''}
+            className={`${filterStatus === 'upcoming' ? 'active' : ''} upcoming-btn`}
             onClick={() => setFilterStatus('upcoming')}
           >
             Upcoming ({events.filter(e => e.status === 'upcoming').length})
@@ -241,7 +241,9 @@ const ManageEventsTab = ({ authUser, setEventsTabLoading, pendingModalType, onMo
                   <td>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                       <MapPin size={14} style={{ color: '#FFD600' }} />
-                      {event.location || 'Online'}
+                      {event.mode === 'offline' 
+                        ? (event.location || event.city || 'Offline') 
+                        : 'Online'}
                     </div>
                   </td>
                   <td>

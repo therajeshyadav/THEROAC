@@ -5,7 +5,7 @@ const teamController = require('../controllers/teamController');
 const { authenticate } = require('../middleware/auth');
 const { requireRole } = require('../middleware/roles');
 const { attachOrganizationContext } = require('../middleware/organizationMiddleware');
-const { uploadSingle, uploadToGCSMiddleware, handleUploadError } = require('../middleware/uploadMiddleware');
+const { uploadSingle, uploadToGCSMiddleware, handleUploadError, uploadNone } = require('../middleware/uploadMiddleware');
 const { validateTeamEligibility } = require('../middleware/teamValidation');
 
 // Public routes (no authentication required)
@@ -22,8 +22,8 @@ router.post('/:eventId/teams/:teamId/evaluate', authenticate, attachOrganization
 router.get('/:id', eventController.getEvent);
 router.get('/:id/registration-status', authenticate, attachOrganizationContext, eventController.checkEventRegistrationStatus);
 
-router.post('/', authenticate, attachOrganizationContext, requireRole(['recruiter', 'organizer', 'admin', 'superadmin']), eventController.createEvent);
-router.put('/:id', authenticate, attachOrganizationContext, requireRole(['recruiter', 'organizer', 'admin', 'superadmin']), eventController.updateEvent);
+router.post('/', authenticate, attachOrganizationContext, requireRole(['recruiter', 'organizer', 'admin', 'superadmin']), uploadNone(), eventController.createEvent);
+router.put('/:id', authenticate, attachOrganizationContext, requireRole(['recruiter', 'organizer', 'admin', 'superadmin']), uploadNone(), eventController.updateEvent);
 
 // Updated upload routes to use GCS
 router.post('/upload-image', 

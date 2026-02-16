@@ -4,7 +4,7 @@ const jobController = require('../controllers/jobController');
 const { authenticate } = require('../middleware/auth');
 const { requireRole } = require('../middleware/roles');
 const { attachOrganizationContext } = require('../middleware/organizationMiddleware');
-const { uploadSingle, uploadToGCSMiddleware, handleUploadError } = require('../middleware/uploadMiddleware');
+const { uploadSingle, uploadToGCSMiddleware, handleUploadError, uploadNone } = require('../middleware/uploadMiddleware');
 
 // Public routes (no authentication required)
 router.get('/', jobController.listJobs);
@@ -20,7 +20,7 @@ router.get('/:jobId/applications', authenticate, attachOrganizationContext, requ
 router.get('/applications/recruiter', authenticate, attachOrganizationContext, requireRole(['recruiter','organizer','admin']), jobController.getRecruiterApplications);
 router.get('/:jobId/application-status', authenticate, attachOrganizationContext, jobController.checkJobApplicationStatus);
 
-router.post('/', authenticate, attachOrganizationContext, requireRole(['recruiter','organizer','admin']), jobController.createJob);
+router.post('/', authenticate, attachOrganizationContext, requireRole(['recruiter','organizer','admin']), uploadNone(), jobController.createJob);
 router.post('/upload-image', 
   authenticate, 
   attachOrganizationContext, 
@@ -53,7 +53,7 @@ router.post('/upload-banner-image',
 );
 router.post('/:jobId/apply', authenticate, attachOrganizationContext, jobController.applyToJob);
 
-router.put('/:id', authenticate, attachOrganizationContext, requireRole(['recruiter','organizer','admin']), jobController.updateJob);
+router.put('/:id', authenticate, attachOrganizationContext, requireRole(['recruiter','organizer','admin']), uploadNone(), jobController.updateJob);
 router.put('/applications/:applicationId/status', authenticate, attachOrganizationContext, requireRole(['recruiter','organizer','admin']), jobController.updateApplicationStatus);
 router.put('/applications/:applicationId/notes', authenticate, attachOrganizationContext, requireRole(['recruiter','organizer','admin']), jobController.updateApplicationNotes);
 router.put('/applications/:applicationId/move-stage', authenticate, attachOrganizationContext, requireRole(['recruiter','organizer','admin']), jobController.moveToNextStage);
